@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api.js';
 import { Toast } from '../components/Common.jsx';
@@ -11,18 +11,118 @@ const STATUS_STYLE = {
   '반려':   { color: '#A32D2D', bg: '#FCEBEB' },
 };
 
+function HousingCard({ r, onStatusChange, onDelete, onResetPassword, toast }) {
+  const st = STATUS_STYLE[r.status];
+  const dateStr = r.created_at?.split?.('T')[0] || '';
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showStatus, setShowStatus] = useState(false);
+  const [note, setNote] = useState('');
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('touchstart', handleClick);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('touchstart', handleClick);
+    };
+  }, []);
+
+  return (
+    <div style={{
+      background: 'var(--bg)', border: '0.5px solid var(--border)',
+      borderLeft: `4px solid ${st.color}`, borderRadius: 12, padding: '14px 16px',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+        <div style={{ flex: 1 }}>
+          <span style={{ fontWeight: 700, fontSize: 15 }}>{r.emp_name}</span>
+          <span style={{ fontSize: 12, color: 'var(--text2)', marginLeft: 6 }}>· {r.emp_no}</span>
+          <span style={{
+            marginLeft: 8, fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+            background: st.bg, color: st.color,
+          }}>{r.status}</span>
+        </div>
+        {/* 햄버거 메뉴 */}
+        <div ref={menuRef} style={{ position: 'relative', flexShrink: 0 }}>
+          <button onClick={() => setMenuOpen(o => !o)} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            padding: '4px 6px', color: 'var(--text2)', fontSize: 18,
+          }}>⋮</button>
+          {menuOpen && (
+            <div style={{
+              position: 'absolute', right: 0, top: '100%', zIndex: 50,
+              background: 'var(--bg)', border: '0.5px solid var(--border)',
+              borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+              overflow: 'hidden', minWidth: 130,
+            }}>
+              {[
+                { label: '✏️ 상태 변경', action: () => { setShowStatus(s => !s); setMenuOpen(false); } },
+                { label: '🔑 비번 초기화', action: () => { onResetPassword(r.id); setMenuOpen(false); }, color: '#854F0B' },
+                { label: '🗑️ 삭제', action: () => { onDelete(r.id); setMenuOpen(false); }, color: '#A32D2D' },
+              ].map((item, i) => (
+                <button key={i} onClick={item.action} style={{
+                  display: 'block', width: '100%', padding: '12px 16px',
+                  border: 'none', background: 'none', textAlign: 'left',
+                  fontSize: 13, cursor: 'pointer', color: item.color || 'var(--text)',
+                  fontFamily: 'inherit', borderBottom: i < 2 ? '0.5px solid var(--border)' : 'none',
+                }}>{item.label}</button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 8, lineHeight: 1.7 }}>
+        <div>🏢 {r.org_name || '-'} ({r.headquarters})</div>
+        <div>🏠 {r.home_address}</div>
+        {r.distance_km && (
+          <div style={{ color: parseFloat(r.distance_km) > 50 ? '#3B6D11' : '#A32D2D', fontWeight: 600 }}>
+            📏 {r.distance_km} km {parseFloat(r.distance_km) > 50 ? '(신청 가능)' : '(50km 이내)'}
+          </div>
+        )}
+        <div>📅 {dateStr}</div>
+        {r.note && <div>💬 {r.note}</div>}
+      </div>
+
+      {/* 상태 변경 패널 */}
+      {showStatus && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8, padding: 10, background: 'var(--bg2)', borderRadius: 8 }}>
+          <textarea placeholder="메모 (선택)" value={note} onChange={e => setNote(e.target.value)}
+            style={{ height: 60, fontSize: 13 }} />
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {STATUSES.filter(s => s !== r.status).map(s => {
+              const sst = STATUS_STYLE[s];
+              return (
+                <button key={s} onClick={() => { onStatusChange(r.id, s, note); setShowStatus(false); setNote(''); }} style={{
+                  padding: '6px 12px', borderRadius: 20, border: 'none',
+                  background: sst.bg, color: sst.color,
+                  fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                }}>{s}</button>
+              );
+            })}
+            <button onClick={() => setShowStatus(false)} style={{
+              padding: '6px 12px', borderRadius: 20,
+              border: '0.5px solid var(--border)', background: 'var(--bg)',
+              color: 'var(--text2)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit',
+            }}>취소</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function HousingMgmt() {
   const nav = useNavigate();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState('');
   const [filterStatus, setFilterStatus] = useState('전체');
-  const [selected, setSelected] = useState(null);
-  const [note, setNote] = useState('');
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   async function load() {
     const data = await api.getHousingRequests();
@@ -30,11 +130,9 @@ export default function HousingMgmt() {
     setLoading(false);
   }
 
-  async function handleStatus(id, status) {
+  async function handleStatus(id, status, note) {
     await api.updateHousingStatus(id, status, note);
     setToast(`"${status}"로 변경되었습니다.`);
-    setSelected(null);
-    setNote('');
     load();
   }
 
@@ -42,6 +140,11 @@ export default function HousingMgmt() {
     await api.deleteHousingRequest(id);
     setToast('삭제되었습니다.');
     load();
+  }
+
+  async function handleResetPassword(id) {
+    await api.resetHousingPassword(id);
+    setToast('비밀번호가 1111로 초기화되었습니다.');
   }
 
   const filtered = filterStatus === '전체' ? requests : requests.filter(r => r.status === filterStatus);
@@ -91,80 +194,13 @@ export default function HousingMgmt() {
       <div className="page-content" style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {loading && <div className="center-msg">불러오는 중...</div>}
         {!loading && filtered.length === 0 && <div className="center-msg">신청 내역이 없습니다.</div>}
-        {filtered.map(r => {
-          const st = STATUS_STYLE[r.status];
-          const dateStr = r.created_at?.split?.('T')[0] || '';
-          return (
-            <div key={r.id} style={{
-              background: 'var(--bg)', border: '0.5px solid var(--border)',
-              borderLeft: `4px solid ${st.color}`, borderRadius: 12, padding: '14px 16px',
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                <div>
-                  <span style={{ fontWeight: 700, fontSize: 15 }}>{r.emp_name}</span>
-                  <span style={{ fontSize: 12, color: 'var(--text2)', marginLeft: 6 }}>· {r.emp_no}</span>
-                </div>
-                <span style={{
-                  fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
-                  background: st.bg, color: st.color,
-                }}>{r.status}</span>
-              </div>
-
-              <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 6, lineHeight: 1.6 }}>
-                <div>🏢 {r.org_name || '-'} ({r.headquarters})</div>
-                <div>🏠 {r.home_address}</div>
-                {r.distance_km && (
-                  <div style={{ color: parseFloat(r.distance_km) <= 50 ? '#3B6D11' : '#A32D2D', fontWeight: 600 }}>
-                    📏 {r.distance_km} km {parseFloat(r.distance_km) <= 50 ? '(신청 가능)' : '(50km 초과)'}
-                  </div>
-                )}
-                <div style={{ color: 'var(--text2)' }}>📅 {dateStr}</div>
-              </div>
-
-              {r.note && <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 8 }}>💬 {r.note}</div>}
-
-              {/* 상태 변경 */}
-              {selected === r.id ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <textarea placeholder="메모 (선택)" value={note} onChange={e => setNote(e.target.value)}
-                    style={{ height: 60, fontSize: 13 }} />
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {STATUSES.filter(s => s !== r.status).map(s => {
-                      const sst = STATUS_STYLE[s];
-                      return (
-                        <button key={s} onClick={() => handleStatus(r.id, s)} style={{
-                          padding: '6px 12px', borderRadius: 20, border: 'none',
-                          background: sst.bg, color: sst.color,
-                          fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-                        }}>{s}</button>
-                      );
-                    })}
-                    <button onClick={() => setSelected(null)} style={{
-                      padding: '6px 12px', borderRadius: 20, border: '0.5px solid var(--border)',
-                      background: 'var(--bg2)', color: 'var(--text2)',
-                      fontSize: 12, cursor: 'pointer', fontFamily: 'inherit',
-                    }}>취소</button>
-                  </div>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => { setSelected(r.id); setNote(''); }}
-                    style={{
-                      flex: 1, height: 34, borderRadius: 8,
-                      background: '#E8F0FB', color: '#1A4A8A',
-                      border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                    }}>상태 변경</button>
-                  <button onClick={() => handleDelete(r.id)}
-                    style={{
-                      height: 34, padding: '0 14px', borderRadius: 8,
-                      background: '#FCEBEB', color: '#A32D2D',
-                      border: 'none', fontSize: 13, cursor: 'pointer',
-                    }}>삭제</button>
-                </div>
-              )}
-            </div>
-          );
-        })}
+        {filtered.map(r => (
+          <HousingCard key={r.id} r={r}
+            onStatusChange={handleStatus}
+            onDelete={handleDelete}
+            onResetPassword={handleResetPassword}
+          />
+        ))}
       </div>
       {toast && <Toast msg={toast} onDone={() => setToast('')} />}
     </div>

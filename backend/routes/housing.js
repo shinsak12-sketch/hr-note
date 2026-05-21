@@ -116,6 +116,12 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
   res.json(request);
 });
 
+// 비밀번호 초기화 (내부, 로그인 필요)
+router.patch('/:id/reset-password', authMiddleware, async (req, res) => {
+  await sql`UPDATE housing_requests SET password = '1111' WHERE id = ${req.params.id}`;
+  res.json({ message: '비밀번호가 1111로 초기화되었습니다.' });
+});
+
 // 삭제 (내부, 로그인 필요)
 router.delete('/:id', authMiddleware, async (req, res) => {
   await sql`DELETE FROM housing_requests WHERE id = ${req.params.id}`;

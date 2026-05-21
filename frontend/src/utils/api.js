@@ -149,5 +149,6 @@ export const api = {
   withdrawHousing: (id, emp_no, password) => request('/housing/withdraw/' + id, { method: 'DELETE', body: JSON.stringify({ emp_no, password }) }),
   getHousingRequests: () => request('/housing'),
   updateHousingStatus: (id, status, note) => request('/housing/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status, note }) }),
+  resetHousingPassword: (id) => request('/housing/' + id + '/reset-password', { method: 'PATCH' }),
   deleteHousingRequest: (id) => request('/housing/' + id, { method: 'DELETE' }),
 };
