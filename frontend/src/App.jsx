@@ -21,7 +21,9 @@ import OfficeHome from './pages/OfficeHome.jsx';
 import OfficeInput from './pages/OfficeInput.jsx';
 import GeneralHome from './pages/GeneralHome.jsx';
 import HousingMgmt from './pages/HousingMgmt.jsx';
+import HousingLanding from './pages/HousingLanding.jsx';
 import HousingApply from './pages/HousingApply.jsx';
+import HousingStatus from './pages/HousingStatus.jsx';
 import { PermissionGuard } from './components/PermissionGuard.jsx';
 
 function PrivateRoute({ children }) {
@@ -44,7 +46,9 @@ export default function App() {
       <Route path="/request" element={<AccountRequest />} />
 
       {/* 사택신청 (로그인 불필요) */}
-      <Route path="/housing-apply" element={<HousingApply />} />
+      <Route path="/housing-apply" element={<HousingLanding />} />
+      <Route path="/housing-apply/new" element={<HousingApply />} />
+      <Route path="/housing-apply/status" element={<HousingStatus />} />
 
       <Route path="/" element={<PrivateRoute><AppHome /></PrivateRoute>} />
 

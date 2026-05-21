@@ -10,7 +10,7 @@ const STATUS_STYLE = {
 
 export default function HousingApply() {
   const [offices, setOffices] = useState([]);
-  const [form, setForm] = useState({ emp_no: '', emp_name: '', department: '', office_id: '', home_address: '' });
+  const [form, setForm] = useState({ emp_no: '', emp_name: '', department: '', office_id: '', home_address: '', home_address_detail: '', password: '', password_confirm: '' });
   const [distance, setDistance] = useState(null);
   const [checking, setChecking] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -71,6 +71,14 @@ export default function HousingApply() {
     setError('');
     if (!form.emp_no || !form.emp_name) {
       setError('사번과 성명을 입력하세요.');
+      return;
+    }
+    if (!form.password) {
+      setError('비밀번호를 설정하세요.');
+      return;
+    }
+    if (form.password !== form.password_confirm) {
+      setError('비밀번호가 일치하지 않습니다.');
       return;
     }
     setSubmitting(true);
@@ -202,10 +210,22 @@ export default function HousingApply() {
         {/* Step 3: 신청 */}
         {distance?.eligible && (
           <>
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text2)' }}>③ 신청</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text2)' }}>③ 신청 정보</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div className="form-group">
+                <label className="form-label">비밀번호 설정 <span className="req">*</span></label>
+                <input type="password" placeholder="현황 조회용"
+                  value={form.password} onChange={e => setF('password', e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">비밀번호 확인 <span className="req">*</span></label>
+                <input type="password" placeholder="다시 입력"
+                  value={form.password_confirm} onChange={e => setF('password_confirm', e.target.value)} />
+              </div>
+            </div>
             <div className="form-group">
               <label className="form-label">비고 <span className="opt">(선택)</span></label>
-              <textarea placeholder="추가 요청사항이 있으면 입력하세요"
+              <textarea placeholder="추가 요청사항"
                 value={form.note || ''} onChange={e => setF('note', e.target.value)}
                 style={{ height: 80 }} />
             </div>
