@@ -113,6 +113,7 @@ export const api = {
   },
   getOfficeHeadquarters: () => request('/offices/headquarters'),
   getOfficeDepartments: (hq) => request('/offices/departments' + (hq ? '?headquarters=' + encodeURIComponent(hq) : '')),
+  getOfficeOrgs: (hq, dept) => { const p = new URLSearchParams(); if(hq) p.set('headquarters',hq); if(dept) p.set('department',dept); return request('/offices/orgs' + (p.toString() ? '?' + p.toString() : '')); },
   getOffice: (id) => request('/offices/' + id),
   createOffice: (body) => request('/offices', { method: 'POST', body: JSON.stringify(body) }),
   updateOffice: (id, body) => request('/offices/' + id, { method: 'PUT', body: JSON.stringify(body) }),

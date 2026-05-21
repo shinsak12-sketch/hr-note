@@ -12,8 +12,10 @@ export default function OfficeHome() {
   const [query, setQuery] = useState('');
   const [headquarters, setHeadquarters] = useState('');
   const [department, setDepartment] = useState('');
+  const [orgName, setOrgName] = useState('');
   const [hqList, setHqList] = useState([]);
   const [deptList, setDeptList] = useState([]);
+  const [orgList, setOrgList] = useState([]);
   const [copied, setCopied] = useState(null);
 
   const load = useCallback(async (params = {}) => {
@@ -34,19 +36,37 @@ export default function OfficeHome() {
     if (headquarters) {
       api.getOfficeDepartments(headquarters).then(setDeptList);
       setDepartment('');
+      setOrgName('');
+      setOrgList([]);
       load({ headquarters });
     } else if (headquarters === '') {
       setDeptList([]);
       setDepartment('');
+      setOrgName('');
+      setOrgList([]);
       load({});
     }
   }, [headquarters, load]);
 
-  // 부서 바뀌면 재조회
+  // 부서 바뀌면 조직 목록 갱신 + 재조회
   useEffect(() => {
-    if (department) load({ headquarters, department });
-    else if (headquarters) load({ headquarters });
+    if (department) {
+      api.getOfficeOrgs(headquarters, department).then(setOrgList);
+      setOrgName('');
+      load({ headquarters, department });
+    } else if (headquarters) {
+      setOrgList([]);
+      setOrgName('');
+      load({ headquarters });
+    }
   }, [department]);
+
+  // 조직 바뀌면 재조회
+  useEffect(() => {
+    if (orgName) load({ headquarters, department, org_name: orgName });
+    else if (department) load({ headquarters, department });
+    else if (headquarters) load({ headquarters });
+  }, [orgName]);
 
   function handleSearch(e) {
     e.preventDefault();
@@ -105,11 +125,18 @@ export default function OfficeHome() {
             {deptList.map(d => <option key={d}>{d}</option>)}
           </select>
         </div>
-        <form onSubmit={handleSearch} style={{ display: 'flex', gap: 8 }}>
-          <input type="text" placeholder="조직명, 주소, 관리자 검색"
-            value={query} onChange={e => setQuery(e.target.value)} style={{ flex: 1 }} />
-          <button type="submit" className="btn-secondary">검색</button>
-        </form>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <select value={orgName} onChange={e => setOrgName(e.target.value)}
+            style={{ flex: 1 }} disabled={!department || orgList.length === 0}>
+            <option value="">전체 조직</option>
+            {orgList.map(o => <option key={o}>{o}</option>)}
+          </select>
+          <form onSubmit={handleSearch} style={{ flex: 2, display: 'flex', gap: 8 }}>
+            <input type="text" placeholder="조직명, 주소, 관리자 검색"
+              value={query} onChange={e => setQuery(e.target.value)} style={{ flex: 1 }} />
+            <button type="submit" className="btn-secondary">검색</button>
+          </form>
+        </div>
       </div>
 
       <div className="page-content" style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>

@@ -10,10 +10,11 @@ router.use(authMiddleware);
 
 // 목록 조회
 router.get('/', async (req, res) => {
-  const { headquarters, department, q } = req.query;
+  const { headquarters, department, org_name, q } = req.query;
   let offices = await sql`SELECT * FROM offices ORDER BY headquarters, department NULLS FIRST, org_name`;
   if (headquarters) offices = offices.filter(o => o.headquarters === headquarters);
   if (department) offices = offices.filter(o => o.department === department);
+  if (org_name) offices = offices.filter(o => o.org_name === org_name);
   if (q) offices = offices.filter(o =>
     o.org_name?.includes(q) || o.address?.includes(q) ||
     o.manager_name?.includes(q) || o.phone?.includes(q)
@@ -37,6 +38,20 @@ router.get('/departments', async (req, res) => {
     rows = await sql`SELECT DISTINCT department FROM offices WHERE department IS NOT NULL ORDER BY department`;
   }
   res.json(rows.map(r => r.department));
+});
+
+// 조직명 목록 (본부+부서 기준)
+router.get('/orgs', async (req, res) => {
+  const { headquarters, department } = req.query;
+  let rows;
+  if (headquarters && department) {
+    rows = await sql`SELECT DISTINCT org_name FROM offices WHERE headquarters = ${headquarters} AND department = ${department} ORDER BY org_name`;
+  } else if (headquarters) {
+    rows = await sql`SELECT DISTINCT org_name FROM offices WHERE headquarters = ${headquarters} ORDER BY org_name`;
+  } else {
+    rows = await sql`SELECT DISTINCT org_name FROM offices ORDER BY org_name`;
+  }
+  res.json(rows.map(r => r.org_name));
 });
 
 // 단건 조회
