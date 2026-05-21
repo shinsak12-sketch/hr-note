@@ -106,12 +106,14 @@ router.get('/permissions', authMiddleware, async (req, res) => {
 });
 
 // 권한 수정 (마스터)
-router.put('/permissions/:work_type', authMiddleware, async (req, res) => {
+router.put('/permissions', authMiddleware, async (req, res) => {
   if (req.user.role !== 'master') return res.status(403).json({ error: '권한이 없습니다.' });
-  const { allowed_menus } = req.body;
+  const { work_type, allowed_menus } = req.body;
   await sql`
-    UPDATE permissions SET allowed_menus = ${JSON.stringify(allowed_menus)}, updated_at = NOW()
-    WHERE work_type = ${req.params.work_type}
+    INSERT INTO permissions (work_type, allowed_menus)
+    VALUES (${work_type}, ${JSON.stringify(allowed_menus)})
+    ON CONFLICT (work_type) DO UPDATE
+    SET allowed_menus = ${JSON.stringify(allowed_menus)}, updated_at = NOW()
   `;
   res.json({ message: '저장되었습니다.' });
 });

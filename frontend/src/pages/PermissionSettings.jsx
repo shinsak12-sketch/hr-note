@@ -22,7 +22,22 @@ export default function PermissionSettings() {
   useEffect(() => {
     api.getPermissions().then(data => {
       const map = {};
-      data.forEach(p => { map[p.work_type] = p.allowed_menus || []; });
+      data.forEach(p => {
+        let menus = p.allowed_menus;
+        if (typeof menus === 'string') {
+          try { menus = JSON.parse(menus); } catch { menus = []; }
+        }
+        map[p.work_type] = Array.isArray(menus) ? menus : [];
+      });
+      // 없는 work_type은 기본값으로 채우기
+      WORK_TYPES.forEach(wt => { if (!map[wt]) map[wt] = []; });
+      setPerms(map);
+      setLoading(false);
+    }).catch(e => {
+      console.error(e);
+      // 기본값으로 세팅
+      const map = {};
+      WORK_TYPES.forEach(wt => { map[wt] = ['tasks','issues','memos','offices']; });
       setPerms(map);
       setLoading(false);
     });
@@ -67,8 +82,8 @@ export default function PermissionSettings() {
       </div>
 
       <div className="page-content" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {loading && <div className="center-msg">불러오는 중...</div>}
-        {WORK_TYPES.map(workType => (
+        {loading && <div className="center-msg">권한 정보 불러오는 중...</div>}
+        {!loading && WORK_TYPES.map(workType => (
           <div key={workType} style={{
             background: 'var(--bg)', border: '0.5px solid var(--border)',
             borderRadius: 12, overflow: 'hidden',
