@@ -162,3 +162,32 @@ router.delete('/:id', async (req, res) => {
 });
 
 export default router;
+
+// ── 조치 이력 ──────────────────────────────────────────
+// 조치 이력 조회
+router.get('/:id/actions', async (req, res) => {
+  const actions = await sql`
+    SELECT * FROM issue_actions WHERE issue_id = ${req.params.id}
+    ORDER BY action_date ASC, created_at ASC
+  `;
+  res.json(actions);
+});
+
+// 조치 추가
+router.post('/:id/actions', async (req, res) => {
+  const { action_date, action_by, action_content } = req.body;
+  if (!action_date || !action_by || !action_content)
+    return res.status(400).json({ error: '모든 항목을 입력하세요.' });
+  const [action] = await sql`
+    INSERT INTO issue_actions (issue_id, action_date, action_by, action_content, created_by)
+    VALUES (${req.params.id}, ${action_date}, ${action_by}, ${action_content}, ${req.user.id})
+    RETURNING *
+  `;
+  res.status(201).json(action);
+});
+
+// 조치 삭제
+router.delete('/:issue_id/actions/:action_id', async (req, res) => {
+  await sql`DELETE FROM issue_actions WHERE id = ${req.params.action_id} AND issue_id = ${req.params.issue_id}`;
+  res.json({ message: '삭제되었습니다.' });
+});

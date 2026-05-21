@@ -40,6 +40,11 @@ export const api = {
   deleteIssue: (id) => request(`/issues/${id}`, { method: 'DELETE' }),
   getSummary: () => request('/issues/stats/summary'),
 
+  // 조치 이력
+  getActions: (issueId) => request(`/issues/${issueId}/actions`),
+  addAction: (issueId, body) => request(`/issues/${issueId}/actions`, { method: 'POST', body: JSON.stringify(body) }),
+  deleteAction: (issueId, actionId) => request(`/issues/${issueId}/actions/${actionId}`, { method: 'DELETE' }),
+
   downloadTemplate: () => {
     const token = getToken();
     fetch(`${BASE}/issues/template/excel`, { headers: { Authorization: `Bearer ${token}` } })
