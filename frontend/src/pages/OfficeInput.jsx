@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../utils/api.js';
 import { Toast } from '../components/Common.jsx';
 
-const EMPTY = { headquarters: '', department: '', org_name: '', address: '', manager_name: '', phone: '' };
+const EMPTY = { headquarters: '', department: '', org_name: '', address: '', address_detail: '', manager_name: '', phone: '' };
 
 export default function OfficeInput() {
   const nav = useNavigate();
@@ -16,6 +16,28 @@ export default function OfficeInput() {
   const [delConfirm, setDelConfirm] = useState(false);
   const [hqList, setHqList] = useState([]);
 
+  // 카카오 주소 API 스크립트 로드
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+    script.async = true;
+    document.head.appendChild(script);
+    return () => { document.head.removeChild(script); };
+  }, []);
+
+  function searchAddress() {
+    if (!window.daum?.Postcode) {
+      alert('주소 검색 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+    new window.daum.Postcode({
+      oncomplete: (data) => {
+        const addr = data.roadAddress || data.jibunAddress;
+        setForm(f => ({ ...f, address: addr, address_detail: '' }));
+      }
+    }).open();
+  }
+
   useEffect(() => {
     api.getOfficeHeadquarters().then(setHqList);
     if (isEdit) {
@@ -24,6 +46,7 @@ export default function OfficeInput() {
         department: o.department || '',
         org_name: o.org_name || '',
         address: o.address || '',
+        address_detail: '',
         manager_name: o.manager_name || '',
         phone: o.phone || '',
       }));
@@ -40,12 +63,17 @@ export default function OfficeInput() {
       return;
     }
     setLoading(true);
+    // 상세주소 합치기
+    const fullAddress = form.address_detail
+      ? `${form.address} ${form.address_detail}`
+      : form.address;
+    const body = { ...form, address: fullAddress };
     try {
       if (isEdit) {
-        await api.updateOffice(id, form);
+        await api.updateOffice(id, body);
         setToast('수정되었습니다.');
       } else {
-        await api.createOffice(form);
+        await api.createOffice(body);
         setToast('등록되었습니다.');
       }
       setTimeout(() => nav('/offices-app', { replace: true }), 1200);
@@ -115,8 +143,19 @@ export default function OfficeInput() {
         {/* 주소 */}
         <div className="form-group">
           <label className="form-label">주소 <span className="req">*</span></label>
-          <textarea placeholder="도로명 주소 입력" value={form.address}
-            onChange={e => setF('address', e.target.value)} style={{ height: 70 }} />
+          <div style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
+            <input type="text" placeholder="주소 검색 후 자동입력" value={form.address}
+              readOnly style={{ flex: 1, background: 'var(--bg2)' }} />
+            <button type="button" onClick={searchAddress} style={{
+              padding: '0 14px', height: 40, borderRadius: 8,
+              background: '#5A4A00', color: '#FFF9E6',
+              border: 'none', cursor: 'pointer', fontSize: 13,
+              fontWeight: 600, whiteSpace: 'nowrap',
+            }}>🔍 주소찾기</button>
+          </div>
+          <input type="text" placeholder="상세주소 입력 (동/호수 등)"
+            value={form.address_detail || ''}
+            onChange={e => setF('address_detail', e.target.value)} />
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
