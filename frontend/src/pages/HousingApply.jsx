@@ -20,20 +20,45 @@ export default function HousingApply() {
 
   useEffect(() => {
     api.getOffices().then(setOffices);
+    // 카카오 주소 API 로드
+    const script = document.createElement('script');
+    script.src = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+    script.async = true;
+    document.head.appendChild(script);
+    return () => { document.head.removeChild(script); };
   }, []);
+
+  function searchAddress() {
+    if (!window.daum?.Postcode) {
+      alert('주소 검색 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+    new window.daum.Postcode({
+      oncomplete: (data) => {
+        const addr = data.roadAddress || data.jibunAddress;
+        setF('home_address', addr);
+        setDistance(null);
+        setStep(1);
+      }
+    }).open();
+  }
 
   function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
 
   async function handleCheckDistance() {
     setError('');
-    if (!form.home_address || !form.office_id) {
+    const fullAddress = form.home_address_detail
+      ? `${form.home_address} ${form.home_address_detail}`
+      : form.home_address;
+    if (!fullAddress || !form.office_id) {
       setError('거주지 주소와 소속을 입력하세요.');
       return;
     }
     setChecking(true);
     try {
-      const res = await api.checkDistance({ home_address: form.home_address, office_id: form.office_id });
+      const res = await api.checkDistance({ home_address: fullAddress, office_id: form.office_id });
       setDistance(res);
+      setForm(f => ({ ...f, home_address: fullAddress }));
       setStep(2);
     } catch (e) {
       setError(e.message);
@@ -127,8 +152,20 @@ export default function HousingApply() {
 
         <div className="form-group">
           <label className="form-label">거주지 주소 <span className="req">*</span></label>
-          <input type="text" placeholder="도로명 주소 입력 (예: 서울시 강남구 테헤란로 123)"
-            value={form.home_address} onChange={e => { setF('home_address', e.target.value); setDistance(null); setStep(1); }} />
+          <div style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
+            <input type="text" placeholder="주소 검색 후 자동입력"
+              value={form.home_address} readOnly
+              style={{ flex: 1, background: 'var(--bg2)' }} />
+            <button type="button" onClick={searchAddress} style={{
+              padding: '0 14px', height: 40, borderRadius: 8,
+              background: '#1A4A8A', color: '#fff',
+              border: 'none', cursor: 'pointer', fontSize: 13,
+              fontWeight: 600, whiteSpace: 'nowrap',
+            }}>🔍 주소찾기</button>
+          </div>
+          <input type="text" placeholder="상세주소 입력 (동/호수 등)"
+            value={form.home_address_detail || ''}
+            onChange={e => setF('home_address_detail', e.target.value)} />
         </div>
 
         <button onClick={handleCheckDistance} disabled={checking}
