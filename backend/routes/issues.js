@@ -19,8 +19,8 @@ router.get('/', async (req, res) => {
   if (date_from) { conditions.push(`issue_date >= $${i++}`); params.push(date_from); }
   if (date_to) { conditions.push(`issue_date <= $${i++}`); params.push(date_to); }
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-  const issues = await sql.query(`SELECT * FROM issues ${where} ORDER BY issue_date DESC, created_at DESC`, params);
-  res.json(issues.rows);
+  const issues = await sql.unsafe(`SELECT * FROM issues ${where} ORDER BY issue_date DESC, created_at DESC`, params);
+  res.json(issues);
 });
 
 // 홈 요약 통계
