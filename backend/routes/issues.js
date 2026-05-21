@@ -11,15 +11,23 @@ router.use(authMiddleware);
 // 이슈 목록 조회
 router.get('/', async (req, res) => {
   const { emp_no, emp_name, issue_type, severity, date_from, date_to } = req.query;
-  let conditions = [], params = [], i = 1;
-  if (emp_no) { conditions.push(`emp_no ILIKE $${i++}`); params.push(`%${emp_no}%`); }
-  if (emp_name) { conditions.push(`emp_name ILIKE $${i++}`); params.push(`%${emp_name}%`); }
-  if (issue_type) { conditions.push(`issue_type = $${i++}`); params.push(issue_type); }
-  if (severity) { conditions.push(`severity = $${i++}`); params.push(severity); }
-  if (date_from) { conditions.push(`issue_date >= $${i++}`); params.push(date_from); }
-  if (date_to) { conditions.push(`issue_date <= $${i++}`); params.push(date_to); }
-  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-  const issues = await sql.unsafe(`SELECT * FROM issues ${where} ORDER BY issue_date DESC, created_at DESC`, params);
+
+  // 필터 없으면 전체 조회
+  if (!emp_no && !emp_name && !issue_type && !severity && !date_from && !date_to) {
+    const issues = await sql`SELECT * FROM issues ORDER BY issue_date DESC, created_at DESC`;
+    return res.json(issues);
+  }
+
+  // 필터 있으면 조건별 처리
+  let issues = await sql`SELECT * FROM issues ORDER BY issue_date DESC, created_at DESC`;
+
+  if (emp_no) issues = issues.filter(i => i.emp_no?.toLowerCase().includes(emp_no.toLowerCase()));
+  if (emp_name) issues = issues.filter(i => i.emp_name?.toLowerCase().includes(emp_name.toLowerCase()));
+  if (issue_type) issues = issues.filter(i => i.issue_type === issue_type);
+  if (severity) issues = issues.filter(i => i.severity === severity);
+  if (date_from) issues = issues.filter(i => i.issue_date >= date_from);
+  if (date_to) issues = issues.filter(i => i.issue_date <= date_to);
+
   res.json(issues);
 });
 
