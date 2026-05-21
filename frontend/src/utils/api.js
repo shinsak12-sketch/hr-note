@@ -111,6 +111,8 @@ export const api = {
     const q = new URLSearchParams(params).toString();
     return request('/offices' + (q ? '?' + q : ''));
   },
+  getOfficeHeadquarters: () => request('/offices/headquarters'),
+  getOfficeDepartments: (hq) => request('/offices/departments' + (hq ? '?headquarters=' + encodeURIComponent(hq) : '')),
   getOffice: (id) => request('/offices/' + id),
   createOffice: (body) => request('/offices', { method: 'POST', body: JSON.stringify(body) }),
   updateOffice: (id, body) => request('/offices/' + id, { method: 'PUT', body: JSON.stringify(body) }),

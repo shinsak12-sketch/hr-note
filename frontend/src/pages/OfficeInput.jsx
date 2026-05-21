@@ -3,8 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../utils/api.js';
 import { Toast } from '../components/Common.jsx';
 
-const GROUP_TYPES = ['본부', '부서', '센터'];
-const EMPTY = { group_type: '센터', group_name: '', org_name: '', address: '', manager_name: '', phone: '' };
+const EMPTY = { headquarters: '', department: '', org_name: '', address: '', manager_name: '', phone: '' };
 
 export default function OfficeInput() {
   const nav = useNavigate();
@@ -15,12 +14,14 @@ export default function OfficeInput() {
   const [toast, setToast] = useState('');
   const [error, setError] = useState('');
   const [delConfirm, setDelConfirm] = useState(false);
+  const [hqList, setHqList] = useState([]);
 
   useEffect(() => {
+    api.getOfficeHeadquarters().then(setHqList);
     if (isEdit) {
       api.getOffice(id).then(o => setForm({
-        group_type: o.group_type || '센터',
-        group_name: o.group_name || '',
+        headquarters: o.headquarters || '',
+        department: o.department || '',
         org_name: o.org_name || '',
         address: o.address || '',
         manager_name: o.manager_name || '',
@@ -34,8 +35,8 @@ export default function OfficeInput() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    if (!form.group_type || !form.group_name || !form.org_name || !form.address) {
-      setError('필수 항목을 모두 입력하세요.');
+    if (!form.headquarters || !form.org_name || !form.address) {
+      setError('본부명, 조직명, 주소는 필수입니다.');
       return;
     }
     setLoading(true);
@@ -80,39 +81,65 @@ export default function OfficeInput() {
       </div>
 
       <form onSubmit={handleSubmit} className="page-content" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          <div className="form-group">
-            <label className="form-label">구분 <span className="req">*</span></label>
-            <select value={form.group_type} onChange={e => setF('group_type', e.target.value)}>
-              {GROUP_TYPES.map(t => <option key={t}>{t}</option>)}
-            </select>
-          </div>
-          <div className="form-group">
-            <label className="form-label">그룹명 <span className="req">*</span></label>
-            <input type="text" placeholder="예: 서울본부" value={form.group_name}
-              onChange={e => setF('group_name', e.target.value)} />
+
+        {/* 본부명 */}
+        <div className="form-group">
+          <label className="form-label">본부명 <span className="req">*</span></label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input type="text" placeholder="예: 서울본부" value={form.headquarters}
+              onChange={e => setF('headquarters', e.target.value)} style={{ flex: 1 }} />
+            {hqList.length > 0 && (
+              <select onChange={e => { if (e.target.value) setF('headquarters', e.target.value); }}
+                style={{ flex: 1 }}>
+                <option value="">기존 본부 선택</option>
+                {hqList.map(h => <option key={h}>{h}</option>)}
+              </select>
+            )}
           </div>
         </div>
+
+        {/* 부서명 */}
+        <div className="form-group">
+          <label className="form-label">부서명 <span className="opt">(선택 — 없으면 빈칸)</span></label>
+          <input type="text" placeholder="예: 인사부서 (본부 직속이면 빈칸)" value={form.department}
+            onChange={e => setF('department', e.target.value)} />
+        </div>
+
+        {/* 조직명 */}
         <div className="form-group">
           <label className="form-label">조직명 <span className="req">*</span></label>
-          <input type="text" placeholder="예: 강남센터" value={form.org_name}
+          <input type="text" placeholder="예: 강남센터, 인사팀" value={form.org_name}
             onChange={e => setF('org_name', e.target.value)} />
         </div>
+
+        {/* 주소 */}
         <div className="form-group">
           <label className="form-label">주소 <span className="req">*</span></label>
           <textarea placeholder="도로명 주소 입력" value={form.address}
             onChange={e => setF('address', e.target.value)} style={{ height: 70 }} />
         </div>
-        <div className="form-group">
-          <label className="form-label">관리자명 <span className="opt">(선택)</span></label>
-          <input type="text" placeholder="담당 관리자 이름" value={form.manager_name}
-            onChange={e => setF('manager_name', e.target.value)} />
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div className="form-group">
+            <label className="form-label">관리자명 <span className="opt">(선택)</span></label>
+            <input type="text" placeholder="담당자" value={form.manager_name}
+              onChange={e => setF('manager_name', e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">전화번호 <span className="opt">(선택)</span></label>
+            <input type="tel" placeholder="02-0000-0000" value={form.phone}
+              onChange={e => setF('phone', e.target.value)} />
+          </div>
         </div>
-        <div className="form-group">
-          <label className="form-label">전화번호 <span className="opt">(선택)</span></label>
-          <input type="tel" placeholder="예: 02-1234-5678" value={form.phone}
-            onChange={e => setF('phone', e.target.value)} />
+
+        {/* 구조 안내 */}
+        <div style={{ fontSize: 12, color: 'var(--text2)', background: 'var(--bg2)', borderRadius: 8, padding: 10, lineHeight: 1.7 }}>
+          📌 <strong>계층 구조 안내</strong><br/>
+          본부 직속 → 부서명 빈칸<br/>
+          부서 소속 → 부서명 입력<br/>
+          예) 서울본부 › 인사부서 › 강남센터
         </div>
+
         {error && <div style={{ color: 'var(--red)', fontSize: 13 }}>{error}</div>}
         <button className="btn-primary" type="submit" disabled={loading}
           style={{ background: '#5A4A00', marginBottom: 8 }}>
