@@ -43,10 +43,10 @@ router.get('/stats/summary', async (req, res) => {
 // 엑셀 양식 다운로드
 router.get('/template/excel', (req, res) => {
   const wb = XLSX.utils.book_new();
-  const headers = [['사번','성명','소속','직급','직책','날짜','이슈구분','심각도','관련자','조치사항']];
-  const example = [['10001','홍길동','서울센터','대리','팀원','2025-01-15','노무','상','박팀장','구두경고 조치']];
+  const headers = [['사번','성명','소속','직급','직책','날짜','이슈구분','심각도','관련자','이슈내용']];
+  const example = [['10001','홍길동','서울센터','대리','팀원','2025-01-15','노무','상','박팀장','무단결근 3회 반복 발생']];
   const ws = XLSX.utils.aoa_to_sheet([...headers, ...example]);
-  ws['!cols'] = [8,10,12,8,8,14,10,6,16,30].map(w => ({ wch: w }));
+  ws['!cols'] = [8,10,12,8,8,14,10,6,16,35].map(w => ({ wch: w }));
   XLSX.utils.book_append_sheet(wb, ws, '이슈등록양식');
   const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
   res.setHeader('Content-Disposition', 'attachment; filename=HR노트_업로드양식.xlsx');
@@ -88,10 +88,10 @@ router.post('/upload/excel', upload.single('file'), async (req, res) => {
         issue_date = String(issue_date).trim();
       }
       await sql`
-        INSERT INTO issues (emp_no, emp_name, department, rank, position, issue_date, issue_type, severity, related_person, action_taken, created_by)
+        INSERT INTO issues (emp_no, emp_name, department, rank, position, issue_date, issue_type, severity, related_person, issue_content, created_by)
         VALUES (${emp_no}, ${emp_name}, ${String(r['소속']||'').trim()||null}, ${String(r['직급']||'').trim()||null},
           ${String(r['직책']||'').trim()||null}, ${issue_date}, ${issue_type}, ${severity},
-          ${String(r['관련자']||'').trim()||null}, ${String(r['조치사항']||'').trim()||null}, ${req.user.id})
+          ${String(r['관련자']||'').trim()||null}, ${String(r['이슈내용']||'').trim()||null}, ${req.user.id})
       `;
       success++;
     }
@@ -109,11 +109,11 @@ router.get('/export/excel', async (req, res) => {
     '직급': i.rank || '', '직책': i.position || '',
     '날짜': i.issue_date?.toISOString?.()?.split('T')[0] || i.issue_date,
     '이슈구분': i.issue_type, '심각도': i.severity,
-    '관련자': i.related_person || '', '조치사항': i.action_taken || '',
+    '관련자': i.related_person || '', '이슈내용': i.issue_content || '',
   }));
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.json_to_sheet(data);
-  ws['!cols'] = [8,10,12,8,8,12,10,6,16,30].map(w => ({ wch: w }));
+  ws['!cols'] = [8,10,12,8,8,12,10,6,16,35].map(w => ({ wch: w }));
   XLSX.utils.book_append_sheet(wb, ws, '이슈목록');
   const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
   res.setHeader('Content-Disposition', 'attachment; filename=HR노트_이슈목록.xlsx');
