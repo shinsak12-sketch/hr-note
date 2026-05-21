@@ -152,15 +152,36 @@ export default function OfficeHome() {
                           <span style={{ fontWeight: 700, fontSize: 15 }}>📍 {office.org_name}</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <button onClick={() => {
-                            navigator.clipboard.writeText(office.address);
-                            setCopied(office.id);
-                            setTimeout(() => setCopied(null), 2000);
+                            const text = [
+                              `📍 ${office.org_name}`,
+                              `🗺️ ${office.address}`,
+                              office.manager_name ? `👤 ${office.manager_name}` : null,
+                              office.phone ? `📞 ${office.phone}` : null,
+                            ].filter(Boolean).join('\n');
+                            if (navigator.share) {
+                              navigator.share({ title: office.org_name, text });
+                            } else {
+                              navigator.clipboard.writeText(text);
+                              setCopied(office.id);
+                              setTimeout(() => setCopied(null), 2000);
+                            }
                           }} style={{
                             fontSize: 11, padding: '3px 8px', borderRadius: 6,
                             background: copied === office.id ? '#EAF3DE' : 'var(--bg2)',
                             color: copied === office.id ? '#3B6D11' : 'var(--text2)',
                             border: '0.5px solid var(--border)', cursor: 'pointer',
-                          }}>{copied === office.id ? '✓ 복사됨' : '📋 복사'}</button>
+                            display: 'flex', alignItems: 'center', gap: 3,
+                          }}>
+                            {copied === office.id ? '✓ 복사됨' : (
+                              <>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                                </svg>
+                                공유
+                              </>
+                            )}
+                          </button>
                           {isMaster && (
                             <button onClick={() => nav(`/offices/${office.id}/edit`)} style={{
                               fontSize: 11, padding: '3px 8px', borderRadius: 6,
