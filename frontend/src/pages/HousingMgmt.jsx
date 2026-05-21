@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api.js';
 import { Toast } from '../components/Common.jsx';
 
-const STATUSES = ['신청', '검토중', '보완요청', '승인', '반려'];
+const STATUSES = ['신청', '보완요청', '승인', '반려'];
 const STATUS_STYLE = {
   '신청':    { color: '#1A4A8A', bg: '#E8F0FB' },
   '검토중':  { color: '#854F0B', bg: '#FAEEDA' },
@@ -90,8 +90,6 @@ function ApprovalModal({ request, onClose, onDone }) {
   const [saving, setSaving] = useState(false);
 
   const APPROVAL_STATUSES = ['승인', '반려', '보완요청'];
-
-  async function handleSave() {
     if (!status) return;
     setSaving(true);
     try {
