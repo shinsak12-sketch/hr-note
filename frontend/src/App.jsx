@@ -24,6 +24,7 @@ import HousingMgmt from './pages/HousingMgmt.jsx';
 import HousingLanding from './pages/HousingLanding.jsx';
 import HousingApply from './pages/HousingApply.jsx';
 import HousingStatus from './pages/HousingStatus.jsx';
+import HRCalc from './pages/HRCalc.jsx';
 import { PermissionGuard } from './components/PermissionGuard.jsx';
 
 function PrivateRoute({ children }) {
@@ -76,6 +77,8 @@ export default function App() {
       <Route path="/offices-app" element={<PrivateRoute><PermissionGuard menuKey="offices"><OfficeHome /></PermissionGuard></PrivateRoute>} />
       <Route path="/offices/new" element={<MasterRoute><OfficeInput /></MasterRoute>} />
       <Route path="/offices/:id/edit" element={<MasterRoute><OfficeInput /></MasterRoute>} />
+
+      <Route path="/hr-calc" element={<PrivateRoute><HRCalc /></PrivateRoute>} />
 
       {/* 총무지원 */}
       <Route path="/general-app" element={<PrivateRoute><PermissionGuard menuKey="general"><GeneralHome /></PermissionGuard></PrivateRoute>} />
