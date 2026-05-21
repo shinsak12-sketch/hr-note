@@ -14,7 +14,17 @@ export default function HousingApply() {
   const [offices, setOffices] = useState([]);
   const [form, setForm] = useState({ emp_no: '', emp_name: '', department: '', office_id: '', home_address: '', home_address_detail: '', password: '', password_confirm: '' });
   const [distance, setDistance] = useState(null);
-  const [officeSearch, setOfficeSearch] = useState('');
+  const [isException, setIsException] = useState(false);
+  const [exceptionChecked, setExceptionChecked] = useState(false);
+
+  async function checkException(empNo) {
+    if (!empNo) return;
+    try {
+      const res = await api.checkHousingException(empNo);
+      setIsException(res.is_exception);
+      setExceptionChecked(true);
+    } catch { setIsException(false); }
+  }
   const [showOfficeList, setShowOfficeList] = useState(false);
   const [checking, setChecking] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -162,7 +172,15 @@ export default function HousingApply() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <div className="form-group">
             <label className="form-label">사번 <span className="req">*</span></label>
-            <input type="text" placeholder="사번" value={form.emp_no} onChange={e => setF('emp_no', e.target.value)} />
+            <input type="text" placeholder="사번"
+              value={form.emp_no}
+              onChange={e => { setF('emp_no', e.target.value); setExceptionChecked(false); setIsException(false); }}
+              onBlur={e => checkException(e.target.value)} />
+            {isException && (
+              <div style={{ fontSize: 12, color: '#854F0B', background: '#FAEEDA', padding: '6px 10px', borderRadius: 6, marginTop: 4 }}>
+                ⭐ 사전 협의된 특인 대상입니다
+              </div>
+            )}
           </div>
           <div className="form-group">
             <label className="form-label">성명 <span className="req">*</span></label>
@@ -251,11 +269,11 @@ export default function HousingApply() {
         {distance && (
           <div style={{
             padding: 16, borderRadius: 12,
-            background: distance.eligible ? '#EAF3DE' : '#FCEBEB',
-            border: `1px solid ${distance.eligible ? '#3B6D11' : '#A32D2D'}30`,
+            background: (distance.eligible || isException) ? '#EAF3DE' : '#FCEBEB',
+            border: `1px solid ${(distance.eligible || isException) ? '#3B6D11' : '#A32D2D'}30`,
           }}>
-            <div style={{ fontWeight: 700, fontSize: 16, color: distance.eligible ? '#3B6D11' : '#A32D2D', marginBottom: 8 }}>
-              {distance.eligible ? "✅ 신청 가능" : "❌ 신청 불가"}
+            <div style={{ fontWeight: 700, fontSize: 16, color: (distance.eligible || isException) ? '#3B6D11' : '#A32D2D', marginBottom: 8 }}>
+              {(distance.eligible || isException) ? "✅ 신청 가능" : "❌ 신청 불가"}
             </div>
             <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.7 }}>
               <div>📍 거주지 → 소속까지</div>
@@ -270,7 +288,7 @@ export default function HousingApply() {
         )}
 
         {/* Step 3: 신청 */}
-        {distance?.eligible && (
+        {(distance?.eligible || isException) && (
           <>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text2)' }}>③ 신청 정보</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
