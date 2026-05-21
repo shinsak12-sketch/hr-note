@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api.js';
-import { Toast } from '../components/Common.jsx';
 
 function AccordionSection({ title, icon, children }) {
   const [open, setOpen] = useState(false);
@@ -34,7 +33,7 @@ function UploadSection({ description, onDownload, onUpload, downloadLabel }) {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState(null);
-  const [toast, setToast] = useState('');
+  const [msg, setMsg] = useState('');
 
   async function handleUpload() {
     if (!file) return;
@@ -43,10 +42,10 @@ function UploadSection({ description, onDownload, onUpload, downloadLabel }) {
     try {
       const res = await onUpload(file);
       setResult(res);
-      setToast(`${res.success}건 등록 완료!`);
+      setMsg(`✅ ${res.success}건 등록 완료!`);
       setFile(null);
     } catch (e) {
-      setToast('업로드 실패: ' + e.message);
+      setMsg('❌ 업로드 실패: ' + e.message);
     } finally {
       setUploading(false);
     }
@@ -60,23 +59,18 @@ function UploadSection({ description, onDownload, onUpload, downloadLabel }) {
         📥 {downloadLabel || '양식 다운로드'}
       </button>
       <input type="file" accept=".xlsx,.xls"
-        onChange={e => setFile(e.target.files[0])}
+        onChange={e => { setFile(e.target.files[0]); setMsg(''); }}
         style={{ height: 'auto', padding: '8px 12px', fontSize: 13 }} />
       {file && <div style={{ fontSize: 12, color: 'var(--text2)' }}>선택: {file.name}</div>}
       <button className="btn-primary" onClick={handleUpload} disabled={!file || uploading}>
         {uploading ? '업로드 중...' : '📤 업로드'}
       </button>
-      {result && (
-        <div style={{ fontSize: 13 }}>
-          <span style={{ color: 'var(--green)', fontWeight: 600 }}>✅ {result.success}건 등록 완료 (전체 {result.total}건)</span>
-          {result.errors?.length > 0 && (
-            <div style={{ color: 'var(--red)', fontSize: 12, marginTop: 4 }}>
-              {result.errors.map((e, i) => <div key={i}>{e}</div>)}
-            </div>
-          )}
+      {msg && <div style={{ fontSize: 13, color: msg.startsWith('✅') ? 'var(--green)' : 'var(--red)', fontWeight: 600 }}>{msg}</div>}
+      {result?.errors?.length > 0 && (
+        <div style={{ fontSize: 12, color: 'var(--red)' }}>
+          {result.errors.map((e, i) => <div key={i}>{e}</div>)}
         </div>
       )}
-      {toast && <Toast msg={toast} onDone={() => setToast('')} />}
     </div>
   );
 }
@@ -100,7 +94,7 @@ export default function Settings() {
         {/* 이슈 업로드 */}
         <AccordionSection title="이슈 일괄 등록" icon="📋">
           <UploadSection
-            description="양식을 다운받아 작성 후 업로드하세요.<br/><span style='color:#A32D2D'>* 이슈구분: 질병/노무/사고/사건/기타<br/>* 심각도: 상/중/하 &nbsp; * 날짜: YYYY-MM-DD</span>"
+            description="양식을 다운받아 작성 후 업로드하세요.<br/><span style='color:#A32D2D'>* 이슈구분: 질병/노무/사고/사건/기타<br/>* 심각도: 상/중/하 &nbsp;* 날짜: YYYY-MM-DD</span>"
             downloadLabel="이슈 양식 다운로드"
             onDownload={() => api.downloadTemplate()}
             onUpload={(file) => api.uploadExcel(file)}
