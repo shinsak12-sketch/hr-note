@@ -6,12 +6,12 @@ const MAIN_APPS = [
   { id: 'tasks',   icon: '📌', title: '업무지시',   desc: '대표님 업무지시 현황 관리', path: '/tasks-app',   color: '#1A4A8A', bg: '#E8F0FB', menuKey: 'tasks' },
   { id: 'issues',  icon: '📋', title: '직원관리',   desc: '직원 이슈 기록 및 관리',   path: '/issues-app',  color: '#3B6D11', bg: '#EAF3DE', menuKey: 'issues' },
   { id: 'general', icon: '🏛️', title: '총무지원',   desc: '사택·자산·수선 관리',       path: '/general-app', color: '#2D6A6A', bg: '#E6F4F4', menuKey: 'general' },
-  { id: 'calc',    icon: '🧮', title: 'HR계산기',   desc: '육아휴직·임금 등 계산',     path: '/hr-calc',     color: '#7B2D8B', bg: '#F5E8F8', menuKey: null },
 ];
 
 const UTILITY_APPS = [
   { id: 'memos',   icon: '📝', title: '메모장',     desc: '현장·회의·수행 메모',       path: '/memos-app',   color: '#5C3D8F', bg: '#F0EBF8', menuKey: 'memos' },
   { id: 'offices', icon: '🏢', title: '사무실 주소', desc: '조직별 사무실 정보',        path: '/offices-app', color: '#5A4A00', bg: '#FFF9E6', menuKey: 'offices' },
+  { id: 'calc',    icon: '🧮', title: 'HR계산기',   desc: '육아휴직·임금 등 계산',     path: '/hr-calc',     color: '#7B2D8B', bg: '#F5E8F8', menuKey: null },
 ];
 
 export default function AppHome() {
