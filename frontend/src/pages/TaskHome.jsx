@@ -75,30 +75,30 @@ export default function TaskHome() {
       </div>
 
       {/* 현황 요약 */}
-      <div style={{ padding: '12px 16px 0', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+      <div style={{ padding: '16px 16px 0', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
         {[
           { label: '전체', val: tasks.length, color: 'var(--text)', bg: 'var(--bg2)' },
           { label: '미완료', val: incomplete, color: '#1A4A8A', bg: '#E8F0FB' },
           { label: '완료', val: counts['완료'] || 0, color: '#3B6D11', bg: '#EAF3DE' },
         ].map(s => (
-          <div key={s.label} style={{ background: s.bg, borderRadius: 10, padding: '10px', textAlign: 'center' }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div>
-            <div style={{ fontSize: 11, color: s.color }}>{s.label}</div>
+          <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '12px', textAlign: 'center' }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: s.color }}>{s.val}</div>
+            <div style={{ fontSize: 11, color: s.color, marginTop: 2 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* 상태 필터 */}
-      <div style={{ display: 'flex', gap: 6, padding: '12px 16px 0', overflowX: 'auto' }}>
+      <div style={{ display: 'flex', gap: 6, padding: '12px 16px', overflowX: 'auto', borderBottom: '0.5px solid var(--border)' }}>
         {['전체', ...STATUSES].map(s => {
           const st = STATUS_STYLE[s];
           const active = filterStatus === s;
           return (
             <button key={s} onClick={() => setFilterStatus(s)} style={{
-              padding: '5px 12px', borderRadius: 20,
-              border: '0.5px solid var(--border)',
-              background: active ? (st?.bg || 'var(--green)') : 'var(--bg2)',
-              color: active ? (st?.color || '#EAF3DE') : 'var(--text2)',
+              padding: '6px 14px', borderRadius: 20,
+              border: active ? 'none' : '0.5px solid var(--border)',
+              background: active ? (st?.bg || '#EAF3DE') : 'var(--bg)',
+              color: active ? (st?.color || '#3B6D11') : 'var(--text2)',
               fontSize: 12, fontWeight: 600, cursor: 'pointer',
               whiteSpace: 'nowrap', fontFamily: 'inherit',
             }}>
