@@ -90,6 +90,8 @@ function ApprovalModal({ request, onClose, onDone }) {
   const [saving, setSaving] = useState(false);
 
   const APPROVAL_STATUSES = ['승인', '반려', '보완요청'];
+
+  async function handleSave() {
     if (!status) return;
     setSaving(true);
     try {
