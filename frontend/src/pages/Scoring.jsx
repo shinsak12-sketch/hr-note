@@ -71,7 +71,7 @@ export default function Scoring() {
   return (
     <div className="app-container">
       <div className="header">
-        <button className="header-back" onClick={() => nav('/')}>
+        <button className="header-back" onClick={() => nav('/issues-app')}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg>
           홈
         </button>

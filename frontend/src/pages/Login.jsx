@@ -34,7 +34,7 @@ export default function Login() {
           margin: '0 auto 12px', fontSize: 28
         }}>📋</div>
         <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>HR노트</div>
-        <div style={{ fontSize: 13, color: 'var(--text2)' }}>직원 이슈 관리 시스템</div>
+        <div style={{ fontSize: 13, color: 'var(--text2)' }}>직원 관리 시스템</div>
       </div>
 
       <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
