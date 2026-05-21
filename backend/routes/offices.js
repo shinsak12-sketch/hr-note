@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
   const { headquarters, department, q } = req.query;
   let offices = await sql`SELECT * FROM offices ORDER BY headquarters, department NULLS FIRST, org_name`;
   if (headquarters) offices = offices.filter(o => o.headquarters === headquarters);
-  if (department) offices = offices.filter(o => o.department === department || o.headquarters === headquarters);
+  if (department) offices = offices.filter(o => o.department === department);
   if (q) offices = offices.filter(o =>
     o.org_name?.includes(q) || o.address?.includes(q) ||
     o.manager_name?.includes(q) || o.phone?.includes(q)

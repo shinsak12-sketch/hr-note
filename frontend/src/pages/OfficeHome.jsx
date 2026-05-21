@@ -16,37 +16,37 @@ export default function OfficeHome() {
   const [deptList, setDeptList] = useState([]);
   const [copied, setCopied] = useState(null);
 
-  // 본부 목록 로드
-  useEffect(() => {
-    api.getOfficeHeadquarters().then(setHqList);
-    load({});
-  }, []);
-
-  // 본부 바뀌면 부서 목록 갱신
-  useEffect(() => {
-    if (headquarters) {
-      api.getOfficeDepartments(headquarters).then(setDeptList);
-      setDepartment('');
-      load({ headquarters });
-    } else {
-      setDeptList([]);
-      setDepartment('');
-      load({});
-    }
-  }, [headquarters]);
-
-  // 부서 바뀌면 재조회
-  useEffect(() => {
-    if (department) load({ headquarters, department });
-    else if (headquarters) load({ headquarters });
-  }, [department]);
-
   const load = useCallback(async (params = {}) => {
     setLoading(true);
     const data = await api.getOffices(params);
     setOffices(data);
     setLoading(false);
   }, []);
+
+  // 본부 목록 로드
+  useEffect(() => {
+    api.getOfficeHeadquarters().then(setHqList);
+    load({});
+  }, [load]);
+
+  // 본부 바뀌면 부서 목록 갱신 + 재조회
+  useEffect(() => {
+    if (headquarters) {
+      api.getOfficeDepartments(headquarters).then(setDeptList);
+      setDepartment('');
+      load({ headquarters });
+    } else if (headquarters === '') {
+      setDeptList([]);
+      setDepartment('');
+      load({});
+    }
+  }, [headquarters, load]);
+
+  // 부서 바뀌면 재조회
+  useEffect(() => {
+    if (department) load({ headquarters, department });
+    else if (headquarters) load({ headquarters });
+  }, [department]);
 
   function handleSearch(e) {
     e.preventDefault();
