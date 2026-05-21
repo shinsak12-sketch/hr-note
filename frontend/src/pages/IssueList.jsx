@@ -1,13 +1,19 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../utils/api.js';
 import { BottomNav, IssueCard } from '../components/Common.jsx';
 
 export default function IssueList() {
   const nav = useNavigate();
+  const [searchParams] = useSearchParams();
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState({ issue_type: '', severity: '', date_from: '', date_to: '' });
+  const [filters, setFilters] = useState({
+    issue_type: '',
+    severity: searchParams.get('severity') || '',
+    date_from: '',
+    date_to: ''
+  });
 
   const load = useCallback(async (f) => {
     setLoading(true);
@@ -49,9 +55,9 @@ export default function IssueList() {
           {['상','중','하'].map(s => <option key={s}>{s}</option>)}
         </select>
         <input type="date" value={filters.date_from} onChange={e => setF('date_from', e.target.value)}
-          style={{ flex: 1, minWidth: 120, fontSize: 12 }} placeholder="시작일" />
+          style={{ flex: 1, minWidth: 120, fontSize: 12 }} />
         <input type="date" value={filters.date_to} onChange={e => setF('date_to', e.target.value)}
-          style={{ flex: 1, minWidth: 120, fontSize: 12 }} placeholder="종료일" />
+          style={{ flex: 1, minWidth: 120, fontSize: 12 }} />
       </div>
 
       <div className="page-content" style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>

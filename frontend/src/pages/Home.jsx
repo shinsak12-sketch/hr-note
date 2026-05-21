@@ -20,6 +20,13 @@ export default function Home() {
   const t = summary?.totals || {};
   const top3 = summary?.top3 || [];
 
+  const statCards = [
+    { val: t.total, label: '전체 이슈', color: 'var(--text)', dot: null, severity: '' },
+    { val: t.high, label: '심각도 상', color: 'var(--red)', dot: 'var(--red)', severity: '상' },
+    { val: t.mid, label: '심각도 중', color: 'var(--amber)', dot: '#EF9F27', severity: '중' },
+    { val: t.low, label: '심각도 하', color: 'var(--green)', dot: 'var(--green-mid)', severity: '하' },
+  ];
+
   return (
     <div className="app-container">
       <div className="header">
@@ -37,26 +44,25 @@ export default function Home() {
       </div>
 
       <div className="page-content" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 20 }}>
+
         {/* 이슈 현황 */}
         <section>
           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>이슈 현황</div>
           <div className="stat-grid">
-            <div className="stat-card">
-              <div className="stat-val">{t.total ?? '-'}</div>
-              <div className="stat-lbl">전체 이슈</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-val" style={{ color: 'var(--red)' }}>{t.high ?? '-'}</div>
-              <div className="stat-lbl"><span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: 'var(--red)', marginRight: 4 }}></span>심각도 상</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-val" style={{ color: 'var(--amber)' }}>{t.mid ?? '-'}</div>
-              <div className="stat-lbl"><span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#EF9F27', marginRight: 4 }}></span>심각도 중</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-val" style={{ color: 'var(--green)' }}>{t.low ?? '-'}</div>
-              <div className="stat-lbl"><span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: 'var(--green-mid)', marginRight: 4 }}></span>심각도 하</div>
-            </div>
+            {statCards.map(({ val, label, color, dot, severity }) => (
+              <div key={label} className="stat-card"
+                onClick={() => severity ? nav(`/issues?severity=${severity}`) : nav('/issues')}
+                style={{ cursor: 'pointer', transition: 'opacity 0.1s' }}
+                onTouchStart={e => e.currentTarget.style.opacity = '0.7'}
+                onTouchEnd={e => e.currentTarget.style.opacity = '1'}
+              >
+                <div className="stat-val" style={{ color }}>{val ?? '-'}</div>
+                <div className="stat-lbl">
+                  {dot && <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: dot, marginRight: 4 }}></span>}
+                  {label}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
