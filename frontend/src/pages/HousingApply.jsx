@@ -107,9 +107,13 @@ export default function HousingApply() {
       <div style={{ textAlign: 'center' }}>
         <div style={{ fontSize: 56, marginBottom: 16 }}>✅</div>
         <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>신청 완료!</div>
-        <div style={{ fontSize: 14, color: 'var(--text2)', lineHeight: 1.7 }}>
+        <div style={{ fontSize: 14, color: 'var(--text2)', lineHeight: 1.7, marginBottom: 32 }}>
           사택 신청이 접수되었습니다.<br/>검토 후 담당자가 연락드립니다.
         </div>
+        <button onClick={() => nav('/housing-apply')} className="btn-primary"
+          style={{ background: '#1A4A8A' }}>
+          홈으로 돌아가기
+        </button>
       </div>
     </div>
   );
