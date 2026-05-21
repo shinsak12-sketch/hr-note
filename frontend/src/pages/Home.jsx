@@ -73,7 +73,7 @@ export default function Home() {
             {top3.length === 0 && <div className="center-msg" style={{ padding: 20 }}>데이터 없음</div>}
             {top3.map((emp, i) => (
               <div key={emp.emp_no} className="detail-row" style={{ cursor: 'pointer' }}
-                onClick={() => nav(`/emp?q=${emp.emp_no}`)}>
+                onClick={() => emp.latest_issue_id ? nav(`/issues/${emp.latest_issue_id}`) : nav(`/emp?q=${emp.emp_no}`)}>
                 <div style={{ width: 24, fontWeight: 600, color: 'var(--text2)', fontSize: 13 }}>{i + 1}</div>
                 <div style={{
                   width: 34, height: 34, borderRadius: '50%',
@@ -82,7 +82,12 @@ export default function Home() {
                   fontWeight: 600, fontSize: 13, marginRight: 10, flexShrink: 0
                 }}>{emp.emp_name?.[0]}</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>{emp.emp_name}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                    <span style={{ fontWeight: 600, fontSize: 14 }}>{emp.emp_name}</span>
+                    {emp.latest_issue_type && (
+                      <span className="badge badge-type" style={{ fontSize: 10 }}>{emp.latest_issue_type}</span>
+                    )}
+                  </div>
                   <div style={{ fontSize: 11, color: 'var(--text2)' }}>{[emp.department, emp.rank].filter(Boolean).join(' · ')}</div>
                 </div>
                 <span className="badge badge-low">{emp.issue_count}건</span>

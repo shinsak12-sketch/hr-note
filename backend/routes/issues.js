@@ -41,9 +41,14 @@ router.get('/stats/summary', async (req, res) => {
     FROM issues
   `;
   const top3 = await sql`
-    SELECT emp_no, emp_name, department, rank, COUNT(*) AS issue_count
-    FROM issues GROUP BY emp_no, emp_name, department, rank
-    ORDER BY issue_count DESC LIMIT 3
+    SELECT i.emp_no, i.emp_name, i.department, i.rank,
+      COUNT(*) AS issue_count,
+      (SELECT issue_type FROM issues WHERE emp_no = i.emp_no ORDER BY issue_date DESC, created_at DESC LIMIT 1) AS latest_issue_type,
+      (SELECT id FROM issues WHERE emp_no = i.emp_no ORDER BY issue_date DESC, created_at DESC LIMIT 1) AS latest_issue_id
+    FROM issues i
+    GROUP BY i.emp_no, i.emp_name, i.department, i.rank
+    ORDER BY issue_count DESC
+    LIMIT 3
   `;
   res.json({ totals, top3 });
 });
