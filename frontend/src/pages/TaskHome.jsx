@@ -11,11 +11,21 @@ const STATUS_STYLE = {
   '보류':   { color: '#A32D2D', bg: '#FCEBEB' },
 };
 
+function parseAssignees(assignee) {
+  try {
+    const parsed = JSON.parse(assignee);
+    return Array.isArray(parsed) ? parsed : [assignee];
+  } catch {
+    return assignee ? [assignee] : [];
+  }
+}
+
 function TaskCard({ task, onClick }) {
   const s = STATUS_STYLE[task.status] || STATUS_STYLE['시작전'];
   const dateStr = task.instruction_date?.split?.('T')[0] || task.instruction_date || '';
   const dueStr = task.due_date?.split?.('T')[0] || task.due_date || '';
   const isOverdue = dueStr && task.status !== '완료' && new Date(dueStr) < new Date();
+  const assignees = parseAssignees(task.assignee);
 
   return (
     <div onClick={onClick} style={{
@@ -33,8 +43,10 @@ function TaskCard({ task, onClick }) {
       <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 6, lineHeight: 1.4 }}>
         {task.content}
       </div>
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-        <span style={{ fontSize: 12, color: 'var(--text2)' }}>👤 {task.assignee}</span>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 12, color: 'var(--text2)' }}>
+          👤 {assignees.join(', ')}
+        </span>
         {dueStr && (
           <span style={{ fontSize: 12, color: isOverdue ? 'var(--red)' : 'var(--text2)' }}>
             {isOverdue ? '⚠️' : '📅'} {dueStr}

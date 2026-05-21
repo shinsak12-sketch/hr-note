@@ -91,4 +91,8 @@ export const api = {
   updateTask: (id, body) => request(`/tasks/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   updateTaskStatus: (id, status) => request(`/tasks/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
   deleteTask: (id) => request(`/tasks/${id}`, { method: 'DELETE' }),
+  // 진행과정
+  getProgress: (taskId) => request(`/tasks/${taskId}/progress`),
+  addProgress: (taskId, body) => request(`/tasks/${taskId}/progress`, { method: 'POST', body: JSON.stringify(body) }),
+  deleteProgress: (taskId, progressId) => request(`/tasks/${taskId}/progress/${progressId}`, { method: 'DELETE' }),
 };

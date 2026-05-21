@@ -29,9 +29,10 @@ router.post('/', async (req, res) => {
   const { instruction_date, content, assignee, due_date, status, note } = req.body;
   if (!instruction_date || !content || !assignee)
     return res.status(400).json({ error: '필수 항목을 모두 입력하세요.' });
+  const assigneeStr = Array.isArray(assignee) ? JSON.stringify(assignee) : assignee;
   const [task] = await sql`
     INSERT INTO tasks (instruction_date, content, assignee, due_date, status, note, created_by)
-    VALUES (${instruction_date}, ${content}, ${assignee}, ${due_date||null}, ${status||'시작전'}, ${note||null}, ${req.user.id})
+    VALUES (${instruction_date}, ${content}, ${assigneeStr}, ${due_date||null}, ${status||'시작전'}, ${note||null}, ${req.user.id})
     RETURNING *
   `;
   res.status(201).json(task);
@@ -40,9 +41,10 @@ router.post('/', async (req, res) => {
 // 수정
 router.put('/:id', async (req, res) => {
   const { instruction_date, content, assignee, due_date, status, note } = req.body;
+  const assigneeStr = Array.isArray(assignee) ? JSON.stringify(assignee) : assignee;
   const [task] = await sql`
     UPDATE tasks SET
-      instruction_date=${instruction_date}, content=${content}, assignee=${assignee},
+      instruction_date=${instruction_date}, content=${content}, assignee=${assigneeStr},
       due_date=${due_date||null}, status=${status}, note=${note||null}, updated_at=NOW()
     WHERE id=${req.params.id} RETURNING *
   `;
@@ -63,6 +65,35 @@ router.patch('/:id/status', async (req, res) => {
 // 삭제
 router.delete('/:id', async (req, res) => {
   await sql`DELETE FROM tasks WHERE id = ${req.params.id}`;
+  res.json({ message: '삭제되었습니다.' });
+});
+
+// ── 진행과정 ──────────────────────────────────────────
+// 진행과정 목록
+router.get('/:id/progress', async (req, res) => {
+  const progress = await sql`
+    SELECT * FROM task_progress WHERE task_id = ${req.params.id}
+    ORDER BY progress_date ASC, created_at ASC
+  `;
+  res.json(progress);
+});
+
+// 진행과정 추가
+router.post('/:id/progress', async (req, res) => {
+  const { progress_date, content } = req.body;
+  if (!progress_date || !content)
+    return res.status(400).json({ error: '모든 항목을 입력하세요.' });
+  const [progress] = await sql`
+    INSERT INTO task_progress (task_id, progress_date, content, created_by)
+    VALUES (${req.params.id}, ${progress_date}, ${content}, ${req.user.id})
+    RETURNING *
+  `;
+  res.status(201).json(progress);
+});
+
+// 진행과정 삭제
+router.delete('/:task_id/progress/:progress_id', async (req, res) => {
+  await sql`DELETE FROM task_progress WHERE id = ${req.params.progress_id} AND task_id = ${req.params.task_id}`;
   res.json({ message: '삭제되었습니다.' });
 });
 

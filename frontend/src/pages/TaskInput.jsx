@@ -6,7 +6,7 @@ import { Toast } from '../components/Common.jsx';
 const STATUSES = ['시작전', '진행중', '일부완료', '완료', '보류'];
 const EMPTY = {
   instruction_date: new Date().toISOString().split('T')[0],
-  content: '', assignee: '', due_date: '', status: '시작전', note: ''
+  content: '', due_date: '', status: '시작전', note: ''
 };
 
 export default function TaskInput() {
@@ -14,6 +14,7 @@ export default function TaskInput() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const [form, setForm] = useState(EMPTY);
+  const [assignees, setAssignees] = useState(['']);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState('');
   const [error, setError] = useState('');
@@ -24,32 +25,53 @@ export default function TaskInput() {
         setForm({
           instruction_date: task.instruction_date?.split?.('T')[0] || task.instruction_date || '',
           content: task.content || '',
-          assignee: task.assignee || '',
           due_date: task.due_date?.split?.('T')[0] || task.due_date || '',
           status: task.status || '시작전',
           note: task.note || '',
         });
+        // 담당자 파싱
+        try {
+          const parsed = JSON.parse(task.assignee);
+          setAssignees(Array.isArray(parsed) ? parsed : [task.assignee]);
+        } catch {
+          setAssignees(task.assignee ? [task.assignee] : ['']);
+        }
       });
     }
   }, [id]);
 
   function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
 
+  function addAssignee() {
+    if (assignees.length < 5) setAssignees(a => [...a, '']);
+  }
+
+  function removeAssignee(idx) {
+    if (assignees.length === 1) return;
+    setAssignees(a => a.filter((_, i) => i !== idx));
+  }
+
+  function updateAssignee(idx, val) {
+    setAssignees(a => a.map((v, i) => i === idx ? val : v));
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    if (!form.instruction_date || !form.content || !form.assignee) {
+    const validAssignees = assignees.filter(a => a.trim());
+    if (!form.instruction_date || !form.content || validAssignees.length === 0) {
       setError('필수 항목을 모두 입력하세요.');
       return;
     }
     setLoading(true);
     try {
+      const body = { ...form, assignee: JSON.stringify(validAssignees) };
       if (isEdit) {
-        await api.updateTask(id, form);
+        await api.updateTask(id, body);
         setToast('수정되었습니다.');
         setTimeout(() => nav(`/tasks/${id}`, { replace: true }), 1200);
       } else {
-        await api.createTask(form);
+        await api.createTask(body);
         setToast('등록되었습니다.');
         setTimeout(() => nav('/tasks-app', { replace: true }), 1200);
       }
@@ -76,10 +98,36 @@ export default function TaskInput() {
           <label className="form-label">지시일자 <span className="req">*</span></label>
           <input type="date" value={form.instruction_date} onChange={e => setF('instruction_date', e.target.value)} />
         </div>
+
+        {/* 담당자 다중입력 */}
         <div className="form-group">
-          <label className="form-label">담당자 <span className="req">*</span></label>
-          <input type="text" placeholder="담당자 이름" value={form.assignee} onChange={e => setF('assignee', e.target.value)} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+            <label className="form-label" style={{ marginBottom: 0 }}>담당자 <span className="req">*</span> <span className="opt">(최대 5명)</span></label>
+            {assignees.length < 5 && (
+              <button type="button" onClick={addAssignee} style={{
+                fontSize: 12, padding: '3px 10px', borderRadius: 6,
+                background: '#E8F0FB', color: '#1A4A8A',
+                border: 'none', cursor: 'pointer', fontWeight: 600,
+              }}>+ 추가</button>
+            )}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {assignees.map((a, idx) => (
+              <div key={idx} style={{ display: 'flex', gap: 8 }}>
+                <input type="text" placeholder={`담당자 ${idx + 1}`}
+                  value={a} onChange={e => updateAssignee(idx, e.target.value)}
+                  style={{ flex: 1 }} />
+                {assignees.length > 1 && (
+                  <button type="button" onClick={() => removeAssignee(idx)} style={{
+                    width: 36, height: 40, borderRadius: 8, border: '0.5px solid var(--border)',
+                    background: '#FCEBEB', color: '#A32D2D', cursor: 'pointer', fontSize: 16, flexShrink: 0,
+                  }}>×</button>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
+
         <div className="form-group">
           <label className="form-label">업무내용 <span className="req">*</span></label>
           <textarea placeholder="업무지시 내용을 입력하세요" value={form.content}
