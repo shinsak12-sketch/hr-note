@@ -27,8 +27,9 @@ async function request(path, options = {}) {
 
 export const api = {
   login: (body) => request('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
+  requestAccount: (body) => request('/auth/request', { method: 'POST', body: JSON.stringify(body) }),
   getUsers: () => request('/auth/users'),
-  addUser: (body) => request('/auth/users', { method: 'POST', body: JSON.stringify(body) }),
+  updateUserStatus: (id, status) => request(`/auth/users/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
   deleteUser: (id) => request(`/auth/users/${id}`, { method: 'DELETE' }),
   changePassword: (id, password) => request(`/auth/users/${id}/password`, { method: 'PATCH', body: JSON.stringify({ password }) }),
 
@@ -44,11 +45,13 @@ export const api = {
   exportExcel: () => {
     const token = getToken();
     const url = `${BASE}/issues/export/excel`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'HR노트_이슈목록.xlsx';
     fetch(url, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.blob())
-      .then(b => { a.href = URL.createObjectURL(b); a.click(); });
+      .then(b => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(b);
+        a.download = 'HR노트_이슈목록.xlsx';
+        a.click();
+      });
   },
 };

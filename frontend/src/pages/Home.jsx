@@ -25,7 +25,9 @@ export default function Home() {
       <div className="header">
         <div style={{ fontSize: 18, fontWeight: 700 }}>HR노트</div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <button onClick={() => nav('/accounts')} className="btn-secondary" style={{ fontSize: 12 }}>계정관리</button>
+          {user.role === 'master' && (
+            <button onClick={() => nav('/accounts')} className="btn-secondary" style={{ fontSize: 12 }}>계정관리</button>
+          )}
           <button onClick={logout} className="btn-secondary" style={{ fontSize: 12 }}>로그아웃</button>
         </div>
       </div>
