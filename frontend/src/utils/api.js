@@ -1,8 +1,6 @@
 const BASE = import.meta.env.VITE_API_URL || '/api';
 
-function getToken() {
-  return localStorage.getItem('hr_token');
-}
+function getToken() { return localStorage.getItem('hr_token'); }
 
 async function request(path, options = {}) {
   const token = getToken();
@@ -31,7 +29,6 @@ export const api = {
   getUsers: () => request('/auth/users'),
   updateUserStatus: (id, status) => request(`/auth/users/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
   deleteUser: (id) => request(`/auth/users/${id}`, { method: 'DELETE' }),
-  changePassword: (id, password) => request(`/auth/users/${id}/password`, { method: 'PATCH', body: JSON.stringify({ password }) }),
 
   getIssues: (params = {}) => {
     const q = new URLSearchParams(params).toString();
@@ -42,12 +39,36 @@ export const api = {
   updateIssue: (id, body) => request(`/issues/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   deleteIssue: (id) => request(`/issues/${id}`, { method: 'DELETE' }),
   getSummary: () => request('/issues/stats/summary'),
+
+  downloadTemplate: () => {
+    const token = getToken();
+    fetch(`${BASE}/issues/template/excel`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.blob()).then(b => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(b);
+        a.download = 'HR노트_업로드양식.xlsx';
+        a.click();
+      });
+  },
+
+  uploadExcel: async (file) => {
+    const token = getToken();
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch(`${BASE}/issues/upload/excel`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '업로드 실패');
+    return data;
+  },
+
   exportExcel: () => {
     const token = getToken();
-    const url = `${BASE}/issues/export/excel`;
-    fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.blob())
-      .then(b => {
+    fetch(`${BASE}/issues/export/excel`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.blob()).then(b => {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(b);
         a.download = 'HR노트_이슈목록.xlsx';

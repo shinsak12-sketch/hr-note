@@ -8,6 +8,7 @@ import IssueInput from './pages/IssueInput.jsx';
 import IssueDetail from './pages/IssueDetail.jsx';
 import AccountMgmt from './pages/AccountMgmt.jsx';
 import AccountRequest from './pages/AccountRequest.jsx';
+import Settings from './pages/Settings.jsx';
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('hr_token');
@@ -33,6 +34,7 @@ export default function App() {
       <Route path="/issues/new" element={<PrivateRoute><IssueInput /></PrivateRoute>} />
       <Route path="/issues/:id" element={<PrivateRoute><IssueDetail /></PrivateRoute>} />
       <Route path="/issues/:id/edit" element={<PrivateRoute><IssueInput /></PrivateRoute>} />
+      <Route path="/settings" element={<MasterRoute><Settings /></MasterRoute>} />
       <Route path="/accounts" element={<MasterRoute><AccountMgmt /></MasterRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
