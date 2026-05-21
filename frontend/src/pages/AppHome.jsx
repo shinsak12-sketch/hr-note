@@ -20,6 +20,15 @@ const APPS = [
     color: '#1A4A8A',
     bg: '#E8F0FB',
   },
+  {
+    id: 'memos',
+    icon: '📝',
+    title: '메모장',
+    desc: '현장·회의·수행 메모',
+    path: '/memos-app',
+    color: '#5C3D8F',
+    bg: '#F0EBF8',
+  },
 ];
 
 export default function AppHome() {

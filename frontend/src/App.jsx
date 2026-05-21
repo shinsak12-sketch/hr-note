@@ -14,6 +14,8 @@ import Scoring from './pages/Scoring.jsx';
 import TaskHome from './pages/TaskHome.jsx';
 import TaskInput from './pages/TaskInput.jsx';
 import TaskDetail from './pages/TaskDetail.jsx';
+import MemoHome from './pages/MemoHome.jsx';
+import MemoEdit from './pages/MemoEdit.jsx';
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('hr_token');
@@ -51,6 +53,11 @@ export default function App() {
       <Route path="/tasks/new" element={<PrivateRoute><TaskInput /></PrivateRoute>} />
       <Route path="/tasks/:id" element={<PrivateRoute><TaskDetail /></PrivateRoute>} />
       <Route path="/tasks/:id/edit" element={<PrivateRoute><TaskInput /></PrivateRoute>} />
+
+      {/* 메모장 */}
+      <Route path="/memos-app" element={<PrivateRoute><MemoHome /></PrivateRoute>} />
+      <Route path="/memos/new" element={<PrivateRoute><MemoEdit /></PrivateRoute>} />
+      <Route path="/memos/:id" element={<PrivateRoute><MemoEdit /></PrivateRoute>} />
 
       {/* 설정/계정 */}
       <Route path="/settings" element={<MasterRoute><Settings /></MasterRoute>} />

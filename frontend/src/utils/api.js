@@ -95,4 +95,14 @@ export const api = {
   getProgress: (taskId) => request(`/tasks/${taskId}/progress`),
   addProgress: (taskId, body) => request(`/tasks/${taskId}/progress`, { method: 'POST', body: JSON.stringify(body) }),
   deleteProgress: (taskId, progressId) => request(`/tasks/${taskId}/progress/${progressId}`, { method: 'DELETE' }),
+
+  // 메모
+  getMemos: (q) => {
+    const qs = q ? '?q=' + encodeURIComponent(q) : '';
+    return request('/memos' + qs);
+  },
+  getMemo: (id) => request('/memos/' + id),
+  createMemo: (body) => request('/memos', { method: 'POST', body: JSON.stringify(body) }),
+  updateMemo: (id, body) => request('/memos/' + id, { method: 'PUT', body: JSON.stringify(body) }),
+  deleteMemo: (id) => request('/memos/' + id, { method: 'DELETE' }),
 };
