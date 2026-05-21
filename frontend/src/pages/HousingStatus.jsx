@@ -77,6 +77,13 @@ export default function HousingStatus() {
             style={{ background: '#1A4A8A' }}>
             {loading ? '조회 중...' : '🔍 조회'}
           </button>
+          <div style={{
+            fontSize: 12, color: 'var(--text2)', textAlign: 'center',
+            padding: '8px 12px', background: 'var(--bg2)', borderRadius: 8, lineHeight: 1.6,
+          }}>
+            🔑 비밀번호 분실 시<br/>
+            <strong style={{ color: 'var(--text)' }}>손사지원파트 신이삭 수석</strong>에게 연락 바랍니다.
+          </div>
         </form>
 
         {searched && requests.length === 0 && (

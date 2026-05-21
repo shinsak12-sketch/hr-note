@@ -115,7 +115,10 @@ export default function HousingApply() {
   return (
     <div className="app-container">
       <div className="header">
-        <div style={{ width: 40 }} />
+        <button className="header-back" onClick={() => nav('/housing-apply')}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg>
+          뒤로
+        </button>
         <div style={{ fontSize: 16, fontWeight: 700 }}>🏠 사택 신청</div>
         <div style={{ width: 40 }} />
       </div>
