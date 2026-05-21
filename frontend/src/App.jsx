@@ -21,6 +21,8 @@ import OfficeHome from './pages/OfficeHome.jsx';
 import OfficeInput from './pages/OfficeInput.jsx';
 import GeneralHome from './pages/GeneralHome.jsx';
 import HousingMgmt from './pages/HousingMgmt.jsx';
+import HousingStats from './pages/HousingStats.jsx';
+import HousingList from './pages/HousingList.jsx';
 import HousingLanding from './pages/HousingLanding.jsx';
 import HousingApply from './pages/HousingApply.jsx';
 import HousingStatus from './pages/HousingStatus.jsx';
@@ -82,7 +84,9 @@ export default function App() {
 
       {/* 총무지원 */}
       <Route path="/general-app" element={<PrivateRoute><PermissionGuard menuKey="general"><GeneralHome /></PermissionGuard></PrivateRoute>} />
+      <Route path="/housing-stats" element={<PrivateRoute><PermissionGuard menuKey="general"><HousingStats /></PermissionGuard></PrivateRoute>} />
       <Route path="/housing-mgmt" element={<PrivateRoute><PermissionGuard menuKey="general"><HousingMgmt /></PermissionGuard></PrivateRoute>} />
+      <Route path="/housing-list" element={<PrivateRoute><PermissionGuard menuKey="general"><HousingList /></PermissionGuard></PrivateRoute>} />
 
       {/* 설정/계정 */}
       <Route path="/settings/permissions" element={<MasterRoute><PermissionSettings /></MasterRoute>} />
