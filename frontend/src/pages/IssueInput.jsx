@@ -6,7 +6,7 @@ import { Toast } from '../components/Common.jsx';
 const EMPTY = {
   emp_no: '', emp_name: '', department: '', rank: '', position: '',
   issue_date: new Date().toISOString().split('T')[0],
-  issue_type: '', severity: '', related_person: '', action_taken: ''
+  issue_type: '', severity: '', related_person: '', issue_content: ''
 };
 
 export default function IssueInput() {
@@ -31,7 +31,7 @@ export default function IssueInput() {
           issue_type: issue.issue_type || '',
           severity: issue.severity || '',
           related_person: issue.related_person || '',
-          action_taken: issue.action_taken || '',
+          issue_content: issue.issue_content || '',
         });
       });
     }
@@ -117,12 +117,14 @@ export default function IssueInput() {
           </select>
         </div>
         <div className="form-group">
-          <label className="form-label">관련자</label>
+          <label className="form-label">관련자 <span className="opt">(선택)</span></label>
           <input type="text" placeholder="관련자 이름" value={form.related_person} onChange={e => setF('related_person', e.target.value)} />
         </div>
         <div className="form-group">
-          <label className="form-label">조치사항</label>
-          <textarea placeholder="조치 내용을 입력하세요" value={form.action_taken} onChange={e => setF('action_taken', e.target.value)} />
+          <label className="form-label">이슈내용 <span className="opt">(선택)</span></label>
+          <textarea placeholder="이슈 내용을 상세히 입력하세요" value={form.issue_content}
+            onChange={e => setF('issue_content', e.target.value)}
+            style={{ height: 120 }} />
         </div>
         {error && <div style={{ color: 'var(--red)', fontSize: 13 }}>{error}</div>}
         <button className="btn-primary" type="submit" disabled={loading} style={{ marginBottom: 8 }}>

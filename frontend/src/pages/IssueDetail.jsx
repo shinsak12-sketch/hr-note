@@ -79,7 +79,7 @@ export default function IssueDetail() {
     { label: '이슈구분', value: <span className="badge badge-type">{issue.issue_type}</span> },
     { label: '심각도', value: <span className={`badge ${sevClass}`}>{issue.severity}</span> },
     issue.related_person && { label: '관련자', value: issue.related_person },
-    issue.action_taken && { label: '최초조치', value: issue.action_taken },
+    issue.issue_content && { label: '이슈내용', value: issue.issue_content },
   ].filter(Boolean);
 
   return (

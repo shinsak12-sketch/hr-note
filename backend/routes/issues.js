@@ -130,12 +130,12 @@ router.get('/:id', async (req, res) => {
 
 // 이슈 등록
 router.post('/', async (req, res) => {
-  const { emp_no, emp_name, department, rank, position, issue_date, issue_type, severity, related_person, action_taken } = req.body;
+  const { emp_no, emp_name, department, rank, position, issue_date, issue_type, severity, related_person, issue_content } = req.body;
   if (!emp_no || !emp_name || !issue_date || !issue_type || !severity)
     return res.status(400).json({ error: '필수 항목을 모두 입력하세요.' });
   const [issue] = await sql`
-    INSERT INTO issues (emp_no, emp_name, department, rank, position, issue_date, issue_type, severity, related_person, action_taken, created_by)
-    VALUES (${emp_no}, ${emp_name}, ${department||null}, ${rank||null}, ${position||null}, ${issue_date}, ${issue_type}, ${severity}, ${related_person||null}, ${action_taken||null}, ${req.user.id})
+    INSERT INTO issues (emp_no, emp_name, department, rank, position, issue_date, issue_type, severity, related_person, issue_content, created_by)
+    VALUES (${emp_no}, ${emp_name}, ${department||null}, ${rank||null}, ${position||null}, ${issue_date}, ${issue_type}, ${severity}, ${related_person||null}, ${issue_content||null}, ${req.user.id})
     RETURNING *
   `;
   res.status(201).json(issue);
@@ -143,12 +143,12 @@ router.post('/', async (req, res) => {
 
 // 이슈 수정
 router.put('/:id', async (req, res) => {
-  const { emp_no, emp_name, department, rank, position, issue_date, issue_type, severity, related_person, action_taken } = req.body;
+  const { emp_no, emp_name, department, rank, position, issue_date, issue_type, severity, related_person, issue_content } = req.body;
   const [issue] = await sql`
     UPDATE issues SET emp_no=${emp_no}, emp_name=${emp_name}, department=${department||null},
       rank=${rank||null}, position=${position||null}, issue_date=${issue_date},
       issue_type=${issue_type}, severity=${severity}, related_person=${related_person||null},
-      action_taken=${action_taken||null}, updated_at=NOW()
+      issue_content=${issue_content||null}, updated_at=NOW()
     WHERE id=${req.params.id} RETURNING *
   `;
   if (!issue) return res.status(404).json({ error: '이슈를 찾을 수 없습니다.' });
