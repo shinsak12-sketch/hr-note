@@ -1,6 +1,87 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api.js';
+
+function MemoCard({ memo, dateStr, ts, onEdit, onDelete }) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('touchstart', handleClick);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('touchstart', handleClick);
+    };
+  }, []);
+
+  return (
+    <div style={{
+      background: 'var(--bg)', border: '0.5px solid var(--border)',
+      borderLeft: '4px solid #5C3D8F',
+      borderRadius: 12, padding: '14px 16px', position: 'relative',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        {/* 클릭 영역 */}
+        <div style={{ flex: 1, cursor: 'pointer' }} onClick={onEdit}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
+            <span style={{ fontSize: 11, color: 'var(--text2)' }}>{dateStr}</span>
+            {memo.tag && (
+              <span style={{
+                fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+                background: ts.bg, color: ts.color,
+              }}>#{memo.tag}</span>
+            )}
+          </div>
+          <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text)', marginBottom: 4 }}>
+            {memo.title || <span style={{ color: 'var(--text2)', fontWeight: 400 }}>제목 없음</span>}
+          </div>
+          {memo.content && (
+            <div style={{
+              fontSize: 13, color: 'var(--text2)', lineHeight: 1.5,
+              overflow: 'hidden', display: '-webkit-box',
+              WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+            }}>
+              {memo.content}
+            </div>
+          )}
+        </div>
+
+        {/* 햄버거 버튼 */}
+        <div ref={menuRef} style={{ position: 'relative', marginLeft: 8, flexShrink: 0 }}>
+          <button onClick={() => setOpen(o => !o)} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            padding: '4px 6px', borderRadius: 6, color: 'var(--text2)',
+            fontSize: 18, lineHeight: 1,
+          }}>⋮</button>
+          {open && (
+            <div style={{
+              position: 'absolute', right: 0, top: '100%', zIndex: 50,
+              background: 'var(--bg)', border: '0.5px solid var(--border)',
+              borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+              overflow: 'hidden', minWidth: 100,
+            }}>
+              <button onClick={() => { setOpen(false); onEdit(); }} style={{
+                display: 'block', width: '100%', padding: '12px 16px',
+                border: 'none', background: 'none', textAlign: 'left',
+                fontSize: 14, cursor: 'pointer', color: '#5C3D8F', fontWeight: 600,
+              }}>✏️ 수정</button>
+              <div style={{ height: '0.5px', background: 'var(--border)' }} />
+              <button onClick={() => { setOpen(false); onDelete(); }} style={{
+                display: 'block', width: '100%', padding: '12px 16px',
+                border: 'none', background: 'none', textAlign: 'left',
+                fontSize: 14, cursor: 'pointer', color: '#A32D2D', fontWeight: 600,
+              }}>🗑️ 삭제</button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function MemoHome() {
   const nav = useNavigate();
@@ -62,58 +143,14 @@ export default function MemoHome() {
           const ts = tagStyle(memo.tag);
           const dateStr = memo.memo_date?.split?.('T')[0] || memo.memo_date || '';
           return (
-            <div key={memo.id}
-              style={{
-                background: 'var(--bg)', border: '0.5px solid var(--border)',
-                borderLeft: '4px solid #5C3D8F',
-                borderRadius: 12, padding: '14px 16px',
-              }}>
-              {/* 상단: 날짜 + 태그 */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <span style={{ fontSize: 11, color: 'var(--text2)' }}>{dateStr}</span>
-                {memo.tag && (
-                  <span style={{
-                    fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
-                    background: ts.bg, color: ts.color,
-                  }}>#{memo.tag}</span>
-                )}
-              </div>
-              {/* 제목 */}
-              <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text)', marginBottom: 4 }}
-                onClick={() => nav(`/memos/${memo.id}`)}>
-                {memo.title || <span style={{ color: 'var(--text2)', fontWeight: 400 }}>제목 없음</span>}
-              </div>
-              {/* 내용 미리보기 */}
-              {memo.content && (
-                <div style={{
-                  fontSize: 13, color: 'var(--text2)', lineHeight: 1.5,
-                  overflow: 'hidden', display: '-webkit-box',
-                  WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                  marginBottom: 10, cursor: 'pointer',
-                }} onClick={() => nav(`/memos/${memo.id}`)}>
-                  {memo.content}
-                </div>
-              )}
-              {/* 수정/삭제 버튼 */}
-              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                <button onClick={() => nav(`/memos/${memo.id}`)}
-                  style={{
-                    flex: 1, height: 34, borderRadius: 8,
-                    background: '#F0EBF8', color: '#5C3D8F',
-                    border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                  }}>✏️ 수정</button>
-                <button onClick={async () => {
-                  if (!window.confirm('이 메모를 삭제할까요?')) return;
-                  await api.deleteMemo(memo.id);
-                  load(query);
-                }}
-                  style={{
-                    flex: 1, height: 34, borderRadius: 8,
-                    background: '#FCEBEB', color: '#A32D2D',
-                    border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                  }}>🗑️ 삭제</button>
-              </div>
-            </div>
+            <MemoCard key={memo.id} memo={memo} dateStr={dateStr} ts={ts}
+              onEdit={() => nav(`/memos/${memo.id}`)}
+              onDelete={async () => {
+                if (!window.confirm('이 메모를 삭제할까요?')) return;
+                await api.deleteMemo(memo.id);
+                load(query);
+              }}
+            />
           );
         })}
       </div>
