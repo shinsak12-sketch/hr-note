@@ -45,7 +45,7 @@ router.post('/check-distance', async (req, res) => {
       geocode(office.address),
     ]);
     const distance_km = await getDistance(homeCoord.lng, homeCoord.lat, officeCoord.lng, officeCoord.lat);
-    res.json({ distance_km, eligible: distance_km <= 50, office_address: office.address });
+    res.json({ distance_km, eligible: distance_km > 50, office_address: office.address });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

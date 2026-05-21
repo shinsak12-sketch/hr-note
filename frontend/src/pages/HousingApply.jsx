@@ -114,7 +114,7 @@ export default function HousingApply() {
 
       <div style={{ padding: '12px 16px 4px', fontSize: 12, color: 'var(--text2)', lineHeight: 1.6,
         background: '#E8F0FB', margin: '0 16px', borderRadius: 8, marginTop: 12 }}>
-        📌 거주지에서 소속 센터까지 <strong style={{ color: '#1A4A8A' }}>실제 도로거리 50km 이내</strong>인 경우 신청 가능합니다.
+        📌 거주지에서 소속 센터까지 <strong style={{ color: '#1A4A8A' }}>실제 도로거리 50km 초과</strong>인 경우 신청 가능합니다.
       </div>
 
       <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto', paddingBottom: 40 }}>
@@ -185,7 +185,7 @@ export default function HousingApply() {
             border: `1px solid ${distance.eligible ? '#3B6D11' : '#A32D2D'}30`,
           }}>
             <div style={{ fontWeight: 700, fontSize: 16, color: distance.eligible ? '#3B6D11' : '#A32D2D', marginBottom: 8 }}>
-              {distance.eligible ? '✅ 신청 가능' : '❌ 신청 불가'}
+              {distance.eligible ? "✅ 신청 가능" : "❌ 신청 불가"}
             </div>
             <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.7 }}>
               <div>📍 거주지 → 소속까지</div>
@@ -193,7 +193,7 @@ export default function HousingApply() {
                 {distance.distance_km} km
               </div>
               <div style={{ fontSize: 12, color: 'var(--text2)' }}>
-                {distance.eligible ? '50km 이내로 사택 신청이 가능합니다.' : '50km 초과로 사택 신청 대상이 아닙니다.'}
+                {distance.eligible ? '50km 초과로 사택 신청이 가능합니다.' : '50km 이내로 사택 신청 대상이 아닙니다.'}
               </div>
             </div>
           </div>
