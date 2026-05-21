@@ -14,6 +14,7 @@ export default function OfficeHome() {
   const [department, setDepartment] = useState('');
   const [hqList, setHqList] = useState([]);
   const [deptList, setDeptList] = useState([]);
+  const [copied, setCopied] = useState(null);
 
   // 본부 목록 로드
   useEffect(() => {
@@ -149,6 +150,17 @@ export default function OfficeHome() {
                       }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                           <span style={{ fontWeight: 700, fontSize: 15 }}>📍 {office.org_name}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <button onClick={() => {
+                            navigator.clipboard.writeText(office.address);
+                            setCopied(office.id);
+                            setTimeout(() => setCopied(null), 2000);
+                          }} style={{
+                            fontSize: 11, padding: '3px 8px', borderRadius: 6,
+                            background: copied === office.id ? '#EAF3DE' : 'var(--bg2)',
+                            color: copied === office.id ? '#3B6D11' : 'var(--text2)',
+                            border: '0.5px solid var(--border)', cursor: 'pointer',
+                          }}>{copied === office.id ? '✓ 복사됨' : '📋 복사'}</button>
                           {isMaster && (
                             <button onClick={() => nav(`/offices/${office.id}/edit`)} style={{
                               fontSize: 11, padding: '3px 8px', borderRadius: 6,
@@ -156,6 +168,7 @@ export default function OfficeHome() {
                               border: '0.5px solid var(--border)', cursor: 'pointer',
                             }}>수정</button>
                           )}
+                        </div>
                         </div>
 
                         {/* 주소 → 네이버지도 */}
