@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api.js';
 
 const STATUS_STYLE = {
@@ -9,14 +10,21 @@ const STATUS_STYLE = {
 };
 
 export default function HousingApply() {
+  const nav = useNavigate();
   const [offices, setOffices] = useState([]);
   const [form, setForm] = useState({ emp_no: '', emp_name: '', department: '', office_id: '', home_address: '', home_address_detail: '', password: '', password_confirm: '' });
   const [distance, setDistance] = useState(null);
+  const [officeSearch, setOfficeSearch] = useState('');
+  const [showOfficeList, setShowOfficeList] = useState(false);
   const [checking, setChecking] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
-  const [step, setStep] = useState(1); // 1: 입력, 2: 거리확인, 3: 완료
+  const [step, setStep] = useState(1);
+
+  const filteredOffices = officeSearch
+    ? offices.filter(o => o.org_name.includes(officeSearch) || o.headquarters.includes(officeSearch))
+    : offices;
 
   useEffect(() => {
     api.getOffices().then(setOffices);
@@ -93,12 +101,6 @@ export default function HousingApply() {
   }
 
   // 소속 그룹핑
-  const grouped = offices.reduce((acc, o) => {
-    const key = o.headquarters;
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(o);
-    return acc;
-  }, {});
 
   if (step === 3) return (
     <div className="app-container" style={{ justifyContent: 'center', alignItems: 'center', padding: 32 }}>
@@ -146,16 +148,49 @@ export default function HousingApply() {
 
         <div className="form-group">
           <label className="form-label">소속 <span className="req">*</span></label>
-          <select value={form.office_id} onChange={e => setF('office_id', e.target.value)}>
-            <option value="">소속 선택</option>
-            {Object.entries(grouped).map(([hq, items]) => (
-              <optgroup key={hq} label={hq}>
-                {items.map(o => (
-                  <option key={o.id} value={o.id}>{o.org_name}</option>
+          <div style={{ position: 'relative' }}>
+            <input type="text"
+              placeholder="센터명 또는 본부명 검색"
+              value={officeSearch || (form.office_id ? (offices.find(o => o.id == form.office_id)?.org_name || '') : '')}
+              onChange={e => {
+                setOfficeSearch(e.target.value);
+                setF('office_id', '');
+                setShowOfficeList(true);
+              }}
+              onFocus={() => setShowOfficeList(true)}
+            />
+            {showOfficeList && (
+              <div style={{
+                position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100,
+                background: 'var(--bg)', border: '0.5px solid var(--border)',
+                borderRadius: 8, maxHeight: 200, overflowY: 'auto',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+              }}>
+                {filteredOffices.length === 0 && (
+                  <div style={{ padding: '12px 14px', fontSize: 13, color: 'var(--text2)' }}>검색 결과 없음</div>
+                )}
+                {filteredOffices.map(o => (
+                  <div key={o.id} onClick={() => {
+                    setF('office_id', String(o.id));
+                    setOfficeSearch('');
+                    setShowOfficeList(false);
+                  }} style={{
+                    padding: '12px 14px', cursor: 'pointer', fontSize: 14,
+                    borderBottom: '0.5px solid var(--border)',
+                    background: form.office_id == o.id ? 'var(--green-light)' : 'var(--bg)',
+                  }}>
+                    <span style={{ fontWeight: 600 }}>{o.org_name}</span>
+                    <span style={{ fontSize: 12, color: 'var(--text2)', marginLeft: 6 }}>{o.headquarters}</span>
+                  </div>
                 ))}
-              </optgroup>
-            ))}
-          </select>
+              </div>
+            )}
+          </div>
+          {form.office_id && !showOfficeList && (
+            <div style={{ fontSize: 12, color: '#3B6D11', marginTop: 4 }}>
+              ✓ {offices.find(o => o.id == form.office_id)?.org_name} 선택됨
+            </div>
+          )}
         </div>
 
         {/* Step 2: 거주지 주소 + 거리 확인 */}
