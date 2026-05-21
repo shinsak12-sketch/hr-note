@@ -10,25 +10,25 @@ const NAVER_SECRET = process.env.NAVER_CLIENT_SECRET;
 // 주소 → 좌표 변환
 async function geocode(address) {
   const res = await fetch(
-    `https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(address)}`,
+    `https://maps.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(address)}`,
     { headers: { 'X-NCP-APIGW-API-KEY-ID': NAVER_ID, 'X-NCP-APIGW-API-KEY': NAVER_SECRET } }
   );
   const data = await res.json();
-  if (!data.addresses?.length) throw new Error('주소를 찾을 수 없습니다.');
-  const { x, y } = data.addresses[0]; // x=경도, y=위도
+  if (!data.addresses?.length) throw new Error('주소를 찾을 수 없습니다. 도로명 주소로 다시 입력해주세요.');
+  const { x, y } = data.addresses[0];
   return { lng: parseFloat(x), lat: parseFloat(y) };
 }
 
 // 실제 도로 거리 계산
 async function getDistance(startLng, startLat, goalLng, goalLat) {
   const res = await fetch(
-    `https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?start=${startLng},${startLat}&goal=${goalLng},${goalLat}&option=trafast`,
+    `https://maps.apigw.ntruss.com/map-direction/v1/driving?start=${startLng},${startLat}&goal=${goalLng},${goalLat}&option=trafast`,
     { headers: { 'X-NCP-APIGW-API-KEY-ID': NAVER_ID, 'X-NCP-APIGW-API-KEY': NAVER_SECRET } }
   );
   const data = await res.json();
   if (data.code !== 0) throw new Error('거리 계산에 실패했습니다.');
   const distanceM = data.route?.trafast?.[0]?.summary?.distance;
-  return Math.round(distanceM / 100) / 10; // km 소수점 1자리
+  return Math.round(distanceM / 100) / 10;
 }
 
 // 거리 계산 API (신청 전 확인용, 로그인 불필요)
