@@ -18,7 +18,8 @@ export default function MemoEdit() {
   const [memoId, setMemoId] = useState(id || null);
   const [delConfirm, setDelConfirm] = useState(false);
   const autoSaveTimer = useRef(null);
-  const isNewRef = useRef(!id);
+  const memoIdRef = useRef(id || null);
+  const savedRef = useRef(true);
 
   useEffect(() => {
     if (isEdit) {
@@ -30,24 +31,25 @@ export default function MemoEdit() {
           tag: memo.tag || '',
         });
         setSaved(true);
+        savedRef.current = true;
       });
     }
   }, [id]);
 
-  const save = useCallback(async (formData, mid) => {
+  const save = useCallback(async (formData) => {
     setAutoSaving(true);
     try {
-      if (mid) {
-        await api.updateMemo(mid, formData);
+      if (memoIdRef.current) {
+        await api.updateMemo(memoIdRef.current, formData);
       } else {
         const created = await api.createMemo(formData);
+        memoIdRef.current = created.id;
         setMemoId(created.id);
-        isNewRef.current = false;
-        return created.id;
       }
       setSaved(true);
+      savedRef.current = true;
     } catch (e) {
-      // 저장 실패 무시
+      // 저장 실패
     } finally {
       setAutoSaving(false);
     }
@@ -57,32 +59,41 @@ export default function MemoEdit() {
     const next = { ...form, [k]: v };
     setForm(next);
     setSaved(false);
+    savedRef.current = false;
     // 자동저장 디바운스 2초
     if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
     autoSaveTimer.current = setTimeout(() => {
-      save(next, memoId);
+      save(next);
     }, 2000);
   }
 
   async function handleManualSave() {
-    const newId = await save(form, memoId);
-    if (newId) setMemoId(newId);
-    setSaved(true);
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    await save(form);
+    // 저장 후 목록으로 이동
+    nav('/memos-app', { replace: true });
+  }
+
+  async function handleBack() {
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    // 미저장 내용 있으면 저장 후 이동
+    if (!savedRef.current && (form.content || form.title)) {
+      await save(form);
+    }
+    nav('/memos-app');
   }
 
   async function handleDelete() {
     if (!delConfirm) { setDelConfirm(true); return; }
-    if (memoId) await api.deleteMemo(memoId);
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    if (memoIdRef.current) await api.deleteMemo(memoIdRef.current);
     nav('/memos-app', { replace: true });
   }
 
   return (
     <div className="app-container">
       <div className="header">
-        <button className="header-back" onClick={async () => {
-          if (!saved && form.content || form.title) await save(form, memoId);
-          nav('/memos-app');
-        }}>
+        <button className="header-back" onClick={handleBack}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg>
           목록
         </button>
@@ -90,7 +101,7 @@ export default function MemoEdit() {
           {autoSaving ? '저장 중...' : saved ? '저장됨 ✓' : '미저장'}
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
-          {memoId && (
+          {memoIdRef.current && (
             <button onClick={handleDelete} style={{
               fontSize: 12, padding: '5px 10px', borderRadius: 8,
               background: delConfirm ? '#FCEBEB' : 'var(--bg2)',
