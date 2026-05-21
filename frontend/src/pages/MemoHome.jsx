@@ -62,34 +62,57 @@ export default function MemoHome() {
           const ts = tagStyle(memo.tag);
           const dateStr = memo.memo_date?.split?.('T')[0] || memo.memo_date || '';
           return (
-            <div key={memo.id} onClick={() => nav(`/memos/${memo.id}`)}
+            <div key={memo.id}
               style={{
                 background: 'var(--bg)', border: '0.5px solid var(--border)',
                 borderLeft: '4px solid #5C3D8F',
-                borderRadius: 12, padding: '14px 16px', cursor: 'pointer',
+                borderRadius: 12, padding: '14px 16px',
               }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text)', flex: 1, marginRight: 8 }}>
-                  {memo.title || <span style={{ color: 'var(--text2)', fontWeight: 400 }}>제목 없음</span>}
-                </div>
-                <span style={{ fontSize: 11, color: 'var(--text2)', flexShrink: 0 }}>{dateStr}</span>
+              {/* 상단: 날짜 + 태그 */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <span style={{ fontSize: 11, color: 'var(--text2)' }}>{dateStr}</span>
+                {memo.tag && (
+                  <span style={{
+                    fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+                    background: ts.bg, color: ts.color,
+                  }}>#{memo.tag}</span>
+                )}
               </div>
+              {/* 제목 */}
+              <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text)', marginBottom: 4 }}
+                onClick={() => nav(`/memos/${memo.id}`)}>
+                {memo.title || <span style={{ color: 'var(--text2)', fontWeight: 400 }}>제목 없음</span>}
+              </div>
+              {/* 내용 미리보기 */}
               {memo.content && (
                 <div style={{
                   fontSize: 13, color: 'var(--text2)', lineHeight: 1.5,
                   overflow: 'hidden', display: '-webkit-box',
                   WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                  marginBottom: memo.tag ? 8 : 0,
-                }}>
+                  marginBottom: 10, cursor: 'pointer',
+                }} onClick={() => nav(`/memos/${memo.id}`)}>
                   {memo.content}
                 </div>
               )}
-              {memo.tag && (
-                <span style={{
-                  fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
-                  background: ts.bg, color: ts.color,
-                }}>#{memo.tag}</span>
-              )}
+              {/* 수정/삭제 버튼 */}
+              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                <button onClick={() => nav(`/memos/${memo.id}`)}
+                  style={{
+                    flex: 1, height: 34, borderRadius: 8,
+                    background: '#F0EBF8', color: '#5C3D8F',
+                    border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                  }}>✏️ 수정</button>
+                <button onClick={async () => {
+                  if (!window.confirm('이 메모를 삭제할까요?')) return;
+                  await api.deleteMemo(memo.id);
+                  load(query);
+                }}
+                  style={{
+                    flex: 1, height: 34, borderRadius: 8,
+                    background: '#FCEBEB', color: '#A32D2D',
+                    border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                  }}>🗑️ 삭제</button>
+              </div>
             </div>
           );
         })}
