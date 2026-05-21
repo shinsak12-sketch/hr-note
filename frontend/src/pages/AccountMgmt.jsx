@@ -24,9 +24,16 @@ export default function AccountMgmt() {
     load();
   }
 
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+
   async function handleDelete(id) {
-    if (!window.confirm('이 계정을 삭제할까요?')) return;
+    if (deleteConfirm !== id) {
+      setDeleteConfirm(id);
+      setTimeout(() => setDeleteConfirm(null), 3000);
+      return;
+    }
     await api.deleteUser(id);
+    setDeleteConfirm(null);
     setToast('삭제되었습니다.');
     load();
   }
@@ -103,7 +110,10 @@ export default function AccountMgmt() {
                   <option value="">업무구분 선택</option>
                   {WORK_TYPES.map(t => <option key={t}>{t}</option>)}
                 </select>
-                <button className="btn-delete" style={{ height: 36 }} onClick={() => handleDelete(u.id)}>삭제</button>
+                <button className="btn-delete" style={{ height: 36 }}
+                  onClick={() => handleDelete(u.id)}>
+                  {deleteConfirm === u.id ? '⚠️ 확인?' : '삭제'}
+                </button>
               </div>
             )}
           </div>
