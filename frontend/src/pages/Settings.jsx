@@ -9,6 +9,25 @@ export default function Settings() {
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState(null);
   const [toast, setToast] = useState('');
+  const [officeFile, setOfficeFile] = useState(null);
+  const [officeUploading, setOfficeUploading] = useState(false);
+  const [officeResult, setOfficeResult] = useState(null);
+
+  async function handleOfficeUpload() {
+    if (!officeFile) return;
+    setOfficeUploading(true);
+    setOfficeResult(null);
+    try {
+      const res = await api.uploadOfficeExcel(officeFile);
+      setOfficeResult(res);
+      setToast(`${res.success}건 등록 완료!`);
+      setOfficeFile(null);
+    } catch (e) {
+      setToast('업로드 실패: ' + e.message);
+    } finally {
+      setOfficeUploading(false);
+    }
+  }
 
   async function handleUpload() {
     if (!file) return;
@@ -75,6 +94,45 @@ export default function Settings() {
                   <div style={{ fontSize: 12, color: 'var(--red)' }}>
                     <div style={{ fontWeight: 600, marginBottom: 4 }}>⚠️ 오류 {result.errors.length}건:</div>
                     {result.errors.map((e, i) => <div key={i}>{e}</div>)}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* 사무실 엑셀 업로드 */}
+        <section>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>🏢 사무실 일괄 등록 (엑셀 업로드)</div>
+          <div className="detail-section">
+            <div className="detail-row" style={{ flexDirection: 'column', gap: 12, alignItems: 'stretch' }}>
+              <div style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.6 }}>
+                양식을 다운받아 작성 후 업로드하세요.<br/>
+                <span style={{ color: 'var(--red)', fontSize: 12 }}>* 구분: 본부/부서/센터 중 하나</span>
+              </div>
+              <button className="btn-secondary" style={{ width: '100%' }} onClick={() => api.downloadOfficeTemplate()}>
+                📥 사무실 양식 다운로드
+              </button>
+            </div>
+            <div className="detail-row" style={{ flexDirection: 'column', gap: 10, alignItems: 'stretch' }}>
+              <input type="file" accept=".xlsx,.xls"
+                onChange={e => setOfficeFile(e.target.files[0])}
+                style={{ height: 'auto', padding: '8px 12px', fontSize: 13 }} />
+              {officeFile && <div style={{ fontSize: 12, color: 'var(--text2)' }}>선택: {officeFile.name}</div>}
+              <button className="btn-primary" onClick={handleOfficeUpload}
+                disabled={!officeFile || officeUploading}
+                style={{ background: '#5A4A00' }}>
+                {officeUploading ? '업로드 중...' : '📤 업로드'}
+              </button>
+            </div>
+            {officeResult && (
+              <div className="detail-row" style={{ flexDirection: 'column', gap: 6, alignItems: 'stretch' }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--green)' }}>
+                  ✅ {officeResult.success}건 등록 완료
+                </div>
+                {officeResult.errors?.length > 0 && (
+                  <div style={{ fontSize: 12, color: 'var(--red)' }}>
+                    {officeResult.errors.map((e, i) => <div key={i}>{e}</div>)}
                   </div>
                 )}
               </div>

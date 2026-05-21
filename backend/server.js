@@ -5,6 +5,7 @@ import authRouter from './routes/auth.js';
 import issuesRouter from './routes/issues.js';
 import tasksRouter from './routes/tasks.js';
 import memosRouter from './routes/memos.js';
+import officesRouter from './routes/offices.js';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/issues', issuesRouter);
 app.use('/api/tasks', tasksRouter);
 app.use('/api/memos', memosRouter);
+app.use('/api/offices', officesRouter);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

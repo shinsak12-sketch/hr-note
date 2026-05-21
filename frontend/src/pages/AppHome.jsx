@@ -29,6 +29,15 @@ const APPS = [
     color: '#5C3D8F',
     bg: '#F0EBF8',
   },
+  {
+    id: 'offices',
+    icon: '🏢',
+    title: '사무실 주소',
+    desc: '조직별 사무실 정보 조회',
+    path: '/offices-app',
+    color: '#5A4A00',
+    bg: '#FFF9E6',
+  },
 ];
 
 export default function AppHome() {

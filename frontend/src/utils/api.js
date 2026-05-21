@@ -105,4 +105,37 @@ export const api = {
   createMemo: (body) => request('/memos', { method: 'POST', body: JSON.stringify(body) }),
   updateMemo: (id, body) => request('/memos/' + id, { method: 'PUT', body: JSON.stringify(body) }),
   deleteMemo: (id) => request('/memos/' + id, { method: 'DELETE' }),
+
+  // 사무실
+  getOffices: (params = {}) => {
+    const q = new URLSearchParams(params).toString();
+    return request('/offices' + (q ? '?' + q : ''));
+  },
+  getOffice: (id) => request('/offices/' + id),
+  createOffice: (body) => request('/offices', { method: 'POST', body: JSON.stringify(body) }),
+  updateOffice: (id, body) => request('/offices/' + id, { method: 'PUT', body: JSON.stringify(body) }),
+  deleteOffice: (id) => request('/offices/' + id, { method: 'DELETE' }),
+  downloadOfficeTemplate: () => {
+    const token = localStorage.getItem('hr_token');
+    fetch(BASE + '/offices/template/excel', { headers: { Authorization: 'Bearer ' + token } })
+      .then(r => r.blob()).then(b => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(b);
+        a.download = 'HR노트_사무실양식.xlsx';
+        a.click();
+      });
+  },
+  uploadOfficeExcel: async (file) => {
+    const token = localStorage.getItem('hr_token');
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch(BASE + '/offices/upload/excel', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token },
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '업로드 실패');
+    return data;
+  },
 };

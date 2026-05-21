@@ -16,6 +16,8 @@ import TaskInput from './pages/TaskInput.jsx';
 import TaskDetail from './pages/TaskDetail.jsx';
 import MemoHome from './pages/MemoHome.jsx';
 import MemoEdit from './pages/MemoEdit.jsx';
+import OfficeHome from './pages/OfficeHome.jsx';
+import OfficeInput from './pages/OfficeInput.jsx';
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('hr_token');
@@ -58,6 +60,11 @@ export default function App() {
       <Route path="/memos-app" element={<PrivateRoute><MemoHome /></PrivateRoute>} />
       <Route path="/memos/new" element={<PrivateRoute><MemoEdit /></PrivateRoute>} />
       <Route path="/memos/:id" element={<PrivateRoute><MemoEdit /></PrivateRoute>} />
+
+      {/* 사무실 주소 */}
+      <Route path="/offices-app" element={<PrivateRoute><OfficeHome /></PrivateRoute>} />
+      <Route path="/offices/new" element={<MasterRoute><OfficeInput /></MasterRoute>} />
+      <Route path="/offices/:id/edit" element={<MasterRoute><OfficeInput /></MasterRoute>} />
 
       {/* 설정/계정 */}
       <Route path="/settings" element={<MasterRoute><Settings /></MasterRoute>} />
