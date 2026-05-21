@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api.js';
-import { Toast } from '../components/Common.jsx';
 
 const MENUS = [
   { key: 'tasks',   label: '📌 업무지시' },
@@ -16,7 +15,7 @@ export default function PermissionSettings() {
   const nav = useNavigate();
   const [perms, setPerms] = useState({});
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState('');
+  const [msg, setMsg] = useState('');
   const [saving, setSaving] = useState('');
 
   useEffect(() => {
@@ -57,9 +56,9 @@ export default function PermissionSettings() {
     setSaving(workType);
     try {
       await api.updatePermission(workType, perms[workType] || []);
-      setToast(`${workType} 권한이 저장되었습니다.`);
+      setMsg(`✅ ${workType} 권한이 저장되었습니다.`);
     } catch (e) {
-      setToast('저장 실패: ' + e.message);
+      setMsg('❌ 저장 실패: ' + e.message);
     } finally {
       setSaving('');
     }
@@ -135,7 +134,13 @@ export default function PermissionSettings() {
           </div>
         ))}
       </div>
-      {toast && <Toast msg={toast} onDone={() => setToast('')} />}
+      {msg && (
+        <div style={{
+          position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
+          background: '#1a1a19', color: '#fff', padding: '10px 20px',
+          borderRadius: 20, fontSize: 13, zIndex: 100,
+        }}>{msg}</div>
+      )}
     </div>
   );
 }
