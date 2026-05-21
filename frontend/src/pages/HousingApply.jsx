@@ -16,6 +16,16 @@ export default function HousingApply() {
   const [distance, setDistance] = useState(null);
   const [isException, setIsException] = useState(false);
   const [exceptionChecked, setExceptionChecked] = useState(false);
+  const [officeSearch, setOfficeSearch] = useState('');
+  const [showOfficeList, setShowOfficeList] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [step, setStep] = useState(1);
+
+  const filteredOffices = officeSearch
+    ? offices.filter(o => o.org_name.includes(officeSearch) || o.headquarters.includes(officeSearch))
+    : offices;
 
   async function checkException(empNo) {
     if (!empNo) return;
@@ -25,16 +35,6 @@ export default function HousingApply() {
       setExceptionChecked(true);
     } catch { setIsException(false); }
   }
-  const [showOfficeList, setShowOfficeList] = useState(false);
-  const [checking, setChecking] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
-  const [error, setError] = useState('');
-  const [step, setStep] = useState(1);
-
-  const filteredOffices = officeSearch
-    ? offices.filter(o => o.org_name.includes(officeSearch) || o.headquarters.includes(officeSearch))
-    : offices;
 
   useEffect(() => {
     api.getOffices().then(setOffices);
