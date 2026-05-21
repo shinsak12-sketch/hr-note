@@ -7,6 +7,7 @@ const APPS = [
   { id: 'issues',  icon: '📋', title: '직원관리',   desc: '직원 이슈 기록 및 관리',   path: '/issues-app',  color: '#3B6D11', bg: '#EAF3DE', menuKey: 'issues' },
   { id: 'memos',   icon: '📝', title: '메모장',     desc: '현장·회의·수행 메모',       path: '/memos-app',   color: '#5C3D8F', bg: '#F0EBF8', menuKey: 'memos' },
   { id: 'offices', icon: '🏢', title: '사무실 주소', desc: '조직별 사무실 정보 조회',   path: '/offices-app', color: '#5A4A00', bg: '#FFF9E6', menuKey: 'offices' },
+  { id: 'general', icon: '🏛️', title: '총무지원',   desc: '사택·자산·수선 관리',       path: '/general-app', color: '#2D6A6A', bg: '#E6F4F4', menuKey: 'general' },
 ];
 
 export default function AppHome() {

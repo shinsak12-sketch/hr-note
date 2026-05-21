@@ -19,6 +19,9 @@ import MemoHome from './pages/MemoHome.jsx';
 import MemoEdit from './pages/MemoEdit.jsx';
 import OfficeHome from './pages/OfficeHome.jsx';
 import OfficeInput from './pages/OfficeInput.jsx';
+import GeneralHome from './pages/GeneralHome.jsx';
+import HousingMgmt from './pages/HousingMgmt.jsx';
+import HousingApply from './pages/HousingApply.jsx';
 import { PermissionGuard } from './components/PermissionGuard.jsx';
 
 function PrivateRoute({ children }) {
@@ -39,6 +42,9 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/request" element={<AccountRequest />} />
+
+      {/* 사택신청 (로그인 불필요) */}
+      <Route path="/housing-apply" element={<HousingApply />} />
 
       <Route path="/" element={<PrivateRoute><AppHome /></PrivateRoute>} />
 
@@ -66,6 +72,10 @@ export default function App() {
       <Route path="/offices-app" element={<PrivateRoute><PermissionGuard menuKey="offices"><OfficeHome /></PermissionGuard></PrivateRoute>} />
       <Route path="/offices/new" element={<MasterRoute><OfficeInput /></MasterRoute>} />
       <Route path="/offices/:id/edit" element={<MasterRoute><OfficeInput /></MasterRoute>} />
+
+      {/* 총무지원 */}
+      <Route path="/general-app" element={<PrivateRoute><PermissionGuard menuKey="general"><GeneralHome /></PermissionGuard></PrivateRoute>} />
+      <Route path="/housing-mgmt" element={<PrivateRoute><PermissionGuard menuKey="general"><HousingMgmt /></PermissionGuard></PrivateRoute>} />
 
       {/* 설정/계정 */}
       <Route path="/settings/permissions" element={<MasterRoute><PermissionSettings /></MasterRoute>} />

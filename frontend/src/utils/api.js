@@ -141,4 +141,11 @@ export const api = {
     if (!res.ok) throw new Error(data.error || '업로드 실패');
     return data;
   },
+
+  // 사택신청
+  checkDistance: (body) => request('/housing/check-distance', { method: 'POST', body: JSON.stringify(body) }),
+  applyHousing: (body) => request('/housing/apply', { method: 'POST', body: JSON.stringify(body) }),
+  getHousingRequests: () => request('/housing'),
+  updateHousingStatus: (id, status, note) => request('/housing/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status, note }) }),
+  deleteHousingRequest: (id) => request('/housing/' + id, { method: 'DELETE' }),
 };
