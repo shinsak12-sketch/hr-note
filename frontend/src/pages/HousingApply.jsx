@@ -132,6 +132,26 @@ export default function HousingApply() {
 
       <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto', paddingBottom: 40 }}>
 
+        {/* 사택 안내 */}
+        <div style={{
+          background: '#FFF9E6', border: '0.5px solid #E8D84A50',
+          borderRadius: 12, padding: '14px 16px',
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#5A4A00', marginBottom: 8 }}>
+            📋 사택 지원 안내
+          </div>
+          <div style={{ fontSize: 12, color: '#5A4A00', lineHeight: 1.9 }}>
+            <div>✅ <strong>지원 대상</strong>: 소속 센터까지 실제 도로거리 50km 초과 직원</div>
+            <div>✅ <strong>지원 내용</strong>: 월 임차료 일부 지원 (사내 규정 기준)</div>
+            <div>✅ <strong>신청 기간</strong>: 연중 수시 접수</div>
+            <div>✅ <strong>처리 기간</strong>: 신청 후 영업일 기준 5일 이내</div>
+            <div>✅ <strong>제출 서류</strong>: 신청 후 담당자 안내에 따라 제출</div>
+            <div style={{ marginTop: 6, paddingTop: 6, borderTop: '0.5px solid #E8D84A50', color: '#854F0B' }}>
+              ⚠️ 허위 신청 시 지원이 취소되며 불이익이 발생할 수 있습니다.
+            </div>
+          </div>
+        </div>
+
         {/* Step 1: 기본 정보 */}
         <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text2)' }}>① 기본 정보</div>
 
