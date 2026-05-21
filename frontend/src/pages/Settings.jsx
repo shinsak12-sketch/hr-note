@@ -111,24 +111,6 @@ export default function Settings() {
           />
         </AccordionSection>
 
-        {/* 권한 설정 */}
-        <AccordionSection title="권한 설정" icon="🔐">
-          <button onClick={() => nav('/settings/permissions')} style={{
-            display: 'flex', alignItems: 'center', gap: 12,
-            padding: '12px 14px', borderRadius: 10,
-            border: '0.5px solid var(--border)', background: 'var(--bg)',
-            cursor: 'pointer', width: '100%', textAlign: 'left',
-          }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 600, fontSize: 14 }}>업무구분별 메뉴 권한 설정</div>
-              <div style={{ fontSize: 12, color: 'var(--text2)', marginTop: 2 }}>인사/교육/총무경리/급여후생별 접근 메뉴 관리</div>
-            </div>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" strokeWidth="2">
-              <path d="m9 18 6-6-6-6"/>
-            </svg>
-          </button>
-        </AccordionSection>
-
         {/* 계정 관리 */}
         <AccordionSection title="계정 관리" icon="👥">
           <button onClick={() => nav('/accounts')} style={{
