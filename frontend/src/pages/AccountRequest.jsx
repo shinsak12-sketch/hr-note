@@ -4,7 +4,8 @@ import { api } from '../utils/api.js';
 
 export default function AccountRequest() {
   const nav = useNavigate();
-  const [form, setForm] = useState({ username: '', password: '', name: '' });
+  const [form, setForm] = useState({ username: '', password: '', name: '', work_type: '' });
+  const WORK_TYPES = ['인사', '교육', '총무경리', '급여후생'];
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -48,6 +49,13 @@ export default function AccountRequest() {
       <form onSubmit={handleSubmit} style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div style={{ fontSize: 13, color: 'var(--text2)', background: 'var(--green-light)', padding: 12, borderRadius: 8 }}>
           계정 신청 후 관리자 승인이 완료되면 로그인할 수 있습니다.
+        </div>
+        <div className="form-group">
+          <label className="form-label">업무구분 <span className="req">*</span></label>
+          <select value={form.work_type} onChange={e => setForm(f => ({ ...f, work_type: e.target.value }))}>
+            <option value="">선택하세요</option>
+            {WORK_TYPES.map(t => <option key={t}>{t}</option>)}
+          </select>
         </div>
         <div className="form-group">
           <label className="form-label">사번 <span className="req">*</span></label>

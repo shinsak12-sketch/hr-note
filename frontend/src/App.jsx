@@ -10,6 +10,7 @@ import IssueDetail from './pages/IssueDetail.jsx';
 import AccountMgmt from './pages/AccountMgmt.jsx';
 import AccountRequest from './pages/AccountRequest.jsx';
 import Settings from './pages/Settings.jsx';
+import PermissionSettings from './pages/PermissionSettings.jsx';
 import Scoring from './pages/Scoring.jsx';
 import TaskHome from './pages/TaskHome.jsx';
 import TaskInput from './pages/TaskInput.jsx';
@@ -18,6 +19,7 @@ import MemoHome from './pages/MemoHome.jsx';
 import MemoEdit from './pages/MemoEdit.jsx';
 import OfficeHome from './pages/OfficeHome.jsx';
 import OfficeInput from './pages/OfficeInput.jsx';
+import { PermissionGuard } from './components/PermissionGuard.jsx';
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('hr_token');
@@ -38,36 +40,36 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/request" element={<AccountRequest />} />
 
-      {/* 앱 목록 홈 */}
       <Route path="/" element={<PrivateRoute><AppHome /></PrivateRoute>} />
 
-      {/* 이슈관리 */}
-      <Route path="/issues-app" element={<PrivateRoute><IssueHome /></PrivateRoute>} />
-      <Route path="/emp" element={<PrivateRoute><EmpList /></PrivateRoute>} />
-      <Route path="/issues" element={<PrivateRoute><IssueList /></PrivateRoute>} />
-      <Route path="/issues/new" element={<PrivateRoute><IssueInput /></PrivateRoute>} />
-      <Route path="/issues/:id" element={<PrivateRoute><IssueDetail /></PrivateRoute>} />
-      <Route path="/issues/:id/edit" element={<PrivateRoute><IssueInput /></PrivateRoute>} />
-      <Route path="/scoring" element={<PrivateRoute><Scoring /></PrivateRoute>} />
-
       {/* 업무지시 */}
-      <Route path="/tasks-app" element={<PrivateRoute><TaskHome /></PrivateRoute>} />
-      <Route path="/tasks/new" element={<PrivateRoute><TaskInput /></PrivateRoute>} />
-      <Route path="/tasks/:id" element={<PrivateRoute><TaskDetail /></PrivateRoute>} />
-      <Route path="/tasks/:id/edit" element={<PrivateRoute><TaskInput /></PrivateRoute>} />
+      <Route path="/tasks-app" element={<PrivateRoute><PermissionGuard menuKey="tasks"><TaskHome /></PermissionGuard></PrivateRoute>} />
+      <Route path="/tasks/new" element={<PrivateRoute><PermissionGuard menuKey="tasks"><TaskInput /></PermissionGuard></PrivateRoute>} />
+      <Route path="/tasks/:id" element={<PrivateRoute><PermissionGuard menuKey="tasks"><TaskDetail /></PermissionGuard></PrivateRoute>} />
+      <Route path="/tasks/:id/edit" element={<PrivateRoute><PermissionGuard menuKey="tasks"><TaskInput /></PermissionGuard></PrivateRoute>} />
+
+      {/* 직원관리 */}
+      <Route path="/issues-app" element={<PrivateRoute><PermissionGuard menuKey="issues"><IssueHome /></PermissionGuard></PrivateRoute>} />
+      <Route path="/emp" element={<PrivateRoute><PermissionGuard menuKey="issues"><EmpList /></PermissionGuard></PrivateRoute>} />
+      <Route path="/issues" element={<PrivateRoute><PermissionGuard menuKey="issues"><IssueList /></PermissionGuard></PrivateRoute>} />
+      <Route path="/issues/new" element={<PrivateRoute><PermissionGuard menuKey="issues"><IssueInput /></PermissionGuard></PrivateRoute>} />
+      <Route path="/issues/:id" element={<PrivateRoute><PermissionGuard menuKey="issues"><IssueDetail /></PermissionGuard></PrivateRoute>} />
+      <Route path="/issues/:id/edit" element={<PrivateRoute><PermissionGuard menuKey="issues"><IssueInput /></PermissionGuard></PrivateRoute>} />
+      <Route path="/scoring" element={<PrivateRoute><PermissionGuard menuKey="issues"><Scoring /></PermissionGuard></PrivateRoute>} />
 
       {/* 메모장 */}
-      <Route path="/memos-app" element={<PrivateRoute><MemoHome /></PrivateRoute>} />
-      <Route path="/memos/new" element={<PrivateRoute><MemoEdit /></PrivateRoute>} />
-      <Route path="/memos/:id" element={<PrivateRoute><MemoEdit /></PrivateRoute>} />
+      <Route path="/memos-app" element={<PrivateRoute><PermissionGuard menuKey="memos"><MemoHome /></PermissionGuard></PrivateRoute>} />
+      <Route path="/memos/new" element={<PrivateRoute><PermissionGuard menuKey="memos"><MemoEdit /></PermissionGuard></PrivateRoute>} />
+      <Route path="/memos/:id" element={<PrivateRoute><PermissionGuard menuKey="memos"><MemoEdit /></PermissionGuard></PrivateRoute>} />
 
       {/* 사무실 주소 */}
-      <Route path="/offices-app" element={<PrivateRoute><OfficeHome /></PrivateRoute>} />
+      <Route path="/offices-app" element={<PrivateRoute><PermissionGuard menuKey="offices"><OfficeHome /></PermissionGuard></PrivateRoute>} />
       <Route path="/offices/new" element={<MasterRoute><OfficeInput /></MasterRoute>} />
       <Route path="/offices/:id/edit" element={<MasterRoute><OfficeInput /></MasterRoute>} />
 
       {/* 설정/계정 */}
       <Route path="/settings" element={<MasterRoute><Settings /></MasterRoute>} />
+      <Route path="/settings/permissions" element={<MasterRoute><PermissionSettings /></MasterRoute>} />
       <Route path="/accounts" element={<MasterRoute><AccountMgmt /></MasterRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
