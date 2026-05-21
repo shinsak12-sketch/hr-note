@@ -68,8 +68,8 @@ export default function App() {
       <Route path="/offices/:id/edit" element={<MasterRoute><OfficeInput /></MasterRoute>} />
 
       {/* 설정/계정 */}
-      <Route path="/settings" element={<MasterRoute><Settings /></MasterRoute>} />
       <Route path="/settings/permissions" element={<MasterRoute><PermissionSettings /></MasterRoute>} />
+      <Route path="/settings" element={<MasterRoute><Settings /></MasterRoute>} />
       <Route path="/accounts" element={<MasterRoute><AccountMgmt /></MasterRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
