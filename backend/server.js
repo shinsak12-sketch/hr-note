@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRouter from './routes/auth.js';
 import issuesRouter from './routes/issues.js';
+import tasksRouter from './routes/tasks.js';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRouter);
 app.use('/api/issues', issuesRouter);
+app.use('/api/tasks', tasksRouter);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

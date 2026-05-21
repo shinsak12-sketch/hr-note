@@ -1,7 +1,8 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login.jsx';
-import Home from './pages/Home.jsx';
+import AppHome from './pages/AppHome.jsx';
+import IssueHome from './pages/IssueHome.jsx';
 import EmpList from './pages/EmpList.jsx';
 import IssueList from './pages/IssueList.jsx';
 import IssueInput from './pages/IssueInput.jsx';
@@ -10,6 +11,9 @@ import AccountMgmt from './pages/AccountMgmt.jsx';
 import AccountRequest from './pages/AccountRequest.jsx';
 import Settings from './pages/Settings.jsx';
 import Scoring from './pages/Scoring.jsx';
+import TaskHome from './pages/TaskHome.jsx';
+import TaskInput from './pages/TaskInput.jsx';
+import TaskDetail from './pages/TaskDetail.jsx';
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('hr_token');
@@ -29,15 +33,29 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/request" element={<AccountRequest />} />
-      <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
+
+      {/* 앱 목록 홈 */}
+      <Route path="/" element={<PrivateRoute><AppHome /></PrivateRoute>} />
+
+      {/* 이슈관리 */}
+      <Route path="/issues-app" element={<PrivateRoute><IssueHome /></PrivateRoute>} />
       <Route path="/emp" element={<PrivateRoute><EmpList /></PrivateRoute>} />
       <Route path="/issues" element={<PrivateRoute><IssueList /></PrivateRoute>} />
       <Route path="/issues/new" element={<PrivateRoute><IssueInput /></PrivateRoute>} />
       <Route path="/issues/:id" element={<PrivateRoute><IssueDetail /></PrivateRoute>} />
       <Route path="/issues/:id/edit" element={<PrivateRoute><IssueInput /></PrivateRoute>} />
-      <Route path="/settings" element={<MasterRoute><Settings /></MasterRoute>} />
       <Route path="/scoring" element={<PrivateRoute><Scoring /></PrivateRoute>} />
+
+      {/* 업무지시 */}
+      <Route path="/tasks-app" element={<PrivateRoute><TaskHome /></PrivateRoute>} />
+      <Route path="/tasks/new" element={<PrivateRoute><TaskInput /></PrivateRoute>} />
+      <Route path="/tasks/:id" element={<PrivateRoute><TaskDetail /></PrivateRoute>} />
+      <Route path="/tasks/:id/edit" element={<PrivateRoute><TaskInput /></PrivateRoute>} />
+
+      {/* 설정/계정 */}
+      <Route path="/settings" element={<MasterRoute><Settings /></MasterRoute>} />
       <Route path="/accounts" element={<MasterRoute><AccountMgmt /></MasterRoute>} />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

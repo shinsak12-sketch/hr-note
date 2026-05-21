@@ -80,4 +80,15 @@ export const api = {
         a.click();
       });
   },
+
+  // 업무지시
+  getTasks: (params = {}) => {
+    const q = new URLSearchParams(params).toString();
+    return request(`/tasks${q ? '?' + q : ''}`);
+  },
+  getTask: (id) => request(`/tasks/${id}`),
+  createTask: (body) => request('/tasks', { method: 'POST', body: JSON.stringify(body) }),
+  updateTask: (id, body) => request(`/tasks/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  updateTaskStatus: (id, status) => request(`/tasks/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  deleteTask: (id) => request(`/tasks/${id}`, { method: 'DELETE' }),
 };
