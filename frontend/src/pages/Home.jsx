@@ -103,6 +103,7 @@ export default function Home() {
             {[
               { icon: '👥', title: '직원별 조회', desc: '사번 또는 성명으로 검색', path: '/emp' },
               { icon: '🔍', title: '이슈별 조회', desc: '구분코드 또는 심각도 필터', path: '/issues' },
+              { icon: '📊', title: '이슈 스코어링', desc: '직원별 위험도 분석', path: '/scoring' },
               { icon: '✏️', title: '이슈 입력', desc: '새 이슈 등록', path: '/issues/new' },
             ].map(m => (
               <button key={m.path} onClick={() => nav(m.path)}
