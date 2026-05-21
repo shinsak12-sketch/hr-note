@@ -3,15 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 const APPS = [
   {
-    id: 'issues',
-    icon: '📋',
-    title: '이슈관리',
-    desc: '직원 이슈 기록 및 관리',
-    path: '/issues-app',
-    color: '#3B6D11',
-    bg: '#EAF3DE',
-  },
-  {
     id: 'tasks',
     icon: '📌',
     title: '업무지시',
@@ -19,6 +10,15 @@ const APPS = [
     path: '/tasks-app',
     color: '#1A4A8A',
     bg: '#E8F0FB',
+  },
+  {
+    id: 'issues',
+    icon: '📋',
+    title: '직원관리',
+    desc: '직원 이슈 기록 및 관리',
+    path: '/issues-app',
+    color: '#3B6D11',
+    bg: '#EAF3DE',
   },
   {
     id: 'memos',
