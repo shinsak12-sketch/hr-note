@@ -29,6 +29,7 @@ import HousingStatus from './pages/HousingStatus.jsx';
 import AssetHome from './pages/AssetHome.jsx';
 import AssetRequests from './pages/AssetRequests.jsx';
 import AssetList from './pages/AssetList.jsx';
+import AssetStock from './pages/AssetStock.jsx';
 import AssetRequest from './pages/AssetRequest.jsx';
 import AssetStatus from './pages/AssetStatus.jsx';
 import RepairRequest from './pages/RepairRequest.jsx';
@@ -62,6 +63,7 @@ export default function App() {
       <Route path="/asset-mgmt" element={<PrivateRoute><PermissionGuard menuKey="general"><AssetHome /></PermissionGuard></PrivateRoute>} />
       <Route path="/asset-requests" element={<PrivateRoute><PermissionGuard menuKey="general"><AssetRequests /></PermissionGuard></PrivateRoute>} />
       <Route path="/asset-list" element={<PrivateRoute><PermissionGuard menuKey="general"><AssetList /></PermissionGuard></PrivateRoute>} />
+      <Route path="/asset-stock" element={<PrivateRoute><PermissionGuard menuKey="general"><AssetStock /></PermissionGuard></PrivateRoute>} />
 
       {/* 수선관리 */}
       <Route path="/repair-stats" element={<PrivateRoute><PermissionGuard menuKey="general"><RepairStats /></PermissionGuard></PrivateRoute>} />

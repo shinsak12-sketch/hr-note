@@ -203,3 +203,24 @@ router.delete('/requests/:id', authMiddleware, async (req, res) => {
 });
 
 export default router;
+
+// 회수 처리
+router.patch('/:id/retrieve', authMiddleware, async (req, res) => {
+  const [asset] = await sql`
+    UPDATE assets SET status='재고', emp_no=NULL, emp_name=NULL, office_id=NULL, org_name=NULL, updated_at=NOW()
+    WHERE id=${req.params.id} RETURNING *
+  `;
+  res.json(asset);
+});
+
+// 배포 처리
+router.patch('/:id/deploy', authMiddleware, async (req, res) => {
+  const { emp_no, emp_name, office_id, org_name } = req.body;
+  if (!emp_name) return res.status(400).json({ error: '성명을 입력하세요.' });
+  const [asset] = await sql`
+    UPDATE assets SET status='사용중', emp_no=${emp_no||null}, emp_name=${emp_name},
+      office_id=${office_id||null}, org_name=${org_name||null}, updated_at=NOW()
+    WHERE id=${req.params.id} RETURNING *
+  `;
+  res.json(asset);
+});

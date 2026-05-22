@@ -205,4 +205,7 @@ export const api = {
   updateRepairStatus: (id, body) => request('/repairs/' + id + '/status', { method: 'PATCH', body: JSON.stringify(body) }),
   resetRepairPassword: (id) => request('/repairs/' + id + '/reset-password', { method: 'PATCH' }),
   deleteRepair: (id) => request('/repairs/' + id, { method: 'DELETE' }),
+
+  retrieveAsset: (id) => request('/assets/' + id + '/retrieve', { method: 'PATCH' }),
+  deployAsset: (id, body) => request('/assets/' + id + '/deploy', { method: 'PATCH', body: JSON.stringify(body) }),
 };
