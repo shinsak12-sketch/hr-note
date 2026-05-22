@@ -5,7 +5,7 @@ const CALCS = [
   { icon: '👶', title: '육아휴직 계산', desc: '육아휴직 기간 및 잔여일 계산', color: '#3B6D11', bg: '#EAF3DE', path: '/hr-calc/parental-leave' },
   { icon: '🤱', title: '임신중 단축근무 계산', desc: '단축근무 대상기간 계산', color: '#1A4A8A', bg: '#E8F0FB', path: '/hr-calc/pregnancy' },
   { icon: '📅', title: '음력/양력 변환', desc: '음력 ↔ 양력 날짜 변환', color: '#5C3D8F', bg: '#F0EBF8', path: '/hr-calc/lunar' },
-  { icon: '📊', title: '영업일수 계산', desc: '두 날짜 사이 영업일 계산', color: '#854F0B', bg: '#FAEEDA', path: null },
+  { icon: '📊', title: '소정근로일수 계산', desc: '기간 내 실제 근무일수 계산', color: '#854F0B', bg: '#FAEEDA', path: null },
   { icon: '💰', title: '평균임금 계산', desc: '퇴직금 산정용 평균임금 계산', color: '#A32D2D', bg: '#FCEBEB', path: null },
 ];
 
@@ -46,10 +46,13 @@ export default function HRCalc() {
               <div style={{ fontWeight: 700, fontSize: 15, color: c.color, marginBottom: 2 }}>{c.title}</div>
               <div style={{ fontSize: 12, color: c.color + '99' }}>{c.desc}</div>
             </div>
-            <span style={{
-              fontSize: 10, padding: '2px 7px', borderRadius: 10,
-              background: c.color + '20', color: c.color, fontWeight: 600,
-            }}>준비중</span>
+            {c.path ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={c.color} strokeWidth="2.5" style={{ flexShrink: 0 }}>
+                <path d="m9 18 6-6-6-6"/>
+              </svg>
+            ) : (
+              <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 10, background: c.color + '20', color: c.color, fontWeight: 600 }}>준비중</span>
+            )}
           </button>
         ))}
       </div>
