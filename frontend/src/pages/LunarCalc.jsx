@@ -41,18 +41,20 @@ export default function LunarCalc() {
       if (mode === 'sol2lun') {
         const solar = Solar.fromYmd(Number(form.year), Number(form.month), Number(form.day));
         const lunar = solar.getLunar();
+        const lunMonth = lunar.getMonth();
+        const isLeapMonth = lunMonth < 0;
         const solDate = new Date(Number(form.year), Number(form.month)-1, Number(form.day));
         setResult({
           type: 'sol2lun',
           solYear: form.year, solMonth: form.month, solDay: form.day,
           dayOfWeek: DAYS_KO[solDate.getDay()],
-          lunYear: lunar.getYear(), lunMonth: lunar.getMonth(), lunDay: lunar.getDay(),
-          lunLeap: lunar.isLeap(),
+          lunYear: lunar.getYear(), lunMonth: Math.abs(lunMonth), lunDay: lunar.getDay(),
+          lunLeap: isLeapMonth,
           ganZhi: ganzhiKo(lunar.getYearInGanZhi()),
           shengXiao: shengxiaoKo(lunar.getYearShengXiao()),
         });
       } else {
-        const lunar = Lunar.fromYmd(Number(form.year), Number(form.month), Number(form.day));
+        const lunar = Lunar.fromYmd(Number(form.year), isLeap ? -Number(form.month) : Number(form.month), Number(form.day));
         const solar = lunar.getSolar();
         const solDate = new Date(solar.getYear(), solar.getMonth()-1, solar.getDay());
         setResult({
