@@ -9,7 +9,7 @@ export default function AssetRequest() {
   const [offices, setOffices] = useState([]);
   const [form, setForm] = useState({
     emp_no: '', emp_name: '', office_id: '',
-    asset_type: '', old_asset_no: '', new_asset_no: '',
+    asset_type: '', old_asset_no: '', new_asset_no: '', product_name: '',
     change_date: new Date().toISOString().split('T')[0],
     reason: '', password: '', password_confirm: ''
   });
@@ -142,6 +142,10 @@ export default function AssetRequest() {
             <label className="form-label">변경 자산번호 <span className="req">*</span></label>
             <input type="text" placeholder="새 번호" value={form.new_asset_no} onChange={e => setF('new_asset_no', e.target.value)} />
           </div>
+        </div>
+        <div className="form-group">
+          <label className="form-label">제품명 <span className="opt">(선택)</span></label>
+          <input type="text" placeholder="상세기재 (예: HP255 G9)" value={form.product_name || ''} onChange={e => setF('product_name', e.target.value)} />
         </div>
         <div className="form-group">
           <label className="form-label">변경일자 <span className="req">*</span></label>

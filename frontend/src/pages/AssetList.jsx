@@ -113,6 +113,7 @@ export default function AssetList() {
             <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.7 }}>
               {a.emp_name && <div>👤 {a.emp_name} · {a.emp_no}</div>}
               {a.org_name && <div>🏢 {a.org_name}</div>}
+              {a.product_name && <div>📦 {a.product_name}</div>}
               {a.note && <div>📝 {a.note}</div>}
             </div>
           </div>

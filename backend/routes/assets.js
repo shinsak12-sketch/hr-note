@@ -58,21 +58,22 @@ router.patch('/:id', authMiddleware, async (req, res) => {
 // ── 엑셀 양식 다운로드 ──────────────────
 router.get('/template/excel', authMiddleware, (req, res) => {
   const wb = XLSX.utils.book_new();
-  const headers = [['자산번호', '자산구분', '사번', '성명', '소속(조직명)', '상태', '비고']];
+  const headers = [['자산번호', '자산구분', '제품명', '사번', '성명', '소속(조직명)', '상태', '비고']];
   const example = [
-    ['NB-2024-001', '노트북', '11500001', '홍길동', '강남센터', '사용중', ''],
-    ['MN-2024-001', '모니터', '11500001', '홍길동', '강남센터', '사용중', ''],
-    ['DP-2024-001', '데스크탑', '11500002', '김철수', '부산센터', '사용중', ''],
-    ['IP-2024-001', '아이패드', '11500003', '이영희', '강남센터', '보관중', ''],
+    ['NB-2024-001', '노트북', 'HP255 G9', '11500001', '홍길동', '강남센터', '사용중', ''],
+    ['MN-2024-001', '모니터', 'LG 27인치', '11500001', '홍길동', '강남센터', '사용중', ''],
+    ['DP-2024-001', '데스크탑', 'Dell OptiPlex', '11500002', '김철수', '부산센터', '사용중', ''],
+    ['IP-2024-001', '아이패드', 'iPad 10세대', '11500003', '이영희', '서울센터', '보관중', ''],
   ];
   const ws = XLSX.utils.aoa_to_sheet([...headers, ...example]);
-  ws['!cols'] = [14, 10, 10, 8, 14, 8, 16].map(w => ({ wch: w }));
+  ws['!cols'] = [14, 10, 16, 10, 8, 14, 8, 16].map(w => ({ wch: w }));
   XLSX.utils.book_append_sheet(wb, ws, '자산등록양식');
 
   const ws2 = XLSX.utils.aoa_to_sheet([
     ['항목', '필수', '설명'],
     ['자산번호', '✅', '고유 자산관리번호'],
     ['자산구분', '✅', '노트북/모니터/데스크탑/아이패드 중 하나'],
+    ['제품명', '선택', '상세기재 (예: HP255 G9)'],
     ['사번', '선택', '현재 사용자 사번'],
     ['성명', '선택', '현재 사용자 성명'],
     ['소속(조직명)', '선택', 'offices 테이블의 org_name과 일치해야 함'],
@@ -111,18 +112,19 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
       }
 
       await sql`
-        INSERT INTO assets (asset_no, asset_type, emp_no, emp_name, office_id, org_name, status, note)
+        INSERT INTO assets (asset_no, asset_type, product_name, emp_no, emp_name, office_id, org_name, status, note)
         VALUES (
           ${asset_no}, ${asset_type},
+          ${String(r['제품명']||'').trim()||null},
           ${String(r['사번']||'').trim()||null}, ${String(r['성명']||'').trim()||null},
           ${office_id}, ${org_name||null},
           ${String(r['상태']||'').trim()||'사용중'}, ${String(r['비고']||'').trim()||null}
         )
         ON CONFLICT (asset_no) DO UPDATE SET
-          asset_type=EXCLUDED.asset_type, emp_no=EXCLUDED.emp_no,
-          emp_name=EXCLUDED.emp_name, office_id=EXCLUDED.office_id,
-          org_name=EXCLUDED.org_name, status=EXCLUDED.status,
-          note=EXCLUDED.note, updated_at=NOW()
+          asset_type=EXCLUDED.asset_type, product_name=EXCLUDED.product_name,
+          emp_no=EXCLUDED.emp_no, emp_name=EXCLUDED.emp_name,
+          office_id=EXCLUDED.office_id, org_name=EXCLUDED.org_name,
+          status=EXCLUDED.status, note=EXCLUDED.note, updated_at=NOW()
       `;
       success++;
     }
@@ -135,12 +137,12 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
 // ── 변경신고 ──────────────────────────
 // 신고 접수 (로그인 불필요)
 router.post('/requests', async (req, res) => {
-  const { emp_no, emp_name, office_id, asset_type, old_asset_no, new_asset_no, change_date, reason, password } = req.body;
+  const { emp_no, emp_name, office_id, asset_type, old_asset_no, new_asset_no, change_date, reason, password, product_name } = req.body;
   if (!emp_no || !emp_name || !asset_type || !old_asset_no || !new_asset_no || !change_date || !reason || !password)
     return res.status(400).json({ error: '필수 항목을 모두 입력하세요.' });
   const [req_] = await sql`
-    INSERT INTO asset_requests (emp_no, emp_name, office_id, asset_type, old_asset_no, new_asset_no, change_date, reason, password)
-    VALUES (${emp_no}, ${emp_name}, ${office_id||null}, ${asset_type}, ${old_asset_no}, ${new_asset_no}, ${change_date}, ${reason}, ${password})
+    INSERT INTO asset_requests (emp_no, emp_name, office_id, asset_type, old_asset_no, new_asset_no, change_date, reason, password, product_name)
+    VALUES (${emp_no}, ${emp_name}, ${office_id||null}, ${asset_type}, ${old_asset_no}, ${new_asset_no}, ${change_date}, ${reason}, ${password}, ${product_name||null})
     RETURNING *
   `;
   res.status(201).json(req_);

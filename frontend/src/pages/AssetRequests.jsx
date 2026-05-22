@@ -117,6 +117,7 @@ export default function AssetRequests() {
               <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.7, marginBottom: 10 }}>
                 <div>🏢 {r.org_name || '-'}</div>
                 <div>💻 {r.asset_type}: {r.old_asset_no} → {r.new_asset_no}</div>
+                {r.product_name && <div>📦 제품명: {r.product_name}</div>}
                 <div>📅 변경일: {r.change_date?.split?.('T')[0]}</div>
                 <div>📝 {r.reason}</div>
                 {r.manager_comment && <div style={{ color: 'var(--text)' }}>💬 {r.manager_comment}</div>}
