@@ -5,6 +5,39 @@ import { Toast } from '../components/Common.jsx';
 
 const WORK_TYPES = ['인사', '교육', '총무경리', '급여후생', '임원', '기타'];
 
+function WorkTypeEditor({ user, onSave, onDelete, deleteConfirm }) {
+  const [selected, setSelected] = useState(user.work_type || '');
+  const [saving, setSaving] = useState(false);
+  const changed = selected !== (user.work_type || '');
+
+  async function handleSave() {
+    setSaving(true);
+    await api.updateUserWorkType(user.id, selected);
+    setSaving(false);
+    onSave();
+  }
+
+  return (
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <select value={selected} onChange={e => setSelected(e.target.value)}
+        style={{ flex: 1, height: 36, fontSize: 13 }}>
+        <option value="">업무구분 선택</option>
+        {WORK_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+      </select>
+      {changed && (
+        <button onClick={handleSave} disabled={saving} style={{
+          height: 36, padding: '0 12px', borderRadius: 8,
+          background: 'var(--green)', color: '#EAF3DE',
+          border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+        }}>{saving ? '...' : '저장'}</button>
+      )}
+      <button className="btn-delete" style={{ height: 36 }} onClick={onDelete}>
+        {deleteConfirm ? '⚠️ 확인?' : '삭제'}
+      </button>
+    </div>
+  );
+}
+
 export default function AccountMgmt() {
   const nav = useNavigate();
   const user = JSON.parse(localStorage.getItem('hr_user') || '{}');
@@ -101,21 +134,7 @@ export default function AccountMgmt() {
               </div>
             )}
             {tab === 'active' && u.role !== 'master' && (
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <select value={u.work_type || ''} onChange={async e => {
-                  const val = e.target.value;
-                  await api.updateUserWorkType(u.id, val);
-                  setToast('업무구분이 변경되었습니다.');
-                  load();
-                }} style={{ flex: 1, height: 36, fontSize: 13 }}>
-                  <option value="">업무구분 선택</option>
-                  {WORK_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-                <button className="btn-delete" style={{ height: 36 }}
-                  onClick={() => handleDelete(u.id)}>
-                  {deleteConfirm === u.id ? '⚠️ 확인?' : '삭제'}
-                </button>
-              </div>
+              <WorkTypeEditor user={u} onSave={() => { setToast('업무구분이 변경되었습니다.'); load(); }} onDelete={() => handleDelete(u.id)} deleteConfirm={deleteConfirm === u.id} />
             )}
           </div>
         ))}
