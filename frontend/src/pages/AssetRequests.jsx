@@ -39,6 +39,7 @@ export default function AssetRequests() {
   const [filter, setFilter] = useState('전체');
   const [selected, setSelected] = useState(null);
   const [comment, setComment] = useState('');
+  const [oldAssetAction, setOldAssetAction] = useState('');
 
   useEffect(() => { load(); }, []);
   async function load() {
@@ -47,9 +48,10 @@ export default function AssetRequests() {
   }
 
   async function handleStatus(id, status) {
-    await api.updateAssetRequestStatus(id, { status, manager_comment: comment });
+    if (status === '확인완료' && !oldAssetAction) return;
+    await api.updateAssetRequestStatus(id, { status, manager_comment: comment, old_asset_action: oldAssetAction });
     setToast(`"${status}"로 처리되었습니다.`);
-    setSelected(null); setComment(''); load();
+    setSelected(null); setComment(''); setOldAssetAction(''); load();
   }
 
   async function handleDelete(id) {
@@ -126,10 +128,31 @@ export default function AssetRequests() {
               {selected === r.id ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <textarea placeholder="코멘트 (선택)" value={comment} onChange={e => setComment(e.target.value)} style={{ height: 60, fontSize: 13 }} />
+
+                  {/* 기존 자산 처리 방법 선택 */}
+                  <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text2)' }}>
+                    기존 자산({r.old_asset_no}) 처리
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    {[
+                      { key: 'new', label: '✨ 신규생성', color: '#1A4A8A', bg: '#E8F0FB' },
+                      { key: 'stock', label: '📦 재고이동', color: '#854F0B', bg: '#FAEEDA' },
+                      { key: 'dispose', label: '🗑️ 폐기', color: '#A32D2D', bg: '#FCEBEB' },
+                    ].map(opt => (
+                      <button key={opt.key} onClick={() => setOldAssetAction(opt.key)} style={{
+                        flex: 1, height: 34, borderRadius: 8, fontSize: 11, fontWeight: 600,
+                        border: `2px solid ${oldAssetAction === opt.key ? opt.color : 'transparent'}`,
+                        background: opt.bg, color: opt.color, cursor: 'pointer', fontFamily: 'inherit',
+                      }}>{opt.label}</button>
+                    ))}
+                  </div>
+
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={() => handleStatus(r.id, '확인완료')} style={{ flex: 1, height: 36, borderRadius: 8, background: '#EAF3DE', color: '#3B6D11', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>✅ 확인완료</button>
+                    <button onClick={() => handleStatus(r.id, '확인완료')}
+                      disabled={!oldAssetAction}
+                      style={{ flex: 1, height: 36, borderRadius: 8, background: oldAssetAction ? '#EAF3DE' : 'var(--bg2)', color: oldAssetAction ? '#3B6D11' : 'var(--text2)', border: 'none', fontSize: 13, fontWeight: 600, cursor: oldAssetAction ? 'pointer' : 'default' }}>✅ 확인완료</button>
                     <button onClick={() => handleStatus(r.id, '반려')} style={{ flex: 1, height: 36, borderRadius: 8, background: '#FCEBEB', color: '#A32D2D', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>❌ 반려</button>
-                    <button onClick={() => { setSelected(null); setComment(''); }} style={{ height: 36, padding: '0 12px', borderRadius: 8, background: 'var(--bg2)', color: 'var(--text2)', border: 'none', fontSize: 13, cursor: 'pointer' }}>취소</button>
+                    <button onClick={() => { setSelected(null); setComment(''); setOldAssetAction(''); }} style={{ height: 36, padding: '0 12px', borderRadius: 8, background: 'var(--bg2)', color: 'var(--text2)', border: 'none', fontSize: 13, cursor: 'pointer' }}>취소</button>
                   </div>
                 </div>
               ) : (

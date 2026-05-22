@@ -180,24 +180,21 @@ router.patch('/requests/:id/status', authMiddleware, async (req, res) => {
     WHERE id=${req.params.id} RETURNING *
   `;
   if (status === '확인완료') {
-    // 자산 존재 여부 확인
-    const [existing] = await sql`SELECT id FROM assets WHERE asset_no = ${request.new_asset_no}`;
+    const { old_asset_action } = req.body; // 'new' | 'stock' | 'dispose'
+
+    // 기존 자산 처리
+    if (old_asset_action === 'stock') {
+      await sql`UPDATE assets SET status='재고', emp_no=NULL, emp_name=NULL, office_id=NULL, org_name=NULL, updated_at=NOW() WHERE asset_no=${request.old_asset_no}`;
+    } else if (old_asset_action === 'dispose') {
+      await sql`DELETE FROM assets WHERE asset_no=${request.old_asset_no}`;
+    }
+
+    // 변경 자산번호 처리
+    const [existing] = await sql`SELECT id FROM assets WHERE asset_no=${request.new_asset_no}`;
     if (existing) {
-      // 기존 자산 업데이트
-      await sql`
-        UPDATE assets SET
-          emp_no=${request.emp_no}, emp_name=${request.emp_name},
-          office_id=${request.office_id}, org_name=${request.department||null},
-          status='사용중', updated_at=NOW()
-        WHERE asset_no=${request.new_asset_no}
-      `;
+      await sql`UPDATE assets SET emp_no=${request.emp_no}, emp_name=${request.emp_name}, office_id=${request.office_id||null}, status='사용중', updated_at=NOW() WHERE asset_no=${request.new_asset_no}`;
     } else {
-      // 자산이 없으면 신규 등록
-      await sql`
-        INSERT INTO assets (asset_no, asset_type, product_name, emp_no, emp_name, office_id, status)
-        VALUES (${request.new_asset_no}, ${request.asset_type}, ${request.product_name||null},
-          ${request.emp_no}, ${request.emp_name}, ${request.office_id||null}, '사용중')
-      `;
+      await sql`INSERT INTO assets (asset_no, asset_type, product_name, emp_no, emp_name, office_id, status) VALUES (${request.new_asset_no}, ${request.asset_type}, ${request.product_name||null}, ${request.emp_no}, ${request.emp_name}, ${request.office_id||null}, '사용중')`;
     }
   }
   res.json(request);
