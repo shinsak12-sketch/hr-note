@@ -103,10 +103,20 @@ export default function AssetRequest() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <div className="form-group">
             <label className="form-label">사번 <span className="req">*</span></label>
-            <input type="text" placeholder="사번"
-              value={form.emp_no}
-              onChange={e => { setF('emp_no', e.target.value); setEmpAssets([]); setF('old_asset_no', ''); }}
-              onBlur={e => fetchEmpAssets(e.target.value, form.asset_type)} />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input type="text" placeholder="사번"
+                value={form.emp_no}
+                onChange={e => { setF('emp_no', e.target.value); setEmpAssets([]); setF('old_asset_no', ''); }}
+                style={{ flex: 1 }} />
+              <button type="button" onClick={() => fetchEmpAssets(form.emp_no, form.asset_type)}
+                disabled={!form.emp_no || loadingAssets}
+                style={{
+                  padding: '0 12px', height: 40, borderRadius: 8,
+                  background: '#5A4A00', color: '#FFF9E6',
+                  border: 'none', fontSize: 12, fontWeight: 600,
+                  cursor: 'pointer', whiteSpace: 'nowrap',
+                }}>{loadingAssets ? '...' : '조회'}</button>
+            </div>
           </div>
           <div className="form-group">
             <label className="form-label">성명 <span className="req">*</span></label>
