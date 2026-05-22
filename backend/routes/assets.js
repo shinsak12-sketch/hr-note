@@ -135,15 +135,29 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
 // ── 변경신고 ──────────────────────────
 // 신고 접수 (로그인 불필요)
 router.post('/requests', async (req, res) => {
-  const { emp_no, emp_name, office_id, asset_type, old_asset_no, new_asset_no, change_date, reason } = req.body;
-  if (!emp_no || !emp_name || !asset_type || !old_asset_no || !new_asset_no || !change_date || !reason)
+  const { emp_no, emp_name, office_id, asset_type, old_asset_no, new_asset_no, change_date, reason, password } = req.body;
+  if (!emp_no || !emp_name || !asset_type || !old_asset_no || !new_asset_no || !change_date || !reason || !password)
     return res.status(400).json({ error: '필수 항목을 모두 입력하세요.' });
   const [req_] = await sql`
-    INSERT INTO asset_requests (emp_no, emp_name, office_id, asset_type, old_asset_no, new_asset_no, change_date, reason)
-    VALUES (${emp_no}, ${emp_name}, ${office_id||null}, ${asset_type}, ${old_asset_no}, ${new_asset_no}, ${change_date}, ${reason})
+    INSERT INTO asset_requests (emp_no, emp_name, office_id, asset_type, old_asset_no, new_asset_no, change_date, reason, password)
+    VALUES (${emp_no}, ${emp_name}, ${office_id||null}, ${asset_type}, ${old_asset_no}, ${new_asset_no}, ${change_date}, ${reason}, ${password})
     RETURNING *
   `;
   res.status(201).json(req_);
+});
+
+// 신청자 현황 조회
+router.post('/requests/my-status', async (req, res) => {
+  const { emp_no, password } = req.body;
+  if (!emp_no || !password) return res.status(400).json({ error: '사번과 비밀번호를 입력하세요.' });
+  const requests = await sql`
+    SELECT ar.*, o.org_name FROM asset_requests ar
+    LEFT JOIN offices o ON ar.office_id = o.id
+    WHERE ar.emp_no = ${emp_no} AND ar.password = ${password}
+    ORDER BY ar.created_at DESC
+  `;
+  if (requests.length === 0) return res.status(404).json({ error: '신청 내역이 없거나 비밀번호가 올바르지 않습니다.' });
+  res.json(requests);
 });
 
 // 신청 목록 (로그인 필요)
@@ -156,14 +170,13 @@ router.get('/requests', authMiddleware, async (req, res) => {
   res.json(requests);
 });
 
-// 상태 변경 + 자산 자동 이동
+// 상태 변경 + 코멘트 + 자산 자동 이동
 router.patch('/requests/:id/status', authMiddleware, async (req, res) => {
   const { status, manager_comment } = req.body;
   const [request] = await sql`
     UPDATE asset_requests SET status=${status}, manager_comment=${manager_comment||null}, updated_at=NOW()
     WHERE id=${req.params.id} RETURNING *
   `;
-  // 확인완료 시 자산 자동 이동
   if (status === '확인완료') {
     await sql`
       UPDATE assets SET
@@ -173,6 +186,12 @@ router.patch('/requests/:id/status', authMiddleware, async (req, res) => {
     `;
   }
   res.json(request);
+});
+
+// 비밀번호 초기화
+router.patch('/requests/:id/reset-password', authMiddleware, async (req, res) => {
+  await sql`UPDATE asset_requests SET password = '1111' WHERE id = ${req.params.id}`;
+  res.json({ message: '비밀번호가 1111로 초기화되었습니다.' });
 });
 
 // 신청 삭제

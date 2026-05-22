@@ -63,15 +63,24 @@ export default function GeneralHome() {
           </div>
         </section>
 
-        {/* 수선 - 준비중 */}
+        {/* 수선 */}
         <section>
           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>🔧 수선</div>
-          <div style={{ padding: '14px 16px', borderRadius: 12, border: '0.5px solid var(--border)', background: 'var(--bg2)', opacity: 0.5, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 20 }}>🔧</span>
-            <div>
-              <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text2)' }}>수선 관리 <span style={{ fontSize: 11, fontWeight: 400 }}>(준비중)</span></div>
-              <div style={{ fontSize: 12, color: 'var(--text2)' }}>시설/장비 수선 요청 처리</div>
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+            {[
+              { icon: '📊', title: '수선현황', desc: '접수 현황', path: '/repair-mgmt', color: '#5C3D8F', bg: '#F0EBF8' },
+            ].map(m => (
+              <button key={m.path} onClick={() => nav(m.path)} style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                padding: '16px 8px', borderRadius: 14,
+                border: `0.5px solid ${m.color}30`, background: m.bg,
+                cursor: 'pointer', textAlign: 'center',
+              }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>{m.icon}</div>
+                <div style={{ fontWeight: 700, fontSize: 13, color: m.color, marginBottom: 3 }}>{m.title}</div>
+                <div style={{ fontSize: 10, color: m.color + '99', lineHeight: 1.4 }}>{m.desc}</div>
+              </button>
+            ))}
           </div>
         </section>
 

@@ -193,4 +193,16 @@ export const api = {
   getAssetRequests: () => request('/assets/requests'),
   updateAssetRequestStatus: (id, body) => request('/assets/requests/' + id + '/status', { method: 'PATCH', body: JSON.stringify(body) }),
   deleteAssetRequest: (id) => request('/assets/requests/' + id, { method: 'DELETE' }),
+
+  // 자산변경신고 추가
+  getMyAssetRequests: (emp_no, password) => request('/assets/requests/my-status', { method: 'POST', body: JSON.stringify({ emp_no, password }) }),
+  resetAssetRequestPassword: (id) => request('/assets/requests/' + id + '/reset-password', { method: 'PATCH' }),
+  // 수선관리
+  submitRepair: (body) => request('/repairs', { method: 'POST', body: JSON.stringify(body) }),
+  getMyRepairs: (emp_no, password) => request('/repairs/my-status', { method: 'POST', body: JSON.stringify({ emp_no, password }) }),
+  getRepairs: () => request('/repairs'),
+  addRepairDirect: (body) => request('/repairs/direct', { method: 'POST', body: JSON.stringify(body) }),
+  updateRepairStatus: (id, body) => request('/repairs/' + id + '/status', { method: 'PATCH', body: JSON.stringify(body) }),
+  resetRepairPassword: (id) => request('/repairs/' + id + '/reset-password', { method: 'PATCH' }),
+  deleteRepair: (id) => request('/repairs/' + id, { method: 'DELETE' }),
 };
