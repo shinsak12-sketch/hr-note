@@ -180,7 +180,7 @@ export default function AssetList() {
 
   async function load() {
     const data = await api.getAssets();
-    setAssets(data.filter(a => a.status !== '재고')); // 재고 제외
+    setAssets(data.filter(a => a.status !== '재고' && a.status !== '폐기'));
     setLoading(false);
   }
 

@@ -30,10 +30,11 @@ export default function AssetRequest() {
     if (!emp_no) { setEmpAssets([]); return; }
     setLoadingAssets(true);
     try {
-      const data = await api.getAssetsByEmp(emp_no, asset_type);
-      setEmpAssets(data);
-      // 자산이 1개면 자동 선택
-      if (data.length === 1) setF('old_asset_no', data[0].asset_no);
+      // 자산구분 없이 전체 조회 후 프론트에서 필터
+      const data = await api.getAssetsByEmp(emp_no, '');
+      const filtered = asset_type ? data.filter(a => a.asset_type === asset_type) : data;
+      setEmpAssets(filtered);
+      if (filtered.length === 1) setF('old_asset_no', filtered[0].asset_no);
       else setF('old_asset_no', '');
     } catch { setEmpAssets([]); }
     finally { setLoadingAssets(false); }
@@ -149,9 +150,10 @@ export default function AssetRequest() {
         <div className="form-group">
           <label className="form-label">자산 구분 <span className="req">*</span></label>
           <select value={form.asset_type} onChange={e => {
-            setF('asset_type', e.target.value);
+            const val = e.target.value;
+            setF('asset_type', val);
             setF('old_asset_no', '');
-            if (form.emp_no) fetchEmpAssets(form.emp_no, e.target.value);
+            if (form.emp_no) fetchEmpAssets(form.emp_no, val);
           }}>
             <option value="">선택하세요</option>
             {ASSET_TYPES.map(t => <option key={t}>{t}</option>)}
