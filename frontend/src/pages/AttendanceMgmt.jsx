@@ -64,7 +64,18 @@ function InputModal({ record, offices, onClose, onDone }) {
       if (isEdit) await api.updateAttendance(record.id, form);
       else await api.createAttendance(form);
       onDone(isEdit ? '수정되었습니다.' : '등록되었습니다.');
-    } catch (e) { } finally { setSaving(false); }
+    } catch (e) {
+      if (e.message?.includes('기간 중복')) {
+        if (!window.confirm(`⚠️ ${e.message}\n\n그래도 등록하시겠습니까?`)) {
+          setSaving(false); return;
+        }
+        // 강제 등록 (overlap 무시 파라미터)
+        try {
+          await api.createAttendance({ ...form, force: true });
+          onDone('등록되었습니다.');
+        } catch (e2) { }
+      }
+    } finally { setSaving(false); }
   }
 
   const typeList = TYPES[form.category] || [];

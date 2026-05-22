@@ -61,14 +61,16 @@ export default function TaskHome() {
   const nav = useNavigate();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState('전체');
+  const [filterStatus, setFilterStatus] = useState('미완료');
 
   useEffect(() => {
     api.getTasks().then(data => { setTasks(data); setLoading(false); });
   }, []);
 
   const counts = STATUSES.reduce((acc, s) => ({ ...acc, [s]: tasks.filter(t => t.status === s).length }), {});
-  const filtered = filterStatus === '전체' ? tasks : tasks.filter(t => t.status === filterStatus);
+  const filtered = filterStatus === '전체' ? tasks
+    : filterStatus === '미완료' ? tasks.filter(t => t.status !== '완료')
+    : tasks.filter(t => t.status === filterStatus);
   const incomplete = tasks.filter(t => !['완료'].includes(t.status)).length;
 
   return (
@@ -102,19 +104,20 @@ export default function TaskHome() {
 
       {/* 상태 필터 */}
       <div style={{ display: 'flex', gap: 6, padding: '12px 16px', overflowX: 'auto', borderBottom: '0.5px solid var(--border)' }}>
-        {['전체', ...STATUSES].map(s => {
+        {['미완료', '전체', ...STATUSES].map(s => {
           const st = STATUS_STYLE[s];
           const active = filterStatus === s;
+          const cnt = s === '미완료' ? incomplete : s === '전체' ? tasks.length : counts[s];
           return (
             <button key={s} onClick={() => setFilterStatus(s)} style={{
               padding: '6px 14px', borderRadius: 20,
               border: active ? 'none' : '0.5px solid var(--border)',
-              background: active ? (st?.bg || '#EAF3DE') : 'var(--bg)',
-              color: active ? (st?.color || '#3B6D11') : 'var(--text2)',
+              background: active ? (s === '미완료' ? '#1A4A8A' : st?.bg || '#EAF3DE') : 'var(--bg)',
+              color: active ? (s === '미완료' ? '#E8F0FB' : st?.color || '#3B6D11') : 'var(--text2)',
               fontSize: 12, fontWeight: 600, cursor: 'pointer',
               whiteSpace: 'nowrap', fontFamily: 'inherit',
             }}>
-              {s} {s !== '전체' && counts[s] ? `(${counts[s]})` : ''}
+              {s} {cnt ? `(${cnt})` : ''}
             </button>
           );
         })}

@@ -67,12 +67,49 @@ router.get('/stats', authMiddleware, async (req, res) => {
     days_left: Math.ceil((new Date(r.return_date) - today) / (1000*60*60*24)),
   })).sort((a, b) => a.days_left - b.days_left);
 
-  res.json({ summary, monthly, d15 });
+  // 종료 D-15 도래 (진행중인데 end_date가 15일 이내)
+  const endingSoon = list.filter(r => {
+    if (r.status !== '진행중' || !r.end_date) return false;
+    const end = new Date(r.end_date);
+    const diff = Math.ceil((end - today) / (1000*60*60*24));
+    return diff >= 0 && diff <= 15;
+  }).map(r => ({
+    ...r,
+    days_left: Math.ceil((new Date(r.end_date) - today) / (1000*60*60*24)),
+  })).sort((a, b) => a.days_left - b.days_left);
+
+  // 시작 D-7 도래 (진행중이 아닌데 start_date가 7일 이내 미래)
+  const startingSoon = list.filter(r => {
+    if (r.status !== '진행중') return false;
+    const start = new Date(r.start_date);
+    const diff = Math.ceil((start - today) / (1000*60*60*24));
+    return diff > 0 && diff <= 7;
+  }).map(r => ({
+    ...r,
+    days_left: Math.ceil((new Date(r.start_date) - today) / (1000*60*60*24)),
+  })).sort((a, b) => a.days_left - b.days_left);
+
+  res.json({ summary, monthly, d15, endingSoon, startingSoon });
 });
 
 // 등록
 router.post('/', authMiddleware, async (req, res) => {
   const d = req.body;
+  // 기간 중복 체크 (force가 아닐 때만)
+  if (!d.force && d.emp_no && d.start_date) {
+    const overlaps = await sql`
+      SELECT id, type, start_date, end_date FROM attendance
+      WHERE emp_no = ${d.emp_no} AND status = '진행중'
+      AND start_date <= ${d.end_date || '9999-12-31'}
+      AND (end_date IS NULL OR end_date >= ${d.start_date})
+    `;
+    if (overlaps.length > 0) {
+      return res.status(409).json({
+        error: `기간 중복: 이미 ${overlaps[0].type} (${overlaps[0].start_date?.split('T')[0]} ~ ${overlaps[0].end_date?.split('T')[0] || '미정'}) 이 진행중입니다.`,
+        overlap: true
+      });
+    }
+  }
   const [rec] = await sql`
     INSERT INTO attendance (
       category, type, office_id, org_name, emp_no, emp_name,
