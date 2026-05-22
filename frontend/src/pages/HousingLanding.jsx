@@ -17,7 +17,7 @@ export default function HousingLanding() {
         </div>
 
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <button onClick={() => nav('/housing-apply/new')} style={{
+          <button onClick={() => nav('/dbsonsa/new')} style={{
             width: '100%', padding: '20px 24px', borderRadius: 14,
             background: '#1A4A8A', color: '#fff',
             border: 'none', cursor: 'pointer', textAlign: 'left',
@@ -30,7 +30,7 @@ export default function HousingLanding() {
             </div>
           </button>
 
-          <button onClick={() => nav('/housing-apply/status')} style={{
+          <button onClick={() => nav('/dbsonsa/status')} style={{
             width: '100%', padding: '20px 24px', borderRadius: 14,
             background: 'var(--bg)', color: 'var(--text)',
             border: '0.5px solid var(--border)', cursor: 'pointer', textAlign: 'left',

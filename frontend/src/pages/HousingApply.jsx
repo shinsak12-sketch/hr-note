@@ -120,7 +120,7 @@ export default function HousingApply() {
         <div style={{ fontSize: 14, color: 'var(--text2)', lineHeight: 1.7, marginBottom: 32 }}>
           사택 신청이 접수되었습니다.<br/>검토 후 담당자가 연락드립니다.
         </div>
-        <button onClick={() => nav('/housing-apply')} className="btn-primary"
+        <button onClick={() => nav('/dbsonsa')} className="btn-primary"
           style={{ background: '#1A4A8A' }}>
           홈으로 돌아가기
         </button>
@@ -131,7 +131,7 @@ export default function HousingApply() {
   return (
     <div className="app-container">
       <div className="header">
-        <button className="header-back" onClick={() => nav('/housing-apply')}>
+        <button className="header-back" onClick={() => nav('/dbsonsa')}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg>
           뒤로
         </button>

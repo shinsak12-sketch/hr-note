@@ -49,9 +49,9 @@ export default function App() {
       <Route path="/request" element={<AccountRequest />} />
 
       {/* 사택신청 (로그인 불필요) */}
-      <Route path="/housing-apply" element={<HousingLanding />} />
-      <Route path="/housing-apply/new" element={<HousingApply />} />
-      <Route path="/housing-apply/status" element={<HousingStatus />} />
+      <Route path="/dbsonsa" element={<HousingLanding />} />
+      <Route path="/dbsonsa/new" element={<HousingApply />} />
+      <Route path="/dbsonsa/status" element={<HousingStatus />} />
 
       <Route path="/" element={<PrivateRoute><AppHome /></PrivateRoute>} />
 
