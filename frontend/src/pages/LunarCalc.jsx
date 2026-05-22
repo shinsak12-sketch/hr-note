@@ -1,58 +1,78 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../utils/api.js';
+import { Solar, Lunar } from 'lunar-javascript';
 
-const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
+const GAN_KO  = ['갑','을','병','정','무','기','경','신','임','계'];
+const ZHI_KO  = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
+const ZODIAC  = ['🐭쥐','🐮소','🐯호랑이','🐰토끼','🐲용','🐍뱀','🐴말','🐑양','🐒원숭이','🐓닭','🐕개','🐗돼지'];
+const DAYS_KO = ['일','월','화','수','목','금','토'];
+
+function ganzhiKo(gz) {
+  const map = {
+    '甲':'갑','乙':'을','丙':'병','丁':'정','戊':'무','己':'기','庚':'경','辛':'신','壬':'임','癸':'계',
+    '子':'자','丑':'축','寅':'인','卯':'묘','辰':'진','巳':'사','午':'오','未':'미','申':'신','酉':'유','戌':'술','亥':'해'
+  };
+  return gz.split('').map(c => map[c] || c).join('');
+}
+
+function shengxiaoKo(sx) {
+  const map = {'鼠':'쥐','牛':'소','虎':'호랑이','兔':'토끼','龙':'용','蛇':'뱀','马':'말','羊':'양','猴':'원숭이','鸡':'닭','狗':'개','猪':'돼지'};
+  return map[sx] || sx;
+}
 
 export default function LunarCalc() {
   const nav = useNavigate();
-  const [mode, setMode] = useState('sol2lun'); // sol2lun | lun2sol
+  const [mode, setMode] = useState('sol2lun');
   const [form, setForm] = useState({ year: '', month: '', day: '' });
   const [isLeap, setIsLeap] = useState(false);
   const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  function setF(k, v) { setForm(f => ({ ...f, [k]: v })); setResult(null); }
+  function setF(k, v) { setForm(f => ({ ...f, [k]: v })); setResult(null); setError(''); }
 
-  async function handleCalc() {
-    if (!form.year || !form.month || !form.day) { setError('날짜를 모두 입력하세요.'); return; }
-    setError(''); setLoading(true); setResult(null);
-    try {
-      let data;
-      if (mode === 'sol2lun') {
-        data = await api.solarToLunar(form.year, form.month, form.day);
-      } else {
-        data = await api.lunarToSolar(form.year, form.month, form.day, isLeap);
-      }
-      const item = data?.response?.body?.items?.item;
-      if (!item) { setError('변환 결과를 찾을 수 없습니다.'); return; }
-      setResult(Array.isArray(item) ? item[0] : item);
-    } catch (e) { setError('API 호출 오류: ' + e.message); }
-    finally { setLoading(false); }
-  }
-
-  function fmt(y, m, d) {
-    if (!y || !m || !d) return '-';
-    return `${y}년 ${Number(m)}월 ${Number(d)}일`;
-  }
-
-  const GAN = ['갑','을','병','정','무','기','경','신','임','계'];
-  const JI = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
-  const ZODIAC = ['🐭쥐','🐮소','🐯호랑이','🐰토끼','🐲용','🐍뱀','🐴말','🐑양','🐒원숭이','🐓닭','🐕개','🐗돼지'];
-
-  function getSexagenary(year) {
-    const y = Number(year);
-    const gan = GAN[(y - 4) % 10];
-    const ji = JI[(y - 4) % 12];
-    const zodiac = ZODIAC[(y - 4) % 12];
-    return `${gan}${ji}년 (${zodiac})`;
-  }
-
-  const today = new Date();
   const daysInMonth = form.year && form.month
     ? new Date(Number(form.year), Number(form.month), 0).getDate()
     : 31;
+
+  function handleCalc() {
+    if (!form.year || !form.month || !form.day) { setError('날짜를 모두 입력하세요.'); return; }
+    setError('');
+    try {
+      if (mode === 'sol2lun') {
+        const solar = Solar.fromYmd(Number(form.year), Number(form.month), Number(form.day));
+        const lunar = solar.getLunar();
+        const solDate = new Date(Number(form.year), Number(form.month)-1, Number(form.day));
+        setResult({
+          type: 'sol2lun',
+          solYear: form.year, solMonth: form.month, solDay: form.day,
+          dayOfWeek: DAYS_KO[solDate.getDay()],
+          lunYear: lunar.getYear(), lunMonth: lunar.getMonth(), lunDay: lunar.getDay(),
+          lunLeap: lunar.isLeap(),
+          ganZhi: ganzhiKo(lunar.getYearInGanZhi()),
+          shengXiao: shengxiaoKo(lunar.getYearShengXiao()),
+        });
+      } else {
+        const lunar = Lunar.fromYmd(Number(form.year), Number(form.month), Number(form.day));
+        const solar = lunar.getSolar();
+        const solDate = new Date(solar.getYear(), solar.getMonth()-1, solar.getDay());
+        setResult({
+          type: 'lun2sol',
+          lunYear: form.year, lunMonth: form.month, lunDay: form.day,
+          lunLeap: isLeap,
+          ganZhi: ganzhiKo(lunar.getYearInGanZhi()),
+          shengXiao: shengxiaoKo(lunar.getYearShengXiao()),
+          solYear: solar.getYear(), solMonth: solar.getMonth(), solDay: solar.getDay(),
+          dayOfWeek: DAYS_KO[solDate.getDay()],
+        });
+      }
+    } catch(e) {
+      setError('날짜를 확인해주세요: ' + e.message);
+    }
+  }
+
+  function fmt(y, m, d) {
+    return `${y}년 ${Number(m)}월 ${Number(d)}일`;
+  }
 
   return (
     <div className="app-container">
@@ -73,7 +93,7 @@ export default function LunarCalc() {
             { val: 'sol2lun', label: '양력 → 음력', icon: '☀️' },
             { val: 'lun2sol', label: '음력 → 양력', icon: '🌙' },
           ].map(m => (
-            <button key={m.val} onClick={() => { setMode(m.val); setResult(null); setError(''); }} style={{
+            <button key={m.val} onClick={() => { setMode(m.val); setResult(null); setError(''); setForm({ year: '', month: '', day: '' }); }} style={{
               flex: 1, height: 46, borderRadius: 12,
               border: `2px solid ${mode === m.val ? '#5C3D8F' : 'var(--border)'}`,
               background: mode === m.val ? '#F0EBF8' : 'var(--bg)',
@@ -102,7 +122,9 @@ export default function LunarCalc() {
               <label className="form-label">월</label>
               <select value={form.month} onChange={e => setF('month', e.target.value)}>
                 <option value="">월</option>
-                {MONTHS.map(m => <option key={m} value={m}>{m}월</option>)}
+                {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                  <option key={m} value={m}>{m}월</option>
+                ))}
               </select>
             </div>
             <div className="form-group">
@@ -116,7 +138,7 @@ export default function LunarCalc() {
             </div>
           </div>
 
-          {/* 음력 윤달 */}
+          {/* 윤달 */}
           {mode === 'lun2sol' && (
             <button type="button" onClick={() => setIsLeap(l => !l)} style={{
               display: 'flex', alignItems: 'center', gap: 8, marginTop: 4,
@@ -126,12 +148,7 @@ export default function LunarCalc() {
               color: isLeap ? '#854F0B' : 'var(--text2)',
               fontSize: 13, fontFamily: 'inherit',
             }}>
-              <div style={{
-                width: 18, height: 18, borderRadius: '50%',
-                border: `2px solid ${isLeap ? '#854F0B' : 'var(--border)'}`,
-                background: isLeap ? '#854F0B' : 'transparent',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
+              <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${isLeap ? '#854F0B' : 'var(--border)'}`, background: isLeap ? '#854F0B' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {isLeap && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff' }} />}
               </div>
               윤달
@@ -140,60 +157,57 @@ export default function LunarCalc() {
 
           {error && <div style={{ color: 'var(--red)', fontSize: 13, marginTop: 6 }}>{error}</div>}
 
-          <button onClick={handleCalc} disabled={loading} style={{
+          <button onClick={handleCalc} style={{
             width: '100%', height: 44, borderRadius: 10, marginTop: 12,
             background: '#5C3D8F', color: '#fff',
             border: 'none', fontSize: 15, fontWeight: 600, cursor: 'pointer',
-          }}>{loading ? '변환 중...' : '🔄 변환'}</button>
+          }}>🔄 변환</button>
         </section>
 
         {/* 결과 */}
         {result && (
           <section>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>변환 결과</div>
-            <div style={{ background: '#F0EBF8', border: '1px solid #5C3D8F20', borderRadius: 12, padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ background: '#F0EBF8', border: '1px solid #5C3D8F20', borderRadius: 12, padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-              {mode === 'sol2lun' ? (
-                <>
-                  <div>
-                    <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 4 }}>☀️ 입력 (양력)</div>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: '#5C3D8F' }}>{fmt(result.solYear, result.solMonth, result.solDay)}</div>
-                  </div>
-                  <div style={{ borderTop: '0.5px solid #5C3D8F30', paddingTop: 12 }}>
-                    <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 4 }}>🌙 음력</div>
-                    <div style={{ fontSize: 22, fontWeight: 700, color: '#5C3D8F' }}>
-                      {fmt(result.lunYear, result.lunMonth, result.lunDay)}
-                      {result.lunLeapmonth === 'Y' && <span style={{ fontSize: 13, marginLeft: 6, color: '#854F0B', background: '#FAEEDA', padding: '2px 6px', borderRadius: 6 }}>윤달</span>}
-                    </div>
-                    <div style={{ fontSize: 12, color: 'var(--text2)', marginTop: 4 }}>{getSexagenary(result.lunYear)}</div>
-                  </div>
-                  {result.dayOfWeek && (
-                    <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: 8, padding: '8px 12px', fontSize: 13 }}>
-                      📅 요일: <strong>{result.dayOfWeek}</strong>
-                    </div>
+              {/* 입력 */}
+              <div>
+                <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 4 }}>
+                  {result.type === 'sol2lun' ? '☀️ 입력 (양력)' : '🌙 입력 (음력)'}
+                </div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: '#5C3D8F' }}>
+                  {result.type === 'sol2lun'
+                    ? fmt(result.solYear, result.solMonth, result.solDay)
+                    : fmt(result.lunYear, result.lunMonth, result.lunDay)}
+                  {result.type === 'lun2sol' && result.lunLeap && (
+                    <span style={{ fontSize: 12, marginLeft: 6, color: '#854F0B', background: '#FAEEDA', padding: '2px 6px', borderRadius: 6 }}>윤달</span>
                   )}
-                </>
-              ) : (
-                <>
-                  <div>
-                    <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 4 }}>🌙 입력 (음력)</div>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: '#5C3D8F' }}>
-                      {fmt(result.lunYear, result.lunMonth, result.lunDay)}
-                      {result.lunLeapmonth === 'Y' && <span style={{ fontSize: 13, marginLeft: 6, color: '#854F0B', background: '#FAEEDA', padding: '2px 6px', borderRadius: 6 }}>윤달</span>}
-                    </div>
-                  </div>
-                  <div style={{ borderTop: '0.5px solid #5C3D8F30', paddingTop: 12 }}>
-                    <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 4 }}>☀️ 양력</div>
-                    <div style={{ fontSize: 22, fontWeight: 700, color: '#5C3D8F' }}>{fmt(result.solYear, result.solMonth, result.solDay)}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text2)', marginTop: 4 }}>{getSexagenary(result.lunYear)}</div>
-                  </div>
-                  {result.dayOfWeek && (
-                    <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: 8, padding: '8px 12px', fontSize: 13 }}>
-                      📅 요일: <strong>{result.dayOfWeek}</strong>
-                    </div>
+                </div>
+              </div>
+
+              {/* 변환 결과 */}
+              <div style={{ borderTop: '0.5px solid #5C3D8F30', paddingTop: 14 }}>
+                <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 4 }}>
+                  {result.type === 'sol2lun' ? '🌙 음력' : '☀️ 양력'}
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: '#5C3D8F' }}>
+                  {result.type === 'sol2lun'
+                    ? fmt(result.lunYear, result.lunMonth, result.lunDay)
+                    : fmt(result.solYear, result.solMonth, result.solDay)}
+                  {result.type === 'sol2lun' && result.lunLeap && (
+                    <span style={{ fontSize: 12, marginLeft: 6, color: '#854F0B', background: '#FAEEDA', padding: '2px 6px', borderRadius: 6 }}>윤달</span>
                   )}
-                </>
-              )}
+                </div>
+                <div style={{ fontSize: 13, color: '#7B2D8B', marginTop: 6, fontWeight: 600 }}>
+                  {result.ganZhi}년 · {result.shengXiao}띠
+                </div>
+              </div>
+
+              {/* 요일 */}
+              <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: 8, padding: '8px 12px', fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--text2)' }}>📅 요일</span>
+                <strong>{result.dayOfWeek}요일</strong>
+              </div>
             </div>
           </section>
         )}
