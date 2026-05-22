@@ -212,4 +212,12 @@ export const api = {
   // 음양력 변환
   solarToLunar: (year, month, day) => request('/lunar?type=sol2lun&solYear=' + year + '&solMonth=' + String(month).padStart(2,'0') + '&solDay=' + String(day).padStart(2,'0')),
   lunarToSolar: (year, month, day, leap) => request('/lunar?type=lun2sol&solYear=' + year + '&solMonth=' + String(month).padStart(2,'0') + '&solDay=' + String(day).padStart(2,'0') + (leap ? '&lunLeapmonth=Y' : '')),
+
+  // 근태관리
+  getAttendance: (params={}) => { const q = new URLSearchParams(params).toString(); return request('/attendance' + (q?'?'+q:'')); },
+  getAttendanceStats: (params={}) => { const q = new URLSearchParams(params).toString(); return request('/attendance/stats' + (q?'?'+q:'')); },
+  createAttendance: (body) => request('/attendance', { method: 'POST', body: JSON.stringify(body) }),
+  updateAttendance: (id, body) => request('/attendance/' + id, { method: 'PATCH', body: JSON.stringify(body) }),
+  closeAttendance: (id, body) => request('/attendance/' + id + '/close', { method: 'PATCH', body: JSON.stringify(body) }),
+  deleteAttendance: (id) => request('/attendance/' + id, { method: 'DELETE' }),
 };
