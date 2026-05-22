@@ -101,8 +101,12 @@ export default function LunarCalc() {
             </div>
             <div className="form-group">
               <label className="form-label">일</label>
-              <input type="number" placeholder="일" value={form.day}
-                onChange={e => setF('day', e.target.value)} min="1" max="31" />
+              <select value={form.day} onChange={e => setF('day', e.target.value)}>
+                <option value="">일</option>
+                {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+                  <option key={d} value={d}>{d}일</option>
+                ))}
+              </select>
             </div>
           </div>
 
