@@ -25,7 +25,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
 // 자산 현황 통계
 router.get('/stats', authMiddleware, async (req, res) => {
-  const assets = await sql`SELECT * FROM assets`;
+  const assets = await sql`SELECT * FROM assets WHERE status NOT IN ('재고', '폐기')`;
   const byType = assets.reduce((acc, a) => {
     acc[a.asset_type] = (acc[a.asset_type] || 0) + 1;
     return acc;
