@@ -5,44 +5,63 @@ export default function HousingLanding() {
   const nav = useNavigate();
 
   return (
-    <div className="app-container" style={{ justifyContent: 'center' }}>
-      <div style={{ padding: '40px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32 }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 56, marginBottom: 12 }}>🏠</div>
-          <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 6 }}>사택 신청</div>
-          <div style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.7 }}>
-            거주지에서 소속 센터까지<br/>
-            <strong style={{ color: '#1A4A8A' }}>실제 도로거리 50km 초과</strong> 시 신청 가능합니다.
+    <div className="app-container">
+      <div className="header">
+        <div style={{ width: 40 }} />
+        <div style={{ fontSize: 16, fontWeight: 700 }}>DB손사 지원 신청</div>
+        <div style={{ width: 40 }} />
+      </div>
+
+      <div style={{ padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 4 }}>신청할 항목을 선택해주세요.</div>
+
+        {/* 사택 신청 */}
+        <button onClick={() => nav('/dbsonsa/new')} style={{
+          display: 'flex', alignItems: 'center', gap: 16,
+          padding: '20px 20px', borderRadius: 16,
+          background: '#E8F0FB', border: '0.5px solid #1A4A8A30',
+          cursor: 'pointer', textAlign: 'left', width: '100%',
+        }}>
+          <div style={{ fontSize: 38 }}>🏠</div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 16, color: '#1A4A8A', marginBottom: 4 }}>사택 신청</div>
+            <div style={{ fontSize: 12, color: '#1A4A8A99', lineHeight: 1.5 }}>
+              연고지 기준 50km 초과 시<br/>사택 지원 신청
+            </div>
           </div>
-        </div>
+        </button>
 
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <button onClick={() => nav('/dbsonsa/new')} style={{
-            width: '100%', padding: '20px 24px', borderRadius: 14,
-            background: '#1A4A8A', color: '#fff',
-            border: 'none', cursor: 'pointer', textAlign: 'left',
-            display: 'flex', alignItems: 'center', gap: 14,
-          }}>
-            <div style={{ fontSize: 32 }}>📝</div>
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 3 }}>신규 사택 신청</div>
-              <div style={{ fontSize: 12, opacity: 0.8 }}>거리 확인 후 신청서 작성</div>
+        {/* 신청 현황 조회 */}
+        <button onClick={() => nav('/dbsonsa/status')} style={{
+          display: 'flex', alignItems: 'center', gap: 16,
+          padding: '20px 20px', borderRadius: 16,
+          background: 'var(--bg)', border: '0.5px solid var(--border)',
+          cursor: 'pointer', textAlign: 'left', width: '100%',
+        }}>
+          <div style={{ fontSize: 38 }}>🔍</div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--text)', marginBottom: 4 }}>사택 신청 현황 조회</div>
+            <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.5 }}>
+              사번과 비밀번호로<br/>내 신청 현황 확인
             </div>
-          </button>
+          </div>
+        </button>
 
-          <button onClick={() => nav('/dbsonsa/status')} style={{
-            width: '100%', padding: '20px 24px', borderRadius: 14,
-            background: 'var(--bg)', color: 'var(--text)',
-            border: '0.5px solid var(--border)', cursor: 'pointer', textAlign: 'left',
-            display: 'flex', alignItems: 'center', gap: 14,
-          }}>
-            <div style={{ fontSize: 32 }}>🔍</div>
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 3 }}>신청 현황 조회</div>
-              <div style={{ fontSize: 12, color: 'var(--text2)' }}>사번과 비밀번호로 내 신청 확인</div>
+        {/* 장비변경 신고 */}
+        <button onClick={() => nav('/dbsonsa/asset')} style={{
+          display: 'flex', alignItems: 'center', gap: 16,
+          padding: '20px 20px', borderRadius: 16,
+          background: '#FFF9E6', border: '0.5px solid #5A4A0030',
+          cursor: 'pointer', textAlign: 'left', width: '100%',
+        }}>
+          <div style={{ fontSize: 38 }}>💻</div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 16, color: '#5A4A00', marginBottom: 4 }}>장비 변경 신고</div>
+            <div style={{ fontSize: 12, color: '#5A4A0099', lineHeight: 1.5 }}>
+              노트북·모니터 등<br/>자산 변경 신고
             </div>
-          </button>
-        </div>
+          </div>
+        </button>
       </div>
     </div>
   );

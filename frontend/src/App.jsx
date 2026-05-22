@@ -26,6 +26,10 @@ import HousingList from './pages/HousingList.jsx';
 import HousingLanding from './pages/HousingLanding.jsx';
 import HousingApply from './pages/HousingApply.jsx';
 import HousingStatus from './pages/HousingStatus.jsx';
+import AssetHome from './pages/AssetHome.jsx';
+import AssetRequests from './pages/AssetRequests.jsx';
+import AssetList from './pages/AssetList.jsx';
+import AssetRequest from './pages/AssetRequest.jsx';
 import HRCalc from './pages/HRCalc.jsx';
 import { PermissionGuard } from './components/PermissionGuard.jsx';
 
@@ -48,10 +52,16 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/request" element={<AccountRequest />} />
 
-      {/* 사택신청 (로그인 불필요) */}
+      {/* 자산관리 */}
+      <Route path="/asset-mgmt" element={<PrivateRoute><PermissionGuard menuKey="general"><AssetHome /></PermissionGuard></PrivateRoute>} />
+      <Route path="/asset-requests" element={<PrivateRoute><PermissionGuard menuKey="general"><AssetRequests /></PermissionGuard></PrivateRoute>} />
+      <Route path="/asset-list" element={<PrivateRoute><PermissionGuard menuKey="general"><AssetList /></PermissionGuard></PrivateRoute>} />
+
+      {/* 사택/장비 신청 (로그인 불필요) */}
       <Route path="/dbsonsa" element={<HousingLanding />} />
       <Route path="/dbsonsa/new" element={<HousingApply />} />
       <Route path="/dbsonsa/status" element={<HousingStatus />} />
+      <Route path="/dbsonsa/asset" element={<AssetRequest />} />
 
       <Route path="/" element={<PrivateRoute><AppHome /></PrivateRoute>} />
 

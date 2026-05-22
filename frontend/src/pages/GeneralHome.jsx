@@ -46,10 +46,10 @@ export default function GeneralHome() {
           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>기타</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {[
-              { icon: '💻', title: '자산 관리', desc: '직원별 장비 현황 관리', color: '#5A4A00', bg: '#FFF9E6', disabled: true },
-              { icon: '🔧', title: '수선 관리', desc: '시설/장비 수선 요청 처리', color: '#5C3D8F', bg: '#F0EBF8', disabled: true },
+              { icon: '💻', title: '자산 관리', desc: '직원별 장비 현황 관리', path: '/asset-mgmt', color: '#5A4A00', bg: '#FFF9E6', disabled: false },
+              { icon: '🔧', title: '수선 관리', desc: '시설/장비 수선 요청 처리', path: null, color: '#5C3D8F', bg: '#F0EBF8', disabled: true },
             ].map(m => (
-              <div key={m.title} style={{
+              <div key={m.title} onClick={() => !m.disabled && m.path && nav(m.path)} style={{
                 display: 'flex', alignItems: 'center', gap: 14,
                 padding: '14px 16px', borderRadius: 12,
                 border: '0.5px solid var(--border)',

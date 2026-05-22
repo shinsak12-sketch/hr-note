@@ -7,6 +7,7 @@ import tasksRouter from './routes/tasks.js';
 import memosRouter from './routes/memos.js';
 import officesRouter from './routes/offices.js';
 import housingRouter from './routes/housing.js';
+import assetsRouter from './routes/assets.js';
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use('/api/tasks', tasksRouter);
 app.use('/api/memos', memosRouter);
 app.use('/api/offices', officesRouter);
 app.use('/api/housing', housingRouter);
+app.use('/api/assets', assetsRouter);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

@@ -171,4 +171,26 @@ export const api = {
   checkHousingException: (emp_no) => request('/housing/exceptions/check/' + emp_no),
   addHousingException: (body) => request('/housing/exceptions', { method: 'POST', body: JSON.stringify(body) }),
   deleteHousingException: (id) => request('/housing/exceptions/' + id, { method: 'DELETE' }),
+
+  // 자산관리
+  getAssets: (params = {}) => { const q = new URLSearchParams(params).toString(); return request('/assets' + (q ? '?' + q : '')); },
+  getAssetStats: () => request('/assets/stats'),
+  updateAsset: (id, body) => request('/assets/' + id, { method: 'PATCH', body: JSON.stringify(body) }),
+  downloadAssetTemplate: () => {
+    const token = localStorage.getItem('hr_token');
+    fetch(BASE + '/assets/template/excel', { headers: { Authorization: 'Bearer ' + token } })
+      .then(r => r.blob()).then(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'HR노트_자산등록양식.xlsx'; a.click(); });
+  },
+  uploadAssetExcel: async (file) => {
+    const token = localStorage.getItem('hr_token');
+    const fd = new FormData(); fd.append('file', file);
+    const res = await fetch(BASE + '/assets/upload/excel', { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '업로드 실패');
+    return data;
+  },
+  submitAssetRequest: (body) => request('/assets/requests', { method: 'POST', body: JSON.stringify(body) }),
+  getAssetRequests: () => request('/assets/requests'),
+  updateAssetRequestStatus: (id, body) => request('/assets/requests/' + id + '/status', { method: 'PATCH', body: JSON.stringify(body) }),
+  deleteAssetRequest: (id) => request('/assets/requests/' + id, { method: 'DELETE' }),
 };
