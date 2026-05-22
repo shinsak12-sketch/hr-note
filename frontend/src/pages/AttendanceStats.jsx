@@ -161,9 +161,11 @@ export default function AttendanceStats() {
         </section>
 
         {/* 종료 D-15 / 시작 D-7 알림 */}
-        {(stats?.endingSoon?.length > 0 || stats?.startingSoon?.length > 0) && (
-          <section>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>⚡ 도래 알림</div>
+        <section>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>⚡ 도래 알림</div>
+          {(!stats?.endingSoon?.length && !stats?.startingSoon?.length) ? (
+            <div style={{ fontSize: 13, color: 'var(--text2)', textAlign: 'center', padding: '12px 0' }}>도래 예정 인원이 없습니다.</div>
+          ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {stats?.startingSoon?.map(r => (
                 <div key={'s'+r.id} style={{ background: 'var(--bg)', border: '0.5px solid #3B6D1130', borderLeft: '4px solid #3B6D11', borderRadius: 12, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -184,8 +186,8 @@ export default function AttendanceStats() {
                 </div>
               ))}
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
         {/* D-15 복직 예정자 */}
         {stats?.d15?.length > 0 && (

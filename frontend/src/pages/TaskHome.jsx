@@ -68,10 +68,22 @@ export default function TaskHome() {
   }, []);
 
   const counts = STATUSES.reduce((acc, s) => ({ ...acc, [s]: tasks.filter(t => t.status === s).length }), {});
-  const filtered = filterStatus === '전체' ? tasks
-    : filterStatus === '미완료' ? tasks.filter(t => t.status !== '완료')
-    : tasks.filter(t => t.status === filterStatus);
+  const [search, setSearch] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+
   const incomplete = tasks.filter(t => !['완료'].includes(t.status)).length;
+
+  const filtered = tasks.filter(t => {
+    const matchStatus = filterStatus === '전체' ? true
+      : filterStatus === '미완료' ? t.status !== '완료'
+      : t.status === filterStatus;
+    const matchSearch = !search || t.title?.includes(search) ||
+      t.assignees?.some(a => a.name?.includes(search)) || t.content?.includes(search);
+    const matchFrom = !dateFrom || (t.due_date && t.due_date >= dateFrom);
+    const matchTo = !dateTo || (t.due_date && t.due_date <= dateTo);
+    return matchStatus && matchSearch && matchFrom && matchTo;
+  });
 
   return (
     <div className="app-container">
@@ -100,6 +112,22 @@ export default function TaskHome() {
             <div style={{ fontSize: 11, color: s.color, marginTop: 2 }}>{s.label}</div>
           </div>
         ))}
+      </div>
+
+      {/* 검색 + 일자 필터 */}
+      <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <input type="text" placeholder="🔍 제목, 담당자, 내용 검색"
+          value={search} onChange={e => setSearch(e.target.value)} />
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+            style={{ flex: 1, fontSize: 12 }} placeholder="마감일 시작" />
+          <span style={{ fontSize: 12, color: 'var(--text2)' }}>~</span>
+          <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+            style={{ flex: 1, fontSize: 12 }} placeholder="마감일 종료" />
+          {(dateFrom || dateTo) && (
+            <button onClick={() => { setDateFrom(''); setDateTo(''); }} style={{ fontSize: 11, padding: '4px 8px', borderRadius: 6, border: 'none', background: '#FCEBEB', color: '#A32D2D', cursor: 'pointer' }}>초기화</button>
+          )}
+        </div>
       </div>
 
       {/* 상태 필터 */}
