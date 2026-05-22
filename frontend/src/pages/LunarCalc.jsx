@@ -88,9 +88,12 @@ export default function LunarCalc() {
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 8 }}>
             <div className="form-group">
               <label className="form-label">연도</label>
-              <input type="number" placeholder={String(today.getFullYear())}
-                value={form.year} onChange={e => setF('year', e.target.value)}
-                min="1900" max="2100" />
+              <select value={form.year} onChange={e => setF('year', e.target.value)}>
+                <option value="">연도</option>
+                {Array.from({ length: 126 }, (_, i) => 2025 - i).map(y => (
+                  <option key={y} value={y}>{y}년</option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
               <label className="form-label">월</label>
