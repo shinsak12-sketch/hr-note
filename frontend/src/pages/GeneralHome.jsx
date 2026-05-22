@@ -52,14 +52,23 @@ export default function GeneralHome() {
               <div key={m.title} onClick={() => !m.disabled && m.path && nav(m.path)} style={{
                 display: 'flex', alignItems: 'center', gap: 14,
                 padding: '14px 16px', borderRadius: 12,
-                border: '0.5px solid var(--border)',
-                background: 'var(--bg2)', opacity: 0.5,
+                border: `0.5px solid ${m.disabled ? 'var(--border)' : m.color + '30'}`,
+                background: m.disabled ? 'var(--bg2)' : m.bg,
+                opacity: m.disabled ? 0.5 : 1,
+                cursor: m.disabled ? 'default' : 'pointer',
               }}>
-                <div style={{ width: 42, height: 42, borderRadius: 10, background: 'var(--border)', fontSize: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{m.icon}</div>
+                <div style={{ width: 42, height: 42, borderRadius: 10, background: m.disabled ? 'var(--border)' : m.color + '20', fontSize: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{m.icon}</div>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text2)' }}>{m.title} <span style={{ fontSize: 11, fontWeight: 400 }}>(준비중)</span></div>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: m.disabled ? 'var(--text2)' : m.color }}>
+                    {m.title} {m.disabled && <span style={{ fontSize: 11, fontWeight: 400 }}>(준비중)</span>}
+                  </div>
                   <div style={{ fontSize: 12, color: 'var(--text2)', marginTop: 2 }}>{m.desc}</div>
                 </div>
+                {!m.disabled && (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" strokeWidth="2" style={{ marginLeft: 'auto' }}>
+                    <path d="m9 18 6-6-6-6"/>
+                  </svg>
+                )}
               </div>
             ))}
           </div>
