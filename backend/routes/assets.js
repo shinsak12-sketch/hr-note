@@ -43,6 +43,20 @@ router.get('/stats', authMiddleware, async (req, res) => {
   res.json({ total: assets.length, byType, requestCounts, recent });
 });
 
+// 사번+자산구분으로 자산 조회 (로그인 불필요)
+router.get('/by-emp', async (req, res) => {
+  const { emp_no, asset_type } = req.query;
+  if (!emp_no) return res.json([]);
+  let assets = await sql`
+    SELECT asset_no, asset_type, product_name, org_name
+    FROM assets
+    WHERE emp_no = ${emp_no} AND status = '사용중'
+    ${asset_type ? sql`AND asset_type = ${asset_type}` : sql``}
+    ORDER BY asset_type, asset_no
+  `;
+  res.json(assets);
+});
+
 // 자산 수정
 router.patch('/:id', authMiddleware, async (req, res) => {
   const { emp_no, emp_name, office_id, org_name, status, note } = req.body;
@@ -134,21 +148,6 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
   }
 });
 
-// 사번+자산구분으로 자산 조회 (로그인 불필요 - 신청화면용)
-router.get('/by-emp', async (req, res) => {
-  const { emp_no, asset_type } = req.query;
-  if (!emp_no) return res.json([]);
-  let assets = await sql`
-    SELECT asset_no, asset_type, product_name, org_name
-    FROM assets
-    WHERE emp_no = ${emp_no} AND status = '사용중'
-    ${asset_type ? sql`AND asset_type = ${asset_type}` : sql``}
-    ORDER BY asset_type, asset_no
-  `;
-  res.json(assets);
-});
-
-// 사번+자산구분으로 자산 조회 (로그인 불필요 - 신청화면용)
 // 신고 접수 (로그인 불필요)
 router.post('/requests', async (req, res) => {
   const { emp_no, emp_name, office_id, asset_type, old_asset_no, new_asset_no, change_date, reason, password, product_name } = req.body;

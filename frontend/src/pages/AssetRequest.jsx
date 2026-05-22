@@ -89,7 +89,8 @@ export default function AssetRequest() {
       {/* 안내 */}
       <div style={{ margin: '12px 16px 0', padding: '10px 14px', background: '#FFF9E6', borderRadius: 8, fontSize: 12, color: '#5A4A00', lineHeight: 1.7 }}>
         📌 퇴직자 장비 인수, 장비 교체 등 자산 변경 시 신고해주세요.<br/>
-        담당자 확인 후 자산 정보가 업데이트됩니다.
+        담당자 확인 후 자산 정보가 업데이트됩니다.<br/>
+        <span style={{ color: '#A32D2D', fontWeight: 600 }}>※ 신규 자산은 담당자가 별도 입력합니다.</span>
       </div>
 
       <form onSubmit={handleSubmit} style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto', paddingBottom: 40 }}>
