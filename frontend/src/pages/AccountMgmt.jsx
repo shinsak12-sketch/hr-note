@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api.js';
 import { Toast } from '../components/Common.jsx';
 
-const WORK_TYPES = ['인사', '교육', '총무경리', '급여후생'];
+const WORK_TYPES = ['인사', '교육', '총무경리', '급여후생', '임원', '기타'];
 
 export default function AccountMgmt() {
   const nav = useNavigate();

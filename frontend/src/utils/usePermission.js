@@ -5,6 +5,8 @@ const PERMISSIONS = {
   '교육':    ['tasks', 'memos', 'offices', 'general'],
   '총무경리': ['tasks', 'memos', 'offices', 'general'],
   '급여후생': ['tasks', 'memos', 'offices', 'general'],
+  '임원':    ['tasks', 'issues', 'memos', 'offices', 'general'],
+  '기타':    ['memos', 'offices', 'general'],
 };
 
 export function usePermission() {

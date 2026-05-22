@@ -6,7 +6,7 @@ import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
 
-const WORK_TYPES = ['인사', '교육', '총무경리', '급여후생'];
+const WORK_TYPES = ['인사', '교육', '총무경리', '급여후생', '임원', '기타'];
 
 // 로그인
 router.post('/login', async (req, res) => {

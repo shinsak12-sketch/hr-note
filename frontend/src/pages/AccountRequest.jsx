@@ -5,7 +5,7 @@ import { api } from '../utils/api.js';
 export default function AccountRequest() {
   const nav = useNavigate();
   const [form, setForm] = useState({ username: '', password: '', name: '', work_type: '' });
-  const WORK_TYPES = ['인사', '교육', '총무경리', '급여후생'];
+  const WORK_TYPES = ['인사', '교육', '총무경리', '급여후생', '임원', '기타'];
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
