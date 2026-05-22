@@ -30,12 +30,17 @@ router.get('/stats', authMiddleware, async (req, res) => {
     acc[a.asset_type] = (acc[a.asset_type] || 0) + 1;
     return acc;
   }, {});
+  const requests = await sql`SELECT status FROM asset_requests`;
+  const requestCounts = requests.reduce((acc, r) => {
+    acc[r.status] = (acc[r.status] || 0) + 1;
+    return acc;
+  }, {});
   const recent = await sql`
     SELECT ar.*, o.org_name FROM asset_requests ar
     LEFT JOIN offices o ON ar.office_id = o.id
     ORDER BY ar.created_at DESC LIMIT 5
   `;
-  res.json({ total: assets.length, byType, recent });
+  res.json({ total: assets.length, byType, requestCounts, recent });
 });
 
 // 자산 수정

@@ -91,7 +91,7 @@ export default function AssetList() {
         {(search || typeFilter) && <div style={{ fontSize: 12, color: 'var(--text2)' }}>검색 결과: {filtered.length}건</div>}
       </div>
 
-      <div className="page-content" style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div className="page-content" style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8, paddingBottom: 40 }}>
         {loading && <div className="center-msg">불러오는 중...</div>}
         {!loading && filtered.length === 0 && <div className="center-msg">자산이 없습니다.</div>}
         {filtered.map(a => (
