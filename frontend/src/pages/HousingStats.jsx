@@ -16,14 +16,14 @@ export default function HousingStats() {
   const list = stats?.list || [];
   const expiring = stats?.expiring || [];
 
-  // 본부별 집계
-  const byHq = list.reduce((acc, r) => {
-    const k = r.headquarters || '미분류';
+  // 부서별 집계
+  const byDept = list.reduce((acc, r) => {
+    const k = r.office_dept || r.headquarters || '미분류';
     acc[k] = (acc[k] || 0) + 1;
     return acc;
   }, {});
-  const hqEntries = Object.entries(byHq).sort((a, b) => b[1] - a[1]);
-  const maxHq = Math.max(...hqEntries.map(e => e[1]), 1);
+  const deptEntries = Object.entries(byDept).sort((a, b) => b[1] - a[1]);
+  const maxDept = Math.max(...deptEntries.map(e => e[1]), 1);
 
   // 만료 현황
   const exp60  = expiring.filter(r => r.days_left <= 60).length;
@@ -77,22 +77,21 @@ export default function HousingStats() {
           </div>
         </section>
 
-        {/* ② 본부별 막대 그래프 */}
-        {hqEntries.length > 0 && (
+        {/* ② 부서별 막대 그래프 */}
+        {deptEntries.length > 0 && (
           <section>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>🏛️ 본부별 사택 수</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>📂 부서별 사택 수</div>
             <div style={{ background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 12, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {hqEntries.map(([hq, cnt]) => (
-                <div key={hq}>
+              {deptEntries.map(([dept, cnt]) => (
+                <div key={dept}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
-                    <span style={{ color: 'var(--text)', fontWeight: 500 }}>{hq}</span>
+                    <span style={{ color: 'var(--text)', fontWeight: 500 }}>{dept}</span>
                     <span style={{ fontWeight: 700, color: '#2D6A6A' }}>{cnt}건</span>
                   </div>
                   <div style={{ background: 'var(--bg2)', borderRadius: 6, height: 10, overflow: 'hidden' }}>
                     <div style={{
-                      height: '100%', borderRadius: 6,
-                      background: '#2D6A6A',
-                      width: `${(cnt / maxHq) * 100}%`,
+                      height: '100%', borderRadius: 6, background: '#2D6A6A',
+                      width: `${(cnt / maxDept) * 100}%`,
                       transition: 'width 0.5s ease',
                     }} />
                   </div>
