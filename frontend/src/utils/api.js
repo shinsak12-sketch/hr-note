@@ -189,6 +189,7 @@ export const api = {
     if (!res.ok) throw new Error(data.error || '업로드 실패');
     return data;
   },
+  getAssetsByEmp: (emp_no, asset_type) => request('/assets/by-emp?emp_no=' + emp_no + (asset_type ? '&asset_type=' + encodeURIComponent(asset_type) : '')),
   submitAssetRequest: (body) => request('/assets/requests', { method: 'POST', body: JSON.stringify(body) }),
   getAssetRequests: () => request('/assets/requests'),
   updateAssetRequestStatus: (id, body) => request('/assets/requests/' + id + '/status', { method: 'PATCH', body: JSON.stringify(body) }),

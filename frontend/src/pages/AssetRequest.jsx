@@ -23,11 +23,25 @@ export default function AssetRequest() {
 
   function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
 
+  const [empAssets, setEmpAssets] = useState([]);
+  const [loadingAssets, setLoadingAssets] = useState(false);
+
+  async function fetchEmpAssets(emp_no, asset_type) {
+    if (!emp_no) { setEmpAssets([]); return; }
+    setLoadingAssets(true);
+    try {
+      const data = await api.getAssetsByEmp(emp_no, asset_type);
+      setEmpAssets(data);
+      // 자산이 1개면 자동 선택
+      if (data.length === 1) setF('old_asset_no', data[0].asset_no);
+      else setF('old_asset_no', '');
+    } catch { setEmpAssets([]); }
+    finally { setLoadingAssets(false); }
+  }
+
   const filteredOffices = officeSearch
     ? offices.filter(o => o.org_name.includes(officeSearch) || o.headquarters.includes(officeSearch))
     : offices;
-
-  async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     const { emp_no, emp_name, asset_type, old_asset_no, new_asset_no, change_date, reason, password, password_confirm } = form;
@@ -85,7 +99,10 @@ export default function AssetRequest() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <div className="form-group">
             <label className="form-label">사번 <span className="req">*</span></label>
-            <input type="text" placeholder="사번" value={form.emp_no} onChange={e => setF('emp_no', e.target.value)} />
+            <input type="text" placeholder="사번"
+              value={form.emp_no}
+              onChange={e => { setF('emp_no', e.target.value); setEmpAssets([]); setF('old_asset_no', ''); }}
+              onBlur={e => fetchEmpAssets(e.target.value, form.asset_type)} />
           </div>
           <div className="form-group">
             <label className="form-label">성명 <span className="req">*</span></label>
@@ -128,7 +145,11 @@ export default function AssetRequest() {
         <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text2)' }}>② 장비 정보</div>
         <div className="form-group">
           <label className="form-label">자산 구분 <span className="req">*</span></label>
-          <select value={form.asset_type} onChange={e => setF('asset_type', e.target.value)}>
+          <select value={form.asset_type} onChange={e => {
+            setF('asset_type', e.target.value);
+            setF('old_asset_no', '');
+            if (form.emp_no) fetchEmpAssets(form.emp_no, e.target.value);
+          }}>
             <option value="">선택하세요</option>
             {ASSET_TYPES.map(t => <option key={t}>{t}</option>)}
           </select>
@@ -136,7 +157,27 @@ export default function AssetRequest() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <div className="form-group">
             <label className="form-label">기존 자산번호 <span className="req">*</span></label>
-            <input type="text" placeholder="기존 번호" value={form.old_asset_no} onChange={e => setF('old_asset_no', e.target.value)} />
+            {empAssets.length > 0 ? (
+              <select value={form.old_asset_no} onChange={e => setF('old_asset_no', e.target.value)}>
+                <option value="">선택하세요</option>
+                {empAssets.map(a => (
+                  <option key={a.asset_no} value={a.asset_no}>
+                    {a.asset_no}{a.product_name ? ` (${a.product_name})` : ''}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div style={{ position: 'relative' }}>
+                <input type="text" placeholder={loadingAssets ? '조회 중...' : '직접 입력'}
+                  value={form.old_asset_no} onChange={e => setF('old_asset_no', e.target.value)}
+                  disabled={loadingAssets} />
+                {empAssets.length === 0 && form.emp_no && form.asset_type && !loadingAssets && (
+                  <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 3 }}>
+                    ℹ️ 조회된 자산 없음 — 직접 입력
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <div className="form-group">
             <label className="form-label">변경 자산번호 <span className="req">*</span></label>
