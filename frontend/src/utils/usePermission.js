@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 
 const PERMISSIONS = {
-  '인사':    ['tasks', 'issues', 'memos', 'offices', 'general'],
-  '교육':    ['tasks', 'memos', 'offices', 'general'],
-  '총무경리': ['tasks', 'memos', 'offices', 'general'],
-  '급여후생': ['tasks', 'memos', 'offices', 'general'],
-  '임원':    ['tasks', 'issues', 'memos', 'offices', 'general'],
+  '인사':    ['tasks', 'issues', 'attendance', 'memos', 'offices', 'general'],
+  '교육':    ['tasks', 'attendance', 'memos', 'offices', 'general'],
+  '총무경리': ['tasks', 'attendance', 'memos', 'offices', 'general'],
+  '급여후생': ['tasks', 'attendance', 'memos', 'offices', 'general'],
+  '임원':    ['tasks', 'issues', 'attendance', 'memos', 'offices', 'general'],
   '기타':    ['memos', 'offices', 'general'],
 };
 

@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { usePermission } from '../utils/usePermission.js';
 
 const MAIN_APPS = [
-  { id: 'tasks',   icon: '📌', title: '업무지시',   desc: '대표님 업무지시 현황 관리', path: '/tasks-app',   color: '#1A4A8A', bg: '#E8F0FB', menuKey: 'tasks' },
-  { id: 'issues',  icon: '📋', title: '직원관리',   desc: '직원 이슈 기록 및 관리',   path: '/issues-app',  color: '#3B6D11', bg: '#EAF3DE', menuKey: 'issues' },
-  { id: 'general', icon: '🏛️', title: '총무지원',   desc: '사택·자산·수선 관리',       path: '/general-app', color: '#2D6A6A', bg: '#E6F4F4', menuKey: 'general' },
+  { id: 'tasks',      icon: '📌', title: '업무관리',   desc: '업무지시 현황 관리',       path: '/tasks-app',      color: '#1A4A8A', bg: '#E8F0FB', menuKey: 'tasks' },
+  { id: 'issues',     icon: '📋', title: '인사관리',   desc: '인사 기록 및 관리',        path: '/issues-app',     color: '#3B6D11', bg: '#EAF3DE', menuKey: 'issues' },
+  { id: 'attendance', icon: '🕐', title: '근태관리',   desc: '출결·휴가·초과 관리',      path: '/attendance-app', color: '#854F0B', bg: '#FAEEDA', menuKey: 'attendance' },
+  { id: 'general',    icon: '🏛️', title: '총무지원',   desc: '사택·자산·수선 관리',      path: '/general-app',    color: '#2D6A6A', bg: '#E6F4F4', menuKey: 'general' },
 ];
 
 const UTILITY_APPS = [
