@@ -151,18 +151,22 @@ export default function HousingApply() {
           background: '#FFF9E6', border: '0.5px solid #E8D84A50',
           borderRadius: 12, padding: '14px 16px',
         }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#5A4A00', marginBottom: 8 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#5A4A00', marginBottom: 10 }}>
             📋 사택 지원 안내
           </div>
-          <div style={{ fontSize: 12, color: '#5A4A00', lineHeight: 1.9 }}>
-            <div>✅ <strong>지원 대상</strong>: 소속 센터까지 실제 도로거리 50km 초과 직원</div>
-            <div>✅ <strong>지원 내용</strong>: 월 임차료 일부 지원 (사내 규정 기준)</div>
-            <div>✅ <strong>신청 기간</strong>: 연중 수시 접수</div>
-            <div>✅ <strong>처리 기간</strong>: 신청 후 영업일 기준 5일 이내</div>
-            <div>✅ <strong>제출 서류</strong>: 신청 후 담당자 안내에 따라 제출</div>
-            <div style={{ marginTop: 6, paddingTop: 6, borderTop: '0.5px solid #E8D84A50', color: '#854F0B' }}>
-              ⚠️ 허위 신청 시 지원이 취소되며 불이익이 발생할 수 있습니다.
-            </div>
+          <div style={{ fontSize: 12, color: '#5A4A00', lineHeight: 2 }}>
+            <div style={{ fontWeight: 600, marginBottom: 2 }}>✅ 지원 대상</div>
+            <div>· 회사 발령으로 비연고지 근무 중인 무주택 직원</div>
+            <div style={{ marginBottom: 8 }}>· 연고지와 근무지 최단거리 50km 이상</div>
+
+            <div style={{ fontWeight: 600, marginBottom: 2 }}>✅ 지원 한도 (월 임차경비)</div>
+            <div>· 부서장: 서울 80만원 / 그 외 75만원</div>
+            <div style={{ marginBottom: 8 }}>· 실무자: 서울 70만원 / 광역시·경인·제주 55만원 / 상기 외 50만원</div>
+
+            <div style={{ fontWeight: 600, marginBottom: 2 }}>📌 사택사용자 수칙</div>
+            <div>1. 이동사유 발생 시 반드시 손사지원파트로 통보하여 의무관계를 명확히 할 것</div>
+            <div>2. 사택 거주 및 퇴거 시 반드시 입주자 점검사항을 손사지원파트로 통보</div>
+            <div>3. 사택 외 용도 사용 절대 금지</div>
           </div>
         </div>
 
