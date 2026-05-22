@@ -39,6 +39,7 @@ import RepairStats from './pages/RepairStats.jsx';
 import RepairList from './pages/RepairList.jsx';
 import HRCalc from './pages/HRCalc.jsx';
 import ParentalLeaveCalc from './pages/ParentalLeaveCalc.jsx';
+import PregnancyCalc from './pages/PregnancyCalc.jsx';
 import { PermissionGuard } from './components/PermissionGuard.jsx';
 
 function PrivateRoute({ children }) {
@@ -109,6 +110,7 @@ export default function App() {
 
       <Route path="/hr-calc" element={<PrivateRoute><HRCalc /></PrivateRoute>} />
       <Route path="/hr-calc/parental-leave" element={<PrivateRoute><ParentalLeaveCalc /></PrivateRoute>} />
+      <Route path="/hr-calc/pregnancy" element={<PrivateRoute><PregnancyCalc /></PrivateRoute>} />
 
       {/* 총무지원 */}
       <Route path="/general-app" element={<PrivateRoute><PermissionGuard menuKey="general"><GeneralHome /></PermissionGuard></PrivateRoute>} />
