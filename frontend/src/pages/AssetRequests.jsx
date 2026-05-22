@@ -1,7 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api.js';
 import { Toast } from '../components/Common.jsx';
+
+function HamburgerMenu({ onReset, onDelete }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    function h(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }
+    document.addEventListener('mousedown', h);
+    document.addEventListener('touchstart', h);
+    return () => { document.removeEventListener('mousedown', h); document.removeEventListener('touchstart', h); };
+  }, []);
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button onClick={() => setOpen(o => !o)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', color: 'var(--text2)', fontSize: 18 }}>⋮</button>
+      {open && (
+        <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', overflow: 'hidden', minWidth: 130 }}>
+          <button onClick={() => { onReset(); setOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#854F0B', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>🔑 비번 초기화</button>
+          <button onClick={() => { onDelete(); setOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#A32D2D', fontFamily: 'inherit' }}>🗑️ 삭제</button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const STATUS_STYLE = {
   '신고접수': { color: '#1A4A8A', bg: '#E8F0FB' },
@@ -110,9 +132,12 @@ export default function AssetRequests() {
                   </div>
                 </div>
               ) : (
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <button onClick={() => { setSelected(r.id); setComment(''); }} style={{ flex: 1, height: 34, borderRadius: 8, background: '#E8F0FB', color: '#1A4A8A', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>처리</button>
-                  <button onClick={() => handleDelete(r.id)} style={{ height: 34, padding: '0 14px', borderRadius: 8, background: '#FCEBEB', color: '#A32D2D', border: 'none', fontSize: 13, cursor: 'pointer' }}>삭제</button>
+                  <HamburgerMenu
+                    onReset={async () => { await api.resetAssetRequestPassword(r.id); setToast('비밀번호가 1111로 초기화되었습니다.'); }}
+                    onDelete={() => handleDelete(r.id)}
+                  />
                 </div>
               )}
             </div>
