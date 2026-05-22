@@ -117,6 +117,7 @@ export default function App() {
       <Route path="/hr-calc/lunar" element={<PrivateRoute><LunarCalc /></PrivateRoute>} />
 
       {/* 총무지원 */}
+      <Route path="/general-app" element={<PrivateRoute><PermissionGuard menuKey="general"><GeneralHome /></PermissionGuard></PrivateRoute>} />
       <Route path="/attendance-app" element={<PrivateRoute><PermissionGuard menuKey="attendance"><AttendanceHome /></PermissionGuard></PrivateRoute>} />
       <Route path="/attendance-mgmt" element={<PrivateRoute><PermissionGuard menuKey="attendance"><AttendanceMgmt /></PermissionGuard></PrivateRoute>} />
       <Route path="/housing-stats" element={<PrivateRoute><PermissionGuard menuKey="general"><HousingStats /></PermissionGuard></PrivateRoute>} />
