@@ -103,6 +103,8 @@ export default function HousingList() {
     return () => { document.removeEventListener('mousedown', h); document.removeEventListener('touchstart', h); };
   }, []);
 
+  const [search, setSearch] = useState('');
+
   useEffect(() => { load(); }, []);
 
   async function load() {
@@ -146,6 +148,12 @@ export default function HousingList() {
   });
 
   const filtered = sorted.filter(r => {
+    const matchSearch = !search || 
+      r.emp_name?.includes(search) || 
+      r.emp_no?.includes(search) ||
+      r.org_name?.includes(search) ||
+      r.housing_address?.includes(search);
+    if (!matchSearch) return false;
     if (filter === '전체') return true;
     const d = getDaysLeft(r);
     if (filter === '🔴 D-60') return d !== null && d <= 60;
@@ -199,7 +207,7 @@ export default function HousingList() {
       </div>
 
       {/* 필터 탭 */}
-      <div style={{ display: 'flex', gap: 6, padding: '10px 16px', overflowX: 'auto', borderBottom: '0.5px solid var(--border)' }}>
+      <div style={{ display: 'flex', gap: 6, padding: '10px 16px 0', overflowX: 'auto' }}>
         {['전체', '🔴 D-60', '🟠 D-90', '🟡 D-180', '정보없음'].map(f => (
           <button key={f} onClick={() => setFilter(f)} style={{
             padding: '5px 12px', borderRadius: 20, border: 'none',
@@ -208,6 +216,18 @@ export default function HousingList() {
             fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit',
           }}>{f}</button>
         ))}
+      </div>
+
+      {/* 검색 */}
+      <div style={{ padding: '8px 16px 0', borderBottom: '0.5px solid var(--border)', paddingBottom: 10 }}>
+        <input type="text" placeholder="🔍 이름, 사번, 조직명, 사택주소 검색"
+          value={search} onChange={e => setSearch(e.target.value)}
+          style={{ width: '100%', boxSizing: 'border-box' }} />
+        {search && (
+          <div style={{ fontSize: 12, color: 'var(--text2)', marginTop: 4 }}>
+            검색 결과: {filtered.length}건
+          </div>
+        )}
       </div>
 
       <div className="page-content" style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
