@@ -76,6 +76,7 @@ export default function AssetStock() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState('');
   const [deployModal, setDeployModal] = useState(null);
+  const [disposeConfirm, setDisposeConfirm] = useState(null);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
 
@@ -85,6 +86,18 @@ export default function AssetStock() {
     const data = await api.getAssets();
     setAssets(data.filter(a => a.status === '재고'));
     setLoading(false);
+  }
+
+  async function handleDispose(id) {
+    if (disposeConfirm !== id) {
+      setDisposeConfirm(id);
+      setTimeout(() => setDisposeConfirm(null), 3000);
+      return;
+    }
+    await api.updateAsset(id, { status: '폐기' });
+    setDisposeConfirm(null);
+    setToast('폐기 처리되었습니다.');
+    load();
   }
 
   const filtered = assets.filter(a => {
@@ -148,11 +161,19 @@ export default function AssetStock() {
               <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, fontWeight: 600, background: '#EAF3DE', color: '#3B6D11' }}>재고</span>
             </div>
             {a.note && <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 8 }}>📝 {a.note}</div>}
-            <button onClick={() => setDeployModal(a)} style={{
-              width: '100%', height: 36, borderRadius: 8,
-              background: '#3B6D11', color: '#EAF3DE',
-              border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            }}>📤 배포</button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => setDeployModal(a)} style={{
+                flex: 1, height: 36, borderRadius: 8,
+                background: '#3B6D11', color: '#EAF3DE',
+                border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              }}>📤 배포</button>
+              <button onClick={() => handleDispose(a.id)} style={{
+                flex: 1, height: 36, borderRadius: 8,
+                background: disposeConfirm === a.id ? '#FCEBEB' : 'var(--bg2)',
+                color: disposeConfirm === a.id ? '#A32D2D' : 'var(--text2)',
+                border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              }}>{disposeConfirm === a.id ? '⚠️ 확인?' : '🗑️ 폐기'}</button>
+            </div>
           </div>
         ))}
       </div>
