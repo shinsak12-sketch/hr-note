@@ -68,7 +68,9 @@ export default function GeneralHome() {
           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>🔧 수선</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
             {[
-              { icon: '📊', title: '수선현황', desc: '접수 현황', path: '/repair-mgmt', color: '#5C3D8F', bg: '#F0EBF8' },
+              { icon: '📊', title: '수선현황', desc: '현황 대시보드', path: '/repair-stats', color: '#5C3D8F', bg: '#F0EBF8' },
+              { icon: '📋', title: '신청관리', desc: '수선요청 처리', path: '/repair-mgmt', color: '#7B2D8B', bg: '#F5E8F8' },
+              { icon: '🔧', title: '수선관리', desc: '진행현황 관리', path: '/repair-list', color: '#3B6D11', bg: '#EAF3DE' },
             ].map(m => (
               <button key={m.path} onClick={() => nav(m.path)} style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
