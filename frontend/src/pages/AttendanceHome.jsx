@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api.js';
 
@@ -14,7 +14,15 @@ export default function AttendanceHome() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [year, setYear] = useState(new Date().getFullYear());
-  const [selectedType, setSelectedType] = useState('전체');
+  const [selectedTypes, setSelectedTypes] = useState([...ALL_TYPES]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function h(e) { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setDropdownOpen(false); }
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, []);
 
   useEffect(() => { load(); }, [year]);
 
@@ -25,11 +33,12 @@ export default function AttendanceHome() {
     setLoading(false);
   }
 
-  // 그래프 데이터
+  function toggleType(t) {
+    setSelectedTypes(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
+  }
+
   const monthlyData = stats?.monthly?.map(m => {
-    const total = selectedType === '전체'
-      ? ALL_TYPES.reduce((sum, t) => sum + (m[t] || 0), 0)
-      : (m[selectedType] || 0);
+    const total = selectedTypes.reduce((sum, t) => sum + (m[t] || 0), 0);
     return { month: m.month, total };
   }) || [];
   const maxVal = Math.max(...monthlyData.map(m => m.total), 1);
@@ -83,13 +92,49 @@ export default function AttendanceHome() {
             </select>
           </div>
 
-          {/* 종류 드롭다운 */}
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <select value={selectedType} onChange={e => setSelectedType(e.target.value)}
-              style={{ flex: 1, height: 36, fontSize: 13 }}>
-              <option value="전체">전체 (모든 종류)</option>
-              {ALL_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
+          {/* 종류 멀티선택 드롭다운 */}
+          <div ref={dropdownRef} style={{ position: 'relative' }}>
+            <button onClick={() => setDropdownOpen(o => !o)} style={{
+              width: '100%', height: 36, borderRadius: 8, padding: '0 12px',
+              border: '0.5px solid var(--border)', background: 'var(--bg)',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', color: 'var(--text)',
+            }}>
+              <span>{selectedTypes.length === ALL_TYPES.length ? '전체 종류' : `${selectedTypes.length}개 선택`}</span>
+              <span style={{ fontSize: 10 }}>▼</span>
+            </button>
+            {dropdownOpen && (
+              <div style={{
+                position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100,
+                background: 'var(--bg)', border: '0.5px solid var(--border)',
+                borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                padding: 10, display: 'flex', flexDirection: 'column', gap: 2, maxHeight: 240, overflowY: 'auto',
+              }}>
+                <button onClick={() => setSelectedTypes(selectedTypes.length === ALL_TYPES.length ? [] : [...ALL_TYPES])}
+                  style={{ padding: '6px 10px', borderRadius: 6, border: 'none', background: 'var(--bg2)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', color: 'var(--text)', marginBottom: 4 }}>
+                  {selectedTypes.length === ALL_TYPES.length ? '✓ 전체 해제' : '전체 선택'}
+                </button>
+                {ALL_TYPES.map(t => {
+                  const on = selectedTypes.includes(t);
+                  const c = TYPE_COLORS[t] || '#5A4A00';
+                  return (
+                    <button key={t} onClick={() => toggleType(t)} style={{
+                      padding: '7px 10px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                      background: on ? c + '15' : 'transparent',
+                      color: on ? c : 'var(--text2)',
+                      fontSize: 12, fontWeight: on ? 700 : 400,
+                      fontFamily: 'inherit', textAlign: 'left',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                    }}>
+                      <span style={{ width: 14, height: 14, borderRadius: 3, border: `2px solid ${on ? c : 'var(--border)'}`, background: on ? c : 'transparent', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        {on && <span style={{ color: '#fff', fontSize: 9, fontWeight: 700 }}>✓</span>}
+                      </span>
+                      {t}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* 막대 그래프 */}
