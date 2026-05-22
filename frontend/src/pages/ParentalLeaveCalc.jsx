@@ -133,36 +133,36 @@ export default function ParentalLeaveCalc() {
 
         {/* 사용기간 입력 */}
         <section>
-          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>육아휴직 사용기간 입력</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>육아휴직 사용기간 입력</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {periods.map((p, i) => {
               const r = calcResults[i];
               const hasData = p.start && p.end;
               return (
                 <div key={i} style={{
                   background: 'var(--bg)', border: `0.5px solid ${hasData && r ? '#3B6D11' : 'var(--border)'}`,
-                  borderRadius: 12, padding: '12px 14px',
+                  borderRadius: 10, padding: '8px 12px',
                 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 8 }}>
-                    {i + 1}회차
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                    <div className="form-group" style={{ marginBottom: 0 }}>
-                      <label className="form-label">시작일</label>
-                      <input type="date" value={p.start} onChange={e => updatePeriod(i, 'start', e.target.value)} />
-                    </div>
-                    <div className="form-group" style={{ marginBottom: 0 }}>
-                      <label className="form-label">종료일</label>
-                      <input type="date" value={p.end} onChange={e => updatePeriod(i, 'end', e.target.value)} />
-                    </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text2)', width: 30, flexShrink: 0 }}>{i+1}회차</div>
+                    <input type="date" value={p.start} onChange={e => updatePeriod(i, 'start', e.target.value)}
+                      style={{ flex: 1, height: 34, fontSize: 12, padding: '0 8px' }} />
+                    <span style={{ fontSize: 11, color: 'var(--text2)', flexShrink: 0 }}>~</span>
+                    <input type="date" value={p.end} onChange={e => updatePeriod(i, 'end', e.target.value)}
+                      style={{ flex: 1, height: 34, fontSize: 12, padding: '0 8px' }} />
                   </div>
                   {hasData && r && (
-                    <div style={{ marginTop: 8, fontSize: 12, color: '#3B6D11', fontWeight: 600, background: '#EAF3DE', borderRadius: 6, padding: '4px 10px' }}>
-                      ✓ {r.months}개월 {r.remainDays}일 ({r.total.toFixed(2)}개월)
+                    <div style={{ marginTop: 5, fontSize: 11, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: '#3B6D11', fontWeight: 600 }}>
+                        ✓ {r.months}개월 {r.remainDays}일 = {r.total.toFixed(4)}개월
+                      </span>
+                      <span style={{ color: 'var(--text2)', fontSize: 10 }}>
+                        ({r.months} + {r.remainDays}/{r.daysInMonth})
+                      </span>
                     </div>
                   )}
                   {hasData && !r && (
-                    <div style={{ marginTop: 8, fontSize: 12, color: '#A32D2D' }}>⚠️ 종료일이 시작일보다 빠릅니다</div>
+                    <div style={{ marginTop: 4, fontSize: 11, color: '#A32D2D' }}>⚠️ 종료일이 시작일보다 빠릅니다</div>
                   )}
                 </div>
               );
@@ -177,21 +177,35 @@ export default function ParentalLeaveCalc() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 4 }}>총 사용기간</div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: isOver ? '#A32D2D' : '#3B6D11' }}>{totalUsed.toFixed(2)}</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: isOver ? '#A32D2D' : '#3B6D11' }}>{totalUsed.toFixed(4)}</div>
                 <div style={{ fontSize: 11, color: 'var(--text2)' }}>개월</div>
               </div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 4 }}>잔여기간</div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: isOver ? '#A32D2D' : '#1A4A8A' }}>{remaining.toFixed(2)}</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: isOver ? '#A32D2D' : '#1A4A8A' }}>{remaining.toFixed(4)}</div>
                 <div style={{ fontSize: 11, color: 'var(--text2)' }}>개월</div>
               </div>
             </div>
+
+            {/* 합산 산식 */}
+            {totalUsed > 0 && (
+              <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: 8, padding: '8px 10px', marginBottom: 10, fontSize: 11, color: 'var(--text2)', lineHeight: 1.8 }}>
+                <div style={{ fontWeight: 600, marginBottom: 2 }}>📐 산식</div>
+                {calcResults.map((r, i) => r ? (
+                  <div key={i}>{i+1}회차: {r.months} + {r.remainDays}/{r.daysInMonth} = {r.total.toFixed(4)}</div>
+                ) : null)}
+                <div style={{ borderTop: '0.5px solid rgba(0,0,0,0.1)', marginTop: 4, paddingTop: 4, fontWeight: 600, color: isOver ? '#A32D2D' : '#3B6D11' }}>
+                  합계: {calcResults.filter(r=>r).map(r => r.total.toFixed(4)).join(' + ')} = {totalUsed.toFixed(4)}개월
+                </div>
+              </div>
+            )}
+
             <div style={{ textAlign: 'center', fontSize: 13, fontWeight: 700, padding: '8px 0', borderTop: `0.5px solid ${isOver ? '#A32D2D' : '#3B6D11'}30` }}>
               {isOver
                 ? `⚠️ 최대 사용기간(${maxMonths}개월) 초과!`
                 : totalUsed === 0
                   ? `최대 ${maxMonths}개월 사용 가능`
-                  : `✅ ${maxMonths}개월 이내 (${(maxMonths - totalUsed).toFixed(2)}개월 남음)`
+                  : `✅ ${maxMonths}개월 이내 (${(maxMonths - totalUsed).toFixed(4)}개월 남음)`
               }
             </div>
           </div>
