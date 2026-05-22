@@ -154,6 +154,19 @@ export const api = {
   updateHousingContract: (id, body) => request('/housing/' + id + '/contract', { method: 'PATCH', body: JSON.stringify(body) }),
   resetHousingPassword: (id) => request('/housing/' + id + '/reset-password', { method: 'PATCH' }),
   deleteHousingRequest: (id) => request('/housing/' + id, { method: 'DELETE' }),
+  downloadHousingTemplate: () => {
+    const token = localStorage.getItem('hr_token');
+    fetch(BASE + '/housing/template/excel', { headers: { Authorization: 'Bearer ' + token } })
+      .then(r => r.blob()).then(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'HR노트_사택등록양식.xlsx'; a.click(); });
+  },
+  uploadHousingExcel: async (file) => {
+    const token = localStorage.getItem('hr_token');
+    const fd = new FormData(); fd.append('file', file);
+    const res = await fetch(BASE + '/housing/upload/excel', { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '업로드 실패');
+    return data;
+  },
   getHousingExceptions: () => request('/housing/exceptions'),
   checkHousingException: (emp_no) => request('/housing/exceptions/check/' + emp_no),
   addHousingException: (body) => request('/housing/exceptions', { method: 'POST', body: JSON.stringify(body) }),

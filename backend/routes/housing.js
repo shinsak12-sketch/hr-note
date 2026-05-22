@@ -1,8 +1,11 @@
 import { Router } from 'express';
+import * as XLSX from 'xlsx';
+import multer from 'multer';
 import sql from '../db.js';
 import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 const NAVER_ID = process.env.NAVER_CLIENT_ID;
 const NAVER_SECRET = process.env.NAVER_CLIENT_SECRET;
@@ -136,7 +139,78 @@ router.delete('/withdraw/:id', async (req, res) => {
   res.json({ message: '철회되었습니다.' });
 });
 
-// ── 내부 관리 ──────────────────────────
+// 기존 사택 일괄 업로드 양식
+router.get('/template/excel', authMiddleware, (req, res) => {
+  const wb = XLSX.utils.book_new();
+  const headers = [['사번', '성명', '소속(조직명)', '거주지주소', '사택주소', '계약시작일', '계약만료일', '보증금(만원)', '월세(만원)', '특이사항']];
+  const example = [['11500001', '홍길동', '강남센터', '서울시 강남구 역삼로 123', '서울시 서초구 서초대로 456', '2024-01-01', '2025-12-31', '3000', '50', '']];
+  const ws = XLSX.utils.aoa_to_sheet([...headers, ...example]);
+  ws['!cols'] = [10,8,12,25,25,12,12,10,10,20].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, ws, '사택등록양식');
+  const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+  res.setHeader('Content-Disposition', 'attachment; filename=HR노트_사택등록양식.xlsx');
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.send(buf);
+});
+
+router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, res) => {
+  try {
+    const wb = XLSX.read(req.file.buffer, { type: 'buffer' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws);
+    let success = 0, errors = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      const rowNum = i + 2;
+      const emp_no = String(r['사번'] || '').trim();
+      const emp_name = String(r['성명'] || '').trim();
+      const org_name = String(r['소속(조직명)'] || '').trim();
+      const home_address = String(r['거주지주소'] || '').trim();
+      const housing_address = String(r['사택주소'] || '').trim();
+
+      if (!emp_no || !emp_name || !home_address) {
+        errors.push(`${rowNum}행: 필수값 누락`); continue;
+      }
+
+      let office_id = null;
+      if (org_name) {
+        const [office] = await sql`SELECT id FROM offices WHERE org_name = ${org_name} LIMIT 1`;
+        if (office) office_id = office.id;
+      }
+
+      const parseDate = (val) => {
+        if (!val) return null;
+        const s = String(val).trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+        if (!isNaN(val)) {
+          const d = new Date(Math.round((Number(val) - 25569) * 86400 * 1000));
+          return d.toISOString().split('T')[0];
+        }
+        return null;
+      };
+
+      await sql`
+        INSERT INTO housing_requests
+          (emp_no, emp_name, office_id, home_address, housing_address,
+           contract_start, contract_end, deposit, monthly_rent, contract_note,
+           status, password, distance_km)
+        VALUES
+          (${emp_no}, ${emp_name}, ${office_id}, ${home_address}, ${housing_address||null},
+           ${parseDate(r['계약시작일'])}, ${parseDate(r['계약만료일'])},
+           ${String(r['보증금(만원)']||'').trim()||null},
+           ${String(r['월세(만원)']||'').trim()||null},
+           ${String(r['특이사항']||'').trim()||null},
+           '승인', '1111', NULL)
+        ON CONFLICT DO NOTHING
+      `;
+      success++;
+    }
+    res.json({ success, errors, total: rows.length });
+  } catch (e) {
+    res.status(500).json({ error: '파일 처리 중 오류: ' + e.message });
+  }
+});
 router.get('/', authMiddleware, async (req, res) => {
   const requests = await sql`
     SELECT h.*, o.org_name, o.headquarters, o.department as office_dept

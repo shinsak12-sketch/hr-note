@@ -6,44 +6,46 @@ export default function HousingStats() {
   const nav = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [hqList, setHqList] = useState([]);
-  const [deptList, setDeptList] = useState([]);
-  const [orgList, setOrgList] = useState([]);
-  const [hq, setHq] = useState('');
-  const [dept, setDept] = useState('');
-  const [org, setOrg] = useState('');
 
   useEffect(() => {
-    api.getOfficeHeadquarters().then(setHqList);
-    loadStats({});
+    api.getHousingStats({}).then(data => { setStats(data); setLoading(false); });
   }, []);
 
-  async function loadStats(params) {
-    setLoading(true);
-    const data = await api.getHousingStats(params);
-    setStats(data);
-    setLoading(false);
-  }
+  if (loading) return <div className="app-container"><div className="center-msg">불러오는 중...</div></div>;
 
-  async function handleHq(val) {
-    setHq(val); setDept(''); setOrg(''); setDeptList([]); setOrgList([]);
-    if (val) { api.getOfficeDepartments(val).then(setDeptList); loadStats({ headquarters: val }); }
-    else loadStats({});
-  }
+  const list = stats?.list || [];
+  const expiring = stats?.expiring || [];
 
-  async function handleDept(val) {
-    setDept(val); setOrg(''); setOrgList([]);
-    if (val) { api.getOfficeOrgs(hq, val).then(setOrgList); loadStats({ headquarters: hq, department: val }); }
-    else loadStats({ headquarters: hq });
-  }
+  // 본부별 집계
+  const byHq = list.reduce((acc, r) => {
+    const k = r.headquarters || '미분류';
+    acc[k] = (acc[k] || 0) + 1;
+    return acc;
+  }, {});
+  const hqEntries = Object.entries(byHq).sort((a, b) => b[1] - a[1]);
+  const maxHq = Math.max(...hqEntries.map(e => e[1]), 1);
 
-  async function handleOrg(val) {
-    setOrg(val);
-    if (val) loadStats({ headquarters: hq, department: dept, org_name: val });
-    else loadStats({ headquarters: hq, department: dept });
-  }
+  // 만료 현황
+  const exp60  = expiring.filter(r => r.days_left <= 60).length;
+  const exp90  = expiring.filter(r => r.days_left > 60 && r.days_left <= 90).length;
+  const exp180 = expiring.filter(r => r.days_left > 90 && r.days_left <= 180).length;
+  const normal = list.length - exp60 - exp90 - exp180;
 
-  const today = new Date();
+  // TOP10 장기 사용자 (계약시작일 기준)
+  const top10 = [...list]
+    .filter(r => r.contract_start)
+    .sort((a, b) => new Date(a.contract_start) - new Date(b.contract_start))
+    .slice(0, 10)
+    .map(r => {
+      const start = new Date(r.contract_start);
+      const now = new Date();
+      const months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+      const years = Math.floor(months / 12);
+      const rem = months % 12;
+      return { ...r, durationStr: years > 0 ? `${years}년 ${rem}개월` : `${rem}개월`, months };
+    });
+
+  const RANK_COLORS = ['#A32D2D', '#854F0B', '#5A4A00'];
 
   return (
     <div className="app-container">
@@ -56,96 +58,113 @@ export default function HousingStats() {
         <div style={{ width: 40 }} />
       </div>
 
-      {/* 필터 */}
-      <div style={{ padding: '10px 16px', borderBottom: '0.5px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <select value={hq} onChange={e => handleHq(e.target.value)} style={{ flex: 1 }}>
-            <option value="">전체 본부</option>
-            {hqList.map(h => <option key={h}>{h}</option>)}
-          </select>
-          <select value={dept} onChange={e => handleDept(e.target.value)} style={{ flex: 1 }} disabled={!hq || !deptList.length}>
-            <option value="">전체 부서</option>
-            {deptList.map(d => <option key={d}>{d}</option>)}
-          </select>
-        </div>
-        <select value={org} onChange={e => handleOrg(e.target.value)} disabled={!dept || !orgList.length}>
-          <option value="">전체 조직</option>
-          {orgList.map(o => <option key={o}>{o}</option>)}
-        </select>
-      </div>
+      <div className="page-content" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-      <div className="page-content" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {loading && <div className="center-msg">불러오는 중...</div>}
-
-        {!loading && stats && (
-          <>
-            {/* 요약 */}
-            <section>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>📊 현황 요약</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                {[
-                  { label: '사택 수', val: `${stats.total}건`, color: '#2D6A6A', bg: '#E6F4F4' },
-                  { label: '보증금 총합', val: stats.deposit_sum ? `${Number(stats.deposit_sum).toLocaleString()}만` : '-', color: '#1A4A8A', bg: '#E8F0FB' },
-                  { label: '월세 총합', val: stats.rent_sum ? `${Number(stats.rent_sum).toLocaleString()}만` : '-', color: '#3B6D11', bg: '#EAF3DE' },
-                ].map(s => (
-                  <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '12px 8px', textAlign: 'center' }}>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: s.color }}>{s.val}</div>
-                    <div style={{ fontSize: 11, color: s.color, marginTop: 2 }}>{s.label}</div>
-                  </div>
-                ))}
+        {/* ① 핵심 지표 */}
+        <section>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>📊 현황 요약</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+            {[
+              { label: '사택 수', val: `${list.length}건`, color: '#2D6A6A', bg: '#E6F4F4' },
+              { label: '보증금 총합', val: stats.deposit_sum ? `${Number(stats.deposit_sum).toLocaleString()}만` : '-', color: '#1A4A8A', bg: '#E8F0FB' },
+              { label: '월세 총합', val: stats.rent_sum ? `${Number(stats.rent_sum).toLocaleString()}만` : '-', color: '#3B6D11', bg: '#EAF3DE' },
+            ].map(s => (
+              <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '14px 8px', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: s.color }}>{s.val}</div>
+                <div style={{ fontSize: 11, color: s.color, marginTop: 3 }}>{s.label}</div>
               </div>
-            </section>
+            ))}
+          </div>
+        </section>
 
-            {/* 만료 예정 */}
-            {stats.expiring?.length > 0 && (
-              <section>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>⚠️ 만료 예정</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {stats.expiring.map(r => {
-                    const d = r.days_left;
-                    const color = d <= 60 ? '#A32D2D' : d <= 90 ? '#854F0B' : '#7A6B00';
-                    const bg = d <= 60 ? '#FCEBEB' : d <= 90 ? '#FAEEDA' : '#FFFBE6';
-                    const badge = d <= 60 ? '🔴' : d <= 90 ? '🟠' : '🟡';
-                    return (
-                      <div key={r.id} style={{ background: 'var(--bg)', border: `0.5px solid ${color}30`, borderLeft: `4px solid ${color}`, borderRadius: 12, padding: '12px 14px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                          <div style={{ fontWeight: 600, fontSize: 14 }}>{r.emp_name} <span style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 400 }}>· {r.emp_no}</span></div>
-                          <span style={{ fontSize: 12, fontWeight: 700, padding: '2px 10px', borderRadius: 20, background: bg, color }}>
-                            {badge} D-{d}
-                          </span>
-                        </div>
-                        <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.7 }}>
-                          <div>🏢 {r.org_name}</div>
-                          {r.housing_address && <div>📍 {r.housing_address}</div>}
-                          <div>📆 만료일: {r.contract_end?.split?.('T')[0]}</div>
-                        </div>
-                      </div>
-                    );
-                  })}
+        {/* ② 본부별 막대 그래프 */}
+        {hqEntries.length > 0 && (
+          <section>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>🏛️ 본부별 사택 수</div>
+            <div style={{ background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 12, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {hqEntries.map(([hq, cnt]) => (
+                <div key={hq}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+                    <span style={{ color: 'var(--text)', fontWeight: 500 }}>{hq}</span>
+                    <span style={{ fontWeight: 700, color: '#2D6A6A' }}>{cnt}건</span>
+                  </div>
+                  <div style={{ background: 'var(--bg2)', borderRadius: 6, height: 10, overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 6,
+                      background: '#2D6A6A',
+                      width: `${(cnt / maxHq) * 100}%`,
+                      transition: 'width 0.5s ease',
+                    }} />
+                  </div>
                 </div>
-              </section>
-            )}
+              ))}
+            </div>
+          </section>
+        )}
 
-            {/* 전체 리스트 */}
-            <section>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>🏠 사택 목록 ({stats.list?.length || 0})</div>
-              {stats.list?.length === 0 && <div className="center-msg">승인된 사택이 없습니다.</div>}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {stats.list?.map(r => (
-                  <div key={r.id} style={{ background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 12, padding: '12px 14px' }}>
-                    <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{r.emp_name} <span style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 400 }}>· {r.emp_no}</span></div>
-                    <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.7 }}>
-                      <div>🏢 {r.org_name}</div>
-                      {r.housing_address && <div>📍 {r.housing_address}</div>}
-                      {r.contract_end && <div>📆 {r.contract_start?.split?.('T')[0]} ~ {r.contract_end?.split?.('T')[0]}</div>}
-                      {r.deposit && <div>💰 보증금 {Number(r.deposit).toLocaleString()}만원 / 월세 {Number(r.monthly_rent).toLocaleString()}만원</div>}
+        {/* ③ 만료 현황 */}
+        <section>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>📅 계약 만료 현황</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+            {[
+              { label: '🔴 D-60', val: exp60, color: '#A32D2D', bg: '#FCEBEB', filter: '🔴 D-60' },
+              { label: '🟠 D-90', val: exp90, color: '#854F0B', bg: '#FAEEDA', filter: '🟠 D-90' },
+              { label: '🟡 D-180', val: exp180, color: '#7A6B00', bg: '#FFFBE6', filter: '🟡 D-180' },
+              { label: '✅ 정상', val: normal, color: '#3B6D11', bg: '#EAF3DE', filter: null },
+            ].map(s => (
+              <button key={s.label} onClick={() => s.filter && nav('/housing-list')}
+                style={{
+                  background: s.bg, borderRadius: 10, padding: '10px 6px', textAlign: 'center',
+                  border: 'none', cursor: s.filter ? 'pointer' : 'default', fontFamily: 'inherit',
+                }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: s.color }}>{s.val}</div>
+                <div style={{ fontSize: 10, color: s.color, marginTop: 2 }}>{s.label}</div>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* ④ 장기 사용자 TOP 10 */}
+        {top10.length > 0 && (
+          <section>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>⏱️ 장기 사용자 TOP {top10.length}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {top10.map((r, idx) => {
+                const rankColor = RANK_COLORS[idx] || 'var(--text2)';
+                const isMedal = idx < 3;
+                return (
+                  <div key={r.id} style={{
+                    background: 'var(--bg)',
+                    border: `0.5px solid ${isMedal ? rankColor + '30' : 'var(--border)'}`,
+                    borderLeft: `4px solid ${isMedal ? rankColor : 'var(--border)'}`,
+                    borderRadius: 12, padding: '12px 14px',
+                    display: 'flex', alignItems: 'center', gap: 12,
+                  }}>
+                    <div style={{
+                      width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                      background: isMedal ? rankColor : 'var(--bg2)',
+                      color: isMedal ? '#fff' : 'var(--text2)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 13, fontWeight: 700,
+                    }}>{idx + 1}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>
+                        {r.emp_name}
+                        <span style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 400, marginLeft: 6 }}>· {r.emp_no}</span>
+                      </div>
+                      <div style={{ fontSize: 12, color: 'var(--text2)', marginTop: 2 }}>🏢 {r.org_name || '-'}</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: isMedal ? rankColor : 'var(--text)' }}>{r.durationStr}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text2)' }}>({r.contract_start?.split?.('T')[0]}~)</div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </section>
-          </>
+                );
+              })}
+            </div>
+          </section>
         )}
+
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api.js';
 import { Toast } from '../components/Common.jsx';
@@ -91,6 +91,17 @@ export default function HousingList() {
   const [toast, setToast] = useState('');
   const [contractModal, setContractModal] = useState(null);
   const [filter, setFilter] = useState('전체');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function h(e) { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false); }
+    document.addEventListener('mousedown', h);
+    document.addEventListener('touchstart', h);
+    return () => { document.removeEventListener('mousedown', h); document.removeEventListener('touchstart', h); };
+  }, []);
 
   useEffect(() => { load(); }, []);
 
@@ -98,6 +109,21 @@ export default function HousingList() {
     const data = await api.getHousingRequests();
     setRequests(data.filter(r => r.status === '승인'));
     setLoading(false);
+  }
+
+  async function handleUpload(file) {
+    setUploading(true);
+    try {
+      const res = await api.uploadHousingExcel(file);
+      setToast(`✅ ${res.success}건 등록 완료!`);
+      setUploadFile(null);
+      setMenuOpen(false);
+      load();
+    } catch (e) {
+      setToast('❌ ' + e.message);
+    } finally {
+      setUploading(false);
+    }
   }
 
   function getDaysLeft(r) {
@@ -113,7 +139,13 @@ export default function HousingList() {
     return null;
   }
 
-  const filtered = requests.filter(r => {
+  const sorted = [...requests].sort((a, b) => {
+    const da = a.contract_end ? new Date(a.contract_end) : new Date('9999-12-31');
+    const db = b.contract_end ? new Date(b.contract_end) : new Date('9999-12-31');
+    return da - db;
+  });
+
+  const filtered = sorted.filter(r => {
     if (filter === '전체') return true;
     const d = getDaysLeft(r);
     if (filter === '🔴 D-60') return d !== null && d <= 60;
@@ -131,7 +163,39 @@ export default function HousingList() {
           뒤로
         </button>
         <div className="header-title">사택 관리</div>
-        <div style={{ width: 40 }} />
+        <div ref={menuRef} style={{ position: 'relative' }}>
+          <button onClick={() => setMenuOpen(o => !o)} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            fontSize: 20, color: 'var(--text2)', padding: '4px 8px',
+          }}>⋮</button>
+          {menuOpen && (
+            <div style={{
+              position: 'absolute', right: 0, top: '100%', zIndex: 100,
+              background: 'var(--bg)', border: '0.5px solid var(--border)',
+              borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+              overflow: 'hidden', minWidth: 200, padding: 12,
+              display: 'flex', flexDirection: 'column', gap: 10,
+            }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text2)' }}>📤 기존 사택 일괄 등록</div>
+              <button onClick={() => api.downloadHousingTemplate()} style={{
+                padding: '8px 12px', borderRadius: 8, background: 'var(--bg2)',
+                color: 'var(--text)', border: '0.5px solid var(--border)',
+                fontSize: 12, cursor: 'pointer', fontFamily: 'inherit',
+              }}>📥 양식 다운로드</button>
+              <input type="file" accept=".xlsx,.xls"
+                onChange={e => setUploadFile(e.target.files[0])}
+                style={{ fontSize: 12 }} />
+              {uploadFile && (
+                <button onClick={() => handleUpload(uploadFile)} disabled={uploading} style={{
+                  padding: '8px 12px', borderRadius: 8,
+                  background: '#3B6D11', color: '#EAF3DE',
+                  border: 'none', fontSize: 12, fontWeight: 600,
+                  cursor: 'pointer', fontFamily: 'inherit',
+                }}>{uploading ? '업로드 중...' : '📤 업로드'}</button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 필터 탭 */}
