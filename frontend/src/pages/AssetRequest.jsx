@@ -42,6 +42,8 @@ export default function AssetRequest() {
   const filteredOffices = officeSearch
     ? offices.filter(o => o.org_name.includes(officeSearch) || o.headquarters.includes(officeSearch))
     : offices;
+
+  async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     const { emp_no, emp_name, asset_type, old_asset_no, new_asset_no, change_date, reason, password, password_confirm } = form;
