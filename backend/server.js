@@ -40,17 +40,28 @@ app.listen(PORT, () => {
 
 // 음양력 변환 프록시
 app.get('/api/lunar', async (req, res) => {
-  const { solYear, solMonth, solDay, type } = req.query;
-  const key = '7ee0ddf1df26d71805f93d0e43dbfe81fd947075e53d361ac0e025dbb80ad698';
+  const { solYear, solMonth, solDay, type, lunLeapmonth } = req.query;
+  const key = process.env.LUNAR_API_KEY || '7ee0ddf1df26d71805f93d0e43dbfe81fd947075e53d361ac0e025dbb80ad698';
   try {
     let url;
+    const mm = String(solMonth).padStart(2,'0');
+    const dd = String(solDay).padStart(2,'0');
     if (type === 'sol2lun') {
-      url = `https://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService/getLunCalInfo?serviceKey=${key}&solYear=${solYear}&solMonth=${solMonth}&solDay=${solDay}&_type=json`;
+      url = `https://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService/getLunCalInfo?serviceKey=${key}&solYear=${solYear}&solMonth=${mm}&solDay=${dd}&_type=json`;
     } else {
-      url = `https://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService/getSolCalInfo?serviceKey=${key}&lunYear=${solYear}&lunMonth=${solMonth}&lunDay=${solDay}&_type=json`;
+      url = `https://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService/getSolCalInfo?serviceKey=${key}&lunYear=${solYear}&lunMonth=${mm}&lunDay=${dd}&lunLeapmonth=${lunLeapmonth||'N'}&_type=json`;
     }
     const response = await fetch(url);
-    const data = await response.json();
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      // XML 응답인 경우 에러 메시지 추출
+      const errMatch = text.match(/<errMsg>(.*?)<\/errMsg>/);
+      const codeMatch = text.match(/<returnAuthMsg>(.*?)<\/returnAuthMsg>/);
+      return res.status(400).json({ error: errMatch?.[1] || codeMatch?.[1] || 'API 응답 오류' });
+    }
     res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });

@@ -50,6 +50,9 @@ export default function LunarCalc() {
   }
 
   const today = new Date();
+  const daysInMonth = form.year && form.month
+    ? new Date(Number(form.year), Number(form.month), 0).getDate()
+    : 31;
 
   return (
     <div className="app-container">
@@ -106,7 +109,7 @@ export default function LunarCalc() {
               <label className="form-label">일</label>
               <select value={form.day} onChange={e => setF('day', e.target.value)}>
                 <option value="">일</option>
-                {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+                {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(d => (
                   <option key={d} value={d}>{d}일</option>
                 ))}
               </select>
