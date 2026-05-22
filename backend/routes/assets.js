@@ -151,7 +151,7 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
 // 신고 접수 (로그인 불필요)
 router.post('/requests', async (req, res) => {
   const { emp_no, emp_name, office_id, asset_type, old_asset_no, new_asset_no, change_date, reason, password, product_name } = req.body;
-  if (!emp_no || !emp_name || !asset_type || !old_asset_no || !new_asset_no || !change_date || !reason || !password)
+  if (!emp_no || !emp_name || !asset_type || !new_asset_no || !change_date || !reason || !password)
     return res.status(400).json({ error: '필수 항목을 모두 입력하세요.' });
   const [req_] = await sql`
     INSERT INTO asset_requests (emp_no, emp_name, office_id, asset_type, old_asset_no, new_asset_no, change_date, reason, password, product_name)
