@@ -14,7 +14,7 @@ export default function AttendanceHome() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [year, setYear] = useState(new Date().getFullYear());
-  const [selectedTypes, setSelectedTypes] = useState(ALL_TYPES.slice(0, 6));
+  const [selectedType, setSelectedType] = useState('전체');
 
   useEffect(() => { load(); }, [year]);
 
@@ -25,13 +25,11 @@ export default function AttendanceHome() {
     setLoading(false);
   }
 
-  function toggleType(t) {
-    setSelectedTypes(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
-  }
-
-  // 그래프 데이터 계산
+  // 그래프 데이터
   const monthlyData = stats?.monthly?.map(m => {
-    const total = selectedTypes.reduce((sum, t) => sum + (m[t] || 0), 0);
+    const total = selectedType === '전체'
+      ? ALL_TYPES.reduce((sum, t) => sum + (m[t] || 0), 0)
+      : (m[selectedType] || 0);
     return { month: m.month, total };
   }) || [];
   const maxVal = Math.max(...monthlyData.map(m => m.total), 1);
@@ -85,19 +83,13 @@ export default function AttendanceHome() {
             </select>
           </div>
 
-          {/* 종류 필터 */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 12 }}>
-            {ALL_TYPES.map(t => {
-              const on = selectedTypes.includes(t);
-              const c = TYPE_COLORS[t] || '#5A4A00';
-              return (
-                <button key={t} onClick={() => toggleType(t)} style={{
-                  padding: '3px 8px', borderRadius: 20, border: `1.5px solid ${on ? c : 'var(--border)'}`,
-                  background: on ? c + '20' : 'var(--bg2)', color: on ? c : 'var(--text2)',
-                  fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-                }}>{t}</button>
-              );
-            })}
+          {/* 종류 드롭다운 */}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <select value={selectedType} onChange={e => setSelectedType(e.target.value)}
+              style={{ flex: 1, height: 36, fontSize: 13 }}>
+              <option value="전체">전체 (모든 종류)</option>
+              {ALL_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
           </div>
 
           {/* 막대 그래프 */}
