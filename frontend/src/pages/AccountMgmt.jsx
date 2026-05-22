@@ -102,13 +102,14 @@ export default function AccountMgmt() {
             )}
             {tab === 'active' && u.role !== 'master' && (
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <select defaultValue={u.work_type || ''} onChange={async e => {
-                  await api.updateUserWorkType(u.id, e.target.value);
+                <select value={u.work_type || ''} onChange={async e => {
+                  const val = e.target.value;
+                  await api.updateUserWorkType(u.id, val);
                   setToast('업무구분이 변경되었습니다.');
                   load();
                 }} style={{ flex: 1, height: 36, fontSize: 13 }}>
                   <option value="">업무구분 선택</option>
-                  {WORK_TYPES.map(t => <option key={t}>{t}</option>)}
+                  {WORK_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
                 <button className="btn-delete" style={{ height: 36 }}
                   onClick={() => handleDelete(u.id)}>
