@@ -34,6 +34,8 @@ import AssetStatus from './pages/AssetStatus.jsx';
 import RepairRequest from './pages/RepairRequest.jsx';
 import RepairStatus from './pages/RepairStatus.jsx';
 import RepairMgmt from './pages/RepairMgmt.jsx';
+import RepairStats from './pages/RepairStats.jsx';
+import RepairList from './pages/RepairList.jsx';
 import HRCalc from './pages/HRCalc.jsx';
 import { PermissionGuard } from './components/PermissionGuard.jsx';
 
@@ -62,7 +64,9 @@ export default function App() {
       <Route path="/asset-list" element={<PrivateRoute><PermissionGuard menuKey="general"><AssetList /></PermissionGuard></PrivateRoute>} />
 
       {/* 수선관리 */}
+      <Route path="/repair-stats" element={<PrivateRoute><PermissionGuard menuKey="general"><RepairStats /></PermissionGuard></PrivateRoute>} />
       <Route path="/repair-mgmt" element={<PrivateRoute><PermissionGuard menuKey="general"><RepairMgmt /></PermissionGuard></PrivateRoute>} />
+      <Route path="/repair-list" element={<PrivateRoute><PermissionGuard menuKey="general"><RepairList /></PermissionGuard></PrivateRoute>} />
 
       {/* 사택/장비/수선 신청 (로그인 불필요) */}
       <Route path="/dbsonsa" element={<HousingLanding />} />
