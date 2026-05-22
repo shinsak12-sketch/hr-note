@@ -189,23 +189,43 @@ export default function OfficeHome() {
                               navigator.share({ title: office.org_name, text });
                             } else {
                               navigator.clipboard.writeText(text);
-                              setCopied(office.id);
+                              setCopied(office.id + '_share');
                               setTimeout(() => setCopied(null), 2000);
                             }
                           }} style={{
                             fontSize: 11, padding: '3px 8px', borderRadius: 6,
-                            background: copied === office.id ? '#EAF3DE' : 'var(--bg2)',
-                            color: copied === office.id ? '#3B6D11' : 'var(--text2)',
+                            background: copied === office.id + '_share' ? '#EAF3DE' : 'var(--bg2)',
+                            color: copied === office.id + '_share' ? '#3B6D11' : 'var(--text2)',
                             border: '0.5px solid var(--border)', cursor: 'pointer',
                             display: 'flex', alignItems: 'center', gap: 3,
                           }}>
-                            {copied === office.id ? '✓ 복사됨' : (
+                            {copied === office.id + '_share' ? '✓ 복사됨' : (
                               <>
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                   <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
                                   <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
                                 </svg>
                                 공유
+                              </>
+                            )}
+                          </button>
+                          <button onClick={() => {
+                            navigator.clipboard.writeText(office.address);
+                            setCopied(office.id + '_addr');
+                            setTimeout(() => setCopied(null), 2000);
+                          }} style={{
+                            fontSize: 11, padding: '3px 8px', borderRadius: 6,
+                            background: copied === office.id + '_addr' ? '#EAF3DE' : 'var(--bg2)',
+                            color: copied === office.id + '_addr' ? '#3B6D11' : 'var(--text2)',
+                            border: '0.5px solid var(--border)', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', gap: 3,
+                          }}>
+                            {copied === office.id + '_addr' ? '✓ 복사됨' : (
+                              <>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                                주소복사
                               </>
                             )}
                           </button>
