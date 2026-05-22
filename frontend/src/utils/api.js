@@ -209,4 +209,7 @@ export const api = {
 
   retrieveAsset: (id) => request('/assets/' + id + '/retrieve', { method: 'PATCH' }),
   deployAsset: (id, body) => request('/assets/' + id + '/deploy', { method: 'PATCH', body: JSON.stringify(body) }),
+  // 음양력 변환
+  solarToLunar: (year, month, day) => request('/lunar?type=sol2lun&solYear=' + year + '&solMonth=' + String(month).padStart(2,'0') + '&solDay=' + String(day).padStart(2,'0')),
+  lunarToSolar: (year, month, day, leap) => request('/lunar?type=lun2sol&solYear=' + year + '&solMonth=' + String(month).padStart(2,'0') + '&solDay=' + String(day).padStart(2,'0') + (leap ? '&lunLeapmonth=Y' : '')),
 };

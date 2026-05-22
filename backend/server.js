@@ -37,3 +37,22 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.listen(PORT, () => {
   console.log(`HR노트 서버 실행 중: http://localhost:${PORT}`);
 });
+
+// 음양력 변환 프록시
+app.get('/api/lunar', async (req, res) => {
+  const { solYear, solMonth, solDay, type } = req.query;
+  const key = '7ee0ddf1df26d71805f93d0e43dbfe81fd947075e53d361ac0e025dbb80ad698';
+  try {
+    let url;
+    if (type === 'sol2lun') {
+      url = `https://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService/getLunCalInfo?serviceKey=${key}&solYear=${solYear}&solMonth=${solMonth}&solDay=${solDay}&_type=json`;
+    } else {
+      url = `https://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService/getSolCalInfo?serviceKey=${key}&lunYear=${solYear}&lunMonth=${solMonth}&lunDay=${solDay}&_type=json`;
+    }
+    const response = await fetch(url);
+    const data = await response.json();
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
