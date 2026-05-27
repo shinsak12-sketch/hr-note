@@ -210,6 +210,9 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
   `;
   res.status(201).json(newRec);
 });
+
+// 삭제
+router.delete('/:id', authMiddleware, async (req, res) => {
   await sql`DELETE FROM attendance WHERE id=${req.params.id}`;
   res.json({ message: '삭제되었습니다.' });
 });
