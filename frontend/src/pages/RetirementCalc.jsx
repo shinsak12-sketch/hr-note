@@ -1,20 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function ceil1(n) { return Math.ceil(n); } // 1원 단위 절상
-
-function addDays(dateStr, days) {
-  const d = new Date(dateStr);
-  d.setDate(d.getDate() + days);
-  return d.toISOString().split('T')[0];
-}
+function ceil1(n) { return Math.ceil(n); }
 
 function fmt(n) {
   if (!n && n !== 0) return '-';
   return Math.round(n).toLocaleString('ko-KR') + '원';
 }
 
-// 근속연수 계산 (년, 월, 일)
 function calcTenure(startStr, endStr) {
   if (!startStr || !endStr) return null;
   const start = new Date(startStr);
@@ -28,21 +21,66 @@ function calcTenure(startStr, endStr) {
   return { years, months, days, totalDays };
 }
 
-// 퇴직소득세 계산
+// 퇴사일 기준 3개월 구간 계산
+function calc3MonthPeriods(endStr) {
+  if (!endStr) return null;
+  const end = new Date(endStr);
+
+  // 3개월 전 날짜 (퇴사일 포함 안함, 전날까지)
+  const periodEnd = new Date(end);
+  periodEnd.setDate(periodEnd.getDate() - 1); // 퇴사일 전날까지
+
+  const periodStart = new Date(end);
+  periodStart.setMonth(periodStart.getMonth() - 3);
+
+  // 구간 분리
+  const periods = [];
+  let cur = new Date(periodStart);
+
+  while (cur <= periodEnd) {
+    const monthStart = new Date(cur.getFullYear(), cur.getMonth(), 1);
+    const monthEnd = new Date(cur.getFullYear(), cur.getMonth() + 1, 0);
+    const segStart = cur > monthStart ? new Date(cur) : new Date(monthStart);
+    const segEnd = periodEnd < monthEnd ? new Date(periodEnd) : new Date(monthEnd);
+
+    const segDays = Math.ceil((segEnd - segStart) / (1000*60*60*24)) + 1;
+    const monthDays = monthEnd.getDate();
+    const isFull = segDays === monthDays;
+
+    periods.push({
+      start: segStart.toISOString().split('T')[0],
+      end: segEnd.toISOString().split('T')[0],
+      days: segDays,
+      monthDays,
+      isFull,
+      year: segStart.getFullYear(),
+      month: segStart.getMonth() + 1,
+    });
+
+    cur = new Date(segEnd);
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  const totalDays = periods.reduce((sum, p) => sum + p.days, 0);
+  return { periods, totalDays, periodStart, periodEnd };
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr) return '-';
+  const d = new Date(dateStr);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
+
 function calcRetirementTax(retirementPay, tenureYears) {
   const y = Math.max(1, Math.ceil(tenureYears));
-
-  // 근속연수공제
   let tenureDeduct = 0;
   if (y <= 5) tenureDeduct = 300000 * y;
   else if (y <= 10) tenureDeduct = 1500000 + 500000 * (y - 5);
   else if (y <= 20) tenureDeduct = 4000000 + 800000 * (y - 10);
   else tenureDeduct = 12000000 + 1200000 * (y - 20);
 
-  // 환산급여
   const converted = Math.max(0, (retirementPay - tenureDeduct)) * 12 / y;
 
-  // 환산급여공제
   let convertedDeduct = 0;
   if (converted <= 8000000) convertedDeduct = converted;
   else if (converted <= 70000000) convertedDeduct = 8000000 + (converted - 8000000) * 0.6;
@@ -50,10 +88,8 @@ function calcRetirementTax(retirementPay, tenureYears) {
   else if (converted <= 300000000) convertedDeduct = 83300000 + (converted - 140000000) * 0.45;
   else convertedDeduct = 155300000 + (converted - 300000000) * 0.35;
 
-  // 과세표준
   const taxBase = Math.max(0, converted - convertedDeduct);
 
-  // 세율 적용 (기본세율)
   let convertedTax = 0;
   if (taxBase <= 14000000) convertedTax = taxBase * 0.06;
   else if (taxBase <= 50000000) convertedTax = 840000 + (taxBase - 14000000) * 0.15;
@@ -63,11 +99,9 @@ function calcRetirementTax(retirementPay, tenureYears) {
   else if (taxBase <= 500000000) convertedTax = 94060000 + (taxBase - 300000000) * 0.40;
   else convertedTax = 174060000 + (taxBase - 500000000) * 0.42;
 
-  // 산출세액
   const incomeTax = Math.floor(convertedTax * y / 12);
   const localTax = Math.floor(incomeTax * 0.1);
   const totalTax = incomeTax + localTax;
-
   return { tenureDeduct, converted, convertedDeduct, taxBase, incomeTax, localTax, totalTax };
 }
 
@@ -80,32 +114,33 @@ export default function RetirementCalc() {
 
   function setS(k, v) { setSalary(s => ({ ...s, [k]: v })); }
 
-  // 근속연수
   const tenure = startDate && endDate ? calcTenure(startDate, endDate) : null;
   const tenureYears = tenure ? tenure.totalDays / 365 : 0;
+  const periodData = endDate ? calc3MonthPeriods(endDate) : null;
 
-  // 월 급여 계산 (1원 절상)
-  const basicM = salary.basic ? ceil1(Number(salary.basic.replace(/,/g,'')) / 12) : 0;
-  const performanceM = salary.performance ? ceil1(Number(salary.performance.replace(/,/g,'')) / 12) : 0;
-  const qualificationM = salary.qualification ? ceil1(Number(salary.qualification.replace(/,/g,'')) / 12) : 0;
-  const bonusM = salary.bonus ? ceil1(Number(salary.bonus.replace(/,/g,'')) / 12) : 0;
+  // 월 급여 (1원 절상)
+  const monthlyWage = (s) => s ? ceil1(Number(s.replace(/,/g,'')) / 12) : 0;
+  const basicM = monthlyWage(salary.basic);
+  const performanceM = monthlyWage(salary.performance);
+  const qualificationM = monthlyWage(salary.qualification);
+  const bonusM = monthlyWage(salary.bonus);
   const monthlyTotal = basicM + performanceM + qualificationM + bonusM;
 
-  // 연차수당 3개월 산입 = 연간÷12×3
+  // 연차수당 3개월 산입
   const annualLeave = salary.annual ? Number(salary.annual.replace(/,/g,'')) : 0;
   const annualLeave3M = Math.floor(annualLeave / 12 * 3);
 
-  // 퇴직 전 3개월 총 일수
-  const days3M = 92; // 고정 92일 (노동부 기준 3개월 평균)
+  // 구간별 임금 계산
+  const periodWages = periodData?.periods.map(p => {
+    const wage = p.isFull ? monthlyTotal : Math.floor(monthlyTotal * p.days / p.monthDays);
+    return { ...p, wage };
+  }) || [];
 
-  // 평균임금 = (3개월 월급여 합 + 연차수당 3개월치) ÷ 3개월 일수
-  const wage3M = monthlyTotal * 3 + annualLeave3M;
-  const avgWage = tenure ? wage3M / days3M : 0;
+  const wage3M = periodWages.reduce((sum, p) => sum + p.wage, 0) + annualLeave3M;
+  const totalDays3M = periodData?.totalDays || 89;
 
-  // 퇴직금 = 평균임금 × 30 × 근속일수/365
+  const avgWage = totalDays3M > 0 ? wage3M / totalDays3M : 0;
   const retirementPay = tenure ? Math.floor(avgWage * 30 * tenure.totalDays / 365) : 0;
-
-  // 세금 계산
   const tax = retirementPay > 0 ? calcRetirementTax(retirementPay, tenureYears) : null;
   const netPay = tax ? retirementPay - tax.totalTax : retirementPay;
 
@@ -203,21 +238,43 @@ export default function RetirementCalc() {
         </section>
 
         {/* 평균임금 계산 결과 */}
-        {tenure && monthlyTotal > 0 && (
+        {tenure && monthlyTotal > 0 && periodData && (
           <section>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>평균임금 계산</div>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>임금 총액 계산</div>
             <div style={{ background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
-              {[
-                { label: '3개월 급여 합계', val: monthlyTotal * 3, sub: `월 ${fmt(monthlyTotal)} × 3개월` },
-                { label: '연차수당 산입액', val: annualLeave3M, sub: `연간 ÷ 12 × 3` },
-                { label: '3개월 총 임금', val: wage3M, bold: true },
-                { label: '÷ 3개월 일수', val: null, sub: `${days3M}일` },
-              ].map((row, i) => (
+              {/* 구간별 임금 */}
+              {periodWages.map((p, i) => (
                 <div key={i} style={{ padding: '10px 14px', borderBottom: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: 12, color: 'var(--text2)' }}>{row.label}{row.sub && <span style={{ fontSize: 10, marginLeft: 4 }}>({row.sub})</span>}</div>
-                  {row.val !== null && <div style={{ fontSize: 13, fontWeight: row.bold ? 700 : 400 }}>{fmt(row.val)}</div>}
+                  <div>
+                    <div style={{ fontSize: 12, color: 'var(--text2)' }}>
+                      {fmtDate(p.start)} ~ {fmtDate(p.end)}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--text2)' }}>
+                      {p.days}일{p.isFull ? ' (전체)' : ` (일할: ${p.days}/${p.monthDays}일)`}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 600 }}>{fmt(p.wage)}</div>
                 </div>
               ))}
+              {/* 연차수당 */}
+              {annualLeave3M > 0 && (
+                <div style={{ padding: '10px 14px', borderBottom: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontSize: 12, color: 'var(--text2)' }}>연차수당 산입액</div>
+                    <div style={{ fontSize: 11, color: 'var(--text2)' }}>연간 ÷ 12 × 3</div>
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 600 }}>{fmt(annualLeave3M)}</div>
+                </div>
+              )}
+              {/* 합계 */}
+              <div style={{ padding: '10px 14px', borderBottom: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between', background: 'var(--bg2)' }}>
+                <div style={{ fontSize: 12, fontWeight: 700 }}>임금 총액</div>
+                <div style={{ fontSize: 13, fontWeight: 700 }}>{fmt(wage3M)}</div>
+              </div>
+              <div style={{ padding: '10px 14px', borderBottom: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ fontSize: 12, color: 'var(--text2)' }}>총 일수</div>
+                <div style={{ fontSize: 13 }}>{totalDays3M}일</div>
+              </div>
               <div style={{ padding: '12px 14px', background: '#FAEEDA', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#854F0B' }}>일 평균임금</div>
                 <div style={{ fontSize: 17, fontWeight: 700, color: '#854F0B' }}>{fmt(avgWage)}</div>
