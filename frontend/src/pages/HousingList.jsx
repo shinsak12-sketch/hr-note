@@ -207,7 +207,7 @@ export default function HousingList() {
       </div>
 
       {/* 필터 탭 */}
-      <div style={{ display: 'flex', gap: 6, padding: '10px 16px 0', overflowX: 'auto' }}>
+      <div style={{ display: 'flex', gap: 6, padding: '10px 16px 0', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {['전체', '🔴 D-60', '🟠 D-90', '🟡 D-180', '정보없음'].map(f => (
           <button key={f} onClick={() => setFilter(f)} style={{
             padding: '5px 12px', borderRadius: 20, border: 'none',

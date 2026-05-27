@@ -245,7 +245,7 @@ export default function AssetList() {
           <input type="text" placeholder="🔍 자산번호, 이름, 사번, 조직명, 제품명 검색"
             value={search} onChange={e => setSearch(e.target.value)} />
         </div>
-        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', padding: '2px 16px 4px' }}>
+        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none', padding: '2px 16px 4px' }}>
           <button onClick={() => setTypeFilter('')} style={{ padding: '4px 12px', borderRadius: 20, border: 'none', background: !typeFilter ? '#5A4A00' : 'var(--bg2)', color: !typeFilter ? '#FFF9E6' : 'var(--text2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit' }}>전체</button>
           {ASSET_TYPES.map(t => (
             <button key={t} onClick={() => setTypeFilter(t)} style={{ padding: '4px 12px', borderRadius: 20, border: 'none', background: typeFilter === t ? '#5A4A00' : 'var(--bg2)', color: typeFilter === t ? '#FFF9E6' : 'var(--text2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit' }}>
