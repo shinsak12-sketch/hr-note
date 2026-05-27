@@ -32,7 +32,8 @@ export default function MaternityCalc() {
   const [birthDate, setBirthDate] = useState('');
   const [startDate, setStartDate] = useState('');   // 전체 시작일 (미분리 시)
   const [usePrenatal, setUsePrenatal] = useState(false);
-  const [prenatalStart, setPrenatalStart] = useState('');  // 출산전 시작일 (분리 시)
+  const [prenatalStart, setPrenatalStart] = useState('');
+  const [postStart, setPostStart] = useState('');
   const [prenatalDays, setPrenatalDays] = useState('');
 
   const type = TYPES.find(t => t.label === typeLabel);
@@ -46,11 +47,13 @@ export default function MaternityCalc() {
   const prenatalEnd = prenatalDays || null; // 종료일 = 입력값
   const postDays = totalDays - prenatalUsed;
 
-  // 전체 종료일: 시작일 기준
+  // 전체 종료일
   const wholeStart = usePrenatal ? prenatalStart : startDate;
-  const wholeEnd = wholeStart ? addDays(wholeStart, totalDays - 1) : null;
+  const postActualStart = usePrenatal ? postStart : (startDate || birthDate);
+  const wholeEnd = usePrenatal
+    ? (postActualStart ? addDays(postActualStart, postDays - 1) : null)
+    : (wholeStart ? addDays(wholeStart, totalDays - 1) : null);
 
-  // 출산후 실제 일수: 출산일 ~ 전체종료일
   const actualPostDays = birthDate && wholeEnd ? diffDays(birthDate, wholeEnd) : postDays;
   const postOk = actualPostDays >= minPostDays;
 
@@ -134,6 +137,10 @@ export default function MaternityCalc() {
                   출산전 사용일수: <strong>{diffDays(prenatalStart, prenatalDays)}일</strong>
                 </div>
               )}
+              <div className="form-group">
+                <label className="form-label">출산후 휴가 시작일</label>
+                <input type="date" value={postStart} onChange={e => setPostStart(e.target.value)} />
+              </div>
               <div style={{ fontSize: 11, color: 'var(--text2)', background: 'var(--bg2)', borderRadius: 6, padding: '6px 10px' }}>
                 ※ 출산전 최대 {totalDays - minPostDays}일 사용 가능 (출산후 {minPostDays}일 의무 확보)
               </div>
@@ -201,10 +208,10 @@ export default function MaternityCalc() {
                 <div style={{ padding: '12px 14px', borderBottom: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: '#3B6D11' }}>출산후 휴가</div>
-                    <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 2 }}>{actualPostDays}일</div>
+                    <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 2 }}>{postDays}일</div>
                   </div>
                   <div style={{ textAlign: 'right', fontSize: 12 }}>
-                    <div>{fmt(birthDate)}</div>
+                    <div>{fmt(postActualStart || birthDate)}</div>
                     <div style={{ color: 'var(--text2)' }}>~ {fmt(wholeEnd)}</div>
                   </div>
                 </div>
