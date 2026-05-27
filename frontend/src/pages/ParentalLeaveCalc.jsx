@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 // 두 날짜 사이 개월수(M)와 잔여일수(D) 계산 - 엑셀 DATEDIF 방식
 function calcMonthsAndDays(startStr, endStr) {
@@ -70,11 +70,27 @@ const EMPTY_PERIOD = { start: '', end: '' };
 
 export default function ParentalLeaveCalc() {
   const nav = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // URL 파라미터에서 기간 데이터 로드
+  const initPeriods = () => {
+    try {
+      const raw = searchParams.get('periods');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const filled = parsed.map(p => ({ start: p.start || '', end: p.end || '' }));
+        while (filled.length < 5) filled.push({ start: '', end: '' });
+        return filled.slice(0, 5);
+      }
+    } catch {}
+    return [{ start:'',end:'' },{ start:'',end:'' },{ start:'',end:'' },{ start:'',end:'' },{ start:'',end:'' }];
+  };
+
+  const fromName = searchParams.get('emp_name') || '';
+  const fromChild = searchParams.get('child') || '';
+
   const [spouseUsed, setSpouseUsed] = useState(false);
-  const [periods, setPeriods] = useState([
-    { ...EMPTY_PERIOD }, { ...EMPTY_PERIOD }, { ...EMPTY_PERIOD },
-    { ...EMPTY_PERIOD }, { ...EMPTY_PERIOD },
-  ]);
+  const [periods, setPeriods] = useState(initPeriods);
   const [expectedStart, setExpectedStart] = useState('');
 
   const maxMonths = spouseUsed ? 18 : 12;
@@ -115,6 +131,12 @@ export default function ParentalLeaveCalc() {
       </div>
 
       <div className="page-content" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 20, paddingBottom: 40 }}>
+
+      {fromName && (
+        <div style={{ margin: '0 16px', padding: '10px 14px', background: '#EAF3DE', borderRadius: 10, fontSize: 12, color: '#3B6D11', fontWeight: 600 }}>
+          📋 {fromName} · {fromChild} 기간 자동 입력됨
+        </div>
+      )}
 
         {/* 배우자 사용 여부 */}
         <section>

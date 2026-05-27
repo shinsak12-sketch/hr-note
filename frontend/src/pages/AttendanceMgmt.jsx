@@ -428,7 +428,7 @@ function ExtendModal({ record, onClose, onDone }) {
 }
 
 
-function AttCard({ r, onEdit, onClose, onExtend, onRevert, onDelete }) {
+function AttCard({ r, onEdit, onClose, onExtend, onRevert, onCalc, onDelete }) {
   const st = STATUS_STYLE[r.status] || STATUS_STYLE['진행중'];
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -459,6 +459,9 @@ function AttCard({ r, onEdit, onClose, onExtend, onRevert, onDelete }) {
           {menuOpen && (
             <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', overflow: 'hidden', minWidth: 130 }}>
               <button onClick={() => { onEdit(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#1A4A8A', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>✏️ 수정</button>
+              {r.type === '육아휴직' && (
+                <button onClick={() => { onCalc(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#3B6D11', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>🧮 잔여기간 계산</button>
+              )}
               {r.status !== '진행중' && (
                 <button onClick={() => { onRevert(r.id); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#854F0B', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>↩️ 종료취소</button>
               )}
@@ -501,7 +504,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onRevert, onDelete }) {
 // ── 메인 ──────────────────────────────
 export default function AttendanceMgmt() {
   const nav = useNavigate();
-  const [list, setList] = useState([]);
+  const nav = useNavigate();
   const [offices, setOffices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState('');
@@ -527,6 +530,27 @@ export default function AttendanceMgmt() {
   async function handleRevert(id) {
     await api.closeAttendance(id, { status: '진행중', end_comment: null });
     setToast('진행중으로 되돌렸습니다.'); load();
+  }
+
+  function handleCalc(r) {
+    // 같은 사번 + 자녀구분의 모든 육아휴직 레코드 필터
+    const related = list.filter(x =>
+      x.emp_no === r.emp_no &&
+      x.type === '육아휴직' &&
+      x.child_order === r.child_order
+    ).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+
+    // URL 파라미터로 periods 전달
+    const periods = related.map(x => ({
+      start: x.start_date?.split('T')[0] || '',
+      end: x.end_date?.split('T')[0] || '',
+    }));
+    const params = new URLSearchParams({
+      periods: JSON.stringify(periods),
+      child: r.child_order || '',
+      emp_name: r.emp_name,
+    });
+    nav('/hr-calc/parental-leave?' + params.toString());
   }
 
   const filtered = list.filter(r => {
@@ -595,6 +619,7 @@ export default function AttendanceMgmt() {
             onClose={r => setCloseModal(r)}
             onExtend={r => setExtendModal(r)}
             onRevert={handleRevert}
+            onCalc={handleCalc}
             onDelete={handleDelete}
           />
         ))}
