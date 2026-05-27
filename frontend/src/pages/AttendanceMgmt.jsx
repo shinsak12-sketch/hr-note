@@ -656,26 +656,15 @@ export default function AttendanceMgmt() {
   const PERIOD_TYPES = ['질병휴직','질병휴가','난임휴직','가족돌봄휴직','가족돌봄휴가'];
   const FAMILY_TYPES = ['가족돌봄휴직','가족돌봄휴가'];
 
-  function getUrgencyOrder(r) {
-    if (r.status !== '진행중') return 99;
-    const today = new Date(); today.setHours(0,0,0,0);
-    const endDate = r.end_date ? new Date(r.end_date) : null;
-    const endDiff = endDate ? Math.ceil((endDate - today) / (1000*60*60*24)) : null;
-    if (endDiff !== null && endDiff < 0) return 1;   // 종료 경과
-    if (endDiff !== null && endDiff <= 15) return 2;  // 종료 임박
-    return 3;
-  }
-
   const filtered = list.filter(r => {
     const matchCat = catFilter === '전체' || r.category === catFilter;
     const matchSt = statusFilter === '전체' || r.status === statusFilter;
     const matchSearch = !search || r.emp_name?.includes(search) || r.emp_no?.includes(search) || r.org_name?.includes(search) || r.type?.includes(search);
     return matchCat && matchSt && matchSearch;
   }).sort((a, b) => {
-    const oa = getUrgencyOrder(a), ob = getUrgencyOrder(b);
-    if (oa !== ob) return oa - ob;
-    if (oa === 1 || oa === 2) return new Date(a.end_date) - new Date(b.end_date);
-    return new Date(b.start_date) - new Date(a.start_date);
+    const ea = a.end_date ? new Date(a.end_date) : new Date('9999-12-31');
+    const eb = b.end_date ? new Date(b.end_date) : new Date('9999-12-31');
+    return ea - eb;
   }).map(r => {
     // 육아휴직: 사번 + 자녀구분 기준 전체 이력
     if (r.type === '육아휴직') {
