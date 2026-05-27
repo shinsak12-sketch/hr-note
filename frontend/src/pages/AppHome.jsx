@@ -3,16 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { usePermission } from '../utils/usePermission.js';
 
 const MAIN_APPS = [
-  { id: 'tasks',      icon: '📌', title: '업무관리',   desc: '업무지시 현황 관리',       path: '/tasks-app',      color: '#1A4A8A', bg: '#E8F0FB', menuKey: 'tasks' },
-  { id: 'issues',     icon: '📋', title: '인사관리',   desc: '인사 기록 및 관리',        path: '/issues-app',     color: '#3B6D11', bg: '#EAF3DE', menuKey: 'issues' },
-  { id: 'attendance', icon: '🕐', title: '근태관리',   desc: '출결·휴가·초과 관리',      path: '/attendance-app', color: '#854F0B', bg: '#FAEEDA', menuKey: 'attendance' },
-  { id: 'general',    icon: '🏛️', title: '총무지원',   desc: '사택·자산·수선 관리',      path: '/general-app',    color: '#2D6A6A', bg: '#E6F4F4', menuKey: 'general' },
+  { id: 'tasks',      icon: '📌', title: '업무관리',   desc: '업무 진행 현황 관리',    path: '/tasks-app',      color: '#1A4A8A', bg: '#E8F0FB', menuKey: 'tasks' },
+  { id: 'issues',     icon: '📋', title: '인사관리',   desc: '',                      path: '/issues-app',     color: '#3B6D11', bg: '#EAF3DE', menuKey: 'issues' },
+  { id: 'attendance', icon: '🕐', title: '근태관리',   desc: '직원 휴가/휴직 관리',   path: '/attendance-app', color: '#854F0B', bg: '#FAEEDA', menuKey: 'attendance' },
+  { id: 'general',    icon: '🏛️', title: '총무지원',   desc: '사택/자산/수선 관리',   path: '/general-app',    color: '#2D6A6A', bg: '#E6F4F4', menuKey: 'general' },
 ];
 
 const UTILITY_APPS = [
-  { id: 'memos',   icon: '📝', title: '메모장',     desc: '현장·회의·수행 메모',       path: '/memos-app',   color: '#5C3D8F', bg: '#F0EBF8', menuKey: 'memos' },
-  { id: 'offices', icon: '🏢', title: '사무실 주소', desc: '조직별 사무실 정보',        path: '/offices-app', color: '#5A4A00', bg: '#FFF9E6', menuKey: 'offices' },
-  { id: 'calc',    icon: '🧮', title: 'HR계산기',   desc: '육아휴직·임금 등 계산',     path: '/hr-calc',     color: '#7B2D8B', bg: '#F5E8F8', menuKey: null },
+  { id: 'memos',   icon: '📝', title: '메모장',     desc: '현장·회의·수행 메모',   path: '/memos-app',   color: '#5C3D8F', bg: '#F0EBF8', menuKey: 'memos' },
+  { id: 'offices', icon: '🏢', title: '사무실 주소', desc: '조직별 사무실 정보',    path: '/offices-app', color: '#5A4A00', bg: '#FFF9E6', menuKey: 'offices' },
+  { id: 'calc',    icon: '🧮', title: 'HR계산기',   desc: '육아휴직·임금 등 계산', path: '/hr-calc',     color: '#7B2D8B', bg: '#F5E8F8', menuKey: null },
 ];
 
 export default function AppHome() {
@@ -66,9 +66,11 @@ export default function AppHome() {
               }}>
               <div style={{ fontSize: 32, marginBottom: 10 }}>{accessible ? app.icon : '🔒'}</div>
               <div style={{ fontWeight: 700, fontSize: 15, color: accessible ? app.color : 'var(--text2)', marginBottom: 3 }}>{app.title}</div>
-              <div style={{ fontSize: 11, color: accessible ? app.color + '99' : 'var(--text2)', lineHeight: 1.4 }}>
-                
-              </div>
+              {app.desc ? (
+                <div style={{ fontSize: 11, color: accessible ? app.color + '99' : 'var(--text2)', lineHeight: 1.4 }}>
+                  {accessible ? app.desc : '접근 권한 없음'}
+                </div>
+              ) : null}
             </button>
           );
         })}
@@ -93,6 +95,7 @@ export default function AppHome() {
                 <span style={{ fontSize: 20 }}>{accessible ? app.icon : '🔒'}</span>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 13, color: accessible ? app.color : 'var(--text2)' }}>{app.title}</div>
+                  <div style={{ fontSize: 10, color: accessible ? app.color + '99' : 'var(--text2)' }}>{app.desc}</div>
                 </div>
               </button>
             );
