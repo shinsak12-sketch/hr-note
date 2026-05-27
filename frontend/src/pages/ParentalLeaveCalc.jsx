@@ -22,7 +22,7 @@ function calcMonthsAndDays(startStr, endStr) {
   let remainDays = Math.round((end - tempDate2) / (1000 * 60 * 60 * 24));
   if (remainDays < 0) remainDays = 0;
 
-  // 해당 종료월 일수 (일할 분모)
+  // 해당 종료월 일수 (일할 분모) - end는 이미 +1일 처리된 날짜
   const daysInMonth = new Date(end.getFullYear(), end.getMonth(), 0).getDate();
 
   // 일할계산값 = ROUNDDOWN(D/C, 3)
