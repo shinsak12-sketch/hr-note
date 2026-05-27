@@ -1,51 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// 두 날짜 사이 개월수(M)와 잔여일수(D) 계산 (월력 기준)
+// 두 날짜 사이 개월수(M)와 잔여일수(D) 계산 - 엑셀 DATEDIF 방식
 function calcMonthsAndDays(startStr, endStr) {
   if (!startStr || !endStr) return null;
   const start = new Date(startStr);
+  // 종료일 +1일 처리 (엑셀 DATEDIF 방식)
   const end = new Date(endStr);
-  if (end < start) return null;
+  end.setDate(end.getDate() + 1);
+  if (end <= start) return null;
 
+  // DATEDIF "m" - 완전한 개월수
   let months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
-  
-  // 일할계산 시작일: 시작일로부터 months개월 후
-  const midDate = new Date(start);
-  midDate.setMonth(midDate.getMonth() + months);
-  
-  if (midDate > end) {
-    months -= 1;
-    midDate.setMonth(midDate.getMonth() - 1);
-  }
+  const tempDate = new Date(start);
+  tempDate.setMonth(tempDate.getMonth() + months);
+  if (tempDate > end) months -= 1;
 
-  const remainDays = Math.round((end - midDate) / (1000 * 60 * 60 * 24));
-  
-  // 해당 월 일수 (일할 분모)
-  const daysInMonth = new Date(end.getFullYear(), end.getMonth() + 1, 0).getDate();
-  const fraction = remainDays / daysInMonth;
-  const total = months + fraction;
+  // DATEDIF "md" - 개월 나머지 일수
+  const tempDate2 = new Date(start);
+  tempDate2.setMonth(tempDate2.getMonth() + months);
+  let remainDays = Math.round((end - tempDate2) / (1000 * 60 * 60 * 24));
+  if (remainDays < 0) remainDays = 0;
+
+  // 해당 종료월 일수 (일할 분모)
+  const daysInMonth = new Date(end.getFullYear(), end.getMonth(), 0).getDate();
+
+  // 일할계산값 = ROUNDDOWN(D/C, 3)
+  const fraction = Math.floor((remainDays / daysInMonth) * 1000) / 1000;
+
+  // 합산 = ROUNDDOWN(M + D/C, 3)
+  const total = Math.floor((months + fraction) * 1000) / 1000;
 
   return { months, remainDays, daysInMonth, fraction, total };
 }
 
-// 잔여개월 기준으로 예상 종료일 계산
+// 잔여개월 기준 예상종료일 - 엑셀 방식
 function calcEndDate(startStr, remainMonths) {
   if (!startStr || remainMonths <= 0) return null;
   const start = new Date(startStr);
-  const fullMonths = Math.floor(remainMonths);
-  const fraction = remainMonths - fullMonths;
 
+  // 해당월 일수
+  const daysInMonth = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
+
+  // 예상종료일 = 예상시작일 + ROUNDDOWN(잔여개월 × 해당월일수, 0)
+  const totalDays = Math.floor(remainMonths * daysInMonth);
   const end = new Date(start);
-  end.setMonth(end.getMonth() + fullMonths);
+  end.setDate(end.getDate() + totalDays);
 
-  if (fraction > 0) {
-    const daysInMonth = new Date(end.getFullYear(), end.getMonth() + 1, 0).getDate();
-    const extraDays = Math.round(fraction * daysInMonth);
-    end.setDate(end.getDate() + extraDays);
-  }
-
-  // 종료일은 end - 1일
+  // -1일 (DATEDIF +1일 역산)
   end.setDate(end.getDate() - 1);
   return end.toISOString().split('T')[0];
 }
@@ -154,7 +156,7 @@ export default function ParentalLeaveCalc() {
                   {hasData && r && (
                     <div style={{ marginTop: 5, fontSize: 11, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ color: '#3B6D11', fontWeight: 600 }}>
-                        ✓ {r.months}개월 {r.remainDays}일 = {r.total.toFixed(4)}개월
+                        ✓ {r.months}개월 {r.remainDays}일 = {r.total.toFixed(3)}개월
                       </span>
                       <span style={{ color: 'var(--text2)', fontSize: 10 }}>
                         ({r.months} + {r.remainDays}/{r.daysInMonth})
@@ -177,12 +179,12 @@ export default function ParentalLeaveCalc() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 4 }}>총 사용기간</div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: isOver ? '#A32D2D' : '#3B6D11' }}>{totalUsed.toFixed(4)}</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: isOver ? '#A32D2D' : '#3B6D11' }}>{totalUsed.toFixed(3)}</div>
                 <div style={{ fontSize: 11, color: 'var(--text2)' }}>개월</div>
               </div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 4 }}>잔여기간</div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: isOver ? '#A32D2D' : '#1A4A8A' }}>{remaining.toFixed(4)}</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: isOver ? '#A32D2D' : '#1A4A8A' }}>{remaining.toFixed(3)}</div>
                 <div style={{ fontSize: 11, color: 'var(--text2)' }}>개월</div>
               </div>
             </div>
@@ -192,10 +194,10 @@ export default function ParentalLeaveCalc() {
               <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: 8, padding: '8px 10px', marginBottom: 10, fontSize: 11, color: 'var(--text2)', lineHeight: 1.8 }}>
                 <div style={{ fontWeight: 600, marginBottom: 2 }}>📐 산식</div>
                 {calcResults.map((r, i) => r ? (
-                  <div key={i}>{i+1}회차: {r.months} + {r.remainDays}/{r.daysInMonth} = {r.total.toFixed(4)}</div>
+                  <div key={i}>{i+1}회차: {r.months} + {r.remainDays}/{r.daysInMonth} = {r.total.toFixed(3)}</div>
                 ) : null)}
                 <div style={{ borderTop: '0.5px solid rgba(0,0,0,0.1)', marginTop: 4, paddingTop: 4, fontWeight: 600, color: isOver ? '#A32D2D' : '#3B6D11' }}>
-                  합계: {calcResults.filter(r=>r).map(r => r.total.toFixed(4)).join(' + ')} = {totalUsed.toFixed(4)}개월
+                  합계: {calcResults.filter(r=>r).map(r => r.total.toFixed(3)).join(' + ')} = {totalUsed.toFixed(3)}개월
                 </div>
               </div>
             )}
@@ -205,7 +207,7 @@ export default function ParentalLeaveCalc() {
                 ? `⚠️ 최대 사용기간(${maxMonths}개월) 초과!`
                 : totalUsed === 0
                   ? `최대 ${maxMonths}개월 사용 가능`
-                  : `✅ ${maxMonths}개월 이내 (${(maxMonths - totalUsed).toFixed(4)}개월 남음)`
+                  : `✅ ${maxMonths}개월 이내 (${(maxMonths - totalUsed).toFixed(3)}개월 남음)`
               }
             </div>
           </div>
@@ -225,7 +227,7 @@ export default function ParentalLeaveCalc() {
                   <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 4 }}>예상 종료일</div>
                   <div style={{ fontSize: 18, fontWeight: 700, color: '#1A4A8A' }}>{fmt(expectedEnd)}</div>
                   <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 4 }}>
-                    {fmt(expectedStart)} ~ {fmt(expectedEnd)} ({remaining.toFixed(2)}개월)
+                    {fmt(expectedStart)} ~ {fmt(expectedEnd)} ({remaining.toFixed(3)}개월)
                   </div>
                 </div>
               )}
