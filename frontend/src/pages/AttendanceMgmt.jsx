@@ -6,11 +6,12 @@ import { Toast } from '../components/Common.jsx';
 const CATEGORIES = ['휴직', '휴가', '단축근무', '근무OFF'];
 const TYPES = {
   '휴직': ['육아휴직','질병휴직','난임휴직','가족돌봄휴직','무급휴직','명령휴직'],
-  '휴가': ['질병휴가','출산전후휴가','가족돌봄휴가'],
+  '휴가': ['질병휴가','출산전휴가','출산후휴가','출산전후휴가','가족돌봄휴가'],
   '단축근무': ['육아기단축근무','임신중단축근무'],
   '근무OFF': ['근무OFF'],
 };
-const CHILD_ORDERS = ['첫째','둘째','셋째','넷째'];
+const CHILD_ORDERS = ['첫째','둘째','셋째','넷째','임신중'];
+const BIRTH_TYPES = ['일반','미숙아','다태아'];
 const STATUS_STYLE = {
   '진행중': { color: '#1A4A8A', bg: '#E8F0FB' },
   '정상종료': { color: '#3B6D11', bg: '#EAF3DE' },
@@ -26,6 +27,7 @@ function InputModal({ record, offices, onClose, onDone }) {
     used_days: '', note: '',
     child_order: '', split_count: '', disease_name: '', remaining_days: '',
     family_target: '', leave_reason: '', multi_birth: false, premature: false,
+    birth_type: '', // 일반/미숙아/다태아
     birth_date: '', prenatal_days: '',
     reduce_hours: '', work_start_time: '', work_end_time: '',
     normal_return_date: '', contract_date: '',
@@ -34,7 +36,8 @@ function InputModal({ record, offices, onClose, onDone }) {
   const [officeSearch, setOfficeSearch] = useState('');
   const [showOfficeList, setShowOfficeList] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [prevPeriods, setPrevPeriods] = useState([]); // 기존 회차 기간
+  const [prevPeriods, setPrevPeriods] = useState([]);
+  const [prenatalRecord, setPrenatalRecord] = useState(null); // 기존 회차 기간
 
   function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
 
@@ -146,9 +149,16 @@ function InputModal({ record, offices, onClose, onDone }) {
           {/* 종류 선택 */}
           <div className="form-group">
             <label className="form-label">종류 <span className="req">*</span></label>
-            <select value={form.type} onChange={e => {
-              setF('type', e.target.value);
-              if (form.emp_no && form.start_date) calcSplitCount(form.emp_no, e.target.value, form.start_date);
+            <select value={form.type} onChange={async e => {
+              const newType = e.target.value;
+              setF('type', newType);
+              if (form.emp_no && form.start_date) calcSplitCount(form.emp_no, newType, form.start_date);
+              // 출산후휴가 선택 시 출산전휴가 이력 조회
+              if (newType === '출산후휴가' && form.emp_no && form.child_order) {
+                const all = await api.getAttendance();
+                const rec = all.find(x => x.emp_no === form.emp_no && x.type === '출산전휴가' && x.child_order === form.child_order);
+                setPrenatalRecord(rec || null);
+              }
             }}>
               {typeList.map(t => <option key={t}>{t}</option>)}
             </select>
@@ -260,22 +270,22 @@ function InputModal({ record, offices, onClose, onDone }) {
               </div>
             </div>
           )}
-          {(form.type === '질병휴직' || form.type === '질병휴가') && (
+          {(form.type === '질병휴직') && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <div className="form-group">
                 <label className="form-label">질병명</label>
                 <input type="text" placeholder="질병명" value={form.disease_name||''} onChange={e => setF('disease_name', e.target.value)} />
               </div>
               <div className="form-group">
-                <label className="form-label">잔여일수</label>
-                <input type="number" placeholder={form.type==='질병휴직'?'최대180일':'최대60일'} value={form.remaining_days||''} onChange={e => setF('remaining_days', e.target.value)} />
+                <label className="form-label">사용회차</label>
+                <input type="number" placeholder="회차" value={form.split_count||''} onChange={e => setF('split_count', e.target.value)} />
               </div>
-              {form.type === '질병휴직' && (
-                <div className="form-group">
-                  <label className="form-label">사용회차</label>
-                  <input type="number" placeholder="회차" value={form.split_count||''} onChange={e => setF('split_count', e.target.value)} />
-                </div>
-              )}
+            </div>
+          )}
+          {form.type === '질병휴가' && (
+            <div className="form-group">
+              <label className="form-label">질병명</label>
+              <input type="text" placeholder="질병명" value={form.disease_name||''} onChange={e => setF('disease_name', e.target.value)} />
             </div>
           )}
           {form.type === '가족돌봄휴직' && (
@@ -290,33 +300,37 @@ function InputModal({ record, offices, onClose, onDone }) {
               <textarea placeholder="휴직사유" value={form.leave_reason||''} onChange={e => setF('leave_reason', e.target.value)} style={{ height: 60 }} />
             </div>
           )}
-          {form.type === '출산전후휴가' && (
+          {['출산전휴가','출산후휴가','출산전후휴가'].includes(form.type) && (
             <>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div className="form-group">
-                  <label className="form-label">출산일(예정일)</label>
-                  <input type="date" value={form.birth_date||''} onChange={e => setF('birth_date', e.target.value)} />
+                  <label className="form-label">자녀구분 <span className="req">*</span></label>
+                  <select value={form.child_order||''} onChange={async e => {
+                    setF('child_order', e.target.value);
+                    if (form.type === '출산후휴가' && form.emp_no && e.target.value) {
+                      const all = await api.getAttendance();
+                      const rec = all.find(x => x.emp_no === form.emp_no && x.type === '출산전휴가' && x.child_order === e.target.value);
+                      setPrenatalRecord(rec || null);
+                    }
+                  }}>
+                    <option value="">선택</option>
+                    {['첫째','둘째','셋째','넷째'].map(c => <option key={c}>{c}</option>)}
+                  </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">출산전 분리사용일</label>
-                  <input type="number" placeholder="일수" value={form.prenatal_days||''} onChange={e => setF('prenatal_days', e.target.value)} />
+                  <label className="form-label">구분 <span className="req">*</span></label>
+                  <select value={form.birth_type||''} onChange={e => setF('birth_type', e.target.value)}>
+                    <option value="">선택</option>
+                    {BIRTH_TYPES.map(t => <option key={t}>{t}</option>)}
+                  </select>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 10 }}>
-                {[['multi_birth','다태아'],['premature','미숙아']].map(([key, label]) => (
-                  <button key={key} type="button" onClick={() => setF(key, !form[key])} style={{
-                    flex: 1, height: 36, borderRadius: 8, fontFamily: 'inherit',
-                    border: `2px solid ${form[key] ? '#1A4A8A' : 'var(--border)'}`,
-                    background: form[key] ? '#E8F0FB' : 'var(--bg2)',
-                    color: form[key] ? '#1A4A8A' : 'var(--text2)',
-                    fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                  }}>{form[key] ? '✓' : ''} {label}</button>
-                ))}
-              </div>
-              {form.post_birth_days > 0 && (
-                <div style={{ background: '#E8F0FB', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#1A4A8A' }}>
-                  📅 출산후기간: {form.post_birth_days}일
-                  {form.post_birth_days >= 45 ? ' ✅ 45일 이상' : ' ⚠️ 45일 미만'}
+              {/* 출산후휴가: 출산전휴가 이력 자동 조회 */}
+              {form.type === '출산후휴가' && prenatalRecord && (
+                <div style={{ background: '#E8F0FB', borderRadius: 8, padding: '10px 12px', fontSize: 12, color: '#1A4A8A', lineHeight: 1.8 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 4 }}>📋 출산전휴가 이력</div>
+                  <div>기간: {prenatalRecord.start_date?.split('T')[0]} ~ {prenatalRecord.end_date?.split('T')[0]}</div>
+                  <div>사용일수: {prenatalRecord.used_days || '-'}일 ({prenatalRecord.birth_type || '-'})</div>
                 </div>
               )}
             </>
@@ -567,8 +581,11 @@ function AttCard({ r, onEdit, onClose, onExtend, onRevert, onCalc, onDelete }) {
               {r.type === '육아휴직' && (
                 <button onClick={() => { onCalc(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#3B6D11', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>🧮 잔여기간 계산</button>
               )}
-              {['질병휴직','난임휴직','가족돌봄휴직','질병휴가'].includes(r.type) && (
+              {['질병휴직','난임휴직','가족돌봄휴직','질병휴가','가족돌봄휴가'].includes(r.type) && (
                 <button onClick={() => { onCalc(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#A32D2D', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>🧮 잔여기간 계산</button>
+              )}
+              {['출산전휴가','출산후휴가','출산전후휴가'].includes(r.type) && (
+                <button onClick={() => { onCalc(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#5C3D8F', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>🧮 출산휴가 계산기</button>
               )}
               {r.status !== '진행중' && (
                 <button onClick={() => { onRevert(r.id); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#854F0B', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>↩️ 종료취소</button>
@@ -593,7 +610,8 @@ function AttCard({ r, onEdit, onClose, onExtend, onRevert, onCalc, onDelete }) {
         ))}
         <div>📅 {r.start_date?.split('T')[0]} ~ {r.end_date?.split('T')[0] || '미정'} ({r.used_days ? r.used_days+'일' : '-'})</div>
         {r.return_date && <div>🔙 복직예정: {r.return_date?.split('T')[0]}</div>}
-        {r.disease_name && <div>🏥 {r.disease_name} {r.remaining_days ? `(잔여 ${r.remaining_days}일)` : ''}</div>}
+        {r.disease_name && <div>🏥 {r.disease_name}</div>}
+        {r.birth_type && <div>👶 {r.birth_type}</div>}
         {r.leave_reason && <div>📝 {r.leave_reason}</div>}
         {r.reduce_hours && <div>⏰ 단축 {r.reduce_hours}시간 ({r.work_start_time}~{r.work_end_time})</div>}
         {r.retirement_date && <div>🎯 정년일: {r.retirement_date?.split('T')[0]}</div>}
@@ -646,6 +664,11 @@ export default function AttendanceMgmt() {
   }
 
   function handleCalc(r) {
+    // 출산전/후/전후 휴가 → 출산전후휴가 계산기로
+    if (['출산전휴가','출산후휴가','출산전후휴가'].includes(r.type)) {
+      nav('/hr-calc/maternity');
+      return;
+    }
     if (['질병휴직','난임휴직','가족돌봄휴직','질병휴가','가족돌봄휴가'].includes(r.type)) {
       const familyTypes = ['가족돌봄휴직','가족돌봄휴가'];
       const related = list.filter(x => {

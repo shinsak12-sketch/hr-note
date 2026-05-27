@@ -6,10 +6,9 @@ const router = Router();
 
 // 자동 회차 계산
 router.get('/split-count', authMiddleware, async (req, res) => {
-  const { emp_no, type, start_date } = req.query;
+  const { emp_no, type, start_date, child_order } = req.query;
   if (!emp_no || !type) return res.json({ split_count: 1 });
 
-  // 가족돌봄은 연도 기준 초기화
   const familyTypes = ['가족돌봄휴직','가족돌봄휴가'];
   let count;
   if (familyTypes.includes(type) && start_date) {
@@ -18,6 +17,15 @@ router.get('/split-count', authMiddleware, async (req, res) => {
       SELECT COUNT(*) as cnt FROM attendance
       WHERE emp_no=${emp_no} AND type=${type}
       AND EXTRACT(YEAR FROM start_date) = ${year}
+    `;
+    count = Number(row.cnt);
+  } else if (type === '육아휴직') {
+    // 임신중 제외하고 카운트
+    const [row] = await sql`
+      SELECT COUNT(*) as cnt FROM attendance
+      WHERE emp_no=${emp_no} AND type=${type}
+      AND (child_order IS NULL OR child_order != '임신중')
+      ${child_order && child_order !== '임신중' ? sql`AND child_order=${child_order}` : sql``}
     `;
     count = Number(row.cnt);
   } else {
@@ -145,6 +153,7 @@ router.post('/', authMiddleware, async (req, res) => {
       child_order, split_count, disease_name, remaining_days,
       family_target, leave_reason, multi_birth, premature,
       birth_date, post_birth_days, paid_period, prenatal_days,
+      birth_type,
       reduce_hours, work_start_time, work_end_time, normal_return_date, contract_date,
       retirement_date, off_start_date, leave_deleted, doc_completed
     ) VALUES (
@@ -155,6 +164,7 @@ router.post('/', authMiddleware, async (req, res) => {
       ${d.remaining_days||null}, ${d.family_target||null}, ${d.leave_reason||null},
       ${d.multi_birth||false}, ${d.premature||false}, ${d.birth_date||null},
       ${d.post_birth_days||null}, ${d.paid_period||null}, ${d.prenatal_days||null},
+      ${d.birth_type||null},
       ${d.reduce_hours||null}, ${d.work_start_time||null}, ${d.work_end_time||null},
       ${d.normal_return_date||null}, ${d.contract_date||null},
       ${d.retirement_date||null}, ${d.off_start_date||null},
@@ -179,7 +189,7 @@ router.patch('/:id', authMiddleware, async (req, res) => {
       leave_reason=${d.leave_reason||null}, multi_birth=${d.multi_birth||false},
       premature=${d.premature||false}, birth_date=${d.birth_date||null},
       post_birth_days=${d.post_birth_days||null}, paid_period=${d.paid_period||null},
-      prenatal_days=${d.prenatal_days||null}, reduce_hours=${d.reduce_hours||null},
+      prenatal_days=${d.prenatal_days||null}, birth_type=${d.birth_type||null}, reduce_hours=${d.reduce_hours||null},
       work_start_time=${d.work_start_time||null}, work_end_time=${d.work_end_time||null},
       normal_return_date=${d.normal_return_date||null}, contract_date=${d.contract_date||null},
       retirement_date=${d.retirement_date||null}, off_start_date=${d.off_start_date||null},
