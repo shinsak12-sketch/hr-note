@@ -662,7 +662,17 @@ export default function AttendanceMgmt() {
     const matchSearch = !search || r.emp_name?.includes(search) || r.emp_no?.includes(search) || r.org_name?.includes(search) || r.type?.includes(search);
     return matchCat && matchSt && matchSearch;
   }).map(r => {
-    // 회차별 기간 표시 대상 종류만 prevPeriods 붙이기
+    // 육아휴직: 사번 + 자녀구분 기준 전체 이력
+    if (r.type === '육아휴직') {
+      const related = list.filter(x =>
+        x.id !== r.id &&
+        x.emp_no === r.emp_no &&
+        x.type === '육아휴직' &&
+        x.child_order === r.child_order
+      ).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+      return { ...r, prevPeriods: related };
+    }
+    // 질병/난임/가족돌봄
     if (!PERIOD_TYPES.includes(r.type)) return r;
     const related = list.filter(x => {
       if (x.id === r.id || x.emp_no !== r.emp_no || x.type !== r.type) return false;
