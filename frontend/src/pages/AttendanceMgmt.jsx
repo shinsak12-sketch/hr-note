@@ -373,7 +373,13 @@ function CloseModal({ record, onClose, onDone }) {
 
 // ── 연장 모달 ──────────────────────────
 function ExtendModal({ record, onClose, onDone }) {
-  const [form, setForm] = useState({ start_date: '', end_date: '', return_date: '' });
+  // 시작일 기본값: 기존 종료일 + 1일
+  const defaultStart = record.end_date ? (() => {
+    const d = new Date(record.end_date);
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split('T')[0];
+  })() : '';
+  const [form, setForm] = useState({ start_date: defaultStart, end_date: '', return_date: '' });
   const [saving, setSaving] = useState(false);
   function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
 

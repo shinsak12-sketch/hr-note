@@ -179,6 +179,9 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
   const [original] = await sql`SELECT * FROM attendance WHERE id=${req.params.id}`;
   if (!original) return res.status(404).json({ error: '원본 레코드를 찾을 수 없습니다.' });
 
+  // 기존 레코드 정상종료 처리
+  await sql`UPDATE attendance SET status='정상종료', updated_at=NOW() WHERE id=${req.params.id}`;
+
   // 같은 사번+종류의 기존 연장 횟수 계산
   const extensions = await sql`
     SELECT COUNT(*) as cnt FROM attendance 
