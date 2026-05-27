@@ -82,7 +82,10 @@ export default function SalaryCalc() {
           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>전년도 기본급</div>
           <input type="text" placeholder="전년도 기본급 (연간)"
             value={prevBasic}
-            onChange={e => setPrevBasic(e.target.value)}
+            onChange={e => {
+              const raw = e.target.value.replace(/,/g, '');
+              if (/^\d*$/.test(raw)) setPrevBasic(raw ? Number(raw).toLocaleString('ko-KR') : '');
+            }}
             style={{ textAlign: 'right', fontSize: 15 }} />
         </section>
 
@@ -146,7 +149,7 @@ export default function SalaryCalc() {
         {/* 성과계수 유형 */}
         <section>
           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>성과계수 유형</div>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
             {['나형', '다형'].map(t => (
               <button key={t} onClick={() => setCoefType(t)} style={{
                 flex: 1, height: 38, borderRadius: 8, fontFamily: 'inherit',
@@ -154,14 +157,52 @@ export default function SalaryCalc() {
                 background: coefType === t ? '#F0EBF8' : 'var(--bg)',
                 color: coefType === t ? '#5C3D8F' : 'var(--text2)',
                 fontSize: 13, fontWeight: coefType === t ? 700 : 400, cursor: 'pointer',
-              }}>
-                {t} {perfGrade ? `(계수 ${coefType === t ? (t==='나형'?COEF_NA:COEF_DA)[perfGrade] : (t==='나형'?COEF_NA:COEF_DA)[perfGrade]})` : ''}
-              </button>
+              }}>{t}</button>
             ))}
           </div>
+          {/* 성과계수 표 */}
+          <div style={{ border: '0.5px solid var(--border)', borderRadius: 10, overflow: 'hidden', fontSize: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '60px repeat(5, 1fr)', background: 'var(--bg2)' }}>
+              <div style={{ padding: '8px 6px', textAlign: 'center', fontWeight: 700, borderRight: '0.5px solid var(--border)' }}>등급</div>
+              {GRADES.map(g => (
+                <div key={g} style={{
+                  padding: '8px 4px', textAlign: 'center', fontWeight: 700,
+                  background: perfGrade === g ? '#F0EBF8' : 'transparent',
+                  color: perfGrade === g ? '#5C3D8F' : 'var(--text)',
+                  borderRight: '0.5px solid var(--border)',
+                }}>{g}</div>
+              ))}
+            </div>
+            {['나형', '다형'].map(type => {
+              const coefs = type === '나형' ? COEF_NA : COEF_DA;
+              return (
+                <div key={type} style={{ display: 'grid', gridTemplateColumns: '60px repeat(5, 1fr)', borderTop: '0.5px solid var(--border)' }}>
+                  <div style={{
+                    padding: '8px 6px', textAlign: 'center', fontWeight: 700,
+                    background: coefType === type ? '#F0EBF8' : 'var(--bg2)',
+                    color: coefType === type ? '#5C3D8F' : 'var(--text2)',
+                    borderRight: '0.5px solid var(--border)',
+                    cursor: 'pointer',
+                  }} onClick={() => setCoefType(type)}>{type}</div>
+                  {GRADES.map(g => {
+                    const isSelected = coefType === type && perfGrade === g;
+                    return (
+                      <div key={g} style={{
+                        padding: '8px 4px', textAlign: 'center',
+                        background: isSelected ? '#F0EBF8' : 'transparent',
+                        color: isSelected ? '#5C3D8F' : coefs[g] > 1 ? '#3B6D11' : coefs[g] < 1 ? '#A32D2D' : 'var(--text)',
+                        fontWeight: isSelected ? 700 : 400,
+                        borderRight: '0.5px solid var(--border)',
+                      }}>{coefs[g]}</div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
           {perfGrade && (
-            <div style={{ marginTop: 6, fontSize: 11, color: 'var(--text2)', display: 'flex', gap: 16, justifyContent: 'center' }}>
-              <span>나형: A={COEF_NA['A']} B+={COEF_NA['B+']} B0={COEF_NA['B0']} B-={COEF_NA['B-']} C={COEF_NA['C']}</span>
+            <div style={{ marginTop: 6, fontSize: 12, color: '#5C3D8F', background: '#F0EBF8', borderRadius: 8, padding: '6px 12px', textAlign: 'center', fontWeight: 600 }}>
+              적용 계수: {coefType === '나형' ? COEF_NA[perfGrade] : COEF_DA[perfGrade]} ({coefType} / 성과 {perfGrade})
             </div>
           )}
         </section>
