@@ -466,6 +466,11 @@ function AttCard({ r, onEdit, onClose, onExtend, onDelete }) {
       </div>
       <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.7, marginBottom: 10 }}>
         <div>🏢 {r.org_name || '-'}</div>
+        {r.is_extension && r.parent_start_date && (
+          <div style={{ color: 'var(--text2)', fontSize: 11 }}>
+            📋 1회차: {r.parent_start_date?.split('T')[0]} ~ {r.parent_end_date?.split('T')[0]}
+          </div>
+        )}
         <div>📅 {r.start_date?.split('T')[0]} ~ {r.end_date?.split('T')[0] || '미정'} ({r.used_days ? r.used_days+'일' : '-'})</div>
         {r.return_date && <div>🔙 복직예정: {r.return_date?.split('T')[0]}</div>}
         {r.child_order && <div>👶 {r.child_order} · {r.split_count}회차</div>}

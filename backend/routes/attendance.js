@@ -8,9 +8,11 @@ const router = Router();
 router.get('/', authMiddleware, async (req, res) => {
   const { category, type, status, year } = req.query;
   let list = await sql`
-    SELECT a.*, o.headquarters, o.department
+    SELECT a.*, o.headquarters, o.department,
+      p.start_date as parent_start_date, p.end_date as parent_end_date
     FROM attendance a
     LEFT JOIN offices o ON a.office_id = o.id
+    LEFT JOIN attendance p ON a.parent_id = p.id
     ORDER BY a.start_date DESC
   `;
   if (category) list = list.filter(r => r.category === category);
@@ -193,7 +195,7 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
   const [newRec] = await sql`
     INSERT INTO attendance (
       category, type, office_id, org_name, emp_no, emp_name,
-      start_date, end_date, return_date,
+      start_date, end_date, return_date, used_days,
       child_order, split_count, disease_name, family_target, leave_reason,
       reduce_hours, work_start_time, work_end_time, normal_return_date, contract_date,
       retirement_date, off_start_date, leave_deleted, doc_completed,
@@ -202,6 +204,7 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
       ${original.category}, ${original.type}, ${original.office_id}, ${original.org_name},
       ${original.emp_no}, ${original.emp_name},
       ${start_date}, ${end_date||null}, ${return_date||null},
+      ${end_date ? Math.ceil((new Date(end_date) - new Date(start_date)) / (1000*60*60*24)) + 1 : null},
       ${original.child_order||null}, ${newSplitCount},
       ${original.disease_name||null}, ${original.family_target||null}, ${original.leave_reason||null},
       ${original.reduce_hours||null}, ${original.work_start_time||null}, ${original.work_end_time||null},
