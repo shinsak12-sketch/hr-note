@@ -21,7 +21,13 @@ export default function AppHome() {
   const { hasAccess } = usePermission();
   const user = JSON.parse(localStorage.getItem('hr_user') || '{}');
 
-  const { display, isWarning } = useAutoLogout();
+  const { display, isWarning } = useAutoLogout(() => {
+    localStorage.removeItem('hr_token');
+    localStorage.removeItem('hr_user');
+    nav('/login', { replace: true });
+  });
+
+  function logout() {
     localStorage.removeItem('hr_token');
     localStorage.removeItem('hr_user');
     nav('/login', { replace: true });
