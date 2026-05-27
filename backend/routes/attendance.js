@@ -30,7 +30,8 @@ router.get('/split-count', authMiddleware, async (req, res) => {
   res.json({ split_count: count + 1 });
 });
 
-
+// 전체 목록
+router.get('/', authMiddleware, async (req, res) => {
   const { category, type, status, year } = req.query;
   let list = await sql`
     SELECT a.*, o.headquarters, o.department,
