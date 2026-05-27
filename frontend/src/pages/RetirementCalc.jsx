@@ -147,7 +147,8 @@ export default function RetirementCalc() {
   const totalDays3M = periodData?.totalDays || 89;
 
   const avgWage = totalDays3M > 0 ? wage3M / totalDays3M : 0;
-  const retirementPay = tenure ? Math.floor(avgWage * 30 * tenure.totalDays / 365) : 0;
+  const isEligible = tenure && tenure.totalDays >= 365;
+  const retirementPay = isEligible ? Math.floor(avgWage * 30 * tenure.totalDays / 365) : 0;
   const tax = retirementPay > 0 ? calcRetirementTax(retirementPay, tenureYears) : null;
   const netPay = tax ? retirementPay - tax.totalTax : retirementPay;
 
@@ -291,17 +292,25 @@ export default function RetirementCalc() {
         )}
 
         {/* 퇴직금 */}
-        {tenure && retirementPay > 0 && (
+        {tenure && monthlyTotal > 0 && periodData && (
           <section>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>퇴직금</div>
-            <div style={{ background: '#FAEEDA', borderRadius: 12, padding: 16 }}>
-              <div style={{ fontSize: 11, color: '#854F0B', marginBottom: 8, lineHeight: 1.7 }}>
-                평균임금 {fmt(avgWage)} × 30일 × {tenure.totalDays}일 ÷ 365
+            {!isEligible ? (
+              <div style={{ background: '#FCEBEB', borderRadius: 12, padding: 16, textAlign: 'center' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#A32D2D', marginBottom: 6 }}>⚠️ 퇴직금 지급 대상 아님</div>
+                <div style={{ fontSize: 12, color: '#A32D2D' }}>계속 근로기간 1년 미만 ({tenure.totalDays}일)</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: '#A32D2D', marginTop: 8 }}>0원</div>
               </div>
-              <div style={{ fontSize: 26, fontWeight: 700, color: '#854F0B', textAlign: 'center' }}>
-                {fmt(retirementPay)}
+            ) : (
+              <div style={{ background: '#FAEEDA', borderRadius: 12, padding: 16 }}>
+                <div style={{ fontSize: 11, color: '#854F0B', marginBottom: 8, lineHeight: 1.7 }}>
+                  평균임금 {fmt(avgWage)} × 30일 × {tenure.totalDays}일 ÷ 365
+                </div>
+                <div style={{ fontSize: 26, fontWeight: 700, color: '#854F0B', textAlign: 'center' }}>
+                  {fmt(retirementPay)}
+                </div>
               </div>
-            </div>
+            )}
           </section>
         )}
 
