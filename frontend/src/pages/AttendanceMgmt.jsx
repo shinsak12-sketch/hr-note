@@ -203,7 +203,14 @@ function InputModal({ record, offices, onClose, onDone }) {
             </div>
             <div className="form-group">
               <label className="form-label">종료일</label>
-              <input type="date" value={form.end_date||''} onChange={e => setF('end_date', e.target.value)} />
+              <input type="date" value={form.end_date||''} onChange={e => {
+                setF('end_date', e.target.value);
+                if (e.target.value) {
+                  const d = new Date(e.target.value);
+                  d.setDate(d.getDate() + 1);
+                  setF('return_date', d.toISOString().split('T')[0]);
+                }
+              }} />
             </div>
           </div>
 
@@ -477,7 +484,14 @@ function ExtendModal({ record, onClose, onDone }) {
             </div>
             <div className="form-group">
               <label className="form-label">연장 종료일</label>
-              <input type="date" value={form.end_date} onChange={e => setF('end_date', e.target.value)} />
+              <input type="date" value={form.end_date} onChange={e => {
+                setF('end_date', e.target.value);
+                if (e.target.value) {
+                  const d = new Date(e.target.value);
+                  d.setDate(d.getDate() + 1);
+                  setF('return_date', d.toISOString().split('T')[0]);
+                }
+              }} />
             </div>
           </div>
           <div className="form-group">
