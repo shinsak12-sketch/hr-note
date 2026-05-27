@@ -7,6 +7,7 @@ const CALCS = [
   { icon: '🤱', title: '임신중 단축근무 계산', desc: '단축근무 대상기간 계산', color: '#1A4A8A', bg: '#E8F0FB', path: '/hr-calc/pregnancy' },
   { icon: '📋', title: '휴가·휴직 잔여기간', desc: '질병·난임·가족돌봄 잔여일 계산', color: '#A32D2D', bg: '#FCEBEB', path: '/hr-calc/leave' },
   { icon: '📅', title: '음력/양력 변환', desc: '음력 ↔ 양력 날짜 변환', color: '#5C3D8F', bg: '#F0EBF8', path: '/hr-calc/lunar' },
+  { icon: '📊', title: '연봉 계산기', desc: '기본급·성과급·가급 계산', color: '#1A4A8A', bg: '#E8F0FB', path: '/hr-calc/salary' },
   { icon: '💰', title: '평균임금·퇴직금 계산', desc: '퇴직금 및 실수령액 계산', color: '#A32D2D', bg: '#FCEBEB', path: '/hr-calc/retirement' },
 ];
 
