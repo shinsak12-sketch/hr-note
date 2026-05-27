@@ -26,26 +26,32 @@ function calc3MonthPeriods(endStr) {
   if (!endStr) return null;
   const end = new Date(endStr);
 
-  // 3개월 전 날짜 (퇴사일 포함 안함, 전날까지)
+  // 전체 구간: 퇴사일 3개월 전 ~ 퇴사일 전날
   const periodEnd = new Date(end);
-  periodEnd.setDate(periodEnd.getDate() - 1); // 퇴사일 전날까지
+  periodEnd.setDate(periodEnd.getDate() - 1);
 
   const periodStart = new Date(end);
   periodStart.setMonth(periodStart.getMonth() - 3);
 
-  // 구간 분리
+  // 월별 구간 분리
   const periods = [];
-  let cur = new Date(periodStart);
+  let curYear = periodStart.getFullYear();
+  let curMonth = periodStart.getMonth(); // 0-based
 
-  while (cur <= periodEnd) {
-    const monthStart = new Date(cur.getFullYear(), cur.getMonth(), 1);
-    const monthEnd = new Date(cur.getFullYear(), cur.getMonth() + 1, 0);
-    const segStart = cur > monthStart ? new Date(cur) : new Date(monthStart);
-    const segEnd = periodEnd < monthEnd ? new Date(periodEnd) : new Date(monthEnd);
+  while (true) {
+    const monthFirstDay = new Date(curYear, curMonth, 1);
+    const monthLastDay = new Date(curYear, curMonth + 1, 0);
+
+    // 구간 시작: periodStart가 이 달 중간이면 그날부터, 아니면 1일부터
+    const segStart = periodStart > monthFirstDay ? new Date(periodStart) : new Date(monthFirstDay);
+    // 구간 끝: periodEnd가 이 달 중간이면 그날까지, 아니면 말일까지
+    const segEnd = periodEnd < monthLastDay ? new Date(periodEnd) : new Date(monthLastDay);
+
+    if (segStart > periodEnd) break;
 
     const segDays = Math.ceil((segEnd - segStart) / (1000*60*60*24)) + 1;
-    const monthDays = monthEnd.getDate();
-    const isFull = segDays === monthDays;
+    const monthDays = monthLastDay.getDate();
+    const isFull = segStart.getDate() === 1 && segEnd.getDate() === monthDays;
 
     periods.push({
       start: segStart.toISOString().split('T')[0],
@@ -53,12 +59,15 @@ function calc3MonthPeriods(endStr) {
       days: segDays,
       monthDays,
       isFull,
-      year: segStart.getFullYear(),
-      month: segStart.getMonth() + 1,
+      year: curYear,
+      month: curMonth + 1,
     });
 
-    cur = new Date(segEnd);
-    cur.setDate(cur.getDate() + 1);
+    // 다음 달로
+    curMonth++;
+    if (curMonth > 11) { curMonth = 0; curYear++; }
+
+    if (new Date(curYear, curMonth, 1) > periodEnd) break;
   }
 
   const totalDays = periods.reduce((sum, p) => sum + p.days, 0);
