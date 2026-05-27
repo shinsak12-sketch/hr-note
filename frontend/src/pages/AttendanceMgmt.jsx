@@ -462,6 +462,9 @@ function AttCard({ r, onEdit, onClose, onExtend, onRevert, onCalc, onDelete }) {
               {r.type === '육아휴직' && (
                 <button onClick={() => { onCalc(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#3B6D11', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>🧮 잔여기간 계산</button>
               )}
+              {['질병휴직','난임휴직','가족돌봄휴직','질병휴가'].includes(r.type) && (
+                <button onClick={() => { onCalc(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#A32D2D', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>🧮 잔여기간 계산</button>
+              )}
               {r.status !== '진행중' && (
                 <button onClick={() => { onRevert(r.id); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#854F0B', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>↩️ 종료취소</button>
               )}
@@ -533,14 +536,29 @@ export default function AttendanceMgmt() {
   }
 
   function handleCalc(r) {
-    // 같은 사번 + 자녀구분의 모든 육아휴직 레코드 필터
+    // 질병휴직/난임휴직/가족돌봄휴직/질병휴가는 일수계산기로
+    if (['질병휴직','난임휴직','가족돌봄휴직','질병휴가'].includes(r.type)) {
+      const related = list.filter(x =>
+        x.emp_no === r.emp_no && x.type === r.type
+      ).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+      const periods = related.map(x => ({
+        start: x.start_date?.split('T')[0] || '',
+        end: x.end_date?.split('T')[0] || '',
+      }));
+      const params = new URLSearchParams({
+        periods: JSON.stringify(periods),
+        type: r.type,
+        emp_name: r.emp_name,
+      });
+      nav('/hr-calc/leave?' + params.toString());
+      return;
+    }
+    // 육아휴직은 기존 계산기로 (사번+자녀구분)
     const related = list.filter(x =>
       x.emp_no === r.emp_no &&
       x.type === '육아휴직' &&
       x.child_order === r.child_order
     ).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
-
-    // URL 파라미터로 periods 전달
     const periods = related.map(x => ({
       start: x.start_date?.split('T')[0] || '',
       end: x.end_date?.split('T')[0] || '',
