@@ -428,7 +428,7 @@ function ExtendModal({ record, onClose, onDone }) {
 }
 
 
-function AttCard({ r, onEdit, onClose, onExtend, onDelete }) {
+function AttCard({ r, onEdit, onClose, onExtend, onRevert, onDelete }) {
   const st = STATUS_STYLE[r.status] || STATUS_STYLE['진행중'];
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -457,8 +457,11 @@ function AttCard({ r, onEdit, onClose, onExtend, onDelete }) {
         <div ref={menuRef} style={{ position: 'relative' }}>
           <button onClick={() => setMenuOpen(o=>!o)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', color: 'var(--text2)', fontSize: 18 }}>⋮</button>
           {menuOpen && (
-            <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', overflow: 'hidden', minWidth: 120 }}>
+            <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', overflow: 'hidden', minWidth: 130 }}>
               <button onClick={() => { onEdit(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#1A4A8A', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>✏️ 수정</button>
+              {r.status !== '진행중' && (
+                <button onClick={() => { onRevert(r.id); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#854F0B', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>↩️ 종료취소</button>
+              )}
               <button onClick={() => { onDelete(r.id); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#A32D2D', fontFamily: 'inherit' }}>🗑️ 삭제</button>
             </div>
           )}
@@ -519,6 +522,11 @@ export default function AttendanceMgmt() {
   async function handleDelete(id) {
     await api.deleteAttendance(id);
     setToast('삭제되었습니다.'); load();
+  }
+
+  async function handleRevert(id) {
+    await api.closeAttendance(id, { status: '진행중', end_comment: null });
+    setToast('진행중으로 되돌렸습니다.'); load();
   }
 
   const filtered = list.filter(r => {
@@ -586,6 +594,7 @@ export default function AttendanceMgmt() {
             onEdit={r => setInputModal(r)}
             onClose={r => setCloseModal(r)}
             onExtend={r => setExtendModal(r)}
+            onRevert={handleRevert}
             onDelete={handleDelete}
           />
         ))}
