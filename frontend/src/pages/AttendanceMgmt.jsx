@@ -371,8 +371,61 @@ function CloseModal({ record, onClose, onDone }) {
   );
 }
 
+// ── 연장 모달 ──────────────────────────
+function ExtendModal({ record, onClose, onDone }) {
+  const [form, setForm] = useState({
+    start_date: record.end_date?.split('T')[0] || '',
+    end_date: '',
+    return_date: '',
+  });
+  const [saving, setSaving] = useState(false);
+
+  async function handleSave() {
+    if (!form.start_date) return;
+    setSaving(true);
+    try {
+      await api.extendAttendance(record.id, form);
+      onDone('연장 등록되었습니다.');
+    } catch(e) { } finally { setSaving(false); }
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'flex-end' }}>
+      <div style={{ background: 'var(--bg)', width: '100%', maxWidth: 480, margin: '0 auto', borderRadius: '16px 16px 0 0', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '0.5px solid var(--border)' }}>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 15 }}>🔄 연장 — {record.emp_name}</div>
+            <div style={{ fontSize: 12, color: 'var(--text2)' }}>{record.type} · {record.split_count}회차 → {(record.split_count||1)+1}회차</div>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'var(--text2)' }}>×</button>
+        </div>
+        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div className="form-group">
+              <label className="form-label">연장 시작일 <span className="req">*</span></label>
+              <input type="date" value={form.start_date} onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">연장 종료일</label>
+              <input type="date" value={form.end_date} onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">복직예정일</label>
+            <input type="date" value={form.return_date} onChange={e => setForm(f => ({ ...f, return_date: e.target.value }))} />
+          </div>
+          <button onClick={handleSave} disabled={saving || !form.start_date} className="btn-primary"
+            style={{ background: '#1A4A8A', marginBottom: 8 }}>
+            {saving ? '저장 중...' : '연장 등록'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── 카드 ──────────────────────────────
-function AttCard({ r, onEdit, onClose, onDelete }) {
+function AttCard({ r, onEdit, onClose, onExtend, onDelete }) {
   const st = STATUS_STYLE[r.status] || STATUS_STYLE['진행중'];
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -394,6 +447,8 @@ function AttCard({ r, onEdit, onClose, onDelete }) {
           <span style={{ fontWeight: 700, fontSize: 15 }}>{r.emp_name}</span>
           <span style={{ fontSize: 12, color: 'var(--text2)', marginLeft: 6 }}>· {r.emp_no}</span>
           <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: cc+'20', color: cc }}>{r.type}</span>
+          {r.split_count > 1 && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A' }}>{r.split_count}회차</span>}
+          {r.is_extension && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F5E8F8', color: '#7B2D8B' }}>연장</span>}
           <span style={{ marginLeft: 4, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: st.bg, color: st.color }}>{r.status}</span>
         </div>
         <div ref={menuRef} style={{ position: 'relative' }}>
@@ -419,9 +474,14 @@ function AttCard({ r, onEdit, onClose, onDelete }) {
         {r.note && <div>📌 {r.note}</div>}
       </div>
       {r.status === '진행중' && (
-        <button onClick={() => onClose(r)} style={{ width: '100%', height: 34, borderRadius: 8, background: '#FAEEDA', color: '#854F0B', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-          종료 처리
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={() => onClose(r)} style={{ flex: 1, height: 34, borderRadius: 8, background: '#FAEEDA', color: '#854F0B', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+            종료 처리
+          </button>
+          <button onClick={() => onExtend(r)} style={{ flex: 1, height: 34, borderRadius: 8, background: '#E8F0FB', color: '#1A4A8A', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+            🔄 연장
+          </button>
+        </div>
       )}
     </div>
   );
@@ -439,6 +499,7 @@ export default function AttendanceMgmt() {
   const [search, setSearch] = useState('');
   const [inputModal, setInputModal] = useState(null);
   const [closeModal, setCloseModal] = useState(null);
+  const [extendModal, setExtendModal] = useState(null);
 
   useEffect(() => { load(); api.getOffices().then(setOffices); }, []);
 
@@ -516,11 +577,19 @@ export default function AttendanceMgmt() {
           <AttCard key={r.id} r={r}
             onEdit={r => setInputModal(r)}
             onClose={r => setCloseModal(r)}
+            onExtend={r => setExtendModal(r)}
             onDelete={handleDelete}
           />
         ))}
       </div>
 
+      {extendModal && (
+        <ExtendModal
+          record={extendModal}
+          onClose={() => setExtendModal(null)}
+          onDone={msg => { setToast(msg); setExtendModal(null); load(); }}
+        />
+      )}
       {inputModal !== null && (
         <InputModal
           record={inputModal?.id ? inputModal : null}

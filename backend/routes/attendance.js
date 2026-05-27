@@ -173,8 +173,43 @@ router.patch('/:id/close', authMiddleware, async (req, res) => {
   res.json(rec);
 });
 
-// 삭제
-router.delete('/:id', authMiddleware, async (req, res) => {
+// 연장 처리
+router.post('/:id/extend', authMiddleware, async (req, res) => {
+  const { start_date, end_date, return_date } = req.body;
+  const [original] = await sql`SELECT * FROM attendance WHERE id=${req.params.id}`;
+  if (!original) return res.status(404).json({ error: '원본 레코드를 찾을 수 없습니다.' });
+
+  // 같은 사번+종류의 기존 연장 횟수 계산
+  const extensions = await sql`
+    SELECT COUNT(*) as cnt FROM attendance 
+    WHERE emp_no=${original.emp_no} AND type=${original.type} AND is_extension=true
+  `;
+  const extCount = Number(extensions[0].cnt);
+  const newSplitCount = (original.split_count || 1) + extCount + 1;
+
+  const [newRec] = await sql`
+    INSERT INTO attendance (
+      category, type, office_id, org_name, emp_no, emp_name,
+      start_date, end_date, return_date,
+      child_order, split_count, disease_name, family_target, leave_reason,
+      reduce_hours, work_start_time, work_end_time, normal_return_date, contract_date,
+      retirement_date, off_start_date, leave_deleted, doc_completed,
+      is_extension, parent_id, status
+    ) VALUES (
+      ${original.category}, ${original.type}, ${original.office_id}, ${original.org_name},
+      ${original.emp_no}, ${original.emp_name},
+      ${start_date}, ${end_date||null}, ${return_date||null},
+      ${original.child_order||null}, ${newSplitCount},
+      ${original.disease_name||null}, ${original.family_target||null}, ${original.leave_reason||null},
+      ${original.reduce_hours||null}, ${original.work_start_time||null}, ${original.work_end_time||null},
+      ${original.normal_return_date||null}, ${original.contract_date||null},
+      ${original.retirement_date||null}, ${original.off_start_date||null},
+      ${original.leave_deleted||false}, ${original.doc_completed||false},
+      true, ${original.parent_id || original.id}, '진행중'
+    ) RETURNING *
+  `;
+  res.status(201).json(newRec);
+});
   await sql`DELETE FROM attendance WHERE id=${req.params.id}`;
   res.json({ message: '삭제되었습니다.' });
 });

@@ -219,5 +219,6 @@ export const api = {
   createAttendance: (body) => request('/attendance', { method: 'POST', body: JSON.stringify(body) }),
   updateAttendance: (id, body) => request('/attendance/' + id, { method: 'PATCH', body: JSON.stringify(body) }),
   closeAttendance: (id, body) => request('/attendance/' + id + '/close', { method: 'PATCH', body: JSON.stringify(body) }),
+  extendAttendance: (id, body) => request('/attendance/' + id + '/extend', { method: 'POST', body: JSON.stringify(body) }),
   deleteAttendance: (id) => request('/attendance/' + id, { method: 'DELETE' }),
 };
