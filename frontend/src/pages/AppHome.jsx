@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePermission } from '../utils/usePermission.js';
+import { useAutoLogout } from '../utils/useAutoLogout.js';
 
 const MAIN_APPS = [
   { id: 'tasks',      icon: '📌', title: '업무관리',   desc: '업무 진행 현황 관리',    path: '/tasks-app',      color: '#1A4A8A', bg: '#E8F0FB', menuKey: 'tasks' },
@@ -20,7 +21,7 @@ export default function AppHome() {
   const { hasAccess } = usePermission();
   const user = JSON.parse(localStorage.getItem('hr_user') || '{}');
 
-  function logout() {
+  const { display, isWarning } = useAutoLogout();
     localStorage.removeItem('hr_token');
     localStorage.removeItem('hr_user');
     nav('/login', { replace: true });
@@ -31,6 +32,11 @@ export default function AppHome() {
       <div className="header">
         <div style={{ fontSize: 18, fontWeight: 700 }}>HR노트</div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span style={{
+            fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 20,
+            background: isWarning ? '#FCEBEB' : 'var(--bg2)',
+            color: isWarning ? '#A32D2D' : 'var(--text2)',
+          }}>⏱️ {display}</span>
           {user.role === 'master' && (
             <button onClick={() => nav('/settings')} className="btn-secondary" style={{ fontSize: 12 }}>설정</button>
           )}
