@@ -44,11 +44,17 @@ export default function MaternityCalc() {
   const prenatalEnd = usePrenatal && prenatalStart && prenatalUsed > 0
     ? addDays(prenatalStart, prenatalUsed - 1) : null;
   const postDays = totalDays - prenatalUsed;
-  const postEnd = birthDate ? addDays(birthDate, postDays - 1) : null;
-  const postOk = postDays >= minPostDays;
 
-  // 유급기간 시작 = 분리 시 출산전시작일, 미분리 시 전체시작일 or 출산일
-  const paidStart = usePrenatal ? prenatalStart : (startDate || birthDate);
+  // 전체 종료일: 시작일 기준
+  const wholeStart = usePrenatal ? prenatalStart : startDate;
+  const wholeEnd = wholeStart ? addDays(wholeStart, totalDays - 1) : null;
+
+  // 출산후 실제 일수: 출산일 ~ 전체종료일
+  const actualPostDays = birthDate && wholeEnd ? diffDays(birthDate, wholeEnd) : postDays;
+  const postOk = actualPostDays >= minPostDays;
+
+  // 유급기간
+  const paidStart = wholeStart || birthDate;
   const paidEnd = paidStart ? addDays(paidStart, paidDays - 1) : null;
 
   return (
@@ -157,7 +163,7 @@ export default function MaternityCalc() {
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 4 }}>출산후 사용일수</div>
-                    <div style={{ fontSize: 26, fontWeight: 700, color: postOk ? '#3B6D11' : '#A32D2D' }}>{postDays}</div>
+                    <div style={{ fontSize: 26, fontWeight: 700, color: postOk ? '#3B6D11' : '#A32D2D' }}>{actualPostDays}</div>
                     <div style={{ fontSize: 11, color: 'var(--text2)' }}>일</div>
                   </div>
                 </div>
@@ -195,11 +201,11 @@ export default function MaternityCalc() {
                 <div style={{ padding: '12px 14px', borderBottom: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: '#3B6D11' }}>출산후 휴가</div>
-                    <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 2 }}>{postDays}일</div>
+                    <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 2 }}>{actualPostDays}일</div>
                   </div>
                   <div style={{ textAlign: 'right', fontSize: 12 }}>
                     <div>{fmt(birthDate)}</div>
-                    <div style={{ color: 'var(--text2)' }}>~ {fmt(postEnd)}</div>
+                    <div style={{ color: 'var(--text2)' }}>~ {fmt(wholeEnd)}</div>
                   </div>
                 </div>
                 {paidEnd && (
@@ -222,7 +228,7 @@ export default function MaternityCalc() {
                   {postOk ? '✅' : '⚠️'} 출산후 {minPostDays}일 이상 여부
                 </div>
                 <div style={{ color: postOk ? '#3B6D11' : '#A32D2D', marginTop: 2 }}>
-                  출산후 {postDays}일 {postOk ? `≥ ${minPostDays}일 ✓` : `< ${minPostDays}일 ✗`}
+                  출산후 {actualPostDays}일 {postOk ? `≥ ${minPostDays}일 ✓` : `< ${minPostDays}일 ✗`}
                   {usePrenatal && prenatalUsed > 0 && ` (출산전 ${prenatalUsed}일 분리사용)`}
                 </div>
               </div>
