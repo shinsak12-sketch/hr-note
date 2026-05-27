@@ -24,38 +24,49 @@ function calcTenure(startStr, endStr) {
 // 퇴사일 기준 3개월 구간 계산
 function calc3MonthPeriods(endStr) {
   if (!endStr) return null;
-  const end = new Date(endStr);
+  
+  // 문자열로 직접 파싱 (타임존 문제 방지)
+  const [eY, eM, eD] = endStr.split('-').map(Number);
 
-  // 시작: 3개월 전 같은 날, 종료: 퇴사일 전날
-  const pS = new Date(end.getFullYear(), end.getMonth() - 3, end.getDate());
-  const pE = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 1);
+  // 시작: 3개월 전 같은 날
+  let pSY = eY, pSM = eM - 3;
+  if (pSM <= 0) { pSM += 12; pSY -= 1; }
+  
+  // 종료: 퇴사일 전날
+  const pEnd = new Date(eY, eM - 1, eD - 1);
+  const pEY = pEnd.getFullYear(), pEM = pEnd.getMonth() + 1, pED = pEnd.getDate();
 
   const periods = [];
-  let sY = pS.getFullYear(), sM = pS.getMonth(), sD = pS.getDate();
+  let sY = pSY, sM = pSM, sD = eD; // 시작일 (일은 퇴사일과 동일)
 
   while (true) {
-    const segStart = new Date(sY, sM, sD);
-    if (segStart > pE) break;
+    if (sY > pEY || (sY === pEY && sM > pEM)) break;
 
-    const monthLastDate = new Date(sY, sM + 1, 0).getDate();
-    let segEnd;
-    if (sY === pE.getFullYear() && sM === pE.getMonth()) {
-      segEnd = new Date(pE.getFullYear(), pE.getMonth(), pE.getDate());
+    const monthLastDate = new Date(sY, sM, 0).getDate(); // sM은 1-based이므로 바로 사용
+    
+    let eEndY, eEndM, eEndD;
+    if (sY === pEY && sM === pEM) {
+      // 마지막 구간: periodEnd까지
+      eEndY = pEY; eEndM = pEM; eEndD = pED;
     } else {
-      segEnd = new Date(sY, sM + 1, 0);
+      // 해당 월 말일까지
+      eEndY = sY; eEndM = sM; eEndD = monthLastDate;
     }
 
+    const segStart = new Date(sY, sM - 1, sD);
+    const segEnd = new Date(eEndY, eEndM - 1, eEndD);
     const segDays = Math.round((segEnd - segStart) / (1000*60*60*24)) + 1;
-    const isFull = sD === 1 && segEnd.getDate() === monthLastDate;
+    const isFull = sD === 1 && eEndD === monthLastDate;
 
     periods.push({
-      start: segStart.toISOString().split('T')[0],
-      end: segEnd.toISOString().split('T')[0],
+      start: `${sY}-${String(sM).padStart(2,'0')}-${String(sD).padStart(2,'0')}`,
+      end: `${eEndY}-${String(eEndM).padStart(2,'0')}-${String(eEndD).padStart(2,'0')}`,
       days: segDays, monthDays: monthLastDate, isFull,
     });
 
-    const next = new Date(sY, sM, segEnd.getDate() + 1);
-    sY = next.getFullYear(); sM = next.getMonth(); sD = next.getDate();
+    // 다음 구간 시작 = 이번 종료일 + 1일
+    sM = eEndM + 1; sD = 1;
+    if (sM > 12) { sM = 1; sY = eEndY + 1; } else { sY = eEndY; }
   }
 
   return { periods, totalDays: periods.reduce((s,p) => s+p.days, 0) };
