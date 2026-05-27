@@ -373,12 +373,9 @@ function CloseModal({ record, onClose, onDone }) {
 
 // ── 연장 모달 ──────────────────────────
 function ExtendModal({ record, onClose, onDone }) {
-  const [form, setForm] = useState({
-    start_date: record.end_date?.split('T')[0] || '',
-    end_date: '',
-    return_date: '',
-  });
+  const [form, setForm] = useState({ start_date: '', end_date: '', return_date: '' });
   const [saving, setSaving] = useState(false);
+  function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
 
   async function handleSave() {
     if (!form.start_date) return;
@@ -393,30 +390,30 @@ function ExtendModal({ record, onClose, onDone }) {
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'flex-end' }}>
       <div style={{ background: 'var(--bg)', width: '100%', maxWidth: 480, margin: '0 auto', borderRadius: '16px 16px 0 0', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '0.5px solid var(--border)' }}>
-          <div>
-            <div style={{ fontWeight: 700, fontSize: 15 }}>🔄 연장 — {record.emp_name}</div>
-            <div style={{ fontSize: 12, color: 'var(--text2)' }}>{record.type} · {record.split_count}회차 → {(record.split_count||1)+1}회차</div>
-          </div>
+          <div style={{ fontWeight: 700, fontSize: 15 }}>🔄 연장 — {record.emp_name} ({record.type})</div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'var(--text2)' }}>×</button>
         </div>
         <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ fontSize: 12, color: 'var(--text2)', background: 'var(--bg2)', borderRadius: 8, padding: '8px 12px' }}>
+            현재 {record.split_count || 1}회차 ({record.start_date?.split('T')[0]} ~ {record.end_date?.split('T')[0] || '미정'})
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div className="form-group">
               <label className="form-label">연장 시작일 <span className="req">*</span></label>
-              <input type="date" value={form.start_date} onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))} />
+              <input type="date" value={form.start_date} onChange={e => setF('start_date', e.target.value)} />
             </div>
             <div className="form-group">
               <label className="form-label">연장 종료일</label>
-              <input type="date" value={form.end_date} onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))} />
+              <input type="date" value={form.end_date} onChange={e => setF('end_date', e.target.value)} />
             </div>
           </div>
           <div className="form-group">
             <label className="form-label">복직예정일</label>
-            <input type="date" value={form.return_date} onChange={e => setForm(f => ({ ...f, return_date: e.target.value }))} />
+            <input type="date" value={form.return_date} onChange={e => setF('return_date', e.target.value)} />
           </div>
-          <button onClick={handleSave} disabled={saving || !form.start_date} className="btn-primary"
-            style={{ background: '#1A4A8A', marginBottom: 8 }}>
-            {saving ? '저장 중...' : '연장 등록'}
+          <button onClick={handleSave} disabled={!form.start_date || saving}
+            className="btn-primary" style={{ background: '#1A4A8A', marginBottom: 8 }}>
+            {saving ? '처리 중...' : '연장 등록'}
           </button>
         </div>
       </div>
@@ -424,7 +421,7 @@ function ExtendModal({ record, onClose, onDone }) {
   );
 }
 
-// ── 카드 ──────────────────────────────
+
 function AttCard({ r, onEdit, onClose, onExtend, onDelete }) {
   const st = STATUS_STYLE[r.status] || STATUS_STYLE['진행중'];
   const [menuOpen, setMenuOpen] = useState(false);
@@ -499,6 +496,7 @@ export default function AttendanceMgmt() {
   const [search, setSearch] = useState('');
   const [inputModal, setInputModal] = useState(null);
   const [closeModal, setCloseModal] = useState(null);
+  const [extendModal, setExtendModal] = useState(null);
   const [extendModal, setExtendModal] = useState(null);
 
   useEffect(() => { load(); api.getOffices().then(setOffices); }, []);
