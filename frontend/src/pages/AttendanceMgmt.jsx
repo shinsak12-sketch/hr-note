@@ -503,7 +503,6 @@ export default function AttendanceMgmt() {
   const [inputModal, setInputModal] = useState(null);
   const [closeModal, setCloseModal] = useState(null);
   const [extendModal, setExtendModal] = useState(null);
-  const [extendModal, setExtendModal] = useState(null);
 
   useEffect(() => { load(); api.getOffices().then(setOffices); }, []);
 
