@@ -35,20 +35,28 @@ function calcMonthsAndDays(startStr, endStr) {
 }
 
 // 잔여개월 기준 예상종료일 - 엑셀 방식
+// V5 = Q5 + ROUNDDOWN(O5*U5, 0)
+// Q5 = 예상시작일 + 정수개월, O5 = 소수부분, U5 = Q5 달의 일수
 function calcEndDate(startStr, remainMonths) {
   if (!startStr || remainMonths <= 0) return null;
   const start = new Date(startStr);
 
-  // 해당월 일수
-  const daysInMonth = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
+  const fullMonths = Math.floor(remainMonths);         // 정수 개월 (n)
+  const fraction = remainMonths - fullMonths;           // 소수 부분 (o)
 
-  // 예상종료일 = 예상시작일 + ROUNDDOWN(잔여개월 × 해당월일수, 0)
-  const totalDays = Math.floor(remainMonths * daysInMonth);
-  const end = new Date(start);
-  end.setDate(end.getDate() + totalDays);
+  // Q5: 예상시작일 + 정수개월 - 1일 (엑셀 방식)
+  const q = new Date(start);
+  q.setMonth(q.getMonth() + fullMonths);
+  q.setDate(q.getDate() - 1);
 
-  // -1일 (DATEDIF +1일 역산)
-  end.setDate(end.getDate() - 1);
+  // U5: Q5 달의 일수 (1월이면 31)
+  const daysInMonth = new Date(q.getFullYear(), q.getMonth() + 1, 0).getDate();
+
+  // V5 = Q5 + ROUNDDOWN(O5 * U5, 0)
+  const extraDays = Math.floor(fraction * daysInMonth);
+  const end = new Date(q);
+  end.setDate(end.getDate() + extraDays);
+
   return end.toISOString().split('T')[0];
 }
 
