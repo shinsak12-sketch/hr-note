@@ -504,7 +504,6 @@ function AttCard({ r, onEdit, onClose, onExtend, onRevert, onCalc, onDelete }) {
 // ── 메인 ──────────────────────────────
 export default function AttendanceMgmt() {
   const nav = useNavigate();
-  const nav = useNavigate();
   const [offices, setOffices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState('');
