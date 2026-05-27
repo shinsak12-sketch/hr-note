@@ -214,6 +214,7 @@ export const api = {
   lunarToSolar: (year, month, day, leap) => request('/lunar?type=lun2sol&solYear=' + year + '&solMonth=' + String(month).padStart(2,'0') + '&solDay=' + String(day).padStart(2,'0') + (leap ? '&lunLeapmonth=Y' : '')),
 
   // 근태관리
+  getAttendanceSplitCount: (emp_no, type, start_date) => request('/attendance/split-count?emp_no=' + emp_no + '&type=' + encodeURIComponent(type) + '&start_date=' + (start_date||'')),
   getAttendance: (params={}) => { const q = new URLSearchParams(params).toString(); return request('/attendance' + (q?'?'+q:'')); },
   getAttendanceStats: (params={}) => { const q = new URLSearchParams(params).toString(); return request('/attendance/stats' + (q?'?'+q:'')); },
   createAttendance: (body) => request('/attendance', { method: 'POST', body: JSON.stringify(body) }),

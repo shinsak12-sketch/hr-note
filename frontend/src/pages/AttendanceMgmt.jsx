@@ -6,7 +6,7 @@ import { Toast } from '../components/Common.jsx';
 const CATEGORIES = ['휴직', '휴가', '단축근무', '근무OFF'];
 const TYPES = {
   '휴직': ['육아휴직','질병휴직','난임휴직','가족돌봄휴직','무급휴직','명령휴직'],
-  '휴가': ['질병휴가','출산전후휴가'],
+  '휴가': ['질병휴가','출산전후휴가','가족돌봄휴가'],
   '단축근무': ['육아기단축근무','임신중단축근무'],
   '근무OFF': ['근무OFF'],
 };
@@ -34,8 +34,30 @@ function InputModal({ record, offices, onClose, onDone }) {
   const [officeSearch, setOfficeSearch] = useState('');
   const [showOfficeList, setShowOfficeList] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [prevPeriods, setPrevPeriods] = useState([]); // 기존 회차 기간
 
   function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
+
+  // 사번+종류+시작일 변경 시 자동 회차 계산
+  async function calcSplitCount(emp_no, type, start_date) {
+    if (!emp_no || !type) return;
+    try {
+      const res = await api.getAttendanceSplitCount(emp_no, type, start_date);
+      setF('split_count', res.split_count);
+
+      // 기존 회차 기간 조회
+      const all = await api.getAttendance();
+      const familyTypes = ['가족돌봄휴직','가족돌봄휴가'];
+      const related = all.filter(x => {
+        if (x.emp_no !== emp_no || x.type !== type) return false;
+        if (familyTypes.includes(type) && start_date) {
+          return new Date(x.start_date).getFullYear() === new Date(start_date).getFullYear();
+        }
+        return true;
+      }).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+      setPrevPeriods(related);
+    } catch {}
+  }
 
   const filteredOffices = officeSearch
     ? offices.filter(o => o.org_name.includes(officeSearch) || o.headquarters?.includes(officeSearch))
@@ -108,7 +130,10 @@ function InputModal({ record, offices, onClose, onDone }) {
           {/* 종류 선택 */}
           <div className="form-group">
             <label className="form-label">종류 <span className="req">*</span></label>
-            <select value={form.type} onChange={e => setF('type', e.target.value)}>
+            <select value={form.type} onChange={e => {
+              setF('type', e.target.value);
+              if (form.emp_no && form.start_date) calcSplitCount(form.emp_no, e.target.value, form.start_date);
+            }}>
               {typeList.map(t => <option key={t}>{t}</option>)}
             </select>
           </div>
@@ -118,7 +143,10 @@ function InputModal({ record, offices, onClose, onDone }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div className="form-group">
               <label className="form-label">사번 <span className="req">*</span></label>
-              <input type="text" placeholder="사번" value={form.emp_no||''} onChange={e => setF('emp_no', e.target.value)} />
+              <input type="text" placeholder="사번" value={form.emp_no||''} onChange={e => {
+                setF('emp_no', e.target.value);
+                if (e.target.value.length >= 6 && form.type && form.start_date) calcSplitCount(e.target.value, form.type, form.start_date);
+              }} />
             </div>
             <div className="form-group">
               <label className="form-label">성명 <span className="req">*</span></label>
@@ -152,13 +180,33 @@ function InputModal({ record, offices, onClose, onDone }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div className="form-group">
               <label className="form-label">시작일 <span className="req">*</span></label>
-              <input type="date" value={form.start_date||''} onChange={e => setF('start_date', e.target.value)} />
+              <input type="date" value={form.start_date||''} onChange={e => {
+                setF('start_date', e.target.value);
+                if (form.emp_no && form.type) calcSplitCount(form.emp_no, form.type, e.target.value);
+              }} />
             </div>
             <div className="form-group">
               <label className="form-label">종료일</label>
               <input type="date" value={form.end_date||''} onChange={e => setF('end_date', e.target.value)} />
             </div>
           </div>
+
+          {/* 기존 회차 기간 표시 */}
+          {!isEdit && prevPeriods.length > 0 && (
+            <div style={{ background: '#E8F0FB', borderRadius: 8, padding: '10px 12px', fontSize: 12, lineHeight: 1.8 }}>
+              <div style={{ fontWeight: 700, color: '#1A4A8A', marginBottom: 4 }}>📋 기존 사용 이력</div>
+              {prevPeriods.map((p, i) => (
+                <div key={p.id} style={{ color: '#1A4A8A' }}>
+                  {i+1}회차: {p.start_date?.split('T')[0]} ~ {p.end_date?.split('T')[0] || '진행중'}
+                  {p.used_days ? ` (${p.used_days}일)` : ''}
+                  <span style={{ marginLeft: 6, fontSize: 11, color: '#5A7AB8' }}>{p.status}</span>
+                </div>
+              ))}
+              <div style={{ borderTop: '0.5px solid #1A4A8A30', marginTop: 4, paddingTop: 4, fontWeight: 700, color: '#1A4A8A' }}>
+                → {form.split_count}회차로 자동 설정
+              </div>
+            </div>
+          )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div className="form-group">
               <label className="form-label">{form.category === '휴가' ? '복귀예정일' : '복직예정일'}</label>
@@ -480,6 +528,12 @@ function AttCard({ r, onEdit, onClose, onExtend, onRevert, onCalc, onDelete }) {
             📋 1회차: {r.parent_start_date?.split('T')[0]} ~ {r.parent_end_date?.split('T')[0]}
           </div>
         )}
+        {/* 질병/난임/가족돌봄 회차별 기간 - AttCard는 list에서 related 받아서 표시 */}
+        {r.prevPeriods?.map((p, i) => (
+          <div key={p.id} style={{ fontSize: 11, color: 'var(--text2)' }}>
+            📋 {i+1}회차: {p.start_date?.split('T')[0]} ~ {p.end_date?.split('T')[0] || '진행중'} {p.used_days ? `(${p.used_days}일)` : ''}
+          </div>
+        ))}
         <div>📅 {r.start_date?.split('T')[0]} ~ {r.end_date?.split('T')[0] || '미정'} ({r.used_days ? r.used_days+'일' : '-'})</div>
         {r.return_date && <div>🔙 복직예정: {r.return_date?.split('T')[0]}</div>}
         {r.child_order && <div>👶 {r.child_order} · {r.split_count}회차</div>}
@@ -536,11 +590,15 @@ export default function AttendanceMgmt() {
   }
 
   function handleCalc(r) {
-    // 질병휴직/난임휴직/가족돌봄휴직/질병휴가는 일수계산기로
-    if (['질병휴직','난임휴직','가족돌봄휴직','질병휴가'].includes(r.type)) {
-      const related = list.filter(x =>
-        x.emp_no === r.emp_no && x.type === r.type
-      ).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+    if (['질병휴직','난임휴직','가족돌봄휴직','질병휴가','가족돌봄휴가'].includes(r.type)) {
+      const familyTypes = ['가족돌봄휴직','가족돌봄휴가'];
+      const related = list.filter(x => {
+        if (x.emp_no !== r.emp_no || x.type !== r.type) return false;
+        if (familyTypes.includes(r.type)) {
+          return new Date(x.start_date).getFullYear() === new Date(r.start_date).getFullYear();
+        }
+        return true;
+      }).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
       const periods = related.map(x => ({
         start: x.start_date?.split('T')[0] || '',
         end: x.end_date?.split('T')[0] || '',
@@ -553,11 +611,9 @@ export default function AttendanceMgmt() {
       nav('/hr-calc/leave?' + params.toString());
       return;
     }
-    // 육아휴직은 기존 계산기로 (사번+자녀구분)
+    // 육아휴직 - 사번+자녀구분
     const related = list.filter(x =>
-      x.emp_no === r.emp_no &&
-      x.type === '육아휴직' &&
-      x.child_order === r.child_order
+      x.emp_no === r.emp_no && x.type === '육아휴직' && x.child_order === r.child_order
     ).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
     const periods = related.map(x => ({
       start: x.start_date?.split('T')[0] || '',
@@ -571,11 +627,25 @@ export default function AttendanceMgmt() {
     nav('/hr-calc/parental-leave?' + params.toString());
   }
 
+  const PERIOD_TYPES = ['질병휴직','질병휴가','난임휴직','가족돌봄휴직','가족돌봄휴가'];
+  const FAMILY_TYPES = ['가족돌봄휴직','가족돌봄휴가'];
+
   const filtered = list.filter(r => {
     const matchCat = catFilter === '전체' || r.category === catFilter;
     const matchSt = statusFilter === '전체' || r.status === statusFilter;
     const matchSearch = !search || r.emp_name?.includes(search) || r.emp_no?.includes(search) || r.org_name?.includes(search) || r.type?.includes(search);
     return matchCat && matchSt && matchSearch;
+  }).map(r => {
+    // 회차별 기간 표시 대상 종류만 prevPeriods 붙이기
+    if (!PERIOD_TYPES.includes(r.type)) return r;
+    const related = list.filter(x => {
+      if (x.id === r.id || x.emp_no !== r.emp_no || x.type !== r.type) return false;
+      if (FAMILY_TYPES.includes(r.type)) {
+        return new Date(x.start_date).getFullYear() === new Date(r.start_date).getFullYear();
+      }
+      return true;
+    }).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+    return { ...r, prevPeriods: related };
   });
 
   const counts = { 전체: list.length };

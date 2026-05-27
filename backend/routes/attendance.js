@@ -4,8 +4,33 @@ import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
 
-// 전체 목록
-router.get('/', authMiddleware, async (req, res) => {
+// 자동 회차 계산
+router.get('/split-count', authMiddleware, async (req, res) => {
+  const { emp_no, type, start_date } = req.query;
+  if (!emp_no || !type) return res.json({ split_count: 1 });
+
+  // 가족돌봄은 연도 기준 초기화
+  const familyTypes = ['가족돌봄휴직','가족돌봄휴가'];
+  let count;
+  if (familyTypes.includes(type) && start_date) {
+    const year = new Date(start_date).getFullYear();
+    const [row] = await sql`
+      SELECT COUNT(*) as cnt FROM attendance
+      WHERE emp_no=${emp_no} AND type=${type}
+      AND EXTRACT(YEAR FROM start_date) = ${year}
+    `;
+    count = Number(row.cnt);
+  } else {
+    const [row] = await sql`
+      SELECT COUNT(*) as cnt FROM attendance
+      WHERE emp_no=${emp_no} AND type=${type}
+    `;
+    count = Number(row.cnt);
+  }
+  res.json({ split_count: count + 1 });
+});
+
+
   const { category, type, status, year } = req.query;
   let list = await sql`
     SELECT a.*, o.headquarters, o.department,

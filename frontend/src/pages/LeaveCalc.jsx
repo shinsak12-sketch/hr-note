@@ -5,6 +5,7 @@ const LEAVE_TYPES = [
   { label: '질병휴직', maxDays: 180 },
   { label: '난임휴직', maxDays: 180 },
   { label: '가족돌봄휴직', maxDays: 90 },
+  { label: '가족돌봄휴가', maxDays: 10 },
   { label: '질병휴가', maxDays: 60 },
 ];
 
@@ -42,8 +43,10 @@ export default function LeaveCalc() {
   const [leaveType, setLeaveType] = useState(init.type);
   const [periods, setPeriods] = useState(init.periods);
   const [expectedStart, setExpectedStart] = useState('');
+  const [familyHolidayDays, setFamilyHolidayDays] = useState(0); // 가족돌봄휴직 시 휴가 차감일
 
   const maxDays = LEAVE_TYPES.find(t => t.label === leaveType)?.maxDays || 0;
+  const isFamilyLeave = leaveType === '가족돌봄휴직';
 
   function updatePeriod(idx, key, val) {
     setPeriods(p => p.map((item, i) => i === idx ? { ...item, [key]: val } : item));
@@ -51,8 +54,9 @@ export default function LeaveCalc() {
 
   const dayResults = periods.map(p => calcDays(p.start, p.end));
   const totalUsed = dayResults.reduce((sum, d) => sum + (d || 0), 0);
-  const remaining = Math.max(0, maxDays - totalUsed);
-  const isOver = maxDays > 0 && totalUsed > maxDays;
+  const deduct = isFamilyLeave ? Number(familyHolidayDays) || 0 : 0;
+  const remaining = Math.max(0, maxDays - totalUsed - deduct);
+  const isOver = maxDays > 0 && (totalUsed + deduct) > maxDays;
 
   // 예상 종료일: 예상시작일 + 잔여일수 - 1
   const expectedEnd = expectedStart && remaining > 0 ? (() => {
@@ -99,6 +103,16 @@ export default function LeaveCalc() {
           {leaveType && (
             <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text2)', background: 'var(--bg2)', borderRadius: 8, padding: '8px 12px' }}>
               📌 {leaveType} 최대 사용기간: <strong>{maxDays}일</strong>
+              {isFamilyLeave && <span style={{ color: '#A32D2D' }}> (같은 연도 가족돌봄휴가 사용일 차감)</span>}
+            </div>
+          )}
+          {isFamilyLeave && (
+            <div className="form-group" style={{ marginTop: 8 }}>
+              <label className="form-label">같은 연도 가족돌봄휴가 사용일수</label>
+              <input type="number" placeholder="0" min="0" max="10"
+                value={familyHolidayDays}
+                onChange={e => setFamilyHolidayDays(e.target.value)}
+                style={{ width: '100%' }} />
             </div>
           )}
         </section>
@@ -165,7 +179,8 @@ export default function LeaveCalc() {
                     <div key={i}>{i+1}회차: {periods[i].start} ~ {periods[i].end} = {d}일</div>
                   ) : null)}
                   <div style={{ borderTop: '0.5px solid rgba(0,0,0,0.1)', marginTop: 4, paddingTop: 4, fontWeight: 600, color: isOver ? '#A32D2D' : '#854F0B' }}>
-                    합계: {dayResults.filter(d=>d).join(' + ')} = {totalUsed}일 / 최대 {maxDays}일
+                    합계: {dayResults.filter(d=>d).join(' + ')} = {totalUsed}일
+                    {isFamilyLeave && deduct > 0 && ` + 휴가 ${deduct}일`} / 최대 {maxDays}일
                   </div>
                 </div>
               )}
@@ -173,9 +188,9 @@ export default function LeaveCalc() {
               <div style={{ textAlign: 'center', fontSize: 13, fontWeight: 700, padding: '8px 0', borderTop: `0.5px solid ${isOver ? '#A32D2D' : '#854F0B'}30` }}>
                 {isOver
                   ? `⚠️ 최대 사용기간(${maxDays}일) 초과!`
-                  : totalUsed === 0
+                  : totalUsed === 0 && deduct === 0
                     ? `최대 ${maxDays}일 사용 가능`
-                    : `✅ ${maxDays}일 이내 (${remaining}일 남음)`
+                    : `✅ ${maxDays}일 이내 (${remaining}일 남음${deduct > 0 ? `, 휴가 ${deduct}일 차감` : ''})`
                 }
               </div>
             </div>
