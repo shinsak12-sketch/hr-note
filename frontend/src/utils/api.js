@@ -220,7 +220,11 @@ export const api = {
   createAttendance: (body) => request('/attendance', { method: 'POST', body: JSON.stringify(body) }),
   updateAttendance: (id, body) => request('/attendance/' + id, { method: 'PATCH', body: JSON.stringify(body) }),
   closeAttendance: (id, body) => request('/attendance/' + id + '/close', { method: 'PATCH', body: JSON.stringify(body) }),
+  downloadAttendanceTemplate: () => fetch(BASE_URL + '/attendance/template/excel', { headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') } }).then(r => r.blob()),
+  uploadAttendanceExcel: (file) => { const fd = new FormData(); fd.append('file', file); return fetch(BASE_URL + '/attendance/upload/excel', { method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') }, body: fd }).then(r => r.json()); },
   extendAttendance: (id, body) => request('/attendance/' + id + '/extend', { method: 'POST', body: JSON.stringify(body) }),
+  downloadAttendanceTemplate: () => fetch(BASE_URL + '/attendance/template/excel', { headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') } }).then(r => r.blob()),
+  uploadAttendanceExcel: (file) => { const fd = new FormData(); fd.append('file', file); return fetch(BASE_URL + '/attendance/upload/excel', { method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') }, body: fd }).then(r => r.json()); },
   extendAttendance: (id, body) => request('/attendance/' + id + '/extend', { method: 'POST', body: JSON.stringify(body) }),
   deleteAttendance: (id) => request('/attendance/' + id, { method: 'DELETE' }),
 };

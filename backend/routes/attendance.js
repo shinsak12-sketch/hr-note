@@ -1,8 +1,11 @@
 import { Router } from 'express';
 import sql from '../db.js';
 import { authMiddleware } from '../middleware/auth.js';
+import * as XLSX from 'xlsx';
+import multer from 'multer';
 
 const router = Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 // 자동 회차 계산
 router.get('/split-count', authMiddleware, async (req, res) => {
@@ -36,6 +39,136 @@ router.get('/split-count', authMiddleware, async (req, res) => {
     count = Number(row.cnt);
   }
   res.json({ split_count: count + 1 });
+});
+
+// 엑셀 템플릿 다운로드
+router.get('/template/excel', authMiddleware, (req, res) => {
+  const wb = XLSX.utils.book_new();
+
+  const sheets = {
+    '휴직': [
+      ['사번','성명','소속','종류','시작일','종료일','복직예정일','사용일수','자녀구분','분할회차','질병명','대상가족','휴직사유','비고'],
+      ['','','','육아휴직/질병휴직/난임휴직/가족돌봄휴직/무급휴직/명령휴직','YYYY-MM-DD','YYYY-MM-DD','YYYY-MM-DD','','첫째/둘째/셋째/넷째/임신중','','','','',''],
+    ],
+    '휴가': [
+      ['사번','성명','소속','종류','시작일','종료일','복귀예정일','사용일수','자녀구분','구분','질병명','비고'],
+      ['','','','질병휴가/출산전휴가/출산후휴가/출산전후휴가/가족돌봄휴가','YYYY-MM-DD','YYYY-MM-DD','YYYY-MM-DD','','첫째/둘째/셋째/넷째','일반/미숙아/다태아','',''],
+    ],
+    '단축근무': [
+      ['사번','성명','소속','종류','시작일','종료일','정상예정일','사용일수','단축시간','근무시작','근무종료','계약일','비고'],
+      ['','','','육아기단축근무/임신중단축근무','YYYY-MM-DD','YYYY-MM-DD','YYYY-MM-DD','','1~5','HH:MM','HH:MM','YYYY-MM-DD',''],
+    ],
+    '근무OFF': [
+      ['사번','성명','소속','시작일','종료일','정년일','OFF시작일','연차삭제','서류완료','비고'],
+      ['','','','YYYY-MM-DD','YYYY-MM-DD','YYYY-MM-DD','YYYY-MM-DD','Y/N','Y/N',''],
+    ],
+  };
+
+  Object.entries(sheets).forEach(([name, data]) => {
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    ws['!cols'] = data[0].map(() => ({ wch: 16 }));
+    XLSX.utils.book_append_sheet(wb, ws, name);
+  });
+
+  const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+  res.setHeader('Content-Disposition', 'attachment; filename=attendance_template.xlsx');
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.send(buf);
+});
+
+// 엑셀 업로드
+router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, res) => {
+  try {
+    const wb = XLSX.read(req.file.buffer, { type: 'buffer', cellDates: true });
+    let inserted = 0, errors = [];
+
+    // 오피스 목록 캐시
+    const offices = await sql`SELECT id, org_name FROM offices`;
+    const officeMap = {};
+    offices.forEach(o => { officeMap[o.org_name] = o.id; });
+
+    for (const sheetName of wb.SheetNames) {
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { defval: '' });
+
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i];
+        try {
+          const emp_no = String(r['사번'] || '').trim();
+          const emp_name = String(r['성명'] || '').trim();
+          if (!emp_no || !emp_name) continue;
+
+          const org_name = String(r['소속'] || '').trim();
+          const office_id = officeMap[org_name] || null;
+
+          const fmtDate = (v) => {
+            if (!v) return null;
+            if (v instanceof Date) return v.toISOString().split('T')[0];
+            const s = String(v).trim();
+            return s || null;
+          };
+
+          let d = {
+            category: sheetName === '근무OFF' ? '근무OFF' : sheetName,
+            type: sheetName === '근무OFF' ? '근무OFF' : String(r['종류'] || '').trim(),
+            emp_no, emp_name, org_name, office_id,
+            start_date: fmtDate(r['시작일']),
+            end_date: fmtDate(r['종료일']) || null,
+            return_date: fmtDate(r['복직예정일'] || r['복귀예정일']) || null,
+            used_days: r['사용일수'] ? Number(r['사용일수']) : null,
+            note: String(r['비고'] || '').trim() || null,
+            // 휴직
+            child_order: String(r['자녀구분'] || '').trim() || null,
+            split_count: r['분할회차'] ? Number(r['분할회차']) : null,
+            disease_name: String(r['질병명'] || '').trim() || null,
+            family_target: String(r['대상가족'] || '').trim() || null,
+            leave_reason: String(r['휴직사유'] || '').trim() || null,
+            // 휴가
+            birth_type: String(r['구분'] || '').trim() || null,
+            // 단축근무
+            reduce_hours: r['단축시간'] ? Number(r['단축시간']) : null,
+            work_start_time: String(r['근무시작'] || '').trim() || null,
+            work_end_time: String(r['근무종료'] || '').trim() || null,
+            normal_return_date: fmtDate(r['정상예정일']) || null,
+            contract_date: fmtDate(r['계약일']) || null,
+            // 근무OFF
+            retirement_date: fmtDate(r['정년일']) || null,
+            off_start_date: fmtDate(r['OFF시작일']) || null,
+            leave_deleted: String(r['연차삭제'] || '').toUpperCase() === 'Y',
+            doc_completed: String(r['서류완료'] || '').toUpperCase() === 'Y',
+          };
+
+          if (!d.start_date) continue;
+
+          await sql`
+            INSERT INTO attendance (
+              category, type, office_id, org_name, emp_no, emp_name,
+              start_date, end_date, return_date, used_days, note,
+              child_order, split_count, disease_name, family_target, leave_reason,
+              birth_type, reduce_hours, work_start_time, work_end_time,
+              normal_return_date, contract_date,
+              retirement_date, off_start_date, leave_deleted, doc_completed
+            ) VALUES (
+              ${d.category}, ${d.type}, ${d.office_id}, ${d.org_name},
+              ${d.emp_no}, ${d.emp_name}, ${d.start_date}, ${d.end_date},
+              ${d.return_date}, ${d.used_days}, ${d.note},
+              ${d.child_order}, ${d.split_count}, ${d.disease_name},
+              ${d.family_target}, ${d.leave_reason}, ${d.birth_type},
+              ${d.reduce_hours}, ${d.work_start_time}, ${d.work_end_time},
+              ${d.normal_return_date}, ${d.contract_date},
+              ${d.retirement_date}, ${d.off_start_date},
+              ${d.leave_deleted}, ${d.doc_completed}
+            )
+          `;
+          inserted++;
+        } catch (e) {
+          errors.push(`${sheetName} ${i+2}행: ${e.message}`);
+        }
+      }
+    }
+    res.json({ inserted, errors });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // 전체 목록

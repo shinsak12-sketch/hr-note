@@ -658,6 +658,24 @@ export default function AttendanceMgmt() {
     setToast('삭제되었습니다.'); load();
   }
 
+  async function handleDownloadTemplate() {
+    const blob = await api.downloadAttendanceTemplate();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'attendance_template.xlsx'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const result = await api.uploadAttendanceExcel(file);
+    if (result.error) { setToast('오류: ' + result.error); return; }
+    setToast(`${result.inserted}건 등록 완료${result.errors?.length ? ` (오류 ${result.errors.length}건)` : ''}`);
+    load();
+    e.target.value = '';
+  }
+
   async function handleRevert(id) {
     await api.closeAttendance(id, { status: '진행중', end_comment: null });
     setToast('진행중으로 되돌렸습니다.'); load();
@@ -752,10 +770,23 @@ export default function AttendanceMgmt() {
           뒤로
         </button>
         <div className="header-title">근태 관리</div>
-        <button onClick={() => setInputModal({})} style={{
-          fontSize: 12, padding: '5px 10px', borderRadius: 8,
-          background: '#FAEEDA', color: '#854F0B', border: 'none', cursor: 'pointer', fontWeight: 600,
-        }}>+ 등록</button>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button onClick={handleDownloadTemplate} style={{
+            fontSize: 11, padding: '5px 8px', borderRadius: 8,
+            background: 'var(--bg2)', color: 'var(--text2)', border: 'none', cursor: 'pointer',
+          }}>📥 서식</button>
+          <label style={{
+            fontSize: 11, padding: '5px 8px', borderRadius: 8,
+            background: 'var(--bg2)', color: 'var(--text2)', border: 'none', cursor: 'pointer',
+          }}>
+            📤 업로드
+            <input type="file" accept=".xlsx" style={{ display: 'none' }} onChange={handleUpload} />
+          </label>
+          <button onClick={() => setInputModal({})} style={{
+            fontSize: 12, padding: '5px 10px', borderRadius: 8,
+            background: '#FAEEDA', color: '#854F0B', border: 'none', cursor: 'pointer', fontWeight: 600,
+          }}>+ 등록</button>
+        </div>
       </div>
 
       {/* 검색 */}
