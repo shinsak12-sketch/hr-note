@@ -40,9 +40,10 @@ export default function MaternityCalc() {
   const minPostDays = type?.minPostDays || 45;
   const paidDays = type?.paidDays || 60;
 
-  const prenatalUsed = usePrenatal ? (Number(prenatalDays) || 0) : 0;
-  const prenatalEnd = usePrenatal && prenatalStart && prenatalUsed > 0
-    ? addDays(prenatalStart, prenatalUsed - 1) : null;
+  // prenatalDays는 이제 출산전 종료일 (date string)
+  const prenatalUsed = usePrenatal && prenatalStart && prenatalDays
+    ? (diffDays(prenatalStart, prenatalDays) || 0) : 0;
+  const prenatalEnd = prenatalDays || null; // 종료일 = 입력값
   const postDays = totalDays - prenatalUsed;
 
   // 전체 종료일: 시작일 기준
@@ -124,14 +125,13 @@ export default function MaternityCalc() {
                   <input type="date" value={prenatalStart} onChange={e => setPrenatalStart(e.target.value)} />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">출산전 사용일수</label>
-                  <input type="number" placeholder="일수" min="1" max={totalDays - minPostDays}
-                    value={prenatalDays} onChange={e => setPrenatalDays(e.target.value)} />
+                  <label className="form-label">출산전 종료일</label>
+                  <input type="date" value={prenatalDays} onChange={e => setPrenatalDays(e.target.value)} />
                 </div>
               </div>
-              {prenatalEnd && (
+              {prenatalStart && prenatalDays && (
                 <div style={{ fontSize: 12, color: '#1A4A8A', background: '#E8F0FB', borderRadius: 8, padding: '8px 12px' }}>
-                  출산전 종료일: <strong>{fmt(prenatalEnd)}</strong>
+                  출산전 사용일수: <strong>{diffDays(prenatalStart, prenatalDays)}일</strong>
                 </div>
               )}
               <div style={{ fontSize: 11, color: 'var(--text2)', background: 'var(--bg2)', borderRadius: 6, padding: '6px 10px' }}>
