@@ -26,42 +26,39 @@ function calc3MonthPeriods(endStr) {
   if (!endStr) return null;
   const end = new Date(endStr);
 
-  // 시작일: 퇴사일에서 3개월 전, 일은 퇴사일 그대로
-  const periodStart = new Date(end);
-  periodStart.setMonth(periodStart.getMonth() - 3);
-
-  // 퇴사일 전날까지
-  const periodEnd = new Date(end);
-  periodEnd.setDate(periodEnd.getDate() - 1);
+  // 시작: 3개월 전 같은 날, 종료: 퇴사일 전날
+  const pS = new Date(end.getFullYear(), end.getMonth() - 3, end.getDate());
+  const pE = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 1);
 
   const periods = [];
-  let segStart = new Date(periodStart);
+  let sY = pS.getFullYear(), sM = pS.getMonth(), sD = pS.getDate();
 
-  while (segStart <= periodEnd) {
-    // 종료일 = 해당월 말일
-    const monthLastDay = new Date(segStart.getFullYear(), segStart.getMonth() + 1, 0);
-    // 단, 퇴직일 전날을 넘으면 퇴직일 전날로
-    const segEnd = monthLastDay > periodEnd ? new Date(periodEnd) : new Date(monthLastDay);
+  while (true) {
+    const segStart = new Date(sY, sM, sD);
+    if (segStart > pE) break;
 
-    const segDays = Math.ceil((segEnd - segStart) / (1000*60*60*24)) + 1;
-    const monthDays = monthLastDay.getDate();
-    const isFull = segStart.getDate() === 1 && segEnd.getDate() === monthDays;
+    const monthLastDate = new Date(sY, sM + 1, 0).getDate();
+    let segEnd;
+    if (sY === pE.getFullYear() && sM === pE.getMonth()) {
+      segEnd = new Date(pE.getFullYear(), pE.getMonth(), pE.getDate());
+    } else {
+      segEnd = new Date(sY, sM + 1, 0);
+    }
+
+    const segDays = Math.round((segEnd - segStart) / (1000*60*60*24)) + 1;
+    const isFull = sD === 1 && segEnd.getDate() === monthLastDate;
 
     periods.push({
       start: segStart.toISOString().split('T')[0],
       end: segEnd.toISOString().split('T')[0],
-      days: segDays,
-      monthDays,
-      isFull,
+      days: segDays, monthDays: monthLastDate, isFull,
     });
 
-    // 다음 구간 시작 = 이번 종료일 + 1일
-    segStart = new Date(segEnd);
-    segStart.setDate(segStart.getDate() + 1);
+    const next = new Date(sY, sM, segEnd.getDate() + 1);
+    sY = next.getFullYear(); sM = next.getMonth(); sD = next.getDate();
   }
 
-  const totalDays = periods.reduce((sum, p) => sum + p.days, 0);
-  return { periods, totalDays };
+  return { periods, totalDays: periods.reduce((s,p) => s+p.days, 0) };
 }
 
 function fmtDate(dateStr) {
