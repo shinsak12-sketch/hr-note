@@ -67,7 +67,7 @@ export default function AppHome() {
               <div style={{ fontSize: 32, marginBottom: 10 }}>{accessible ? app.icon : '🔒'}</div>
               <div style={{ fontWeight: 700, fontSize: 15, color: accessible ? app.color : 'var(--text2)', marginBottom: 3 }}>{app.title}</div>
               <div style={{ fontSize: 11, color: accessible ? app.color + '99' : 'var(--text2)', lineHeight: 1.4 }}>
-                {accessible ? app.desc : '접근 권한 없음'}
+                
               </div>
             </button>
           );
@@ -93,7 +93,6 @@ export default function AppHome() {
                 <span style={{ fontSize: 20 }}>{accessible ? app.icon : '🔒'}</span>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 13, color: accessible ? app.color : 'var(--text2)' }}>{app.title}</div>
-                  <div style={{ fontSize: 10, color: accessible ? app.color + '99' : 'var(--text2)' }}>{app.desc}</div>
                 </div>
               </button>
             );
