@@ -526,6 +526,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onRevert, onCalc, onDelete }) {
           <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: cc+'20', color: cc }}>{r.type}</span>
           {r.split_count > 1 && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A' }}>{r.split_count}회차</span>}
           {r.is_extension && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F5E8F8', color: '#7B2D8B' }}>연장</span>}
+          {r.child_order && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#EAF3DE', color: '#3B6D11' }}>{r.child_order}</span>}
           <span style={{ marginLeft: 4, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: st.bg, color: st.color }}>{r.status}</span>
         </div>
         <div ref={menuRef} style={{ position: 'relative' }}>
@@ -562,7 +563,6 @@ function AttCard({ r, onEdit, onClose, onExtend, onRevert, onCalc, onDelete }) {
         ))}
         <div>📅 {r.start_date?.split('T')[0]} ~ {r.end_date?.split('T')[0] || '미정'} ({r.used_days ? r.used_days+'일' : '-'})</div>
         {r.return_date && <div>🔙 복직예정: {r.return_date?.split('T')[0]}</div>}
-        {r.child_order && <div>👶 {r.child_order} · {r.split_count}회차</div>}
         {r.disease_name && <div>🏥 {r.disease_name} {r.remaining_days ? `(잔여 ${r.remaining_days}일)` : ''}</div>}
         {r.leave_reason && <div>📝 {r.leave_reason}</div>}
         {r.reduce_hours && <div>⏰ 단축 {r.reduce_hours}시간 ({r.work_start_time}~{r.work_end_time})</div>}
