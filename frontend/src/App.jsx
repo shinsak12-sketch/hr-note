@@ -46,6 +46,7 @@ import PregnancyCalc from './pages/PregnancyCalc.jsx';
 import LunarCalc from './pages/LunarCalc.jsx';
 import LeaveCalc from './pages/LeaveCalc.jsx';
 import MaternityCalc from './pages/MaternityCalc.jsx';
+import RetirementCalc from './pages/RetirementCalc.jsx';
 import { PermissionGuard } from './components/PermissionGuard.jsx';
 
 function PrivateRoute({ children }) {
@@ -120,6 +121,7 @@ export default function App() {
       <Route path="/hr-calc/lunar" element={<PrivateRoute><LunarCalc /></PrivateRoute>} />
       <Route path="/hr-calc/leave" element={<PrivateRoute><LeaveCalc /></PrivateRoute>} />
       <Route path="/hr-calc/maternity" element={<PrivateRoute><MaternityCalc /></PrivateRoute>} />
+      <Route path="/hr-calc/retirement" element={<PrivateRoute><RetirementCalc /></PrivateRoute>} />
 
       {/* 총무지원 */}
       <Route path="/general-app" element={<PrivateRoute><PermissionGuard menuKey="general"><GeneralHome /></PermissionGuard></PrivateRoute>} />
