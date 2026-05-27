@@ -205,6 +205,9 @@ function InputModal({ record, offices, onClose, onDone }) {
               <div style={{ borderTop: '0.5px solid #1A4A8A30', marginTop: 4, paddingTop: 4, fontWeight: 700, color: '#1A4A8A' }}>
                 → {form.split_count}회차로 자동 설정
               </div>
+              <div style={{ marginTop: 6, padding: '6px 10px', background: '#FAEEDA', borderRadius: 6, fontSize: 11, fontWeight: 700, color: '#854F0B' }}>
+                ⚠️ 잔여기간 확인 필요 — HR계산기에서 잔여기간을 확인하세요.
+              </div>
             </div>
           )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
