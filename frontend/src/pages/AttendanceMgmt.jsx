@@ -491,8 +491,31 @@ function AttCard({ r, onEdit, onClose, onExtend, onRevert, onCalc, onDelete }) {
   const catColor = { '휴직':'#A32D2D','휴가':'#1A4A8A','단축근무':'#3B6D11','근무OFF':'#5C3D8F' };
   const cc = catColor[r.category] || '#854F0B';
 
+  // 이상감지
+  const today = new Date(); today.setHours(0,0,0,0);
+  const endDate = r.end_date ? new Date(r.end_date) : null;
+  const startDate = r.start_date ? new Date(r.start_date) : null;
+  const endDiff = endDate ? Math.ceil((endDate - today) / (1000*60*60*24)) : null;
+  const startDiff = startDate ? Math.ceil((startDate - today) / (1000*60*60*24)) : null;
+
+  let alertBadge = null;
+  if (r.status === '진행중') {
+    if (endDate && endDiff < 0) {
+      alertBadge = { text: `🔴 종료일 ${Math.abs(endDiff)}일 경과`, bg: '#FCEBEB', color: '#A32D2D' };
+    } else if (endDate && endDiff >= 0 && endDiff <= 15) {
+      alertBadge = { text: `🟠 종료 D-${endDiff}`, bg: '#FAEEDA', color: '#854F0B' };
+    } else if (startDate && startDiff > 0 && startDiff <= 7) {
+      alertBadge = { text: `🟡 시작 D-${startDiff}`, bg: '#FFFBE6', color: '#5A4A00' };
+    }
+  }
+
   return (
-    <div style={{ background: 'var(--bg)', border: `0.5px solid ${cc}20`, borderLeft: `4px solid ${cc}`, borderRadius: 12, padding: '12px 14px' }}>
+    <div style={{ background: 'var(--bg)', border: `0.5px solid ${alertBadge?.color || cc}20`, borderLeft: `4px solid ${alertBadge?.color || cc}`, borderRadius: 12, padding: '12px 14px' }}>
+      {alertBadge && (
+        <div style={{ marginBottom: 8, display: 'inline-block', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: alertBadge.bg, color: alertBadge.color }}>
+          {alertBadge.text}
+        </div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
         <div style={{ flex: 1 }}>
           <span style={{ fontWeight: 700, fontSize: 15 }}>{r.emp_name}</span>
