@@ -45,7 +45,7 @@ function InputModal({ record, offices, onClose, onDone }) {
       const res = await api.getAttendanceSplitCount(emp_no, type, start_date);
       setF('split_count', res.split_count);
 
-      // 기존 회차 기간 조회
+      // 기존 이력 조회
       const all = await api.getAttendance();
       const familyTypes = ['가족돌봄휴직','가족돌봄휴가'];
       const related = all.filter(x => {
@@ -56,6 +56,22 @@ function InputModal({ record, offices, onClose, onDone }) {
         return true;
       }).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
       setPrevPeriods(related);
+
+      // 이름/소속 자동입력 (기존 이력 있으면)
+      if (related.length > 0) {
+        const ref = related[related.length - 1]; // 가장 최근 이력
+        if (!form.emp_name) setF('emp_name', ref.emp_name || '');
+        if (!form.office_id && ref.office_id) setF('office_id', String(ref.office_id));
+        if (!form.org_name && ref.org_name) setF('org_name', ref.org_name || '');
+      } else {
+        // 같은 사번 다른 종류에서라도 이름 찾기
+        const anyRecord = all.filter(x => x.emp_no === emp_no).sort((a,b) => new Date(b.start_date) - new Date(a.start_date))[0];
+        if (anyRecord) {
+          if (!form.emp_name) setF('emp_name', anyRecord.emp_name || '');
+          if (!form.office_id && anyRecord.office_id) setF('office_id', String(anyRecord.office_id));
+          if (!form.org_name && anyRecord.org_name) setF('org_name', anyRecord.org_name || '');
+        }
+      }
     } catch {}
   }
 
