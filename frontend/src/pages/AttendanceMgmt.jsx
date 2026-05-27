@@ -483,7 +483,7 @@ export default function AttendanceMgmt() {
       </div>
 
       {/* 카테고리 필터 */}
-      <div style={{ display: 'flex', gap: 6, padding: '8px 16px 0', overflowX: 'auto', paddingBottom: 4 }}>
+      <div style={{ display: 'flex', gap: 6, padding: '8px 16px 0', overflowX: "auto", paddingBottom: 4, scrollbarWidth: "none", msOverflowStyle: "none" }}>
         {['전체', ...CATEGORIES].map(c => (
           <button key={c} onClick={() => setCatFilter(c)} style={{
             padding: '4px 12px', borderRadius: 20, border: 'none', whiteSpace: 'nowrap',
@@ -495,7 +495,7 @@ export default function AttendanceMgmt() {
       </div>
 
       {/* 상태 필터 */}
-      <div style={{ display: 'flex', gap: 6, padding: '6px 16px 8px', borderBottom: '0.5px solid var(--border)', overflowX: 'auto', paddingBottom: 8 }}>
+      <div style={{ display: 'flex', gap: 6, padding: '6px 16px 8px', borderBottom: '0.5px solid var(--border)', overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none", msOverflowStyle: "none" }}>
         {['진행중', '정상종료', '조기종료', '전체'].map(s => {
           const st = STATUS_STYLE[s];
           return (
