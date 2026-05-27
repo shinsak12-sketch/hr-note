@@ -119,38 +119,48 @@ export default function RetirementCalc() {
   const [endDate, setEndDate] = useState('');
   const [salary, setSalary] = useState({ basic: '', performance: '', qualification: '', bonus: '', annual: '' });
 
+  // 계산 결과 state (버튼 누를 때만 업데이트)
+  const [calcTenureResult, setCalcTenureResult] = useState(null);
+  const [calcPeriodData, setCalcPeriodData] = useState(null);
+  const [calcResult, setCalcResult] = useState(null); // { avgWage, retirementPay, tax, netPay, isEligible }
+
   function setS(k, v) { setSalary(s => ({ ...s, [k]: v })); }
 
-  const tenure = startDate && endDate ? calcTenure(startDate, endDate) : null;
-  const tenureYears = tenure ? tenure.totalDays / 365 : 0;
-  const periodData = endDate ? calc3MonthPeriods(endDate) : null;
+  // 기간 계산 버튼
+  function handleCalcTenure() {
+    if (!startDate || !endDate) return;
+    setCalcTenureResult(calcTenure(startDate, endDate));
+    setCalcPeriodData(calc3MonthPeriods(endDate));
+    setCalcResult(null); // 임금 결과 초기화
+  }
 
-  // 월 급여 (1원 절상)
-  const monthlyWage = (s) => s ? ceil1(Number(s.replace(/,/g,'')) / 12) : 0;
-  const basicM = monthlyWage(salary.basic);
-  const performanceM = monthlyWage(salary.performance);
-  const qualificationM = monthlyWage(salary.qualification);
-  const bonusM = monthlyWage(salary.bonus);
-  const monthlyTotal = basicM + performanceM + qualificationM + bonusM;
+  // 임금 계산 버튼
+  function handleCalcWage() {
+    if (!calcTenureResult || !calcPeriodData) return;
+    const monthlyWage = (s) => s ? ceil1(Number(s.replace(/,/g,'')) / 12) : 0;
+    const basicM = monthlyWage(salary.basic);
+    const performanceM = monthlyWage(salary.performance);
+    const qualificationM = monthlyWage(salary.qualification);
+    const bonusM = monthlyWage(salary.bonus);
+    const monthlyTotal = basicM + performanceM + qualificationM + bonusM;
+    const annualLeave = salary.annual ? Number(salary.annual.replace(/,/g,'')) : 0;
+    const annualLeave3M = Math.floor(annualLeave / 12 * 3);
 
-  // 연차수당 3개월 산입
-  const annualLeave = salary.annual ? Number(salary.annual.replace(/,/g,'')) : 0;
-  const annualLeave3M = Math.floor(annualLeave / 12 * 3);
+    const periodWages = calcPeriodData.periods.map(p => ({
+      ...p,
+      wage: p.isFull ? monthlyTotal : Math.floor(monthlyTotal * p.days / p.monthDays),
+    }));
+    const wage3M = periodWages.reduce((sum, p) => sum + p.wage, 0) + annualLeave3M;
+    const totalDays3M = calcPeriodData.totalDays;
+    const avgWage = totalDays3M > 0 ? wage3M / totalDays3M : 0;
+    const tenureYears = calcTenureResult.totalDays / 365;
+    const isEligible = calcTenureResult.totalDays >= 365;
+    const retirementPay = isEligible ? Math.floor(avgWage * 30 * calcTenureResult.totalDays / 365) : 0;
+    const tax = retirementPay > 0 ? calcRetirementTax(retirementPay, tenureYears) : null;
+    const netPay = tax ? retirementPay - tax.totalTax : retirementPay;
 
-  // 구간별 임금 계산
-  const periodWages = periodData?.periods.map(p => {
-    const wage = p.isFull ? monthlyTotal : Math.floor(monthlyTotal * p.days / p.monthDays);
-    return { ...p, wage };
-  }) || [];
-
-  const wage3M = periodWages.reduce((sum, p) => sum + p.wage, 0) + annualLeave3M;
-  const totalDays3M = periodData?.totalDays || 89;
-
-  const avgWage = totalDays3M > 0 ? wage3M / totalDays3M : 0;
-  const isEligible = tenure && tenure.totalDays >= 365;
-  const retirementPay = isEligible ? Math.floor(avgWage * 30 * tenure.totalDays / 365) : 0;
-  const tax = retirementPay > 0 ? calcRetirementTax(retirementPay, tenureYears) : null;
-  const netPay = tax ? retirementPay - tax.totalTax : retirementPay;
+    setCalcResult({ avgWage, retirementPay, tax, netPay, isEligible, periodWages, wage3M, totalDays3M, annualLeave3M, monthlyTotal, basicM, performanceM, qualificationM, bonusM });
+  }
 
   const SALARY_ITEMS = [
     { key: 'basic', label: '기본급' },
@@ -199,16 +209,22 @@ export default function RetirementCalc() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div className="form-group">
               <label className="form-label">입사일</label>
-              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+              <input type="date" value={startDate} onChange={e => { setStartDate(e.target.value); setCalcTenureResult(null); setCalcResult(null); }} />
             </div>
             <div className="form-group">
               <label className="form-label">퇴사일</label>
-              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+              <input type="date" value={endDate} onChange={e => { setEndDate(e.target.value); setCalcTenureResult(null); setCalcResult(null); }} />
             </div>
           </div>
-          {tenure && (
-            <div style={{ fontSize: 12, color: '#854F0B', background: '#FAEEDA', borderRadius: 8, padding: '8px 12px', marginTop: 4 }}>
-              📅 {tenure.years}년 {tenure.months}개월 {tenure.days}일 ({tenure.totalDays.toLocaleString()}일)
+          <button onClick={handleCalcTenure} disabled={!startDate || !endDate} style={{
+            width: '100%', height: 38, borderRadius: 8, marginTop: 8,
+            background: startDate && endDate ? '#854F0B' : 'var(--bg2)',
+            color: startDate && endDate ? '#FFF9E6' : 'var(--text2)',
+            border: 'none', fontSize: 13, fontWeight: 600, cursor: startDate && endDate ? 'pointer' : 'default',
+          }}>📅 기간 계산</button>
+          {calcTenureResult && (
+            <div style={{ fontSize: 12, color: '#854F0B', background: '#FAEEDA', borderRadius: 8, padding: '8px 12px', marginTop: 6 }}>
+              📅 {calcTenureResult.years}년 {calcTenureResult.months}개월 {calcTenureResult.days}일 ({calcTenureResult.totalDays.toLocaleString()}일)
             </div>
           )}
         </section>
@@ -243,71 +259,70 @@ export default function RetirementCalc() {
               </div>
             </div>
           </div>
+          <button onClick={handleCalcWage} disabled={!calcTenureResult} style={{
+            width: '100%', height: 38, borderRadius: 8, marginTop: 10,
+            background: calcTenureResult ? '#1A4A8A' : 'var(--bg2)',
+            color: calcTenureResult ? '#E8F0FB' : 'var(--text2)',
+            border: 'none', fontSize: 13, fontWeight: 600, cursor: calcTenureResult ? 'pointer' : 'default',
+          }}>💰 임금 계산</button>
+          {!calcTenureResult && (
+            <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 6, textAlign: 'center' }}>먼저 기간 계산을 해주세요</div>
+          )}
         </section>
 
-        {/* 평균임금 계산 결과 */}
-        {tenure && monthlyTotal > 0 && periodData && (
+        {/* 임금 총액 계산 */}
+        {calcResult && calcTenureResult && calcPeriodData && (
           <section>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>임금 총액 계산</div>
             <div style={{ background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
-              {/* 구간별 임금 */}
-              {periodWages.map((p, i) => (
+              {calcResult.periodWages.map((p, i) => (
                 <div key={i} style={{ padding: '10px 14px', borderBottom: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <div style={{ fontSize: 12, color: 'var(--text2)' }}>
-                      {fmtDate(p.start)} ~ {fmtDate(p.end)}
-                    </div>
-                    <div style={{ fontSize: 11, color: 'var(--text2)' }}>
-                      {p.days}일{p.isFull ? ' (전체)' : ` (일할: ${p.days}/${p.monthDays}일)`}
-                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--text2)' }}>{fmtDate(p.start)} ~ {fmtDate(p.end)}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text2)' }}>{p.days}일{p.isFull ? ' (전체)' : ` (일할: ${p.days}/${p.monthDays}일)`}</div>
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 600 }}>{fmt(p.wage)}</div>
                 </div>
               ))}
-              {/* 연차수당 */}
-              {annualLeave3M > 0 && (
-                <div style={{ padding: '10px 14px', borderBottom: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: 12, color: 'var(--text2)' }}>연차수당 산입액</div>
-                    <div style={{ fontSize: 11, color: 'var(--text2)' }}>연간 ÷ 12 × 3</div>
-                  </div>
-                  <div style={{ fontSize: 13, fontWeight: 600 }}>{fmt(annualLeave3M)}</div>
+              {calcResult.annualLeave3M > 0 && (
+                <div style={{ padding: '10px 14px', borderBottom: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between' }}>
+                  <div><div style={{ fontSize: 12, color: 'var(--text2)' }}>연차수당 산입액</div><div style={{ fontSize: 11, color: 'var(--text2)' }}>연간 ÷ 12 × 3</div></div>
+                  <div style={{ fontSize: 13, fontWeight: 600 }}>{fmt(calcResult.annualLeave3M)}</div>
                 </div>
               )}
-              {/* 합계 */}
               <div style={{ padding: '10px 14px', borderBottom: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between', background: 'var(--bg2)' }}>
                 <div style={{ fontSize: 12, fontWeight: 700 }}>임금 총액</div>
-                <div style={{ fontSize: 13, fontWeight: 700 }}>{fmt(wage3M)}</div>
+                <div style={{ fontSize: 13, fontWeight: 700 }}>{fmt(calcResult.wage3M)}</div>
               </div>
               <div style={{ padding: '10px 14px', borderBottom: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between' }}>
                 <div style={{ fontSize: 12, color: 'var(--text2)' }}>총 일수</div>
-                <div style={{ fontSize: 13 }}>{totalDays3M}일</div>
+                <div style={{ fontSize: 13 }}>{calcResult.totalDays3M}일</div>
               </div>
               <div style={{ padding: '12px 14px', background: '#FAEEDA', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#854F0B' }}>일 평균임금</div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: '#854F0B' }}>{fmt(avgWage)}</div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: '#854F0B' }}>{fmt(calcResult.avgWage)}</div>
               </div>
             </div>
           </section>
         )}
 
         {/* 퇴직금 */}
-        {tenure && monthlyTotal > 0 && periodData && (
+        {calcResult && calcTenureResult && (
           <section>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>퇴직금</div>
-            {!isEligible ? (
+            {!calcResult.isEligible ? (
               <div style={{ background: '#FCEBEB', borderRadius: 12, padding: 16, textAlign: 'center' }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: '#A32D2D', marginBottom: 6 }}>⚠️ 퇴직금 지급 대상 아님</div>
-                <div style={{ fontSize: 12, color: '#A32D2D' }}>계속 근로기간 1년 미만 ({tenure.totalDays}일)</div>
+                <div style={{ fontSize: 12, color: '#A32D2D' }}>계속 근로기간 1년 미만 ({calcTenureResult.totalDays}일)</div>
                 <div style={{ fontSize: 22, fontWeight: 700, color: '#A32D2D', marginTop: 8 }}>0원</div>
               </div>
             ) : (
               <div style={{ background: '#FAEEDA', borderRadius: 12, padding: 16 }}>
                 <div style={{ fontSize: 11, color: '#854F0B', marginBottom: 8, lineHeight: 1.7 }}>
-                  평균임금 {fmt(avgWage)} × 30일 × {tenure.totalDays}일 ÷ 365
+                  평균임금 {fmt(calcResult.avgWage)} × 30일 × {calcTenureResult.totalDays}일 ÷ 365
                 </div>
                 <div style={{ fontSize: 26, fontWeight: 700, color: '#854F0B', textAlign: 'center' }}>
-                  {fmt(retirementPay)}
+                  {fmt(calcResult.retirementPay)}
                 </div>
               </div>
             )}
@@ -315,19 +330,19 @@ export default function RetirementCalc() {
         )}
 
         {/* 퇴직소득세 */}
-        {tax && receiveType === '일시금' && (
+        {calcResult?.tax && receiveType === '일시금' && (
           <section>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>퇴직소득세</div>
             <div style={{ background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
               {[
-                { label: '퇴직급여', val: retirementPay },
-                { label: '근속연수공제', val: -tax.tenureDeduct, sub: `${Math.ceil(tenureYears)}년` },
-                { label: '환산급여', val: tax.converted, sub: '× 12 ÷ 근속연수' },
-                { label: '환산급여공제', val: -tax.convertedDeduct },
-                { label: '과세표준', val: tax.taxBase, bold: true },
-                { label: '소득세', val: -tax.incomeTax },
-                { label: '지방소득세', val: -tax.localTax, sub: '소득세 × 10%' },
-                { label: '세금 합계', val: -tax.totalTax, bold: true, color: '#A32D2D' },
+                { label: '퇴직급여', val: calcResult.retirementPay },
+                { label: '근속연수공제', val: -calcResult.tax.tenureDeduct, sub: `${Math.ceil(calcTenureResult.totalDays/365)}년` },
+                { label: '환산급여', val: calcResult.tax.converted, sub: '× 12 ÷ 근속연수' },
+                { label: '환산급여공제', val: -calcResult.tax.convertedDeduct },
+                { label: '과세표준', val: calcResult.tax.taxBase, bold: true },
+                { label: '소득세', val: -calcResult.tax.incomeTax },
+                { label: '지방소득세', val: -calcResult.tax.localTax, sub: '소득세 × 10%' },
+                { label: '세금 합계', val: -calcResult.tax.totalTax, bold: true, color: '#A32D2D' },
               ].map((row, i) => (
                 <div key={i} style={{ padding: '10px 14px', borderBottom: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ fontSize: 12, color: 'var(--text2)' }}>{row.label}{row.sub && <span style={{ fontSize: 10, marginLeft: 4 }}>({row.sub})</span>}</div>
@@ -341,24 +356,22 @@ export default function RetirementCalc() {
         )}
 
         {/* 실수령액 */}
-        {retirementPay > 0 && (
+        {calcResult && calcResult.retirementPay > 0 && (
           <section>
             <div style={{ background: receiveType === '일시금' ? '#EAF3DE' : '#E8F0FB', borderRadius: 14, padding: 20, textAlign: 'center' }}>
               <div style={{ fontSize: 12, color: receiveType === '일시금' ? '#3B6D11' : '#1A4A8A', marginBottom: 8, fontWeight: 600 }}>
                 {receiveType === '일시금' ? '💰 실수령 퇴직금' : '💰 IRP·DC 이전금액 (세전)'}
               </div>
               <div style={{ fontSize: 30, fontWeight: 700, color: receiveType === '일시금' ? '#3B6D11' : '#1A4A8A' }}>
-                {fmt(receiveType === '일시금' ? netPay : retirementPay)}
+                {fmt(receiveType === '일시금' ? calcResult.netPay : calcResult.retirementPay)}
               </div>
-              {receiveType === '일시금' && tax && (
+              {receiveType === '일시금' && calcResult.tax && (
                 <div style={{ fontSize: 11, color: '#3B6D11', marginTop: 6 }}>
-                  퇴직금 {fmt(retirementPay)} — 세금 {fmt(tax.totalTax)}
+                  퇴직금 {fmt(calcResult.retirementPay)} — 세금 {fmt(calcResult.tax.totalTax)}
                 </div>
               )}
               {receiveType === 'IRP·DC 이전' && (
-                <div style={{ fontSize: 11, color: '#1A4A8A', marginTop: 6 }}>
-                  ※ 실제 수령 시점에 퇴직소득세 부과
-                </div>
+                <div style={{ fontSize: 11, color: '#1A4A8A', marginTop: 6 }}>※ 실제 수령 시점에 퇴직소득세 부과</div>
               )}
             </div>
           </section>
