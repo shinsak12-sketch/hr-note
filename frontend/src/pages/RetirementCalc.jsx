@@ -26,28 +26,22 @@ function calc3MonthPeriods(endStr) {
   if (!endStr) return null;
   const end = new Date(endStr);
 
-  // 전체 구간: 퇴사일 3개월 전 ~ 퇴사일 전날
-  const periodEnd = new Date(end);
-  periodEnd.setDate(periodEnd.getDate() - 1);
-
+  // 시작일: 퇴사일에서 3개월 전, 일은 퇴사일 그대로
   const periodStart = new Date(end);
   periodStart.setMonth(periodStart.getMonth() - 3);
 
-  // 월별 구간 분리
+  // 퇴사일 전날까지
+  const periodEnd = new Date(end);
+  periodEnd.setDate(periodEnd.getDate() - 1);
+
   const periods = [];
-  let curYear = periodStart.getFullYear();
-  let curMonth = periodStart.getMonth(); // 0-based
+  let segStart = new Date(periodStart);
 
-  while (true) {
-    const monthFirstDay = new Date(curYear, curMonth, 1);
-    const monthLastDay = new Date(curYear, curMonth + 1, 0);
-
-    // 구간 시작: periodStart가 이 달 중간이면 그날부터, 아니면 1일부터
-    const segStart = periodStart > monthFirstDay ? new Date(periodStart) : new Date(monthFirstDay);
-    // 구간 끝: periodEnd가 이 달 중간이면 그날까지, 아니면 말일까지
-    const segEnd = periodEnd < monthLastDay ? new Date(periodEnd) : new Date(monthLastDay);
-
-    if (segStart > periodEnd) break;
+  while (segStart <= periodEnd) {
+    // 종료일 = 해당월 말일
+    const monthLastDay = new Date(segStart.getFullYear(), segStart.getMonth() + 1, 0);
+    // 단, 퇴직일 전날을 넘으면 퇴직일 전날로
+    const segEnd = monthLastDay > periodEnd ? new Date(periodEnd) : new Date(monthLastDay);
 
     const segDays = Math.ceil((segEnd - segStart) / (1000*60*60*24)) + 1;
     const monthDays = monthLastDay.getDate();
@@ -59,19 +53,15 @@ function calc3MonthPeriods(endStr) {
       days: segDays,
       monthDays,
       isFull,
-      year: curYear,
-      month: curMonth + 1,
     });
 
-    // 다음 달로
-    curMonth++;
-    if (curMonth > 11) { curMonth = 0; curYear++; }
-
-    if (new Date(curYear, curMonth, 1) > periodEnd) break;
+    // 다음 구간 시작 = 이번 종료일 + 1일
+    segStart = new Date(segEnd);
+    segStart.setDate(segStart.getDate() + 1);
   }
 
   const totalDays = periods.reduce((sum, p) => sum + p.days, 0);
-  return { periods, totalDays, periodStart, periodEnd };
+  return { periods, totalDays };
 }
 
 function fmtDate(dateStr) {
