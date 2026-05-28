@@ -645,8 +645,16 @@ export default function AttendanceMgmt() {
   const [inputModal, setInputModal] = useState(null);
   const [closeModal, setCloseModal] = useState(null);
   const [extendModal, setExtendModal] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const headerMenuRef = useRef(null);
 
-  useEffect(() => { load(); api.getOffices().then(setOffices); }, []);
+  useEffect(() => {
+    load();
+    api.getOffices().then(setOffices);
+    function h(e) { if (headerMenuRef.current && !headerMenuRef.current.contains(e.target)) setMenuOpen(false); }
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, []);
 
   async function load() {
     const data = await api.getAttendance();
@@ -770,22 +778,26 @@ export default function AttendanceMgmt() {
           뒤로
         </button>
         <div className="header-title">근태 관리</div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          <button onClick={handleDownloadTemplate} style={{
-            fontSize: 11, padding: '5px 8px', borderRadius: 8,
-            background: 'var(--bg2)', color: 'var(--text2)', border: 'none', cursor: 'pointer',
-          }}>📥 서식</button>
-          <label style={{
-            fontSize: 11, padding: '5px 8px', borderRadius: 8,
-            background: 'var(--bg2)', color: 'var(--text2)', border: 'none', cursor: 'pointer',
-          }}>
-            📤 업로드
-            <input type="file" accept=".xlsx" style={{ display: 'none' }} onChange={handleUpload} />
-          </label>
+        <div ref={headerMenuRef} style={{ position: 'relative', display: 'flex', gap: 6 }}>
           <button onClick={() => setInputModal({})} style={{
             fontSize: 12, padding: '5px 10px', borderRadius: 8,
             background: '#FAEEDA', color: '#854F0B', border: 'none', cursor: 'pointer', fontWeight: 600,
           }}>+ 등록</button>
+          <button onClick={() => setMenuOpen(o => !o)} style={{
+            width: 34, height: 34, borderRadius: 8, background: 'var(--bg2)',
+            border: 'none', cursor: 'pointer', fontSize: 18, color: 'var(--text2)',
+          }}>⋮</button>
+          {menuOpen && (
+            <div style={{ position: 'absolute', right: 0, top: '110%', zIndex: 100, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', overflow: 'hidden', minWidth: 150 }}>
+              <button onClick={() => { handleDownloadTemplate(); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#1A4A8A', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>
+                📥 서식 다운로드
+              </button>
+              <label style={{ display: 'block', width: '100%', padding: '12px 16px', fontSize: 13, cursor: 'pointer', color: '#3B6D11', fontFamily: 'inherit' }}>
+                📤 엑셀 업로드
+                <input type="file" accept=".xlsx" style={{ display: 'none' }} onChange={(e) => { handleUpload(e); setMenuOpen(false); }} />
+              </label>
+            </div>
+          )}
         </div>
       </div>
 
