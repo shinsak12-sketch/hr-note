@@ -139,6 +139,44 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
 
           if (!d.start_date) continue;
 
+          // 회차 자동계산 (엑셀에 없으면 자동)
+          if (!d.split_count && d.emp_no && d.type) {
+            const familyTypes = ['가족돌봄휴직','가족돌봄휴가'];
+            const childTypes = ['육아휴직','출산전휴가','출산후휴가','출산전후휴가'];
+            let countRows;
+            if (familyTypes.includes(d.type)) {
+              const year = new Date(d.start_date).getFullYear();
+              countRows = await sql`
+                SELECT COUNT(*) as cnt FROM attendance
+                WHERE emp_no=${d.emp_no} AND type=${d.type}
+                AND EXTRACT(YEAR FROM start_date) = ${year}
+              `;
+            } else if (childTypes.includes(d.type) && d.child_order) {
+              countRows = await sql`
+                SELECT COUNT(*) as cnt FROM attendance
+                WHERE emp_no=${d.emp_no} AND type=${d.type}
+                AND child_order=${d.child_order}
+              `;
+            } else if (d.type === '육아휴직') {
+              countRows = await sql`
+                SELECT COUNT(*) as cnt FROM attendance
+                WHERE emp_no=${d.emp_no} AND type=${d.type}
+                AND (child_order IS NULL OR child_order != '임신중')
+                ${d.child_order ? sql`AND child_order=${d.child_order}` : sql``}
+              `;
+            } else {
+              countRows = await sql`
+                SELECT COUNT(*) as cnt FROM attendance
+                WHERE emp_no=${d.emp_no} AND type=${d.type}
+              `;
+            }
+            d.split_count = Number(countRows[0].cnt) + 1;
+          }
+
+          // 한국 시간 기준 상태
+          const koreaToday = new Date(Date.now() + 9*60*60*1000).toISOString().split('T')[0];
+          const status = d.start_date > koreaToday ? '예정' : '진행중';
+
           await sql`
             INSERT INTO attendance (
               category, type, office_id, org_name, emp_no, emp_name,
@@ -146,7 +184,7 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
               child_order, split_count, disease_name, family_target, leave_reason,
               birth_type, reduce_hours, work_start_time, work_end_time,
               normal_return_date, contract_date,
-              retirement_date, off_start_date, leave_deleted, doc_completed
+              retirement_date, off_start_date, leave_deleted, doc_completed, status
             ) VALUES (
               ${d.category}, ${d.type}, ${d.office_id}, ${d.org_name},
               ${d.emp_no}, ${d.emp_name}, ${d.start_date}, ${d.end_date},
@@ -156,7 +194,7 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
               ${d.reduce_hours}, ${d.work_start_time}, ${d.work_end_time},
               ${d.normal_return_date}, ${d.contract_date},
               ${d.retirement_date}, ${d.off_start_date},
-              ${d.leave_deleted}, ${d.doc_completed}
+              ${d.leave_deleted}, ${d.doc_completed}, ${status}
             )
           `;
           inserted++;
