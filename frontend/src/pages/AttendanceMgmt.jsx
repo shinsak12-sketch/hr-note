@@ -670,7 +670,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
               {['출산전휴가','출산후휴가','출산전후휴가'].includes(r.type) && (
                 <button onClick={() => { onCalc(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#5C3D8F', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>🧮 출산휴가 계산기</button>
               )}
-              {r.status !== '진행중' && (
+              {(r.status !== '진행중' && r.status !== '예정') && (
                 <button onClick={() => { onRevert(r.id); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#854F0B', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>↩️ 종료취소</button>
               )}
               <button onClick={() => { onDelete(r.id); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#A32D2D', fontFamily: 'inherit' }}>🗑️ 삭제</button>
@@ -728,6 +728,7 @@ export default function AttendanceMgmt() {
   const nav = useNavigate();
   const [list, setList] = useState([]);
   const [offices, setOffices] = useState([]);
+  const [orgMap, setOrgMap] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState('');
   const [catFilter, setCatFilter] = useState('전체');
@@ -747,6 +748,7 @@ export default function AttendanceMgmt() {
   useEffect(() => {
     load();
     api.getOffices().then(setOffices);
+    api.getOrgMap().then(setOrgMap);
     function h(e) { if (headerMenuRef.current && !headerMenuRef.current.contains(e.target)) setMenuOpen(false); }
     document.addEventListener('mousedown', h);
     return () => document.removeEventListener('mousedown', h);
@@ -801,7 +803,7 @@ export default function AttendanceMgmt() {
   }
 
   async function handleRevert(id) {
-    await api.closeAttendance(id, { status: '진행중', end_comment: null });
+    await api.revertAttendance(id);
     setToast('진행중으로 되돌렸습니다.'); load();
   }
 
@@ -856,16 +858,23 @@ export default function AttendanceMgmt() {
   const hqList = [...new Set(offices.map(o => o.headquarters).filter(Boolean))].sort();
   const deptList = [...new Set(offices.filter(o => !hqFilter || o.headquarters === hqFilter).map(o => o.department).filter(Boolean))].sort();
   const orgList = [...new Set(offices.filter(o => (!hqFilter || o.headquarters === hqFilter) && (!deptFilter || o.department === deptFilter)).map(o => o.org_name).filter(Boolean))].sort();
+  // orgMap으로 실제 org_name 변환
+  const resolveOrgName = (orgName) => {
+    const mapped = orgMap.find(m => m.input_name === orgName);
+    return mapped ? mapped.mapped_org_name : orgName;
+  };
+
   const hqOrgNames = hqFilter ? new Set(offices.filter(o => o.headquarters === hqFilter).map(o => o.org_name)) : null;
   const deptOrgNames = deptFilter ? new Set(offices.filter(o => o.department === deptFilter).map(o => o.org_name)) : null;
 
   const filtered = list.filter(r => {
+    const resolvedOrg = resolveOrgName(r.org_name);
     const matchCat = catFilter === '전체' || r.category === catFilter;
     const matchSt = statusFilter === '전체' || r.status === statusFilter;
     const matchSearch = !search || r.emp_name?.includes(search) || r.emp_no?.includes(search) || r.org_name?.includes(search) || r.type?.includes(search);
-    const matchHq = !hqOrgNames || hqOrgNames.has(r.org_name);
-    const matchDept = !deptOrgNames || deptOrgNames.has(r.org_name);
-    const matchOrg = !orgFilter || r.org_name === orgFilter;
+    const matchHq = !hqOrgNames || hqOrgNames.has(resolvedOrg);
+    const matchDept = !deptOrgNames || deptOrgNames.has(resolvedOrg);
+    const matchOrg = !orgFilter || resolvedOrg === orgFilter;
     const matchYear = !yearFilter || r.start_date?.split('T')[0]?.startsWith(yearFilter);
     return matchCat && matchSt && matchSearch && matchHq && matchDept && matchOrg && matchYear;
   }).sort((a, b) => {

@@ -107,6 +107,9 @@ export const api = {
   deleteMemo: (id) => request('/memos/' + id, { method: 'DELETE' }),
 
   // 사무실
+  getOrgMap: () => request('/orgmap'),
+  addOrgMap: (body) => request('/orgmap', { method: 'POST', body: JSON.stringify(body) }),
+  deleteOrgMap: (id) => request('/orgmap/' + id, { method: 'DELETE' }),
   getOffices: (params = {}) => {
     const q = new URLSearchParams(params).toString();
     return request('/offices' + (q ? '?' + q : ''));
@@ -222,6 +225,7 @@ export const api = {
   closeAttendance: (id, body) => request('/attendance/' + id + '/close', { method: 'PATCH', body: JSON.stringify(body) }),
   downloadAttendanceTemplate: () => fetch(BASE + '/attendance/template/excel', { headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') } }).then(r => r.blob()),
   uploadAttendanceExcel: (file) => { const fd = new FormData(); fd.append('file', file); return fetch(BASE + '/attendance/upload/excel', { method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') }, body: fd }).then(r => r.json()); },
+  revertAttendance: (id) => request('/attendance/' + id + '/revert', { method: 'PATCH' }),
   extendAttendance: (id, body) => request('/attendance/' + id + '/extend', { method: 'POST', body: JSON.stringify(body) }),
   deleteAttendance: (id) => request('/attendance/' + id, { method: 'DELETE' }),
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api.js';
 
@@ -75,6 +75,68 @@ function UploadSection({ description, onDownload, onUpload, downloadLabel }) {
   );
 }
 
+function OrgMapSection() {
+  const [list, setList] = useState([]);
+  const [inputName, setInputName] = useState('');
+  const [offices, setOffices] = useState([]);
+  const [mappedOrg, setMappedOrg] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    api.getOrgMap().then(setList);
+    api.getOffices().then(setOffices);
+  }, []);
+
+  async function handleAdd() {
+    if (!inputName || !mappedOrg) return;
+    setSaving(true);
+    await api.addOrgMap({ input_name: inputName, mapped_org_name: mappedOrg });
+    setInputName(''); setMappedOrg('');
+    api.getOrgMap().then(setList);
+    setSaving(false);
+  }
+
+  async function handleDelete(id) {
+    await api.deleteOrgMap(id);
+    api.getOrgMap().then(setList);
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.6 }}>
+        업로드 데이터의 소속명과 사무실 조직명이 다를 경우 여기서 매핑하세요.<br/>
+        예: <b>강남차량부 강남보상센터</b> → <b>강남보상센터</b>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <input type="text" placeholder="업로드 소속명 (예: 강남차량부 강남보상센터)"
+          value={inputName} onChange={e => setInputName(e.target.value)} />
+        <select value={mappedOrg} onChange={e => setMappedOrg(e.target.value)}>
+          <option value="">실제 조직명 선택</option>
+          {offices.map(o => <option key={o.id} value={o.org_name}>{o.org_name}</option>)}
+        </select>
+        <button onClick={handleAdd} disabled={!inputName || !mappedOrg || saving}
+          style={{ height: 38, borderRadius: 8, background: '#1A4A8A', color: '#E8F0FB', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+          {saving ? '추가 중...' : '+ 추가'}
+        </button>
+      </div>
+      {list.length > 0 && (
+        <div style={{ border: '0.5px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
+          {list.map((item, i) => (
+            <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', borderBottom: i < list.length-1 ? '0.5px solid var(--border)' : 'none', fontSize: 12 }}>
+              <div>
+                <span style={{ color: 'var(--text2)' }}>{item.input_name}</span>
+                <span style={{ margin: '0 6px', color: 'var(--text2)' }}>→</span>
+                <span style={{ fontWeight: 600 }}>{item.mapped_org_name}</span>
+              </div>
+              <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#A32D2D', fontSize: 16 }}>×</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Settings() {
   const nav = useNavigate();
 
@@ -109,6 +171,11 @@ export default function Settings() {
             onDownload={() => api.downloadOfficeTemplate()}
             onUpload={(file) => api.uploadOfficeExcel(file)}
           />
+        </AccordionSection>
+
+        {/* 조직명 매핑 */}
+        <AccordionSection title="조직명 매핑 관리" icon="🗂️">
+          <OrgMapSection />
         </AccordionSection>
 
         {/* 계정 관리 */}
