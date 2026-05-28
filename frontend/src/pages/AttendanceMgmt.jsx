@@ -827,20 +827,22 @@ export default function AttendanceMgmt() {
     const eb = b.end_date ? new Date(b.end_date) : new Date('9999-12-31');
     return ea - eb;
   }).map(r => {
-    // 육아휴직: 사번 + 자녀구분 기준 전체 이력
+    // 육아휴직: 사번 + 자녀구분 기준, 자신보다 시작일이 이전인 것만
     if (r.type === '육아휴직') {
       const related = list.filter(x =>
         x.id !== r.id &&
         x.emp_no === r.emp_no &&
         x.type === '육아휴직' &&
-        x.child_order === r.child_order
+        x.child_order === r.child_order &&
+        x.start_date < r.start_date
       ).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
       return { ...r, prevPeriods: related };
     }
-    // 질병/난임/가족돌봄
+    // 질병/난임/가족돌봄: 자신보다 시작일이 이전인 것만
     if (!PERIOD_TYPES.includes(r.type)) return r;
     const related = list.filter(x => {
       if (x.id === r.id || x.emp_no !== r.emp_no || x.type !== r.type) return false;
+      if (x.start_date >= r.start_date) return false;
       if (FAMILY_TYPES.includes(r.type)) {
         return new Date(x.start_date).getFullYear() === new Date(r.start_date).getFullYear();
       }
