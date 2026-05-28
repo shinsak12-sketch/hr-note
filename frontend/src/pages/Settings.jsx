@@ -81,11 +81,29 @@ function OrgMapSection() {
   const [offices, setOffices] = useState([]);
   const [mappedOrg, setMappedOrg] = useState('');
   const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState('');
 
   useEffect(() => {
     api.getOrgMap().then(setList);
     api.getOffices().then(setOffices);
   }, []);
+
+  async function handleDownload() {
+    const blob = await api.downloadOrgMapTemplate();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'orgmap_template.xlsx';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleUpload(e) {
+    const file = e.target.files[0]; if (!file) return;
+    setToast('업로드 중...');
+    const result = await api.uploadOrgMap(file);
+    setToast(`${result.inserted}건 등록 완료`);
+    api.getOrgMap().then(setList);
+    e.target.value = '';
+  }
 
   async function handleAdd() {
     if (!inputName || !mappedOrg) return;
@@ -104,18 +122,29 @@ function OrgMapSection() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.6 }}>
-        업로드 데이터의 소속명과 사무실 조직명이 다를 경우 여기서 매핑하세요.<br/>
-        예: <b>강남차량부 강남보상센터</b> → <b>강남보상센터</b>
+        업로드 데이터의 소속명과 사무실 조직명이 다를 경우 매핑하세요.
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <input type="text" placeholder="업로드 소속명 (예: 강남차량부 강남보상센터)"
-          value={inputName} onChange={e => setInputName(e.target.value)} />
+      {/* 엑셀 업로드 */}
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={handleDownload} style={{ flex: 1, height: 36, borderRadius: 8, background: 'var(--bg2)', border: '0.5px solid var(--border)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+          📥 양식 다운로드
+        </button>
+        <label style={{ flex: 1, height: 36, borderRadius: 8, background: '#EAF3DE', color: '#3B6D11', border: 'none', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit', fontWeight: 600 }}>
+          📤 엑셀 업로드
+          <input type="file" accept=".xlsx" style={{ display: 'none' }} onChange={handleUpload} />
+        </label>
+      </div>
+      {toast && <div style={{ fontSize: 12, color: '#3B6D11', background: '#EAF3DE', borderRadius: 6, padding: '6px 10px' }}>{toast}</div>}
+      {/* 수기 추가 */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, borderTop: '0.5px solid var(--border)', paddingTop: 10 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text2)' }}>수기 추가</div>
+        <input type="text" placeholder="업로드 소속명" value={inputName} onChange={e => setInputName(e.target.value)} />
         <select value={mappedOrg} onChange={e => setMappedOrg(e.target.value)}>
           <option value="">실제 조직명 선택</option>
           {offices.map(o => <option key={o.id} value={o.org_name}>{o.org_name}</option>)}
         </select>
         <button onClick={handleAdd} disabled={!inputName || !mappedOrg || saving}
-          style={{ height: 38, borderRadius: 8, background: '#1A4A8A', color: '#E8F0FB', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+          style={{ height: 36, borderRadius: 8, background: '#1A4A8A', color: '#E8F0FB', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
           {saving ? '추가 중...' : '+ 추가'}
         </button>
       </div>

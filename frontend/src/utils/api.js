@@ -110,6 +110,8 @@ export const api = {
   getOrgMap: () => request('/orgmap'),
   addOrgMap: (body) => request('/orgmap', { method: 'POST', body: JSON.stringify(body) }),
   deleteOrgMap: (id) => request('/orgmap/' + id, { method: 'DELETE' }),
+  downloadOrgMapTemplate: () => fetch(BASE + '/orgmap/template', { headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') } }).then(r => r.blob()),
+  uploadOrgMap: (file) => { const fd = new FormData(); fd.append('file', file); return fetch(BASE + '/orgmap/upload', { method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') }, body: fd }).then(r => r.json()); },
   getOffices: (params = {}) => {
     const q = new URLSearchParams(params).toString();
     return request('/offices' + (q ? '?' + q : ''));
