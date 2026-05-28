@@ -748,8 +748,8 @@ export default function AttendanceMgmt() {
   async function handleDownloadTemplate() {
     try {
       const token = localStorage.getItem('hr_token');
-      const BASE_URL = import.meta.env.VITE_API_URL || 'https://hr-note-production.up.railway.app';
-      const res = await fetch(`${BASE_URL}/attendance/template/excel`, {
+      const BASE = import.meta.env.VITE_API_URL || '/api';
+      const res = await fetch(`${BASE}/attendance/template/excel`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) { setToast('다운로드 실패: ' + res.status); return; }
