@@ -101,6 +101,9 @@ export const api = {
     const qs = q ? '?q=' + encodeURIComponent(q) : '';
     return request('/memos' + qs);
   },
+  getAttachments: (memoId) => request('/attachments/memo/' + memoId),
+  uploadAttachment: (memoId, file) => { const fd = new FormData(); fd.append('file', file); return fetch(BASE + '/attachments/memo/' + memoId, { method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') }, body: fd }).then(r => r.json()); },
+  deleteAttachment: (id) => request('/attachments/' + id, { method: 'DELETE' }),
   getMemo: (id) => request('/memos/' + id),
   shareMemo: (id, userIds) => request('/memos/' + id + '/share', { method: 'POST', body: JSON.stringify({ user_ids: userIds }) }),
   getMemoShares: (id) => request('/memos/' + id + '/shares'),

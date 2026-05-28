@@ -11,6 +11,7 @@ import assetsRouter from './routes/assets.js';
 import repairsRouter from './routes/repairs.js';
 import attendanceRouter from './routes/attendance.js';
 import orgmapRouter from './routes/orgmap.js';
+import attachmentsRouter from './routes/attachments.js';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use('/api/assets', assetsRouter);
 app.use('/api/repairs', repairsRouter);
 app.use('/api/attendance', attendanceRouter);
 app.use('/api/orgmap', orgmapRouter);
+app.use('/api/attachments', attachmentsRouter);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
