@@ -250,6 +250,17 @@ router.get('/', authMiddleware, async (req, res) => {
     AND end_date::date <= ${koreaToday}::date
   `;
 
+  // 시작일 도래 안한 진행중 → 예정으로 보정
+  // 시작일 도래한 예정 → 진행중으로 보정
+  await sql`
+    UPDATE attendance SET status='예정', updated_at=NOW()
+    WHERE status='진행중' AND start_date::date > ${koreaToday}::date
+  `;
+  await sql`
+    UPDATE attendance SET status='진행중', updated_at=NOW()
+    WHERE status='예정' AND start_date::date <= ${koreaToday}::date
+  `;
+
   let list = await sql`
     SELECT a.*, o.headquarters, o.department,
       p.start_date as parent_start_date, p.end_date as parent_end_date
@@ -504,6 +515,9 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
     newSplitCount = Number(row.cnt) + 1;
   }
 
+  const koreaToday = new Date(Date.now() + 9*60*60*1000).toISOString().split('T')[0];
+  const newStatus = start_date > koreaToday ? '예정' : '진행중';
+
   const [newRec] = await sql`
     INSERT INTO attendance (
       category, type, office_id, org_name, emp_no, emp_name,
@@ -523,7 +537,7 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
       ${original.normal_return_date||null}, ${original.contract_date||null},
       ${original.retirement_date||null}, ${original.off_start_date||null},
       ${original.leave_deleted||false}, ${original.doc_completed||false},
-      ${!is_split}, ${original.parent_id || original.id}, '진행중'
+      ${!is_split}, ${original.parent_id || original.id}, ${newStatus}
     ) RETURNING *
   `;
   res.status(201).json(newRec);
