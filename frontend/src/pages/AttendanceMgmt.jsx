@@ -707,25 +707,35 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
         <div>🏢 {r.org_name || '-'}</div>
         {r.prevPeriods?.map((p, i) => {
           const isImsin = p.type === '육아휴직(임신중)';
-          // 다음 레코드(현재 카드 포함) 시작일이 이 레코드 종료일+1이면 연장
-          const nextRecord = i < r.prevPeriods.length - 1 ? r.prevPeriods[i + 1] : r;
+          // 다음 레코드 (i+1번째 prevPeriod 또는 현재카드 r)
+          const nextRec = i < r.prevPeriods.length - 1 ? r.prevPeriods[i + 1] : r;
+          // 이 레코드 종료일+1 = 다음 레코드 시작일이면 → 다음꺼 입장에서 이건 연장
           const pEnd = p.end_date ? new Date(p.end_date) : null;
-          const nextStart = nextRecord?.start_date ? new Date(nextRecord.start_date) : null;
-          const isExtension = !isImsin && pEnd && nextStart &&
-            Math.round((nextStart - pEnd) / (1000*60*60*24)) === 1;
+          const nStart = nextRec?.start_date ? new Date(nextRec.start_date) : null;
+          const nextIsExtension = !isImsin && pEnd && nStart &&
+            Math.round((nStart - pEnd) / (1000*60*60*24)) === 1;
+
+          // 이 레코드 자신이 연장인지: 이전 레코드 종료일+1 = 이 레코드 시작일
+          const prevRec = i > 0 ? r.prevPeriods[i - 1] : null;
+          const prevEnd = prevRec?.end_date ? new Date(prevRec.end_date) : null;
+          const curStart = p.start_date ? new Date(p.start_date) : null;
+          const thisIsExtension = !isImsin && prevEnd && curStart &&
+            Math.round((curStart - prevEnd) / (1000*60*60*24)) === 1;
+
+          // 회차 카운트: 연장/임신중 제외
           const roundNum = r.prevPeriods.slice(0, i + 1).filter((x, j) => {
             if (x.type === '육아휴직(임신중)') return false;
-            const nx = j < r.prevPeriods.length - 1 ? r.prevPeriods[j + 1] : r;
-            const xEnd = x.end_date ? new Date(x.end_date) : null;
-            const nxStart = nx?.start_date ? new Date(nx.start_date) : null;
-            const xIsExt = xEnd && nxStart && Math.round((nxStart - xEnd) / (1000*60*60*24)) === 1;
-            return !xIsExt;
+            const prev = j > 0 ? r.prevPeriods[j - 1] : null;
+            const pe = prev?.end_date ? new Date(prev.end_date) : null;
+            const cs = x.start_date ? new Date(x.start_date) : null;
+            return !(pe && cs && Math.round((cs - pe) / (1000*60*60*24)) === 1);
           }).length;
+
           return (
             <div key={p.id} style={{ fontSize: 11, color: 'var(--text2)' }}>
               {isImsin
                 ? `📋 임신중: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
-                : isExtension
+                : thisIsExtension
                 ? `📋 연장: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
                 : `📋 ${roundNum}회차: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
               }
