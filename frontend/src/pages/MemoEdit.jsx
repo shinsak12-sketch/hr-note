@@ -15,7 +15,7 @@ function ShareModal({ memoId, onClose }) {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    api.getAccounts().then(data => {
+    api.getUsers().then(data => {
       const me = JSON.parse(localStorage.getItem('hr_user') || '{}');
       setUsers(data.filter(u => u.status === 'active' && u.id !== me.id));
     });
