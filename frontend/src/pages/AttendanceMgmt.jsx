@@ -856,7 +856,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
         {r.leave_reason && <div>📝 {r.leave_reason}</div>}
         {r.reduce_hours && <div>⏰ 단축 {r.reduce_hours}시간 ({r.work_start_time}~{r.work_end_time})</div>}
         {r.retirement_date && <div>🎯 정년일: {r.retirement_date?.split('T')[0]}</div>}
-        {r.end_comment && <div style={{ color: 'var(--text)' }}>💬 {r.end_comment}</div>}
+        {r.end_comment && <div style={{ fontSize: 11, fontWeight: 600, color: '#fff', background: '#1A4A8A', borderRadius: 6, padding: '3px 8px', marginTop: 4, display: 'inline-block' }}>💬 {r.end_comment}</div>}
         {r.note && <div>📌 {r.note}</div>}
       </div>
       {(r.status === '진행중' || r.status === '예정' || r.status === '종료예정') && (
