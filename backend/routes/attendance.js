@@ -513,12 +513,20 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
     if (!is_split) {
       newSplitCount = original.split_count || 1;
     } else {
-      const [row] = await sql`
-        SELECT COUNT(*) as cnt FROM attendance
-        WHERE emp_no=${original.emp_no} AND type=${original.type}
-        ${original.child_order ? sql`AND child_order=${original.child_order}` : sql``}
-      `;
-      newSplitCount = Number(row.cnt) + 1;
+      let countRows;
+      if (original.child_order) {
+        countRows = await sql`
+          SELECT COUNT(*) as cnt FROM attendance
+          WHERE emp_no=${original.emp_no} AND type=${original.type}
+          AND child_order=${original.child_order}
+        `;
+      } else {
+        countRows = await sql`
+          SELECT COUNT(*) as cnt FROM attendance
+          WHERE emp_no=${original.emp_no} AND type=${original.type}
+        `;
+      }
+      newSplitCount = Number(countRows[0].cnt) + 1;
     }
 
     const koreaToday = new Date(Date.now() + 9*60*60*1000).toISOString().split('T')[0];
