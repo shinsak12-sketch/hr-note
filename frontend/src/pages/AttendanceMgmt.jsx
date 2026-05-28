@@ -635,6 +635,16 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
   const cc = CAT_COLOR[r.category] || '#854F0B';
   const childStyle = r.child_order ? (CHILD_COLORS[r.child_order] || { bg: '#EAF3DE', color: '#3B6D11' }) : null;
 
+  // 종류별 설정
+  const LEAVE_CONFIG = {
+    '육아휴직':     { maxDays: 365, overLabel: '+6개월 추가', extExclude: true },
+    '육아휴직(임신중)': { maxDays: null, extExclude: true },
+    '질병휴직':     { maxDays: 180, overLabel: '180일 초과', extExclude: false },
+    '난임휴직':     { maxDays: 180, overLabel: '180일 초과', extExclude: false },
+    '가족돌봄휴직': { maxDays: 90,  overLabel: '90일 초과',  extExclude: false },
+  };
+  const cfg = LEAVE_CONFIG[r.type] || {};
+
   // 배경색 = 날짜 기준
   const todayStr = new Date(Date.now() + 9*60*60*1000).toISOString().split('T')[0];
   const startStr = r.start_date?.split('T')[0];
@@ -644,7 +654,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
     : (!endStr || endStr >= todayStr) ? '#FFFDF0' // 진행 중 - 노란 미색
     : 'var(--bg)';                               // 종료 후 - 흰 배경
 
-  // 연장 여부: 현재 카드가 이전 카드 종료일+1 시작
+  // 연장 여부: 현재 카드가 이전 카드 종료일+1 시작 (육아휴직은 연장=회차제외, 질병등은 연장=회차포함)
   const prevRecord = r.prevPeriods?.length > 0 ? r.prevPeriods[r.prevPeriods.length - 1] : null;
   const isExtensionCard = !!(prevRecord?.end_date && r.start_date &&
     Math.round((new Date(r.start_date) - new Date(prevRecord.end_date)) / (1000*60*60*24)) === 1 &&
@@ -698,15 +708,16 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           <span style={{ fontSize: 12, color: 'var(--text2)' }}>· {r.emp_no}</span>
           <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: cc+'20', color: cc, whiteSpace: 'nowrap' }}>{r.type}</span>
           {r.split_count >= 1 && r.type !== '육아휴직(임신중)' && (() => {
-            // 연장/임신중 제외한 이전 카드 수 + 1 = 현재 회차
+            // cfg.extExclude: 연장 제외(육아휴직) vs 포함(질병휴직 등)
             const prevNonExt = (r.prevPeriods || []).filter((p, i, arr) => {
               if (p.type === '육아휴직(임신중)') return false;
+              if (!cfg.extExclude) return true; // 질병 등: 연장도 회차 포함
               if (i === 0) return true;
               const pe = arr[i-1]?.end_date ? new Date(arr[i-1].end_date) : null;
               const cs = p.start_date ? new Date(p.start_date) : null;
               return !(pe && cs && Math.round((cs - pe) / (1000*60*60*24)) === 1);
             }).length;
-            const displayRound = isExtensionCard ? prevNonExt : prevNonExt + 1;
+            const displayRound = (isExtensionCard && cfg.extExclude) ? prevNonExt : prevNonExt + 1;
             return <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>{displayRound}회차</span>;
           })()}
           {isExtensionCard && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F5E8F8', color: '#7B2D8B', whiteSpace: 'nowrap' }}>연장</span>}
@@ -748,24 +759,16 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
         <div>🏢 {r.org_name || '-'}</div>
         {r.prevPeriods?.map((p, i) => {
           const isImsin = p.type === '육아휴직(임신중)';
-          // 다음 레코드 (i+1번째 prevPeriod 또는 현재카드 r)
-          const nextRec = i < r.prevPeriods.length - 1 ? r.prevPeriods[i + 1] : r;
-          // 이 레코드 종료일+1 = 다음 레코드 시작일이면 → 다음꺼 입장에서 이건 연장
-          const pEnd = p.end_date ? new Date(p.end_date) : null;
-          const nStart = nextRec?.start_date ? new Date(nextRec.start_date) : null;
-          const nextIsExtension = !isImsin && pEnd && nStart &&
-            Math.round((nStart - pEnd) / (1000*60*60*24)) === 1;
-
-          // 이 레코드 자신이 연장인지: 이전 레코드 종료일+1 = 이 레코드 시작일
           const prevRec = i > 0 ? r.prevPeriods[i - 1] : null;
           const prevEnd = prevRec?.end_date ? new Date(prevRec.end_date) : null;
           const curStart = p.start_date ? new Date(p.start_date) : null;
           const thisIsExtension = !isImsin && prevEnd && curStart &&
             Math.round((curStart - prevEnd) / (1000*60*60*24)) === 1;
 
-          // 회차 카운트: 연장/임신중 제외
+          // 회차 카운트: cfg.extExclude면 연장 제외, 아니면 포함
           const roundNum = r.prevPeriods.slice(0, i + 1).filter((x, j) => {
             if (x.type === '육아휴직(임신중)') return false;
+            if (!cfg.extExclude) return true;
             const prev = j > 0 ? r.prevPeriods[j - 1] : null;
             const pe = prev?.end_date ? new Date(prev.end_date) : null;
             const cs = x.start_date ? new Date(x.start_date) : null;
@@ -776,7 +779,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
             <div key={p.id} style={{ fontSize: 11, color: 'var(--text2)' }}>
               {isImsin
                 ? `📋 임신중: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
-                : thisIsExtension
+                : (thisIsExtension && cfg.extExclude)
                 ? `📋 연장: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
                 : `📋 ${roundNum}회차: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
               }
@@ -789,9 +792,9 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
             <span style={{ fontSize: 11, fontWeight: 700, color: '#854F0B', background: '#FAEEDA', borderRadius: 6, padding: '3px 8px' }}>
               📊 총 사용일수: {totalUsedDays}일
             </span>
-            {totalUsedDays > 365 && (
+            {cfg.maxDays && totalUsedDays > cfg.maxDays && (
               <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', background: '#A32D2D', borderRadius: 6, padding: '3px 8px', whiteSpace: 'nowrap' }}>
-                +6개월 추가
+                {cfg.overLabel}
               </span>
             )}
           </div>
