@@ -332,13 +332,13 @@ router.get('/stats', authMiddleware, async (req, res) => {
   res.json({ summary, monthly, d15, endingSoon, startingSoon });
 });
 
-// 알림 카운트 (홈화면용)
+// 알림 카운트 (홈화면용) - 진행중인데 종료일 D-15 이내
 router.get('/alert-count', authMiddleware, async (req, res) => {
   const koreaToday = new Date(Date.now() + 9*60*60*1000).toISOString().split('T')[0];
   const d15 = new Date(Date.now() + 9*60*60*1000 + 15*24*60*60*1000).toISOString().split('T')[0];
   const [row] = await sql`
     SELECT COUNT(*) as cnt FROM attendance
-    WHERE status IN ('진행중','종료예정')
+    WHERE status = '진행중'
     AND end_date IS NOT NULL
     AND end_date::date <= ${d15}::date
     AND end_date::date >= ${koreaToday}::date
