@@ -175,9 +175,9 @@ export default function OfficeHome() {
                         background: 'var(--bg)', border: '0.5px solid var(--border)',
                         borderRadius: 12, padding: '14px 16px',
                       }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                          <span style={{ fontWeight: 700, fontSize: 15 }}>📍 {office.org_name}</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div style={{ marginBottom: 8 }}>
+                          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6 }}>📍 {office.org_name}</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'flex-end' }}>
                           <button onClick={() => {
                             const text = [
                               `📍 ${office.org_name}`,
