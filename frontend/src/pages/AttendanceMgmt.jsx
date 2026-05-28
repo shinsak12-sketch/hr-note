@@ -773,8 +773,8 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
         <div ref={menuRef} style={{ position: 'relative' }}>
           <button onClick={() => setMenuOpen(o=>!o)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', color: 'var(--text2)', fontSize: 18 }}>⋮</button>
           {menuOpen && (
-            <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', overflow: 'hidden', minWidth: 130 }}>
-              <button onClick={() => { onComment(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#5C3D8F', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>💬 코멘트</button>
+            <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', minWidth: 160 }}>
+              <button onClick={() => { onComment(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#5C3D8F', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)', borderRadius: '10px 10px 0 0' }}>💬 코멘트</button>
               <button onClick={() => { onEdit(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#1A4A8A', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>✏️ 수정</button>
               {r.prevPeriods?.length > 0 && (
                 <button onClick={async () => {
