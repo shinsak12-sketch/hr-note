@@ -667,11 +667,25 @@ export default function AttendanceMgmt() {
   }
 
   async function handleDownloadTemplate() {
-    const blob = await api.downloadAttendanceTemplate();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'attendance_template.xlsx'; a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const token = localStorage.getItem('hr_token');
+      const BASE_URL = import.meta.env.VITE_API_URL || 'https://hr-note-production.up.railway.app';
+      const res = await fetch(`${BASE_URL}/attendance/template/excel`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) { setToast('다운로드 실패: ' + res.status); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'attendance_template.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch(e) {
+      setToast('다운로드 오류: ' + e.message);
+    }
   }
 
   async function handleUpload(e) {
