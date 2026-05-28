@@ -137,6 +137,9 @@ router.post('/upload/excel', upload.single('file'), async (req, res) => {
     const rows = XLSX.utils.sheet_to_json(ws);
     let success = 0, errors = [];
 
+    // 기존 전체 삭제 후 새로 등록 (덮어쓰기)
+    await sql`DELETE FROM offices`;
+
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
       const rowNum = i + 2;
