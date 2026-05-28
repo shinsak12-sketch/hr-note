@@ -15,9 +15,11 @@ function NewHousingModal({ onClose, onDone }) {
     area_sqm: '',
   });
   const [saving, setSaving] = useState(false);
+  const [offices, setOffices] = useState([]);
   function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
 
   useEffect(() => {
+    api.getOffices().then(setOffices);
     const script = document.createElement('script');
     script.src = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
     script.async = true;
@@ -64,7 +66,10 @@ function NewHousingModal({ onClose, onDone }) {
           </div>
           <div className="form-group">
             <label className="form-label">소속</label>
-            <input type="text" placeholder="소속" value={form.org_name} onChange={e => setF('org_name', e.target.value)} />
+            <select value={form.org_name} onChange={e => setF('org_name', e.target.value)}>
+              <option value="">선택</option>
+              {offices.map(o => <option key={o.id} value={o.org_name}>{o.org_name}</option>)}
+            </select>
           </div>
 
           {/* 사택 주소 */}
