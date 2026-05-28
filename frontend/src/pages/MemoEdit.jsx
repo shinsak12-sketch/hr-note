@@ -67,6 +67,12 @@ function ShareModal({ memoId, onClose }) {
                         <div style={{ fontSize: 13, fontWeight: 600 }}>{s.name}</div>
                       </div>
                       <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: '#F0EBF8', color: '#5C3D8F', fontWeight: 600 }}>공유됨</span>
+                      <button onClick={async () => {
+                        if (!window.confirm(`${s.name}님의 공유를 취소할까요?`)) return;
+                        await api.unshareMemo(memoId, s.user_id);
+                        setShares(prev => prev.filter(x => x.id !== s.id));
+                        setUsers(prev => [...prev, { id: s.user_id, name: s.name }]);
+                      }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#A32D2D', fontSize: 18, padding: '0 2px' }}>×</button>
                     </div>
                   ))}
                 </>

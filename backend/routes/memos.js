@@ -60,7 +60,26 @@ router.put('/:id', async (req, res) => {
   res.json(memo);
 });
 
-// 공유 목록 조회 (내가 공유한 사람들)
+// 공유 취소 (특정 사용자)
+router.delete('/:id/shares/:userId', async (req, res) => {
+  await sql`
+    DELETE FROM memos 
+    WHERE shared_from=${req.params.id} AND user_id=${req.params.userId}
+    AND EXISTS (SELECT 1 FROM memos WHERE id=${req.params.id} AND user_id=${req.user.id})
+  `;
+  res.json({ ok: true });
+});
+
+// 공유 전체 취소
+router.delete('/:id/shares', async (req, res) => {
+  await sql`
+    DELETE FROM memos WHERE shared_from=${req.params.id}
+    AND EXISTS (SELECT 1 FROM memos WHERE id=${req.params.id} AND user_id=${req.user.id})
+  `;
+  res.json({ ok: true });
+});
+
+
 router.get('/:id/shares', async (req, res) => {
   const shares = await sql`
     SELECT m.id, m.user_id, u.name, u.username, m.created_at
@@ -101,9 +120,12 @@ router.post('/:id/share', async (req, res) => {
   res.json({ shared: shared.length });
 });
 
-// 삭제
+// 삭제 (공유본, 댓글 모두 함께 삭제)
 router.delete('/:id', async (req, res) => {
-  await sql`DELETE FROM memos WHERE id = ${req.params.id} AND user_id = ${req.user.id}`;
+  // 공유본 먼저 삭제
+  await sql`DELETE FROM memos WHERE shared_from=${req.params.id}`;
+  // 원본 삭제 (memo_attachments, memo_comments는 ON DELETE CASCADE)
+  await sql`DELETE FROM memos WHERE id=${req.params.id} AND user_id=${req.user.id}`;
   res.json({ message: '삭제되었습니다.' });
 });
 

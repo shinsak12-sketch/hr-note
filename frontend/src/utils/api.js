@@ -113,6 +113,7 @@ export const api = {
   addMemoComment: (id, content) => request('/memos/' + id + '/comments', { method: 'POST', body: JSON.stringify({ content }) }),
   deleteMemoComment: (memoId, id) => request('/memos/' + memoId + '/comments/' + id, { method: 'DELETE' }),
   getMemoShares: (id) => request('/memos/' + id + '/shares'),
+  unshareMemo: (id, userId) => request('/memos/' + id + '/shares/' + userId, { method: 'DELETE' }),
   createMemo: (body) => request('/memos', { method: 'POST', body: JSON.stringify(body) }),
   updateMemo: (id, body) => request('/memos/' + id, { method: 'PUT', body: JSON.stringify(body) }),
   deleteMemo: (id) => request('/memos/' + id, { method: 'DELETE' }),
