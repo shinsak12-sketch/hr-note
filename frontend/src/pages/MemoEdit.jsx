@@ -209,8 +209,6 @@ export default function MemoEdit() {
   async function handleManualSave() {
     if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
     await save(form);
-    // 저장 후 목록으로 이동
-    nav('/memos-app', { replace: true });
   }
 
   async function handleBack() {
@@ -328,13 +326,20 @@ export default function MemoEdit() {
         <div style={{ borderTop: '0.5px solid var(--border)', paddingTop: 12, marginTop: 4, paddingBottom: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
             <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text2)' }}>📎 첨부파일{attachments.length > 0 ? ` (${attachments.length})` : ''}</span>
-            {!memoData?.is_shared && memoIdRef.current && (
+            {!memoData?.is_shared && (
               <label style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, background: 'var(--bg2)', color: 'var(--text2)', cursor: 'pointer', border: '0.5px solid var(--border)' }}>
                 {uploading ? '업로드 중...' : '+ 파일 추가'}
                 <input type="file" style={{ display: 'none' }} multiple onChange={async (e) => {
-                  if (!memoIdRef.current) return;
                   setUploading(true);
                   try {
+                    // 저장 안 됐으면 먼저 저장
+                    if (!memoIdRef.current) {
+                      const created = await api.createMemo(form);
+                      memoIdRef.current = created.id;
+                      setMemoId(created.id);
+                      setSaved(true);
+                      savedRef.current = true;
+                    }
                     const sign = await api.getAttachmentSign();
                     for (const file of e.target.files) {
                       const fd = new FormData();
