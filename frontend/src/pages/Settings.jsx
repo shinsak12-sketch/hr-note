@@ -75,6 +75,55 @@ function UploadSection({ description, onDownload, onUpload, downloadLabel }) {
   );
 }
 
+function EmployeeSection() {
+  const [toast, setToast] = useState('');
+  const [count, setCount] = useState(null);
+
+  useEffect(() => {
+    api.getEmployees().then(list => setCount(list.length)).catch(() => {});
+  }, []);
+
+  async function handleDownload() {
+    const blob = await api.downloadEmployeeTemplate();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'HR노트_명부양식.xlsx';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleUpload(e) {
+    const file = e.target.files[0]; if (!file) return;
+    setToast('업로드 중...');
+    try {
+      const result = await api.uploadEmployees(file);
+      setToast(`완료! 신규 ${result.inserted}명, 수정 ${result.updated}명`);
+      setCount(result.inserted + result.updated);
+    } catch(err) {
+      setToast('오류: ' + err.message);
+    }
+    e.target.value = '';
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.6 }}>
+        발령 시 명부를 업로드하면 관련 정보가 자동으로 업데이트됩니다.
+        {count !== null && <span style={{ fontWeight: 700, color: 'var(--text)' }}> (현재 {count}명)</span>}
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={handleDownload} style={{ flex: 1, height: 36, borderRadius: 8, background: 'var(--bg2)', border: '0.5px solid var(--border)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+          📥 양식 다운로드
+        </button>
+        <label style={{ flex: 1, height: 36, borderRadius: 8, background: '#1A4A8A', color: '#E8F0FB', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit', fontWeight: 600 }}>
+          📤 명부 업로드
+          <input type="file" accept=".xlsx" style={{ display: 'none' }} onChange={handleUpload} />
+        </label>
+      </div>
+      {toast && <div style={{ fontSize: 12, padding: '8px 10px', borderRadius: 8, background: 'var(--bg2)', color: 'var(--text2)' }}>{toast}</div>}
+    </div>
+  );
+}
+
 function OrgMapSection() {
   const [list, setList] = useState([]);
   const [inputName, setInputName] = useState('');
@@ -200,6 +249,11 @@ export default function Settings() {
             onDownload={() => api.downloadOfficeTemplate()}
             onUpload={(file) => api.uploadOfficeExcel(file)}
           />
+        </AccordionSection>
+
+        {/* 명부 관리 */}
+        <AccordionSection title="명부 관리" icon="👥">
+          <EmployeeSection />
         </AccordionSection>
 
         {/* 조직명 매핑 */}
