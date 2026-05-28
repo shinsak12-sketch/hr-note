@@ -442,6 +442,9 @@ router.patch('/:id/revert', authMiddleware, async (req, res) => {
   `;
   res.json(rec);
 });
+
+// 종료처리
+router.patch('/:id/close', authMiddleware, async (req, res) => {
   const { status, end_comment, end_date, close_type } = req.body;
   const [rec] = await sql`
     UPDATE attendance SET 
