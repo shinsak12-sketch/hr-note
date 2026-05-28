@@ -659,12 +659,6 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
       </div>
       <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.7, marginBottom: 10 }}>
         <div>🏢 {r.org_name || '-'}</div>
-        {r.is_extension && r.parent_start_date && (
-          <div style={{ color: 'var(--text2)', fontSize: 11 }}>
-            📋 1회차: {r.parent_start_date?.split('T')[0]} ~ {r.parent_end_date?.split('T')[0]}
-          </div>
-        )}
-        {/* 질병/난임/가족돌봄 회차별 기간 - AttCard는 list에서 related 받아서 표시 */}
         {r.prevPeriods?.map((p, i) => (
           <div key={p.id} style={{ fontSize: 11, color: 'var(--text2)' }}>
             📋 {i+1}회차: {p.start_date?.split('T')[0]} ~ {p.end_date?.split('T')[0] || '진행중'} {p.used_days ? `(${p.used_days}일)` : ''}
