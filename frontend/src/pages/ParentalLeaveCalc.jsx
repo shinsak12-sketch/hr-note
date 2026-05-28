@@ -79,7 +79,7 @@ export default function ParentalLeaveCalc() {
       if (raw) {
         const parsed = JSON.parse(raw);
         const filled = parsed.map(p => ({ start: p.start || '', end: p.end || '' }));
-        while (filled.length < 5) filled.push({ start: '', end: '' });
+        while (filled.length < 9) filled.push({ start: '', end: '' });
         return filled.slice(0, 5);
       }
     } catch {}
