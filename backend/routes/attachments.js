@@ -1,16 +1,42 @@
 import { Router } from 'express';
 import sql from '../db.js';
 import { authMiddleware } from '../middleware/auth.js';
-import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// 서명 발급 (프론트에서 직접 Cloudinary 업로드용)
+router.get('/sign', authMiddleware, (req, res) => {
+  const timestamp = Math.round(Date.now() / 1000);
+  const folder = 'hr-note/memos';
+  const signature = cloudinary.utils.api_sign_request(
+    { timestamp, folder },
+    process.env.CLOUDINARY_API_SECRET
+  );
+  res.json({
+    timestamp,
+    signature,
+    folder,
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+  });
+});
+
+// 첨부파일 DB 저장 (업로드 완료 후 메타 저장)
+router.post('/memo/:memoId', authMiddleware, async (req, res) => {
+  const { file_name, file_url, file_type, file_size } = req.body;
+  const [att] = await sql`
+    INSERT INTO memo_attachments (memo_id, file_name, file_url, file_type, file_size)
+    VALUES (${req.params.memoId}, ${file_name}, ${file_url}, ${file_type||null}, ${file_size||null})
+    RETURNING *
+  `;
+  res.status(201).json(att);
 });
 
 // 첨부파일 목록 조회
@@ -21,35 +47,11 @@ router.get('/memo/:memoId', authMiddleware, async (req, res) => {
   res.json(list);
 });
 
-// 첨부파일 업로드
-router.post('/memo/:memoId', authMiddleware, upload.single('file'), async (req, res) => {
-  const file = req.file;
-  if (!file) return res.status(400).json({ error: '파일이 없습니다.' });
-
-  // cloudinary 업로드
-  const b64 = Buffer.from(file.buffer).toString('base64');
-  const dataUri = `data:${file.mimetype};base64,${b64}`;
-
-  const result = await cloudinary.uploader.upload(dataUri, {
-    folder: 'hr-note/memos',
-    resource_type: 'auto',
-    public_id: `memo_${req.params.memoId}_${Date.now()}`,
-  });
-
-  const [att] = await sql`
-    INSERT INTO memo_attachments (memo_id, file_name, file_url, file_type, file_size)
-    VALUES (${req.params.memoId}, ${file.originalname}, ${result.secure_url}, ${file.mimetype}, ${file.size})
-    RETURNING *
-  `;
-  res.status(201).json(att);
-});
-
 // 첨부파일 삭제
 router.delete('/:id', authMiddleware, async (req, res) => {
   const [att] = await sql`SELECT file_url FROM memo_attachments WHERE id=${req.params.id}`;
   if (att) {
-    // cloudinary에서도 삭제
-    const publicId = att.file_url.split('/').slice(-2).join('/').replace(/\.[^/.]+$/, '');
+    const publicId = att.file_url.split('/upload/')[1]?.replace(/\.[^/.]+$/, '');
     try { await cloudinary.uploader.destroy(publicId); } catch {}
   }
   await sql`DELETE FROM memo_attachments WHERE id=${req.params.id}`;

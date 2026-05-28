@@ -306,12 +306,29 @@ export default function MemoEdit() {
                 <input type="file" style={{ display: 'none' }} multiple onChange={async (e) => {
                   if (!memoIdRef.current) return;
                   setUploading(true);
-                  for (const file of e.target.files) {
-                    await api.uploadAttachment(memoIdRef.current, file);
+                  try {
+                    const sign = await api.getAttachmentSign();
+                    for (const file of e.target.files) {
+                      const fd = new FormData();
+                      fd.append('file', file);
+                      fd.append('api_key', sign.api_key);
+                      fd.append('timestamp', sign.timestamp);
+                      fd.append('signature', sign.signature);
+                      fd.append('folder', sign.folder);
+                      const res = await fetch(`https://api.cloudinary.com/v1_1/${sign.cloud_name}/auto/upload`, { method: 'POST', body: fd });
+                      const data = await res.json();
+                      const att = await api.saveAttachment(memoIdRef.current, {
+                        file_name: file.name,
+                        file_url: data.secure_url,
+                        file_type: file.type,
+                        file_size: file.size,
+                      });
+                      setAttachments(a => [...a, att]);
+                    }
+                  } finally {
+                    setUploading(false);
+                    e.target.value = '';
                   }
-                  api.getAttachments(memoIdRef.current).then(setAttachments);
-                  setUploading(false);
-                  e.target.value = '';
                 }} />
               </label>
             )}
