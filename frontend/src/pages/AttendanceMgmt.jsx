@@ -697,11 +697,33 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           <span style={{ fontWeight: 700, fontSize: 15 }}>{r.emp_name}</span>
           <span style={{ fontSize: 12, color: 'var(--text2)' }}>· {r.emp_no}</span>
           <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: cc+'20', color: cc, whiteSpace: 'nowrap' }}>{r.type}</span>
-          {r.split_count >= 1 && r.type !== '육아휴직(임신중)' && (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>
-              {isExtensionCard ? (prevRecord?.split_count || r.split_count) : r.split_count}회차
-            </span>
-          )}
+          {r.split_count >= 1 && r.type !== '육아휴직(임신중)' && (() => {
+            let displayRound;
+            if (isExtensionCard) {
+              // 연장 카드: 이전 비연장 카드 회차 그대로
+              const prevNonExt = [...(r.prevPeriods || [])].reverse().find((p, i, arr) => {
+                const prevP = arr[i + 1];
+                const pe = prevP?.end_date ? new Date(prevP.end_date) : null;
+                const cs = p.start_date ? new Date(p.start_date) : null;
+                return !(pe && cs && Math.round((cs - pe) / (1000*60*60*24)) === 1);
+              });
+              displayRound = prevNonExt?.split_count || prevRecord?.split_count || r.split_count;
+            } else if (r.prevPeriods?.length > 0) {
+              // 분할 카드: 이전 연장 제외한 비연장 카드 수 + 1
+              const nonExtCount = r.prevPeriods.filter((p, i, arr) => {
+                if (p.type === '육아휴직(임신중)') return false;
+                if (i === 0) return true;
+                const prevP = arr[i - 1];
+                const pe = prevP?.end_date ? new Date(prevP.end_date) : null;
+                const cs = p.start_date ? new Date(p.start_date) : null;
+                return !(pe && cs && Math.round((cs - pe) / (1000*60*60*24)) === 1);
+              }).length;
+              displayRound = nonExtCount + 1;
+            } else {
+              displayRound = r.split_count;
+            }
+            return <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>{displayRound}회차</span>;
+          })()}
           {isExtensionCard && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F5E8F8', color: '#7B2D8B', whiteSpace: 'nowrap' }}>연장</span>}
           {r.child_order && childStyle && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: childStyle.bg, color: childStyle.color, whiteSpace: 'nowrap' }}>{r.child_order}</span>}
           {/* 진행중 배지: 날짜 기준 */}
