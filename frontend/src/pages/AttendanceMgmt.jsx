@@ -670,7 +670,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           <span style={{ fontWeight: 700, fontSize: 15 }}>{r.emp_name}</span>
           <span style={{ fontSize: 12, color: 'var(--text2)' }}>· {r.emp_no}</span>
           <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: cc+'20', color: cc, whiteSpace: 'nowrap' }}>{r.type}</span>
-          {r.split_count >= 1 && r.type !== '육아휴직(임신중)' && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>{r.split_count}회차</span>}
+          {r.split_count >= 1 && r.type !== '육아휴직(임신중)' && !r.is_extension && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>{r.split_count}회차</span>}
           {r.is_extension && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F5E8F8', color: '#7B2D8B', whiteSpace: 'nowrap' }}>연장</span>}
           {r.child_order && childStyle && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: childStyle.bg, color: childStyle.color, whiteSpace: 'nowrap' }}>{r.child_order}</span>}
           <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: st.bg, color: st.color, whiteSpace: 'nowrap' }}>{r.status}</span>
@@ -700,12 +700,16 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
       <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.7, marginBottom: 10 }}>
         <div>🏢 {r.org_name || '-'}</div>
         {r.prevPeriods?.map((p, i) => {
-          // 임신중 제외하고 육아휴직 회차만 카운트
-          const roundNum = r.prevPeriods.slice(0, i + 1).filter(x => x.type !== '육아휴직(임신중)').length;
+          const isImsin = p.type === '육아휴직(임신중)';
+          const isExtension = p.is_extension;
+          // 연장/임신중 제외하고 회차만 카운트
+          const roundNum = r.prevPeriods.slice(0, i + 1).filter(x => !x.is_extension && x.type !== '육아휴직(임신중)').length;
           return (
             <div key={p.id} style={{ fontSize: 11, color: 'var(--text2)' }}>
-              {p.type === '육아휴직(임신중)'
+              {isImsin
                 ? `📋 임신중: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
+                : isExtension
+                ? `📋 연장: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
                 : `📋 ${roundNum}회차: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
               }
             </div>
@@ -923,8 +927,6 @@ export default function AttendanceMgmt() {
       ).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
       return { ...r, prevPeriods: related };
     }
-    // 질병/난임/가족돌봄: 자신보다 시작일이 이전인 것만
-    if (!PERIOD_TYPES.includes(r.type)) return r;
     const related = list.filter(x => {
       if (x.id === r.id || x.emp_no !== r.emp_no || x.type !== r.type) return false;
       if (x.start_date >= r.start_date) return false;

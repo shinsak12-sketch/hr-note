@@ -483,18 +483,26 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
   const [original] = await sql`SELECT * FROM attendance WHERE id=${req.params.id}`;
   if (!original) return res.status(404).json({ error: '원본 레코드를 찾을 수 없습니다.' });
 
-  // 연장은 기존 레코드 정상종료, 분할은 유지
+  // 연장: 기존 정상종료 처리 / 분할: 유지
   if (!is_split) {
     await sql`UPDATE attendance SET status='정상종료', updated_at=NOW() WHERE id=${req.params.id}`;
   }
 
-  // 같은 사번+종류의 기존 연장 횟수 계산
-  const extensions = await sql`
-    SELECT COUNT(*) as cnt FROM attendance 
-    WHERE emp_no=${original.emp_no} AND type=${original.type} AND is_extension=true
-  `;
-  const extCount = Number(extensions[0].cnt);
-  const newSplitCount = (original.split_count || 1) + extCount + 1;
+  // 연장: 같은 회차 유지 / 분할: 새 회차 계산
+  let newSplitCount;
+  if (!is_split) {
+    // 연장은 원본 회차 그대로
+    newSplitCount = original.split_count || 1;
+  } else {
+    // 분할은 같은 사번+종류+자녀구분에서 연장 제외하고 회차 계산
+    const [row] = await sql`
+      SELECT COUNT(*) as cnt FROM attendance
+      WHERE emp_no=${original.emp_no} AND type=${original.type}
+      ${original.child_order ? sql`AND child_order=${original.child_order}` : sql``}
+      AND (is_extension IS NULL OR is_extension = false)
+    `;
+    newSplitCount = Number(row.cnt) + 1;
+  }
 
   const [newRec] = await sql`
     INSERT INTO attendance (
@@ -515,7 +523,7 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
       ${original.normal_return_date||null}, ${original.contract_date||null},
       ${original.retirement_date||null}, ${original.off_start_date||null},
       ${original.leave_deleted||false}, ${original.doc_completed||false},
-      true, ${original.parent_id || original.id}, '진행중'
+      ${!is_split}, ${original.parent_id || original.id}, '진행중'
     ) RETURNING *
   `;
   res.status(201).json(newRec);
