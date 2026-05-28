@@ -164,36 +164,41 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
 
           // 회차 자동계산 (엑셀에 없으면 자동)
           if (!d.split_count && d.emp_no && d.type) {
-            const familyTypes = ['가족돌봄휴직','가족돌봄휴가'];
-            const childTypes = ['육아휴직','출산전휴가','출산후휴가','출산전후휴가'];
-            let countRows;
-            if (familyTypes.includes(d.type)) {
-              const year = new Date(d.start_date).getFullYear();
-              countRows = await sql`
-                SELECT COUNT(*) as cnt FROM attendance
-                WHERE emp_no=${d.emp_no} AND type=${d.type}
-                AND EXTRACT(YEAR FROM start_date) = ${year}
-              `;
-            } else if (childTypes.includes(d.type) && d.child_order) {
-              countRows = await sql`
-                SELECT COUNT(*) as cnt FROM attendance
-                WHERE emp_no=${d.emp_no} AND type=${d.type}
-                AND child_order=${d.child_order}
-              `;
-            } else if (d.type === '육아휴직') {
-              countRows = await sql`
-                SELECT COUNT(*) as cnt FROM attendance
-                WHERE emp_no=${d.emp_no} AND type=${d.type}
-                AND (child_order IS NULL OR child_order != '임신중')
-                ${d.child_order ? sql`AND child_order=${d.child_order}` : sql``}
-              `;
+            // 임신중은 회차 없음
+            if (d.type === '육아휴직(임신중)') {
+              d.split_count = null;
             } else {
-              countRows = await sql`
-                SELECT COUNT(*) as cnt FROM attendance
-                WHERE emp_no=${d.emp_no} AND type=${d.type}
-              `;
+              const familyTypes = ['가족돌봄휴직','가족돌봄휴가'];
+              const childTypes = ['육아휴직','출산전휴가','출산후휴가','출산전후휴가'];
+              let countRows;
+              if (familyTypes.includes(d.type)) {
+                const year = new Date(d.start_date).getFullYear();
+                countRows = await sql`
+                  SELECT COUNT(*) as cnt FROM attendance
+                  WHERE emp_no=${d.emp_no} AND type=${d.type}
+                  AND EXTRACT(YEAR FROM start_date) = ${year}
+                `;
+              } else if (childTypes.includes(d.type) && d.child_order) {
+                countRows = await sql`
+                  SELECT COUNT(*) as cnt FROM attendance
+                  WHERE emp_no=${d.emp_no} AND type=${d.type}
+                  AND child_order=${d.child_order}
+                `;
+              } else if (d.type === '육아휴직') {
+                countRows = await sql`
+                  SELECT COUNT(*) as cnt FROM attendance
+                  WHERE emp_no=${d.emp_no} AND type=${d.type}
+                  AND (child_order IS NULL OR child_order != '임신중')
+                  ${d.child_order ? sql`AND child_order=${d.child_order}` : sql``}
+                `;
+              } else {
+                countRows = await sql`
+                  SELECT COUNT(*) as cnt FROM attendance
+                  WHERE emp_no=${d.emp_no} AND type=${d.type}
+                `;
+              }
+              d.split_count = Number(countRows[0].cnt) + 1;
             }
-            d.split_count = Number(countRows[0].cnt) + 1;
           }
 
           // 한국 시간 기준 상태

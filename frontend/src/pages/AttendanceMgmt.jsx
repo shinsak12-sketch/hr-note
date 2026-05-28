@@ -699,14 +699,18 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
       </div>
       <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.7, marginBottom: 10 }}>
         <div>🏢 {r.org_name || '-'}</div>
-        {r.prevPeriods?.map((p, i) => (
-          <div key={p.id} style={{ fontSize: 11, color: 'var(--text2)' }}>
-            {p.type === '육아휴직(임신중)'
-              ? `📋 임신중: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
-              : `📋 ${i+1}회차: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
-            }
-          </div>
-        ))}
+        {r.prevPeriods?.map((p, i) => {
+          // 임신중 제외하고 육아휴직 회차만 카운트
+          const roundNum = r.prevPeriods.slice(0, i + 1).filter(x => x.type !== '육아휴직(임신중)').length;
+          return (
+            <div key={p.id} style={{ fontSize: 11, color: 'var(--text2)' }}>
+              {p.type === '육아휴직(임신중)'
+                ? `📋 임신중: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
+                : `📋 ${roundNum}회차: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
+              }
+            </div>
+          );
+        })}
         <div>📅 {r.start_date?.split('T')[0]} ~ {r.end_date?.split('T')[0] || '미정'} ({r.used_days ? r.used_days+'일' : '-'})</div>
         {r.prevPeriods?.length > 0 && totalUsedDays > 0 && (
           <div style={{ fontSize: 11, fontWeight: 700, color: '#854F0B', background: '#FAEEDA', borderRadius: 6, padding: '3px 8px', display: 'inline-block', marginTop: 2 }}>
