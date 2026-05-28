@@ -2,6 +2,44 @@ const BASE = import.meta.env.VITE_API_URL || '/api';
 
 function getToken() { return localStorage.getItem('hr_token'); }
 
+// ── 간단한 메모리 캐시 ──────────────────────
+const cache = new Map();
+const CACHE_TTL = 30 * 1000; // 30초
+
+function getCached(key) {
+  const item = cache.get(key);
+  if (!item) return null;
+  if (Date.now() - item.ts > CACHE_TTL) { cache.delete(key); return null; }
+  return item.data;
+}
+
+function setCache(key, data) {
+  cache.set(key, { data, ts: Date.now() });
+}
+
+export function invalidateCache(pattern) {
+  for (const key of cache.keys()) {
+    if (key.includes(pattern)) cache.delete(key);
+  }
+}
+
+// stale-while-revalidate: 캐시 있으면 즉시 반환 + 백그라운드 갱신
+async function cachedRequest(path, setter) {
+  const cached = getCached(path);
+  if (cached) {
+    setter?.(cached); // 캐시 즉시 반환
+    // 백그라운드로 최신 데이터 갱신
+    request(path).then(fresh => {
+      setCache(path, fresh);
+      setter?.(fresh);
+    }).catch(() => {});
+    return cached;
+  }
+  const data = await request(path);
+  setCache(path, data);
+  return data;
+}
+
 async function request(path, options = {}) {
   const token = getToken();
   const res = await fetch(`${BASE}${path}`, {
@@ -99,9 +137,9 @@ export const api = {
   // 메모
   getMemos: (q) => {
     const qs = q ? '?q=' + encodeURIComponent(q) : '';
-    return request('/memos' + qs);
+    return cachedRequest('/memos' + qs);
   },
-  getMemo: (id) => request('/memos/' + id),
+  getMemo: (id) => cachedRequest('/memos/' + id),
   shareMemo: (id, userIds) => request('/memos/' + id + '/share', { method: 'POST', body: JSON.stringify({ user_ids: userIds }) }),
   getMemoUnreadCount: () => request('/memos/unread-count'),
   markMemoRead: (id) => request('/memos/' + id + '/read', { method: 'PATCH' }),
@@ -110,21 +148,21 @@ export const api = {
   deleteMemoComment: (memoId, id) => request('/memos/' + memoId + '/comments/' + id, { method: 'DELETE' }),
   getMemoShares: (id) => request('/memos/' + id + '/shares'),
   unshareMemo: (id, userId) => request('/memos/' + id + '/shares/' + userId, { method: 'DELETE' }),
-  createMemo: (body) => request('/memos', { method: 'POST', body: JSON.stringify(body) }),
-  updateMemo: (id, body) => request('/memos/' + id, { method: 'PUT', body: JSON.stringify(body) }),
-  deleteMemo: (id) => request('/memos/' + id, { method: 'DELETE' }),
+  createMemo: (body) => request('/memos', { method: 'POST', body: JSON.stringify(body) }).then(r => { invalidateCache('/memos'); return r; }),
+  updateMemo: (id, body) => request('/memos/' + id, { method: 'PUT', body: JSON.stringify(body) }).then(r => { invalidateCache('/memos'); return r; }),
+  deleteMemo: (id) => request('/memos/' + id, { method: 'DELETE' }).then(r => { invalidateCache('/memos'); return r; }),
 
   // 사무실
-  getOrgMap: () => request('/orgmap'),
+  getOrgMap: () => cachedRequest('/orgmap'),
   addOrgMap: (body) => request('/orgmap', { method: 'POST', body: JSON.stringify(body) }),
   deleteOrgMap: (id) => request('/orgmap/' + id, { method: 'DELETE' }),
   downloadOrgMapTemplate: () => fetch(BASE + '/orgmap/template', { headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') } }).then(r => r.blob()),
   uploadOrgMap: (file) => { const fd = new FormData(); fd.append('file', file); return fetch(BASE + '/orgmap/upload', { method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') }, body: fd }).then(r => r.json()); },
   getOffices: (params = {}) => {
     const q = new URLSearchParams(params).toString();
-    return request('/offices' + (q ? '?' + q : ''));
+    return cachedRequest('/offices' + (q ? '?' + q : ''));
   },
-  getOfficeHeadquarters: () => request('/offices/headquarters'),
+  getOfficeHeadquarters: () => cachedRequest('/offices/headquarters'),
   getOfficeDepartments: (hq) => request('/offices/departments' + (hq ? '?headquarters=' + encodeURIComponent(hq) : '')),
   getOfficeOrgs: (hq, dept) => { const p = new URLSearchParams(); if(hq) p.set('headquarters',hq); if(dept) p.set('department',dept); return request('/offices/orgs' + (p.toString() ? '?' + p.toString() : '')); },
   getOffice: (id) => request('/offices/' + id),
@@ -161,12 +199,12 @@ export const api = {
   getMyHousingStatus: (emp_no, password) => request('/housing/my-status', { method: 'POST', body: JSON.stringify({ emp_no, password }) }),
   submitSupplement: (id, emp_no, password, supplement) => request('/housing/supplement/' + id, { method: 'PATCH', body: JSON.stringify({ emp_no, password, supplement }) }),
   withdrawHousing: (id, emp_no, password) => request('/housing/withdraw/' + id, { method: 'DELETE', body: JSON.stringify({ emp_no, password }) }),
-  getHousingRequests: () => request('/housing'),
+  getHousingRequests: () => cachedRequest('/housing'),
   getHousingStats: (params = {}) => { const q = new URLSearchParams(params).toString(); return request('/housing/stats' + (q ? '?' + q : '')); },
   updateHousingStatus: (id, body) => request('/housing/' + id + '/status', { method: 'PATCH', body: JSON.stringify(body) }),
   updateHousingContract: (id, body) => request('/housing/' + id + '/contract', { method: 'PATCH', body: JSON.stringify(body) }),
   resetHousingPassword: (id) => request('/housing/' + id + '/reset-password', { method: 'PATCH' }),
-  deleteHousingRequest: (id) => request('/housing/' + id, { method: 'DELETE' }),
+  deleteHousingRequest: (id) => request('/housing/' + id, { method: 'DELETE' }).then(r => { invalidateCache('/housing'); return r; }),
   downloadHousingTemplate: () => {
     const token = localStorage.getItem('hr_token');
     fetch(BASE + '/housing/template/excel', { headers: { Authorization: 'Bearer ' + token } })
@@ -214,7 +252,7 @@ export const api = {
   // 수선관리
   submitRepair: (body) => request('/repairs', { method: 'POST', body: JSON.stringify(body) }),
   getMyRepairs: (emp_no, password) => request('/repairs/my-status', { method: 'POST', body: JSON.stringify({ emp_no, password }) }),
-  getRepairs: () => request('/repairs'),
+  getRepairs: () => cachedRequest('/repairs'),
   addRepairDirect: (body) => request('/repairs/direct', { method: 'POST', body: JSON.stringify(body) }),
   updateRepairStatus: (id, body) => request('/repairs/' + id + '/status', { method: 'PATCH', body: JSON.stringify(body) }),
   resetRepairPassword: (id) => request('/repairs/' + id + '/reset-password', { method: 'PATCH' }),
@@ -228,14 +266,14 @@ export const api = {
 
   // 근태관리
   getAttendanceSplitCount: (emp_no, type, start_date) => request('/attendance/split-count?emp_no=' + emp_no + '&type=' + encodeURIComponent(type) + '&start_date=' + (start_date||'')),
-  getAttendance: (params={}) => { const q = new URLSearchParams(params).toString(); return request('/attendance' + (q?'?'+q:'')); },
+  getAttendance: (params={}) => { const q = new URLSearchParams(params).toString(); return cachedRequest('/attendance' + (q?'?'+q:'')); },
   getAttendanceStats: (params={}) => { const q = new URLSearchParams(params).toString(); return request('/attendance/stats' + (q?'?'+q:'')); },
-  createAttendance: (body) => request('/attendance', { method: 'POST', body: JSON.stringify(body) }),
+  createAttendance: (body) => request('/attendance', { method: 'POST', body: JSON.stringify(body) }).then(r => { invalidateCache('/attendance'); return r; }),
   updateAttendance: (id, body) => request('/attendance/' + id, { method: 'PATCH', body: JSON.stringify(body) }),
   closeAttendance: (id, body) => request('/attendance/' + id + '/close', { method: 'PATCH', body: JSON.stringify(body) }),
   downloadAttendanceTemplate: () => fetch(BASE + '/attendance/template/excel', { headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') } }).then(r => r.blob()),
   uploadAttendanceExcel: (file) => { const fd = new FormData(); fd.append('file', file); return fetch(BASE + '/attendance/upload/excel', { method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') }, body: fd }).then(r => r.json()); },
   revertAttendance: (id) => request('/attendance/' + id + '/revert', { method: 'PATCH' }),
   extendAttendance: (id, body) => request('/attendance/' + id + '/extend', { method: 'POST', body: JSON.stringify(body) }),
-  deleteAttendance: (id) => request('/attendance/' + id, { method: 'DELETE' }),
+  deleteAttendance: (id) => request('/attendance/' + id, { method: 'DELETE' }).then(r => { invalidateCache('/attendance'); return r; }),
 };
