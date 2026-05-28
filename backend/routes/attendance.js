@@ -139,6 +139,19 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
 
           if (!d.start_date) continue;
 
+          // 사용일수 자동계산
+          if (!d.used_days && d.start_date && d.end_date) {
+            const s = new Date(d.start_date), e = new Date(d.end_date);
+            d.used_days = Math.ceil((e - s) / (1000*60*60*24)) + 1;
+          }
+
+          // 복직예정일 자동계산 (+1일)
+          if (!d.return_date && d.end_date) {
+            const e = new Date(d.end_date);
+            e.setDate(e.getDate() + 1);
+            d.return_date = e.toISOString().split('T')[0];
+          }
+
           // 회차 자동계산 (엑셀에 없으면 자동)
           if (!d.split_count && d.emp_no && d.type) {
             const familyTypes = ['가족돌봄휴직','가족돌봄휴가'];
