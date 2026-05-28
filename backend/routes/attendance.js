@@ -540,8 +540,7 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
       start_date, end_date, return_date, used_days,
       child_order, split_count, disease_name, family_target, leave_reason,
       reduce_hours, work_start_time, work_end_time, normal_return_date, contract_date,
-      retirement_date, off_start_date, leave_deleted, doc_completed,
-      is_extension, parent_id, status
+      retirement_date, off_start_date, leave_deleted, doc_completed, status
     ) VALUES (
       ${original.category}, ${original.type}, ${original.office_id}, ${original.org_name},
       ${original.emp_no}, ${original.emp_name},
@@ -553,7 +552,7 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
       ${original.normal_return_date||null}, ${original.contract_date||null},
       ${original.retirement_date||null}, ${original.off_start_date||null},
       ${original.leave_deleted||false}, ${original.doc_completed||false},
-      ${!is_split}, ${original.parent_id || original.id}, ${newStatus}
+      ${newStatus}
     ) RETURNING *
   `;
   res.status(201).json(newRec);
