@@ -614,7 +614,10 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
   const cc = CAT_COLOR[r.category] || '#854F0B';
   const childStyle = r.child_order ? (CHILD_COLORS[r.child_order] || { bg: '#EAF3DE', color: '#3B6D11' }) : null;
 
-  // 총 사용일수 (이전 회차 + 현재)
+  // 상태별 카드 배경
+  const cardBg = r.status === '진행중' ? '#FFFDF0' : r.status === '예정' ? '#FFF5F5' : 'var(--bg)';
+
+  // 총 사용일수
   const prevTotalDays = r.prevPeriods?.reduce((sum, p) => sum + (p.used_days || 0), 0) || 0;
   const totalUsedDays = prevTotalDays + (r.used_days || 0);
 
@@ -626,7 +629,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
   const startDiff = startDate ? Math.ceil((startDate - today) / (1000*60*60*24)) : null;
 
   let alertBadge = null;
-  if (r.status === '진행중') {
+  if (r.status === '진행중' || r.status === '종료예정') {
     if (endDate && endDiff < 0) {
       alertBadge = { text: `🔴 종료일 ${Math.abs(endDiff)}일 경과`, bg: '#FCEBEB', color: '#A32D2D' };
     } else if (endDate && endDiff >= 0 && endDiff <= 15) {
@@ -637,7 +640,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
   }
 
   return (
-    <div style={{ background: 'var(--bg)', border: `0.5px solid ${alertBadge?.color || cc}20`, borderLeft: `4px solid ${alertBadge?.color || cc}`, borderRadius: 12, padding: '12px 14px' }}>
+    <div style={{ background: cardBg, border: `0.5px solid ${alertBadge?.color || cc}20`, borderLeft: `4px solid ${alertBadge?.color || cc}`, borderRadius: 12, padding: '12px 14px' }}>
       {alertBadge && (
         <div style={{ marginBottom: 8, display: 'inline-block', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: alertBadge.bg, color: alertBadge.color }}>
           {alertBadge.text}
@@ -728,6 +731,7 @@ export default function AttendanceMgmt() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState('');
   const [catFilter, setCatFilter] = useState('전체');
+  const [yearFilter, setYearFilter] = useState('');
   const [hqFilter, setHqFilter] = useState('');
   const [deptFilter, setDeptFilter] = useState('');
   const [orgFilter, setOrgFilter] = useState('');
@@ -862,7 +866,8 @@ export default function AttendanceMgmt() {
     const matchHq = !hqOrgNames || hqOrgNames.has(r.org_name);
     const matchDept = !deptOrgNames || deptOrgNames.has(r.org_name);
     const matchOrg = !orgFilter || r.org_name === orgFilter;
-    return matchCat && matchSt && matchSearch && matchHq && matchDept && matchOrg;
+    const matchYear = !yearFilter || r.start_date?.split('T')[0]?.startsWith(yearFilter);
+    return matchCat && matchSt && matchSearch && matchHq && matchDept && matchOrg && matchYear;
   }).sort((a, b) => {
     const ea = a.end_date ? new Date(a.end_date) : new Date('9999-12-31');
     const eb = b.end_date ? new Date(b.end_date) : new Date('9999-12-31');
@@ -946,6 +951,12 @@ export default function AttendanceMgmt() {
 
       {/* 조직 필터 */}
       <div style={{ display: 'flex', gap: 6, padding: '8px 16px', borderBottom: '0.5px solid var(--border)' }}>
+        <select value={yearFilter} onChange={e => setYearFilter(e.target.value)} style={{ width: 80, fontSize: 12, height: 34, flexShrink: 0 }}>
+          <option value="">전체연도</option>
+          {Array.from({length: new Date().getFullYear() - 2018}, (_, i) => new Date().getFullYear() - i).map(y => (
+            <option key={y} value={String(y)}>{y}</option>
+          ))}
+        </select>
         <select value={hqFilter} onChange={e => { setHqFilter(e.target.value); setDeptFilter(''); setOrgFilter(''); }} style={{ flex: 1, fontSize: 12, height: 34 }}>
           <option value="">전체 본부</option>
           {hqList.map(h => <option key={h} value={h}>{h}</option>)}
