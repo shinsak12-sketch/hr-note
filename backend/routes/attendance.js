@@ -102,7 +102,14 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
 
           const fmtDate = (v) => {
             if (!v) return null;
-            if (v instanceof Date) return v.toISOString().split('T')[0];
+            if (v instanceof Date) {
+              return v.toISOString().split('T')[0];
+            }
+            // 엑셀 시리얼 숫자 변환
+            if (typeof v === 'number') {
+              const date = new Date((v - 25569) * 86400 * 1000);
+              return date.toISOString().split('T')[0];
+            }
             const s = String(v).trim();
             return s || null;
           };
