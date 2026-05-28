@@ -346,7 +346,8 @@ router.get('/alert-count', authMiddleware, async (req, res) => {
   res.json({ count: Number(row.cnt) });
 });
 
-
+// 등록
+router.post('/', authMiddleware, async (req, res) => {
   const d = req.body;
 
   // 한국 시간 기준 오늘
