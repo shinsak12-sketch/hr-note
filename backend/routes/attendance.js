@@ -203,7 +203,6 @@ router.get('/stats', authMiddleware, async (req, res) => {
 
   // 현재 진행중 카운트
   const active = list.filter(r => r.status === '진행중');
-  const summary = {
     휴직: active.filter(r => r.category === '휴직').length,
     휴가: active.filter(r => r.category === '휴가').length,
     단축근무: active.filter(r => r.category === '단축근무').length,
@@ -264,6 +263,26 @@ router.get('/stats', authMiddleware, async (req, res) => {
 // 등록
 router.post('/', authMiddleware, async (req, res) => {
   const d = req.body;
+
+  // 한국 시간 기준 오늘
+  const koreaToday = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+  // 시작일 검증 - 같은 사번+종류의 마지막 종료일 이후여야 함
+  if (d.emp_no && d.type && d.start_date) {
+    const existing = await sql`
+      SELECT end_date FROM attendance 
+      WHERE emp_no=${d.emp_no} AND type=${d.type}
+      AND end_date IS NOT NULL
+      ORDER BY end_date DESC LIMIT 1
+    `;
+    if (existing.length > 0 && existing[0].end_date) {
+      const lastEnd = String(existing[0].end_date).split('T')[0];
+      if (d.start_date <= lastEnd) {
+        return res.status(400).json({ error: `시작일(${d.start_date})은 기존 마지막 종료일(${lastEnd}) 이후여야 합니다.` });
+      }
+    }
+  }
+
   // 기간 중복 체크 (force가 아닐 때만)
   if (!d.force && d.emp_no && d.start_date) {
     const overlaps = await sql`
@@ -302,7 +321,7 @@ router.post('/', authMiddleware, async (req, res) => {
       ${d.normal_return_date||null}, ${d.contract_date||null},
       ${d.retirement_date||null}, ${d.off_start_date||null},
       ${d.leave_deleted||false}, ${d.doc_completed||false},
-      ${d.start_date > new Date().toISOString().split('T')[0] ? '예정' : '진행중'}
+      ${d.start_date > koreaToday ? '예정' : '진행중'}
     ) RETURNING *
   `;
   res.status(201).json(rec);

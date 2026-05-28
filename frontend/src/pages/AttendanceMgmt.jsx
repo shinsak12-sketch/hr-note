@@ -107,15 +107,18 @@ function InputModal({ record, offices, onClose, onDone }) {
       else await api.createAttendance(form);
       onDone(isEdit ? '수정되었습니다.' : '등록되었습니다.');
     } catch (e) {
-      if (e.message?.includes('기간 중복')) {
+      if (e.message?.includes('시작일')) {
+        alert(`⚠️ ${e.message}`);
+      } else if (e.message?.includes('기간 중복')) {
         if (!window.confirm(`⚠️ ${e.message}\n\n그래도 등록하시겠습니까?`)) {
           setSaving(false); return;
         }
-        // 강제 등록 (overlap 무시 파라미터)
         try {
           await api.createAttendance({ ...form, force: true });
           onDone('등록되었습니다.');
-        } catch (e2) { }
+        } catch (e2) { alert(e2.message); }
+      } else {
+        alert(e.message || '오류가 발생했습니다.');
       }
     } finally { setSaving(false); }
   }
