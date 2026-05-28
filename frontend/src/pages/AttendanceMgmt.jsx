@@ -700,13 +700,16 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           {r.split_count >= 1 && r.type !== '육아휴직(임신중)' && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>{r.split_count}회차</span>}
           {isExtensionCard && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F5E8F8', color: '#7B2D8B', whiteSpace: 'nowrap' }}>연장</span>}
           {r.child_order && childStyle && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: childStyle.bg, color: childStyle.color, whiteSpace: 'nowrap' }}>{r.child_order}</span>}
-          {isExtPending ? (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F0EBF8', color: '#5C3D8F', whiteSpace: 'nowrap' }}>연장예정</span>
-          ) : isDone ? (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: STATUS_STYLE['정상종료'].bg, color: STATUS_STYLE['정상종료'].color, whiteSpace: 'nowrap' }}>{r.close_type || '종료예정'}</span>
-          ) : (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: st.bg, color: st.color, whiteSpace: 'nowrap' }}>{r.status}</span>
-          )}
+          {/* 진행중 배지: 날짜 기준 */}
+          {(() => {
+            const inProgress = startStr && startStr <= todayStr && (!endStr || endStr >= todayStr);
+            const ended = endStr && endStr < todayStr;
+            if (inProgress) return <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>진행중</span>;
+            if (!startStr || startStr > todayStr) return <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#FAEEDA', color: '#854F0B', whiteSpace: 'nowrap' }}>예정</span>;
+            if (ended) return <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: STATUS_STYLE['정상종료'].bg, color: STATUS_STYLE['정상종료'].color, whiteSpace: 'nowrap' }}>{r.status === '조기종료' ? '조기종료' : '정상종료'}</span>;
+          })()}
+          {/* 추가 배지: 조치 상태 */}
+          {isExtPending && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F0EBF8', color: '#5C3D8F', whiteSpace: 'nowrap' }}>연장예정</span>}
         </div>
         <div ref={menuRef} style={{ position: 'relative' }}>
           <button onClick={() => setMenuOpen(o=>!o)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', color: 'var(--text2)', fontSize: 18 }}>⋮</button>
