@@ -626,9 +626,10 @@ function CommentModal({ record, onClose, onDone }) {
   const [saving, setSaving] = useState(false);
   async function handleSave() {
     setSaving(true);
-    await api.updateAttendance(record.id, { comment });
-    onDone('코멘트가 저장되었습니다.');
-    setSaving(false);
+    try {
+      await api.updateAttendanceComment(record.id, comment);
+      onDone('코멘트가 저장되었습니다.');
+    } catch(e) { alert(e.message); } finally { setSaving(false); }
   }
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'flex-end' }}>

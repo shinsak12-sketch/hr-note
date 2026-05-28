@@ -484,6 +484,16 @@ router.patch('/:id', authMiddleware, async (req, res) => {
   res.json(rec);
 });
 
+// 코멘트만 업데이트
+router.patch('/:id/comment', authMiddleware, async (req, res) => {
+  const { comment } = req.body;
+  const [rec] = await sql`
+    UPDATE attendance SET comment=${comment||null}, updated_at=NOW()
+    WHERE id=${req.params.id} RETURNING *
+  `;
+  res.json(rec);
+});
+
 // 종료취소 (진행중 복원)
 router.patch('/:id/revert', authMiddleware, async (req, res) => {
   const [original] = await sql`SELECT original_end_date FROM attendance WHERE id=${req.params.id}`;

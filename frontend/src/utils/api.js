@@ -275,6 +275,7 @@ export const api = {
   closeAttendance: (id, body) => request('/attendance/' + id + '/close', { method: 'PATCH', body: JSON.stringify(body) }).then(r => { invalidateCache('/attendance'); return r; }),
   downloadAttendanceTemplate: () => fetch(BASE + '/attendance/template/excel', { headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') } }).then(r => r.blob()),
   uploadAttendanceExcel: (file) => { const fd = new FormData(); fd.append('file', file); return fetch(BASE + '/attendance/upload/excel', { method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') }, body: fd }).then(r => r.json()); },
+  updateAttendanceComment: (id, comment) => request('/attendance/' + id + '/comment', { method: 'PATCH', body: JSON.stringify({ comment }) }),
   revertAttendance: (id) => request('/attendance/' + id + '/revert', { method: 'PATCH' }).then(r => { invalidateCache('/attendance'); return r; }),
   extendAttendance: (id, body) => request('/attendance/' + id + '/extend', { method: 'POST', body: JSON.stringify(body) }).then(r => { invalidateCache('/attendance'); return r; }),
   deleteAttendance: (id) => request('/attendance/' + id, { method: 'DELETE' }).then(r => { invalidateCache('/attendance'); return r; }),
