@@ -80,10 +80,10 @@ export default function ParentalLeaveCalc() {
         const parsed = JSON.parse(raw);
         const filled = parsed.map(p => ({ start: p.start || '', end: p.end || '' }));
         while (filled.length < 9) filled.push({ start: '', end: '' });
-        return filled.slice(0, 5);
+        return filled.slice(0, 9);
       }
     } catch {}
-    return [{ start:'',end:'' },{ start:'',end:'' },{ start:'',end:'' },{ start:'',end:'' },{ start:'',end:'' }];
+    return Array.from({length: 9}, () => ({ start:'', end:'' }));
   };
 
   const fromName = searchParams.get('emp_name') || '';
