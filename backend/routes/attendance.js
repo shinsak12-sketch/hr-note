@@ -23,14 +23,30 @@ router.get('/split-count', authMiddleware, async (req, res) => {
     `;
     count = Number(row.cnt);
   } else if (type === '육아휴직') {
-    // 임신중 종류 제외하고 카운트
-    const [row] = await sql`
-      SELECT COUNT(*) as cnt FROM attendance
-      WHERE emp_no=${emp_no} AND type=${type}
-      AND (child_order IS NULL OR child_order != '임신중')
-      ${child_order ? sql`AND child_order=${child_order}` : sql``}
-    `;
-    count = Number(row.cnt);
+    // 임신중/연장(날짜 연속) 제외하고 카운트
+    let rows;
+    if (child_order) {
+      rows = await sql`
+        SELECT start_date, end_date FROM attendance
+        WHERE emp_no=${emp_no} AND type=${type} AND child_order=${child_order}
+        ORDER BY start_date ASC
+      `;
+    } else {
+      rows = await sql`
+        SELECT start_date, end_date FROM attendance
+        WHERE emp_no=${emp_no} AND type=${type}
+        ORDER BY start_date ASC
+      `;
+    }
+    // 연장(이전 종료일+1 = 현재 시작일) 제외하고 카운트
+    count = rows.reduce((cnt, row, i) => {
+      if (i === 0) return cnt + 1;
+      const prevEnd = rows[i-1].end_date;
+      const curStart = row.start_date;
+      if (!prevEnd || !curStart) return cnt + 1;
+      const diff = Math.round((new Date(curStart) - new Date(prevEnd)) / (1000*60*60*24));
+      return diff === 1 ? cnt : cnt + 1; // 연장이면 카운트 안 함
+    }, 0);
   } else if (type === '육아휴직(임신중)') {
     // 임신중은 회차 카운트 안 함 → 항상 1 반환
     return res.json({ split_count: null });
@@ -185,19 +201,26 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
                   AND child_order=${d.child_order}
                 `;
               } else if (d.type === '육아휴직') {
-                countRows = await sql`
-                  SELECT COUNT(*) as cnt FROM attendance
-                  WHERE emp_no=${d.emp_no} AND type=${d.type}
-                  AND (child_order IS NULL OR child_order != '임신중')
-                  ${d.child_order ? sql`AND child_order=${d.child_order}` : sql``}
-                `;
+                // 연장(날짜 연속) 제외하고 카운트
+                let rows;
+                if (d.child_order) {
+                  rows = await sql`SELECT start_date, end_date FROM attendance WHERE emp_no=${d.emp_no} AND type=${d.type} AND child_order=${d.child_order} ORDER BY start_date ASC`;
+                } else {
+                  rows = await sql`SELECT start_date, end_date FROM attendance WHERE emp_no=${d.emp_no} AND type=${d.type} ORDER BY start_date ASC`;
+                }
+                const cnt = rows.reduce((c, row, i) => {
+                  if (i === 0) return c + 1;
+                  const diff = Math.round((new Date(row.start_date) - new Date(rows[i-1].end_date)) / (1000*60*60*24));
+                  return diff === 1 ? c : c + 1;
+                }, 0);
+                d.split_count = cnt + 1;
               } else {
                 countRows = await sql`
                   SELECT COUNT(*) as cnt FROM attendance
                   WHERE emp_no=${d.emp_no} AND type=${d.type}
                 `;
+                d.split_count = Number(countRows[0].cnt) + 1;
               }
-              d.split_count = Number(countRows[0].cnt) + 1;
             }
           }
 
