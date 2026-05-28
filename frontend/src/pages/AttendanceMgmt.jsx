@@ -676,12 +676,12 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
             📋 {i+1}회차: {p.start_date?.split('T')[0]} ~ {p.end_date?.split('T')[0] || '진행중'} {p.used_days ? `(${p.used_days}일)` : ''}
           </div>
         ))}
+        <div>📅 {r.start_date?.split('T')[0]} ~ {r.end_date?.split('T')[0] || '미정'} ({r.used_days ? r.used_days+'일' : '-'})</div>
         {r.prevPeriods?.length > 0 && totalUsedDays > 0 && (
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#854F0B', background: '#FAEEDA', borderRadius: 6, padding: '3px 8px', display: 'inline-block', marginBottom: 2 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#854F0B', background: '#FAEEDA', borderRadius: 6, padding: '3px 8px', display: 'inline-block', marginTop: 2 }}>
             📊 총 사용일수: {totalUsedDays}일
           </div>
         )}
-        <div>📅 {r.start_date?.split('T')[0]} ~ {r.end_date?.split('T')[0] || '미정'} ({r.used_days ? r.used_days+'일' : '-'})</div>
         {r.return_date && <div>🔙 복직예정: {r.return_date?.split('T')[0]}</div>}
         {r.disease_name && <div>🏥 {r.disease_name}</div>}
         {r.birth_type && <div>👶 {r.birth_type}</div>}
