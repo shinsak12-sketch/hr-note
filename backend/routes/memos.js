@@ -116,21 +116,26 @@ router.delete('/:id', async (req, res) => {
   res.json({ message: '삭제되었습니다.' });
 });
 
-// 댓글 목록
+// 댓글 목록 (원본 메모 & 공유본 모두 같은 댓글 공유)
 router.get('/:id/comments', async (req, res) => {
+  // 공유본이면 원본 id로 조회, 원본이면 그대로
+  const [memo] = await sql`SELECT id, shared_from FROM memos WHERE id=${req.params.id}`;
+  const targetId = memo?.shared_from || req.params.id;
   const comments = await sql`
-    SELECT * FROM memo_comments WHERE memo_id=${req.params.id} ORDER BY created_at ASC
+    SELECT * FROM memo_comments WHERE memo_id=${targetId} ORDER BY created_at ASC
   `;
   res.json(comments);
 });
 
-// 댓글 등록
+// 댓글 등록 (원본에 저장)
 router.post('/:id/comments', async (req, res) => {
   const { content } = req.body;
   if (!content) return res.status(400).json({ error: '내용을 입력하세요.' });
+  const [memo] = await sql`SELECT id, shared_from FROM memos WHERE id=${req.params.id}`;
+  const targetId = memo?.shared_from || req.params.id;
   const [comment] = await sql`
     INSERT INTO memo_comments (memo_id, user_id, user_name, content)
-    VALUES (${req.params.id}, ${req.user.id}, ${req.user.name}, ${content})
+    VALUES (${targetId}, ${req.user.id}, ${req.user.name}, ${content})
     RETURNING *
   `;
   res.status(201).json(comment);

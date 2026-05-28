@@ -203,7 +203,11 @@ export default function MemoEdit() {
   }
 
   async function handleDelete() {
-    if (!delConfirm) { setDelConfirm(true); return; }
+    if (!delConfirm) {
+      setDelConfirm(true);
+      setTimeout(() => setDelConfirm(false), 3000); // 3초 후 자동 초기화
+      return;
+    }
     if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
     if (memoIdRef.current) await api.deleteMemo(memoIdRef.current);
     nav('/memos-app', { replace: true });
@@ -336,7 +340,8 @@ export default function MemoEdit() {
           {attachments.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {attachments.map(att => {
-                const isImage = att.file_type?.startsWith('image/');
+                const isImage = att.file_type?.startsWith('image/') ||
+                  /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(att.file_url || att.file_name || '');
                 return (
                   <div key={att.id} style={{ border: '0.5px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
                     {isImage && (
@@ -344,6 +349,7 @@ export default function MemoEdit() {
                         src={att.file_url.replace('/upload/', '/upload/w_800,c_limit,q_auto,f_auto/')}
                         alt={att.file_name}
                         style={{ width: '100%', height: 'auto', display: 'block', background: 'var(--bg2)' }}
+                        onError={e => { e.target.style.display = 'none'; }}
                       />
                     )}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px' }}>
@@ -354,8 +360,11 @@ export default function MemoEdit() {
                       <span style={{ fontSize: 11, color: 'var(--text2)', flexShrink: 0 }}>{att.file_size ? Math.round(att.file_size/1024) + 'KB' : ''}</span>
                       {!memoData?.is_shared && (
                         <button onClick={async () => {
-                          await api.deleteAttachment(att.id);
-                          setAttachments(a => a.filter(x => x.id !== att.id));
+                          if (!window.confirm('첨부파일을 삭제하시겠습니까?')) return;
+                          try {
+                            await api.deleteAttachment(att.id);
+                            setAttachments(a => a.filter(x => x.id !== att.id));
+                          } catch(e) { alert('삭제 실패: ' + e.message); }
                         }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#A32D2D', fontSize: 16, padding: '0 4px', flexShrink: 0 }}>×</button>
                       )}
                     </div>
@@ -371,8 +380,8 @@ export default function MemoEdit() {
         <ShareModal memoId={memoIdRef.current} onClose={() => setShareModal(false)} />
       )}
 
-      {/* 댓글 섹션 - 공유된 메모에서만 표시 */}
-      {memoIdRef.current && (memoData?.is_shared || comments.length > 0) && (
+      {/* 댓글 섹션 - 저장된 메모이면 모두 표시 */}
+      {isEdit && memoIdRef.current && (
         <div style={{ borderTop: '0.5px solid var(--border)', padding: '12px 16px 20px' }}>
           <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>
             💬 댓글 {comments.length > 0 ? `(${comments.length})` : ''}
