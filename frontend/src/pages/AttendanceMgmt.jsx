@@ -732,7 +732,7 @@ export default function AttendanceMgmt() {
 
   useEffect(() => {
     load();
-    api.getOffices().then(setOffices);
+    api.getOffices().then(data => { console.log('offices sample:', data?.[0]); setOffices(data); });
     function h(e) { if (headerMenuRef.current && !headerMenuRef.current.contains(e.target)) setMenuOpen(false); }
     document.addEventListener('mousedown', h);
     return () => document.removeEventListener('mousedown', h);
