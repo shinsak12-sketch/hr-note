@@ -23,14 +23,17 @@ router.get('/split-count', authMiddleware, async (req, res) => {
     `;
     count = Number(row.cnt);
   } else if (type === '육아휴직') {
-    // 임신중 제외하고 카운트
+    // 임신중 종류 제외하고 카운트
     const [row] = await sql`
       SELECT COUNT(*) as cnt FROM attendance
       WHERE emp_no=${emp_no} AND type=${type}
       AND (child_order IS NULL OR child_order != '임신중')
-      ${child_order && child_order !== '임신중' ? sql`AND child_order=${child_order}` : sql``}
+      ${child_order ? sql`AND child_order=${child_order}` : sql``}
     `;
     count = Number(row.cnt);
+  } else if (type === '육아휴직(임신중)') {
+    // 임신중은 회차 카운트 안 함 → 항상 1 반환
+    return res.json({ split_count: null });
   } else {
     const [row] = await sql`
       SELECT COUNT(*) as cnt FROM attendance

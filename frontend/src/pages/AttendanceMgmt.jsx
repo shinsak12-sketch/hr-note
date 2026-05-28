@@ -5,12 +5,12 @@ import { Toast } from '../components/Common.jsx';
 
 const CATEGORIES = ['휴직', '휴가', '단축근무', '근무OFF'];
 const TYPES = {
-  '휴직': ['육아휴직','질병휴직','난임휴직','가족돌봄휴직','무급휴직','명령휴직'],
+  '휴직': ['육아휴직','육아휴직(임신중)','질병휴직','난임휴직','가족돌봄휴직','무급휴직','명령휴직'],
   '휴가': ['질병휴가','출산전휴가','출산후휴가','출산전후휴가','가족돌봄휴가'],
   '단축근무': ['육아기단축근무','임신중단축근무'],
   '근무OFF': ['근무OFF'],
 };
-const CHILD_ORDERS = ['첫째','둘째','셋째','넷째','임신중'];
+const CHILD_ORDERS = ['첫째','둘째','셋째','넷째'];
 const BIRTH_TYPES = ['일반','미숙아','다태아'];
 const STATUS_STYLE = {
   '예정':    { color: '#854F0B', bg: '#FAEEDA' },
@@ -259,7 +259,7 @@ function InputModal({ record, offices, onClose, onDone }) {
           </div>
 
           {/* 종류별 추가 필드 */}
-          {form.type === '육아휴직' && (
+          {(form.type === '육아휴직' || form.type === '육아휴직(임신중)') && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <div className="form-group">
                 <label className="form-label">자녀구분</label>
@@ -652,7 +652,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           {menuOpen && (
             <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', overflow: 'hidden', minWidth: 130 }}>
               <button onClick={() => { onEdit(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#1A4A8A', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>✏️ 수정</button>
-              {r.type === '육아휴직' && (
+              {(r.type === '육아휴직' || r.type === '육아휴직(임신중)') && (
                 <button onClick={() => { onCalc(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#3B6D11', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>🧮 잔여기간 계산</button>
               )}
               {['질병휴직','난임휴직','가족돌봄휴직','질병휴가','가족돌봄휴가'].includes(r.type) && (
@@ -809,9 +809,11 @@ export default function AttendanceMgmt() {
       nav('/hr-calc/leave?' + params.toString());
       return;
     }
-    // 육아휴직 - 사번+자녀구분
+    // 육아휴직 - 사번+자녀구분 (임신중 종류도 포함)
     const related = list.filter(x =>
-      x.emp_no === r.emp_no && x.type === '육아휴직' && x.child_order === r.child_order
+      x.emp_no === r.emp_no &&
+      (x.type === '육아휴직' || x.type === '육아휴직(임신중)') &&
+      x.child_order === r.child_order
     ).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
     const periods = related.map(x => ({
       start: x.start_date?.split('T')[0] || '',
@@ -839,11 +841,11 @@ export default function AttendanceMgmt() {
     return ea - eb;
   }).map(r => {
     // 육아휴직: 사번 + 자녀구분 기준, 자신보다 시작일이 이전인 것만
-    if (r.type === '육아휴직') {
+    if (r.type === '육아휴직' || r.type === '육아휴직(임신중)') {
       const related = list.filter(x =>
         x.id !== r.id &&
         x.emp_no === r.emp_no &&
-        x.type === '육아휴직' &&
+        (x.type === '육아휴직' || x.type === '육아휴직(임신중)') &&
         x.child_order === r.child_order &&
         x.start_date < r.start_date
       ).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
