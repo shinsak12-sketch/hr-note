@@ -717,6 +717,7 @@ export default function AttendanceMgmt() {
   const [offices, setOffices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState('');
+  const [catFilter, setCatFilter] = useState('전체');
   const [hqFilter, setHqFilter] = useState('');
   const [deptFilter, setDeptFilter] = useState('');
   const [orgFilter, setOrgFilter] = useState('');
