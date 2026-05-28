@@ -137,8 +137,12 @@ router.post('/upload/excel', upload.single('file'), async (req, res) => {
     const rows = XLSX.utils.sheet_to_json(ws);
     let success = 0, errors = [];
 
-    // 기존 전체 삭제 후 새로 등록 (덮어쓰기)
-    await sql`DELETE FROM offices`;
+    // 기존 전체 삭제 대신 upsert (org_name 기준)
+    // 먼저 업로드된 org_name 목록 외 삭제
+    const newOrgNames = rows.map(r => String(r['조직명'] || '').trim()).filter(Boolean);
+    if (newOrgNames.length > 0) {
+      await sql`DELETE FROM offices WHERE org_name != ALL(${newOrgNames})`;
+    }
 
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
@@ -155,6 +159,12 @@ router.post('/upload/excel', upload.single('file'), async (req, res) => {
         INSERT INTO offices (headquarters, department, org_name, address, manager_name, phone)
         VALUES (${headquarters}, ${department}, ${org_name}, ${address},
           ${String(r['관리자명']||'').trim()||null}, ${String(r['전화번호']||'').trim()||null})
+        ON CONFLICT (org_name) DO UPDATE SET
+          headquarters=EXCLUDED.headquarters,
+          department=EXCLUDED.department,
+          address=EXCLUDED.address,
+          manager_name=EXCLUDED.manager_name,
+          phone=EXCLUDED.phone
       `;
       success++;
     }
