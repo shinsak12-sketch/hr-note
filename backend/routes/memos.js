@@ -9,19 +9,10 @@ router.use(authMiddleware);
 router.get('/', async (req, res) => {
   const { q } = req.query;
   let memos;
-  if (q) {
-    memos = await sql`
-      SELECT * FROM memos
-      WHERE user_id = ${req.user.id}
-      AND (title ILIKE ${'%'+q+'%'} OR content ILIKE ${'%'+q+'%'} OR tag ILIKE ${'%'+q+'%'})
-      ORDER BY memo_date DESC, updated_at DESC
-    `;
-  } else {
-    memos = await sql`
-      SELECT * FROM memos WHERE user_id = ${req.user.id}
-      ORDER BY memo_date DESC, updated_at DESC
-    `;
-  }
+  const baseQuery = q
+    ? sql`SELECT m.*, (SELECT COUNT(*) FROM memos s WHERE s.shared_from=m.id) as share_count FROM memos m WHERE m.user_id=${req.user.id} AND (m.title ILIKE ${'%'+q+'%'} OR m.content ILIKE ${'%'+q+'%'} OR m.tag ILIKE ${'%'+q+'%'}) ORDER BY m.memo_date DESC, m.updated_at DESC`
+    : sql`SELECT m.*, (SELECT COUNT(*) FROM memos s WHERE s.shared_from=m.id) as share_count FROM memos m WHERE m.user_id=${req.user.id} ORDER BY m.memo_date DESC, m.updated_at DESC`;
+  memos = await baseQuery;
   res.json(memos);
 });
 

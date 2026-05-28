@@ -37,7 +37,12 @@ function MemoCard({ memo, dateStr, ts, onEdit, onDelete }) {
             )}
             {memo.is_shared && (
               <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20, background: '#F0EBF8', color: '#5C3D8F' }}>
-                📤 공유 · {memo.shared_by_name}
+                📤 공유받음 · {memo.shared_by_name}
+              </span>
+            )}
+            {!memo.is_shared && memo.share_count > 0 && (
+              <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20, background: '#EAF3DE', color: '#3B6D11' }}>
+                📤 공유됨 · {memo.share_count}명
               </span>
             )}
           </div>

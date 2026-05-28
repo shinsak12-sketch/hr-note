@@ -289,13 +289,21 @@ export default function MemoEdit() {
         <textarea
           placeholder="내용을 입력하세요..."
           value={form.content}
-          onChange={e => setF('content', e.target.value)}
+          onChange={e => {
+            setF('content', e.target.value);
+            e.target.style.height = 'auto';
+            e.target.style.height = Math.max(200, e.target.scrollHeight) + 'px';
+          }}
+          onFocus={e => {
+            e.target.style.height = 'auto';
+            e.target.style.height = Math.max(200, e.target.scrollHeight) + 'px';
+          }}
           readOnly={memoData?.is_shared}
           style={{
-            flex: 1, border: 'none', background: 'transparent',
+            border: 'none', background: 'transparent',
             fontSize: 15, lineHeight: 1.8, resize: 'none',
-            minHeight: 'calc(100vh - 280px)', borderRadius: 0,
-            padding: '8px 0',
+            minHeight: 200, height: 'auto', borderRadius: 0,
+            padding: '8px 0', overflow: 'hidden',
           }}
           autoFocus={!isEdit && !memoData?.is_shared}
         />
