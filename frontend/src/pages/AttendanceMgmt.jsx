@@ -666,14 +666,14 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
         </div>
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 4 }}>
           <span style={{ fontWeight: 700, fontSize: 15 }}>{r.emp_name}</span>
-          <span style={{ fontSize: 12, color: 'var(--text2)', marginLeft: 6 }}>· {r.emp_no}</span>
-          <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: cc+'20', color: cc }}>{r.type}</span>
-          {r.split_count >= 1 && r.type !== '육아휴직(임신중)' && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A' }}>{r.split_count}회차</span>}
-          {r.is_extension && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F5E8F8', color: '#7B2D8B' }}>연장</span>}
-          {r.child_order && childStyle && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: childStyle.bg, color: childStyle.color }}>{r.child_order}</span>}
-          <span style={{ marginLeft: 4, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: st.bg, color: st.color }}>{r.status}</span>
+          <span style={{ fontSize: 12, color: 'var(--text2)' }}>· {r.emp_no}</span>
+          <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: cc+'20', color: cc, whiteSpace: 'nowrap' }}>{r.type}</span>
+          {r.split_count >= 1 && r.type !== '육아휴직(임신중)' && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>{r.split_count}회차</span>}
+          {r.is_extension && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F5E8F8', color: '#7B2D8B', whiteSpace: 'nowrap' }}>연장</span>}
+          {r.child_order && childStyle && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: childStyle.bg, color: childStyle.color, whiteSpace: 'nowrap' }}>{r.child_order}</span>}
+          <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: st.bg, color: st.color, whiteSpace: 'nowrap' }}>{r.status}</span>
         </div>
         <div ref={menuRef} style={{ position: 'relative' }}>
           <button onClick={() => setMenuOpen(o=>!o)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', color: 'var(--text2)', fontSize: 18 }}>⋮</button>
@@ -713,8 +713,15 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
         })}
         <div>📅 {r.start_date?.split('T')[0]} ~ {r.end_date?.split('T')[0] || '미정'} ({r.used_days ? r.used_days+'일' : '-'})</div>
         {r.prevPeriods?.length > 0 && totalUsedDays > 0 && (
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#854F0B', background: '#FAEEDA', borderRadius: 6, padding: '3px 8px', display: 'inline-block', marginTop: 2 }}>
-            📊 총 사용일수: {totalUsedDays}일
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#854F0B', background: '#FAEEDA', borderRadius: 6, padding: '3px 8px' }}>
+              📊 총 사용일수: {totalUsedDays}일
+            </span>
+            {totalUsedDays > 365 && (
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', background: '#A32D2D', borderRadius: 6, padding: '3px 8px', whiteSpace: 'nowrap' }}>
+                +6개월 추가
+              </span>
+            )}
           </div>
         )}
         {r.return_date && <div>🔙 {['정상종료','조기종료'].includes(r.status) ? '복직일' : '복직예정'}: {r.return_date?.split('T')[0]}</div>}
