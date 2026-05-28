@@ -961,8 +961,14 @@ export default function AttendanceMgmt() {
   const filtered = list.filter(r => {
     const resolvedOrg = resolveOrgName(r.org_name);
     const matchCat = catFilter === '전체' || r.category === catFilter;
-    const matchSt = statusFilter === '전체' || 
-      (statusFilter === '종료' ? (r.status === '정상종료' || r.status === '조기종료') : r.status === statusFilter);
+    const today = new Date(Date.now() + 9*60*60*1000).toISOString().split('T')[0];
+    const rStart = r.start_date?.split('T')[0];
+    const rEnd = r.end_date?.split('T')[0];
+    const dateStatus = !rStart ? '종료'
+      : rStart > today ? '예정'
+      : (!rEnd || rEnd >= today) ? '진행중'
+      : '종료';
+    const matchSt = statusFilter === '전체' || dateStatus === statusFilter;
     const matchSearch = !search || r.emp_name?.includes(search) || r.emp_no?.includes(search) || r.org_name?.includes(search) || r.type?.includes(search);
     const matchHq = !hqOrgNames || hqOrgNames.has(resolvedOrg);
     const matchDept = !deptOrgNames || deptOrgNames.has(resolvedOrg);
@@ -1073,10 +1079,17 @@ export default function AttendanceMgmt() {
       {/* 상태 필터 */}
       <div style={{ display: 'flex', gap: 6, padding: '6px 16px 8px', borderBottom: '0.5px solid var(--border)', overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none", msOverflowStyle: "none" }}>
         {['전체', '예정', '진행중', '종료'].map(s => {
-          const st = STATUS_STYLE[s === '종료' ? '정상종료' : s];
-          const count = s === '전체' ? list.length
-            : s === '종료' ? list.filter(r => r.status === '정상종료' || r.status === '조기종료').length
-            : list.filter(r => r.status === s).length;
+          const today = new Date(Date.now() + 9*60*60*1000).toISOString().split('T')[0];
+          const getDateStatus = (r) => {
+            const rs = r.start_date?.split('T')[0];
+            const re = r.end_date?.split('T')[0];
+            if (!rs) return '종료';
+            if (rs > today) return '예정';
+            if (!re || re >= today) return '진행중';
+            return '종료';
+          };
+          const st = s === '예정' ? STATUS_STYLE['예정'] : s === '진행중' ? STATUS_STYLE['진행중'] : s === '종료' ? STATUS_STYLE['정상종료'] : null;
+          const count = s === '전체' ? list.length : list.filter(r => getDateStatus(r) === s).length;
           return (
             <button key={s} onClick={() => setStatusFilter(s)} style={{
               padding: '4px 12px', borderRadius: 20, border: 'none', whiteSpace: 'nowrap',
