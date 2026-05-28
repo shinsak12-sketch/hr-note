@@ -635,14 +635,18 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
   const cc = CAT_COLOR[r.category] || '#854F0B';
   const childStyle = r.child_order ? (CHILD_COLORS[r.child_order] || { bg: '#EAF3DE', color: '#3B6D11' }) : null;
 
-  // 상태별 카드 배경
-  const cardBg = r.status === '진행중' ? '#FFFDF0' : r.status === '예정' ? '#FFF5F5' : 'var(--bg)';
-
-  // 연장 여부: 이전 레코드 종료일+1 = 현재 시작일
+  // 연장 여부: 이전 레코드 종료일+1 = 현재 시작일 (현재 카드가 연장)
   const prevRecord = r.prevPeriods?.length > 0 ? r.prevPeriods[r.prevPeriods.length - 1] : null;
   const isExtensionCard = !!(prevRecord?.end_date && r.start_date &&
     Math.round((new Date(r.start_date) - new Date(prevRecord.end_date)) / (1000*60*60*24)) === 1 &&
     prevRecord.type !== '육아휴직(임신중)');
+
+  // 기존 카드가 연장예정인지 (종료예정이면서 이후에 연장 카드가 있을 수 있음)
+  // → 이건 status로만 판단, 배지/배경 조정
+  const isExtPending = r.status === '종료예정';
+
+  // 상태별 카드 배경 - 종료예정도 진행중색으로
+  const cardBg = (r.status === '진행중' || isExtPending) ? '#FFFDF0' : r.status === '예정' ? '#FFF5F5' : 'var(--bg)';
   const prevTotalDays = r.prevPeriods?.reduce((sum, p) => sum + (p.used_days || 0), 0) || 0;
   const totalUsedDays = prevTotalDays + (r.used_days || 0);
 
@@ -676,10 +680,17 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           <span style={{ fontWeight: 700, fontSize: 15 }}>{r.emp_name}</span>
           <span style={{ fontSize: 12, color: 'var(--text2)' }}>· {r.emp_no}</span>
           <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: cc+'20', color: cc, whiteSpace: 'nowrap' }}>{r.type}</span>
-          {r.split_count >= 1 && r.type !== '육아휴직(임신중)' && !isExtensionCard && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>{r.split_count}회차</span>}
+          {r.split_count >= 1 && r.type !== '육아휴직(임신중)' && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>{r.split_count}회차</span>}
           {isExtensionCard && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F5E8F8', color: '#7B2D8B', whiteSpace: 'nowrap' }}>연장</span>}
           {r.child_order && childStyle && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: childStyle.bg, color: childStyle.color, whiteSpace: 'nowrap' }}>{r.child_order}</span>}
-          <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: st.bg, color: st.color, whiteSpace: 'nowrap' }}>{r.status}</span>
+          {isExtPending ? (
+            <>
+              <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>진행중</span>
+              <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F0EBF8', color: '#5C3D8F', whiteSpace: 'nowrap' }}>연장예정</span>
+            </>
+          ) : (
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: st.bg, color: st.color, whiteSpace: 'nowrap' }}>{r.status}</span>
+          )}
         </div>
         <div ref={menuRef} style={{ position: 'relative' }}>
           <button onClick={() => setMenuOpen(o=>!o)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', color: 'var(--text2)', fontSize: 18 }}>⋮</button>
