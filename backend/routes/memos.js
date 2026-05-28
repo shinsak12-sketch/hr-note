@@ -60,6 +60,35 @@ router.put('/:id', async (req, res) => {
   res.json(memo);
 });
 
+// 공유
+router.post('/:id/share', async (req, res) => {
+  const { user_ids } = req.body; // 공유할 사용자 ID 배열
+  const [original] = await sql`SELECT * FROM memos WHERE id=${req.params.id} AND user_id=${req.user.id}`;
+  if (!original) return res.status(404).json({ error: '메모를 찾을 수 없습니다.' });
+
+  // 공유 대상 사용자 정보
+  const targets = await sql`SELECT id, name FROM users WHERE id = ANY(${user_ids})`;
+
+  const shared = [];
+  for (const target of targets) {
+    // 이미 공유된 경우 스킵
+    const [exists] = await sql`
+      SELECT id FROM memos WHERE user_id=${target.id} AND shared_from=${original.id}
+    `;
+    if (exists) continue;
+
+    const [memo] = await sql`
+      INSERT INTO memos (user_id, memo_date, title, content, tag, is_shared, shared_from, shared_by, shared_by_name)
+      VALUES (
+        ${target.id}, ${original.memo_date}, ${original.title}, ${original.content}, ${original.tag},
+        true, ${original.id}, ${req.user.id}, ${req.user.name}
+      ) RETURNING *
+    `;
+    shared.push(memo);
+  }
+  res.json({ shared: shared.length });
+});
+
 // 삭제
 router.delete('/:id', async (req, res) => {
   await sql`DELETE FROM memos WHERE id = ${req.params.id} AND user_id = ${req.user.id}`;

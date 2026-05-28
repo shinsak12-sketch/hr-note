@@ -35,6 +35,11 @@ function MemoCard({ memo, dateStr, ts, onEdit, onDelete }) {
                 background: ts.bg, color: ts.color,
               }}>#{memo.tag}</span>
             )}
+            {memo.is_shared && (
+              <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20, background: '#F0EBF8', color: '#5C3D8F' }}>
+                📤 공유 · {memo.shared_by_name}
+              </span>
+            )}
           </div>
           <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text)', marginBottom: 4 }}>
             {memo.title || <span style={{ color: 'var(--text2)', fontWeight: 400 }}>제목 없음</span>}
