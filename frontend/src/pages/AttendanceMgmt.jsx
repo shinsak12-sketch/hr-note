@@ -713,7 +713,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
             📊 총 사용일수: {totalUsedDays}일
           </div>
         )}
-        {r.return_date && <div>🔙 복직예정: {r.return_date?.split('T')[0]}</div>}
+        {r.return_date && <div>🔙 {['정상종료','조기종료'].includes(r.status) ? '복직일' : '복직예정'}: {r.return_date?.split('T')[0]}</div>}
         {r.expected_birth_date && <div>🍼 출산예정: {r.expected_birth_date?.split('T')[0]}</div>}
         {r.disease_name && <div>🏥 {r.disease_name}</div>}
         {r.birth_type && <div>👶 {r.birth_type}</div>}

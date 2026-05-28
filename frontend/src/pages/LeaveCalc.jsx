@@ -79,7 +79,7 @@ export default function LeaveCalc() {
           뒤로
         </button>
         <div className="header-title">📋 휴가·휴직 잔여기간</div>
-        <div style={{ width: 40 }} />
+        <button onClick={() => nav("/attendance-app")} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#FAEEDA", color: "#854F0B", border: "none", cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap" }}>근태관리</button>
       </div>
 
       <div className="page-content" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 20, paddingBottom: 40 }}>
