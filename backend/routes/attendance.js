@@ -203,6 +203,7 @@ router.get('/stats', authMiddleware, async (req, res) => {
 
   // 현재 진행중 카운트
   const active = list.filter(r => r.status === '진행중');
+  const summary = {
     휴직: active.filter(r => r.category === '휴직').length,
     휴가: active.filter(r => r.category === '휴가').length,
     단축근무: active.filter(r => r.category === '단축근무').length,
