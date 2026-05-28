@@ -49,13 +49,24 @@ router.get('/memo/:memoId', authMiddleware, async (req, res) => {
 
 // 첨부파일 삭제
 router.delete('/:id', authMiddleware, async (req, res) => {
-  const [att] = await sql`SELECT file_url FROM memo_attachments WHERE id=${req.params.id}`;
-  if (att) {
-    const publicId = att.file_url.split('/upload/')[1]?.replace(/\.[^/.]+$/, '');
-    try { await cloudinary.uploader.destroy(publicId); } catch {}
+  try {
+    const [att] = await sql`SELECT file_url FROM memo_attachments WHERE id=${req.params.id}`;
+    await sql`DELETE FROM memo_attachments WHERE id=${req.params.id}`;
+    res.json({ ok: true });
+    // Cloudinary 삭제는 응답 후 비동기로 처리
+    if (att?.file_url) {
+      try {
+        const parts = att.file_url.split('/upload/');
+        if (parts[1]) {
+          const publicId = parts[1].replace(/\?.*$/, '').replace(/\.[^/.]+$/, '');
+          await cloudinary.uploader.destroy(publicId, { resource_type: 'auto' });
+        }
+      } catch(e) { console.error('Cloudinary 삭제 실패:', e.message); }
+    }
+  } catch(e) {
+    console.error('첨부파일 삭제 오류:', e.message);
+    if (!res.headersSent) res.status(500).json({ error: e.message });
   }
-  await sql`DELETE FROM memo_attachments WHERE id=${req.params.id}`;
-  res.json({ ok: true });
 });
 
 export default router;
