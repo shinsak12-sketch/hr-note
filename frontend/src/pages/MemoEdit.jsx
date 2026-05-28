@@ -134,9 +134,7 @@ export default function MemoEdit() {
   const [delConfirm, setDelConfirm] = useState(false);
   const [shareModal, setShareModal] = useState(false);
   const [memoData, setMemoData] = useState(null);
-  const [attachments, setAttachments] = useState([]);
-  const [uploading, setUploading] = useState(false);
-  const [comments, setComments] = useState([]);
+
   const [commentText, setCommentText] = useState('');
   const textareaRef = useRef(null);
   const autoSaveTimer = useRef(null);
@@ -168,7 +166,6 @@ export default function MemoEdit() {
         setMemoData(memo);
         setSaved(true);
         savedRef.current = true;
-        api.getAttachments(id).then(setAttachments);
         api.getMemoComments(id).then(setComments);
         if (memo.is_shared && !memo.is_read) api.markMemoRead(id).catch(() => {});
       });
@@ -321,88 +318,6 @@ export default function MemoEdit() {
           }}
           autoFocus={!isEdit && !memoData?.is_shared}
         />
-
-        {/* 첨부파일 */}
-        <div style={{ borderTop: '0.5px solid var(--border)', paddingTop: 12, marginTop: 4, paddingBottom: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text2)' }}>📎 첨부파일{attachments.length > 0 ? ` (${attachments.length})` : ''}</span>
-            {!memoData?.is_shared && (
-              <label style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, background: 'var(--bg2)', color: 'var(--text2)', cursor: 'pointer', border: '0.5px solid var(--border)' }}>
-                {uploading ? '업로드 중...' : '+ 파일 추가'}
-                <input type="file" style={{ display: 'none' }} multiple onChange={async (e) => {
-                  setUploading(true);
-                  try {
-                    // 저장 안 됐으면 먼저 저장
-                    if (!memoIdRef.current) {
-                      const created = await api.createMemo(form);
-                      memoIdRef.current = created.id;
-                      setMemoId(created.id);
-                      setSaved(true);
-                      savedRef.current = true;
-                    }
-                    const sign = await api.getAttachmentSign();
-                    for (const file of e.target.files) {
-                      const fd = new FormData();
-                      fd.append('file', file);
-                      fd.append('api_key', sign.api_key);
-                      fd.append('timestamp', sign.timestamp);
-                      fd.append('signature', sign.signature);
-                      fd.append('folder', sign.folder);
-                      const res = await fetch(`https://api.cloudinary.com/v1_1/${sign.cloud_name}/auto/upload`, { method: 'POST', body: fd });
-                      const data = await res.json();
-                      const att = await api.saveAttachment(memoIdRef.current, {
-                        file_name: file.name,
-                        file_url: data.secure_url,
-                        file_type: file.type,
-                        file_size: file.size,
-                      });
-                      setAttachments(a => [...a, att]);
-                    }
-                  } finally {
-                    setUploading(false);
-                    e.target.value = '';
-                  }
-                }} />
-              </label>
-            )}
-          </div>
-          {attachments.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {attachments.map(att => {
-                const isImage = att.file_type?.startsWith('image/') ||
-                  /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(att.file_url || att.file_name || '');
-                return (
-                  <div key={att.id} style={{ border: '0.5px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
-                    {isImage && (
-                      <img
-                        src={att.file_url.replace('/upload/', '/upload/w_800,c_limit,q_auto,f_auto/')}
-                        alt={att.file_name}
-                        style={{ width: '100%', height: 'auto', display: 'block', background: 'var(--bg2)' }}
-                        onError={e => { e.target.style.display = 'none'; }}
-                      />
-                    )}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px' }}>
-                      <span style={{ fontSize: 18 }}>{isImage ? '🖼️' : '📄'}</span>
-                      <a href={att.file_url} target="_blank" rel="noreferrer" style={{ flex: 1, fontSize: 12, color: '#1A4A8A', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {att.file_name}
-                      </a>
-                      <span style={{ fontSize: 11, color: 'var(--text2)', flexShrink: 0 }}>{att.file_size ? Math.round(att.file_size/1024) + 'KB' : ''}</span>
-                      {!memoData?.is_shared && (
-                        <button onClick={async () => {
-                          if (!window.confirm('첨부파일을 삭제하시겠습니까?')) return;
-                          try {
-                            await api.deleteAttachment(att.id);
-                            setAttachments(a => a.filter(x => x.id !== att.id));
-                          } catch(e) { alert('삭제 실패: ' + e.message); }
-                        }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#A32D2D', fontSize: 16, padding: '0 4px', flexShrink: 0 }}>×</button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
 
         {/* 댓글 섹션 - 저장된 메모이면 모두 표시 */}
         {isEdit && memoIdRef.current && (
