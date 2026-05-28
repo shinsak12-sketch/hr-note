@@ -850,7 +850,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
         {r.return_date && <div>🔙 {['정상종료','조기종료'].includes(r.status) ? '복직일' : '복직예정'}: {r.return_date?.split('T')[0]}</div>}
         {r.expected_birth_date && <div>🍼 출산예정: {r.expected_birth_date?.split('T')[0]}</div>}
         {r.disease_name && <div>🏥 {r.disease_name}</div>}
-        {r.comment && <div style={{ fontSize: 11, color: '#5C3D8F', background: '#F0EBF8', borderRadius: 6, padding: '4px 8px', marginTop: 2 }}>💬 {r.comment}</div>}
+        {r.comment && <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 2 }}>💬 {r.comment}</div>}
         {r.birth_type && <div>👶 {r.birth_type}</div>}
         {r.leave_reason && <div>📝 {r.leave_reason}</div>}
         {r.reduce_hours && <div>⏰ 단축 {r.reduce_hours}시간 ({r.work_start_time}~{r.work_end_time})</div>}
