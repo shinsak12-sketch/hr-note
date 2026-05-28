@@ -13,8 +13,11 @@ const TYPES = {
 const CHILD_ORDERS = ['첫째','둘째','셋째','넷째','임신중'];
 const BIRTH_TYPES = ['일반','미숙아','다태아'];
 const STATUS_STYLE = {
-  '진행중': { color: '#1A4A8A', bg: '#E8F0FB' },
-  '정상종료': { color: '#3B6D11', bg: '#EAF3DE' },
+  '예정':    { color: '#854F0B', bg: '#FAEEDA' },
+  '진행중':  { color: '#1A4A8A', bg: '#E8F0FB' },
+  '정상종료':{ color: '#3B6D11', bg: '#EAF3DE' },
+  '조기종료':{ color: 'var(--text2)', bg: 'var(--bg2)' },
+};
   '조기종료': { color: '#854F0B', bg: '#FAEEDA' },
 };
 
@@ -523,7 +526,65 @@ function ExtendModal({ record, onClose, onDone }) {
 }
 
 
-function AttCard({ r, onEdit, onClose, onExtend, onRevert, onCalc, onDelete }) {
+// ── 분할 모달 ──────────────────────────
+function SplitModal({ record, onClose, onDone }) {
+  const [form, setForm] = useState({ start_date: '', end_date: '', return_date: '' });
+  const [saving, setSaving] = useState(false);
+  function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
+
+  async function handleSave() {
+    if (!form.start_date) return;
+    setSaving(true);
+    try {
+      await api.extendAttendance(record.id, { ...form, is_split: true });
+      onDone('분할 등록되었습니다.');
+    } catch(e) { } finally { setSaving(false); }
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'flex-end' }}>
+      <div style={{ background: 'var(--bg)', width: '100%', maxWidth: 480, margin: '0 auto', borderRadius: '16px 16px 0 0', overflow: 'hidden' }}>
+        <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '0.5px solid var(--border)' }}>
+          <div style={{ fontWeight: 700, fontSize: 15 }}>✂️ 분할 — {record.emp_name} ({record.type})</div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'var(--text2)' }}>×</button>
+        </div>
+        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ fontSize: 12, color: 'var(--text2)', background: 'var(--bg2)', borderRadius: 8, padding: '8px 12px', lineHeight: 1.6 }}>
+            현재 {record.split_count || 1}회차 ({record.start_date?.split('T')[0]} ~ {record.end_date?.split('T')[0] || '미정'})<br/>
+            연장과 달리 시작일을 자유롭게 입력하세요.
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div className="form-group">
+              <label className="form-label">분할 시작일 <span className="req">*</span></label>
+              <input type="date" value={form.start_date} onChange={e => setF('start_date', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">분할 종료일</label>
+              <input type="date" value={form.end_date} onChange={e => {
+                setF('end_date', e.target.value);
+                if (e.target.value) {
+                  const d = new Date(e.target.value);
+                  d.setDate(d.getDate() + 1);
+                  setF('return_date', d.toISOString().split('T')[0]);
+                }
+              }} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">복직예정일</label>
+            <input type="date" value={form.return_date} onChange={e => setF('return_date', e.target.value)} />
+          </div>
+          <button onClick={handleSave} disabled={!form.start_date || saving}
+            className="btn-primary" style={{ background: '#5C3D8F', marginBottom: 8 }}>
+            {saving ? '처리 중...' : '분할 등록'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDelete }) {
   const st = STATUS_STYLE[r.status] || STATUS_STYLE['진행중'];
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -618,14 +679,19 @@ function AttCard({ r, onEdit, onClose, onExtend, onRevert, onCalc, onDelete }) {
         {r.end_comment && <div style={{ color: 'var(--text)' }}>💬 {r.end_comment}</div>}
         {r.note && <div>📌 {r.note}</div>}
       </div>
-      {r.status === '진행중' && (
+      {(r.status === '진행중' || r.status === '예정') && (
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={() => onClose(r)} style={{ flex: 1, height: 34, borderRadius: 8, background: '#FAEEDA', color: '#854F0B', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-            종료 처리
-          </button>
           <button onClick={() => onExtend(r)} style={{ flex: 1, height: 34, borderRadius: 8, background: '#E8F0FB', color: '#1A4A8A', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
             🔄 연장
           </button>
+          <button onClick={() => onSplit(r)} style={{ flex: 1, height: 34, borderRadius: 8, background: '#F0EBF8', color: '#5C3D8F', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+            ✂️ 분할
+          </button>
+          {r.status === '진행중' && (
+            <button onClick={() => onClose(r)} style={{ flex: 1, height: 34, borderRadius: 8, background: '#FAEEDA', color: '#854F0B', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+              종료
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -645,6 +711,7 @@ export default function AttendanceMgmt() {
   const [inputModal, setInputModal] = useState(null);
   const [closeModal, setCloseModal] = useState(null);
   const [extendModal, setExtendModal] = useState(null);
+  const [splitModal, setSplitModal] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const headerMenuRef = useRef(null);
 
@@ -856,6 +923,7 @@ export default function AttendanceMgmt() {
             onEdit={r => setInputModal(r)}
             onClose={r => setCloseModal(r)}
             onExtend={r => setExtendModal(r)}
+            onSplit={r => setSplitModal(r)}
             onRevert={handleRevert}
             onCalc={handleCalc}
             onDelete={handleDelete}
@@ -863,6 +931,10 @@ export default function AttendanceMgmt() {
         ))}
       </div>
 
+      {splitModal && (
+        <SplitModal record={splitModal} onClose={() => setSplitModal(null)}
+          onDone={msg => { setToast(msg); setSplitModal(null); load(); }} />
+      )}
       {extendModal && (
         <ExtendModal
           record={extendModal}

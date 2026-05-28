@@ -288,7 +288,7 @@ router.post('/', authMiddleware, async (req, res) => {
       birth_date, post_birth_days, paid_period, prenatal_days,
       birth_type,
       reduce_hours, work_start_time, work_end_time, normal_return_date, contract_date,
-      retirement_date, off_start_date, leave_deleted, doc_completed
+      retirement_date, off_start_date, leave_deleted, doc_completed, status
     ) VALUES (
       ${d.category}, ${d.type}, ${d.office_id||null}, ${d.org_name||null},
       ${d.emp_no}, ${d.emp_name}, ${d.start_date}, ${d.end_date||null},
@@ -301,7 +301,8 @@ router.post('/', authMiddleware, async (req, res) => {
       ${d.reduce_hours||null}, ${d.work_start_time||null}, ${d.work_end_time||null},
       ${d.normal_return_date||null}, ${d.contract_date||null},
       ${d.retirement_date||null}, ${d.off_start_date||null},
-      ${d.leave_deleted||false}, ${d.doc_completed||false}
+      ${d.leave_deleted||false}, ${d.doc_completed||false},
+      ${d.start_date > new Date().toISOString().split('T')[0] ? '예정' : '진행중'}
     ) RETURNING *
   `;
   res.status(201).json(rec);
@@ -344,14 +345,16 @@ router.patch('/:id/close', authMiddleware, async (req, res) => {
   res.json(rec);
 });
 
-// 연장 처리
+// 연장/분할 처리
 router.post('/:id/extend', authMiddleware, async (req, res) => {
-  const { start_date, end_date, return_date } = req.body;
+  const { start_date, end_date, return_date, is_split } = req.body;
   const [original] = await sql`SELECT * FROM attendance WHERE id=${req.params.id}`;
   if (!original) return res.status(404).json({ error: '원본 레코드를 찾을 수 없습니다.' });
 
-  // 기존 레코드 정상종료 처리
-  await sql`UPDATE attendance SET status='정상종료', updated_at=NOW() WHERE id=${req.params.id}`;
+  // 연장은 기존 레코드 정상종료, 분할은 유지
+  if (!is_split) {
+    await sql`UPDATE attendance SET status='정상종료', updated_at=NOW() WHERE id=${req.params.id}`;
+  }
 
   // 같은 사번+종류의 기존 연장 횟수 계산
   const extensions = await sql`
