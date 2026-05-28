@@ -715,6 +715,9 @@ export default function AttendanceMgmt() {
   const nav = useNavigate();
   const [list, setList] = useState([]);
   const [offices, setOffices] = useState([]);
+  const [hqList, setHqList] = useState([]);
+  const [deptList, setDeptList] = useState([]);
+  const [orgList, setOrgList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState('');
   const [catFilter, setCatFilter] = useState('전체');
@@ -732,7 +735,8 @@ export default function AttendanceMgmt() {
 
   useEffect(() => {
     load();
-    api.getOffices().then(data => { console.log('offices sample:', data?.[0]); setOffices(data); });
+    api.getOffices().then(data => { setOffices(data); });
+    api.getOfficeHeadquarters().then(setHqList);
     function h(e) { if (headerMenuRef.current && !headerMenuRef.current.contains(e.target)) setMenuOpen(false); }
     document.addEventListener('mousedown', h);
     return () => document.removeEventListener('mousedown', h);
@@ -839,10 +843,16 @@ export default function AttendanceMgmt() {
   const PERIOD_TYPES = ['질병휴직','질병휴가','난임휴직','가족돌봄휴직','가족돌봄휴가'];
   const FAMILY_TYPES = ['가족돌봄휴직','가족돌봄휴가'];
 
-  // 조직 필터 목록 - 사무실 데이터 기반
-  const hqList = [...new Set(offices.map(o => o.headquarters).filter(Boolean))].sort();
-  const deptList = [...new Set(offices.filter(o => !hqFilter || o.headquarters === hqFilter).map(o => o.department).filter(Boolean))].sort();
-  const orgList = [...new Set(offices.filter(o => (!hqFilter || o.headquarters === hqFilter) && (!deptFilter || o.department === deptFilter)).map(o => o.org_name).filter(Boolean))].sort();
+  // 조직 필터 목록 - 전용 API 사용
+  const loadDepts = async (hq) => {
+    const data = await api.getOfficeDepartments(hq);
+    setDeptList(data);
+    setOrgList([]);
+  };
+  const loadOrgs = async (hq, dept) => {
+    const data = await api.getOfficeOrgs(hq, dept);
+    setOrgList(data);
+  };
 
   const filtered = list.filter(r => {
     const matchCat = catFilter === '전체' || r.category === catFilter;
@@ -935,11 +945,11 @@ export default function AttendanceMgmt() {
 
       {/* 조직 필터 */}
       <div style={{ display: 'flex', gap: 6, padding: '8px 16px', borderBottom: '0.5px solid var(--border)' }}>
-        <select value={hqFilter} onChange={e => { setHqFilter(e.target.value); setDeptFilter(''); setOrgFilter(''); }} style={{ flex: 1, fontSize: 12, height: 34 }}>
+        <select value={hqFilter} onChange={e => { setHqFilter(e.target.value); setDeptFilter(''); setOrgFilter(''); loadDepts(e.target.value); }} style={{ flex: 1, fontSize: 12, height: 34 }}>
           <option value="">전체 본부</option>
           {hqList.map(h => <option key={h} value={h}>{h}</option>)}
         </select>
-        <select value={deptFilter} onChange={e => { setDeptFilter(e.target.value); setOrgFilter(''); }} style={{ flex: 1, fontSize: 12, height: 34 }}>
+        <select value={deptFilter} onChange={e => { setDeptFilter(e.target.value); setOrgFilter(''); loadOrgs(hqFilter, e.target.value); }} style={{ flex: 1, fontSize: 12, height: 34 }}>
           <option value="">전체 부서</option>
           {deptList.map(d => <option key={d} value={d}>{d}</option>)}
         </select>
