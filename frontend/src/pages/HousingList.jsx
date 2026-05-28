@@ -3,7 +3,167 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api.js';
 import { Toast } from '../components/Common.jsx';
 
-function ContractModal({ request, onClose, onDone }) {
+function NewHousingModal({ onClose, onDone }) {
+  const [form, setForm] = useState({
+    emp_no: '', emp_name: '', org_name: '',
+    housing_address: '',
+    contract_start: '', initial_end: '', contract_end: '',
+    auto_renew_years: '',
+    rent_type: '월세',
+    deposit: '', monthly_rent: '',
+    rent_day: '', payment_type: '후불',
+    area_sqm: '',
+  });
+  const [saving, setSaving] = useState(false);
+  function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+    script.async = true;
+    document.head.appendChild(script);
+    return () => { try { document.head.removeChild(script); } catch {} };
+  }, []);
+
+  function searchAddress() {
+    if (!window.daum?.Postcode) { alert('주소 검색 로딩 중입니다.'); return; }
+    new window.daum.Postcode({
+      oncomplete: (data) => setF('housing_address', data.roadAddress || data.jibunAddress)
+    }).open();
+  }
+
+  async function handleSave() {
+    if (!form.emp_no || !form.emp_name) return;
+    setSaving(true);
+    try {
+      await api.createHousingDirect(form);
+      onDone('사택이 등록되었습니다.');
+    } catch(e) { alert(e.message); } finally { setSaving(false); }
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'flex-end' }}>
+      <div style={{ background: 'var(--bg)', width: '100%', maxWidth: 480, margin: '0 auto', borderRadius: '16px 16px 0 0', maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '0.5px solid var(--border)' }}>
+          <div style={{ fontWeight: 700, fontSize: 15 }}>🏠 사택 신규 등록</div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'var(--text2)' }}>×</button>
+        </div>
+        <div style={{ overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 32 }}>
+
+          {/* 직원 정보 */}
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text2)' }}>직원 정보</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div className="form-group">
+              <label className="form-label">사번 <span className="req">*</span></label>
+              <input type="text" placeholder="사번" value={form.emp_no} onChange={e => setF('emp_no', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">성명 <span className="req">*</span></label>
+              <input type="text" placeholder="성명" value={form.emp_name} onChange={e => setF('emp_name', e.target.value)} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">소속</label>
+            <input type="text" placeholder="소속" value={form.org_name} onChange={e => setF('org_name', e.target.value)} />
+          </div>
+
+          {/* 사택 주소 */}
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text2)' }}>사택 정보</div>
+          <div className="form-group">
+            <label className="form-label">사택 주소</label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input type="text" placeholder="주소 검색" value={form.housing_address} readOnly style={{ flex: 1, background: 'var(--bg2)' }} />
+              <button type="button" onClick={searchAddress} style={{ padding: '0 12px', height: 40, borderRadius: 8, background: '#3B6D11', color: '#EAF3DE', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>🔍 검색</button>
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">전용평수</label>
+            <input type="number" placeholder="평" value={form.area_sqm} onChange={e => setF('area_sqm', e.target.value)} step="0.1" />
+          </div>
+
+          {/* 계약 기간 */}
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text2)' }}>계약 기간</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div className="form-group">
+              <label className="form-label">계약 시작일</label>
+              <input type="date" value={form.contract_start} onChange={e => setF('contract_start', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">최초 종료일</label>
+              <input type="date" value={form.initial_end} onChange={e => setF('initial_end', e.target.value)} />
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div className="form-group">
+              <label className="form-label">현재 종료일</label>
+              <input type="date" value={form.contract_end} onChange={e => setF('contract_end', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">자동갱신 (년)</label>
+              <input type="number" placeholder="년수" value={form.auto_renew_years} onChange={e => setF('auto_renew_years', e.target.value)} min="0" max="5" />
+            </div>
+          </div>
+
+          {/* 임대 조건 */}
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text2)' }}>임대 조건</div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {['월세','연세'].map(t => (
+              <button key={t} onClick={() => setF('rent_type', t)} style={{
+                flex: 1, height: 38, borderRadius: 8, fontFamily: 'inherit',
+                border: `2px solid ${form.rent_type === t ? '#1A4A8A' : 'var(--border)'}`,
+                background: form.rent_type === t ? '#E8F0FB' : 'var(--bg)',
+                color: form.rent_type === t ? '#1A4A8A' : 'var(--text2)',
+                fontSize: 13, fontWeight: form.rent_type === t ? 700 : 400, cursor: 'pointer',
+              }}>{t}</button>
+            ))}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div className="form-group">
+              <label className="form-label">보증금 (만원)</label>
+              <input type="number" placeholder="만원" value={form.deposit} onChange={e => setF('deposit', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">{form.rent_type === '연세' ? '연세' : '월세'} (만원)</label>
+              <input type="number" placeholder="만원" value={form.monthly_rent} onChange={e => setF('monthly_rent', e.target.value)} />
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div className="form-group">
+              <label className="form-label">지급일</label>
+              <select value={form.rent_day} onChange={e => setF('rent_day', e.target.value)}>
+                <option value="">선택</option>
+                {Array.from({length: 31}, (_, i) => i+1).map(d => (
+                  <option key={d} value={d}>{d}일</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">지급시기</label>
+              <div style={{ display: 'flex', gap: 6, height: 40 }}>
+                {['선불','후불'].map(t => (
+                  <button key={t} onClick={() => setF('payment_type', t)} style={{
+                    flex: 1, borderRadius: 8, fontFamily: 'inherit',
+                    border: `2px solid ${form.payment_type === t ? '#854F0B' : 'var(--border)'}`,
+                    background: form.payment_type === t ? '#FAEEDA' : 'var(--bg)',
+                    color: form.payment_type === t ? '#854F0B' : 'var(--text2)',
+                    fontSize: 12, fontWeight: form.payment_type === t ? 700 : 400, cursor: 'pointer',
+                  }}>{t}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <button onClick={handleSave} disabled={saving || !form.emp_no || !form.emp_name}
+            className="btn-primary" style={{ background: '#2D6A6A', height: 44, fontSize: 15, marginBottom: 8 }}>
+            {saving ? '저장 중...' : '등록'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
   const [form, setForm] = useState({
     housing_address: request.housing_address || '',
     contract_start: request.contract_start?.split?.('T')[0] || '',
@@ -90,6 +250,7 @@ export default function HousingList() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState('');
   const [contractModal, setContractModal] = useState(null);
+  const [newModal, setNewModal] = useState(false);
   const [filter, setFilter] = useState('전체');
   const [menuOpen, setMenuOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
@@ -184,7 +345,12 @@ export default function HousingList() {
               overflow: 'hidden', minWidth: 200, padding: 12,
               display: 'flex', flexDirection: 'column', gap: 10,
             }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text2)' }}>📤 기존 사택 일괄 등록</div>
+              <button onClick={() => { setNewModal(true); setMenuOpen(false); }} style={{
+                padding: '8px 12px', borderRadius: 8, background: '#2D6A6A', color: '#E6F4F4',
+                border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+              }}>🏠 신규 등록</button>
+              <div style={{ borderTop: '0.5px solid var(--border)', paddingTop: 10 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 8 }}>📤 기존 사택 일괄 등록</div>
               <button onClick={() => api.downloadHousingTemplate()} style={{
                 padding: '8px 12px', borderRadius: 8, background: 'var(--bg2)',
                 color: 'var(--text)', border: '0.5px solid var(--border)',
@@ -201,6 +367,7 @@ export default function HousingList() {
                   cursor: 'pointer', fontFamily: 'inherit',
                 }}>{uploading ? '업로드 중...' : '📤 업로드'}</button>
               )}
+              </div>
             </div>
           )}
         </div>
@@ -275,6 +442,10 @@ export default function HousingList() {
         })}
       </div>
 
+      {newModal && (
+        <NewHousingModal onClose={() => setNewModal(false)}
+          onDone={msg => { setToast(msg); setNewModal(false); load(); }} />
+      )}
       {contractModal && (
         <ContractModal request={contractModal} onClose={() => setContractModal(null)}
           onDone={msg => { setToast(msg); setContractModal(null); load(); }} />

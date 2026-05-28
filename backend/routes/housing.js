@@ -211,6 +211,28 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
     res.status(500).json({ error: '파일 처리 중 오류: ' + e.message });
   }
 });
+
+// 사택 직접 등록 (관리자)
+router.post('/direct', authMiddleware, async (req, res) => {
+  const d = req.body;
+  const [rec] = await sql`
+    INSERT INTO housing_requests (
+      emp_no, emp_name, department, housing_address,
+      contract_start, contract_end, initial_end, auto_renew_years,
+      rent_type, deposit, monthly_rent, rent_day, payment_type, area_sqm,
+      status
+    ) VALUES (
+      ${d.emp_no}, ${d.emp_name}, ${d.org_name||null}, ${d.housing_address||null},
+      ${d.contract_start||null}, ${d.contract_end||null}, ${d.initial_end||null},
+      ${d.auto_renew_years||null},
+      ${d.rent_type||null}, ${d.deposit||null}, ${d.monthly_rent||null},
+      ${d.rent_day||null}, ${d.payment_type||null}, ${d.area_sqm||null},
+      '승인'
+    ) RETURNING *
+  `;
+  res.status(201).json(rec);
+});
+
 router.get('/', authMiddleware, async (req, res) => {
   const requests = await sql`
     SELECT h.*, o.org_name, o.headquarters, o.department as office_dept
