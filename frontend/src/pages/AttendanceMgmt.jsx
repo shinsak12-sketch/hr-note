@@ -738,6 +738,16 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           {menuOpen && (
             <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', overflow: 'hidden', minWidth: 130 }}>
               <button onClick={() => { onEdit(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#1A4A8A', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>✏️ 수정</button>
+              {r.prevPeriods?.length > 0 && (
+                <button onClick={async () => {
+                  const next = r.extra_months > 0 ? 0 : 6;
+                  await api.updateAttendance(r.id, { extra_months: next });
+                  setMenuOpen(false);
+                  onRevert(r.id); // load 트리거용
+                }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#A32D2D', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>
+                  {r.extra_months > 0 ? '➖ 6개월 추가 취소' : '➕ 6개월 추가'}
+                </button>
+              )}
               {(r.type === '육아휴직' || r.type === '육아휴직(임신중)') && (
                 <button onClick={() => { onCalc(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#3B6D11', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>🧮 잔여기간 계산</button>
               )}
@@ -792,9 +802,9 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
             <span style={{ fontSize: 11, fontWeight: 700, color: '#854F0B', background: '#FAEEDA', borderRadius: 6, padding: '3px 8px' }}>
               📊 총 사용일수: {totalUsedDays}일
             </span>
-            {cfg.maxDays && totalUsedDays > cfg.maxDays && (
+            {r.extra_months > 0 && (
               <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', background: '#A32D2D', borderRadius: 6, padding: '3px 8px', whiteSpace: 'nowrap' }}>
-                {cfg.overLabel}
+                +{r.extra_months}개월 추가
               </span>
             )}
           </div>

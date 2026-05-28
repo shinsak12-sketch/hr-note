@@ -476,6 +476,7 @@ router.patch('/:id', authMiddleware, async (req, res) => {
       retirement_date=${d.retirement_date||null}, off_start_date=${d.off_start_date||null},
       leave_deleted=${d.leave_deleted||false}, doc_completed=${d.doc_completed||false},
       expected_birth_date=${d.expected_birth_date||null},
+      extra_months=${d.extra_months !== undefined ? d.extra_months : null},
       updated_at=NOW()
     WHERE id=${req.params.id} RETURNING *
   `;
