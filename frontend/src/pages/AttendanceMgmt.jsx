@@ -496,7 +496,7 @@ function ExtendModal({ record, onClose, onDone }) {
     d.setDate(d.getDate() + 1);
     return d.toISOString().split('T')[0];
   })() : '';
-  const [form, setForm] = useState({ start_date: defaultStart, end_date: '', return_date: '' });
+  const [form, setForm] = useState({ start_date: defaultStart, end_date: '', return_date: '', comment: '' });
   const [saving, setSaving] = useState(false);
   function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
 
@@ -506,7 +506,7 @@ function ExtendModal({ record, onClose, onDone }) {
     try {
       await api.extendAttendance(record.id, form);
       onDone('연장 등록되었습니다.');
-    } catch(e) { } finally { setSaving(false); }
+    } catch(e) { alert(e.message); } finally { setSaving(false); }
   }
 
   return (
@@ -541,6 +541,10 @@ function ExtendModal({ record, onClose, onDone }) {
             <label className="form-label">복직예정일</label>
             <input type="date" value={form.return_date} onChange={e => setF('return_date', e.target.value)} />
           </div>
+          <div className="form-group">
+            <label className="form-label">코멘트</label>
+            <textarea placeholder="코멘트 입력" value={form.comment} onChange={e => setF('comment', e.target.value)} style={{ height: 60 }} />
+          </div>
           <button onClick={handleSave} disabled={!form.start_date || saving}
             className="btn-primary" style={{ background: '#1A4A8A', marginBottom: 8 }}>
             {saving ? '처리 중...' : '연장 등록'}
@@ -554,7 +558,7 @@ function ExtendModal({ record, onClose, onDone }) {
 
 // ── 분할 모달 ──────────────────────────
 function SplitModal({ record, onClose, onDone }) {
-  const [form, setForm] = useState({ start_date: '', end_date: '', return_date: '' });
+  const [form, setForm] = useState({ start_date: '', end_date: '', return_date: '', comment: '' });
   const [saving, setSaving] = useState(false);
   function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
 
@@ -602,6 +606,10 @@ function SplitModal({ record, onClose, onDone }) {
             <label className="form-label">복직예정일</label>
             <input type="date" value={form.return_date} onChange={e => setF('return_date', e.target.value)} />
           </div>
+          <div className="form-group">
+            <label className="form-label">코멘트</label>
+            <textarea placeholder="코멘트 입력" value={form.comment} onChange={e => setF('comment', e.target.value)} style={{ height: 60 }} />
+          </div>
           <button onClick={handleSave} disabled={!form.start_date || saving}
             className="btn-primary" style={{ background: '#5C3D8F', marginBottom: 8 }}>
             {saving ? '처리 중...' : '분할 등록'}
@@ -612,7 +620,36 @@ function SplitModal({ record, onClose, onDone }) {
   );
 }
 
-function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDelete }) {
+// ── 코멘트 모달 ──────────────────────────
+function CommentModal({ record, onClose, onDone }) {
+  const [comment, setComment] = useState(record.comment || '');
+  const [saving, setSaving] = useState(false);
+  async function handleSave() {
+    setSaving(true);
+    await api.updateAttendance(record.id, { comment });
+    onDone('코멘트가 저장되었습니다.');
+    setSaving(false);
+  }
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'flex-end' }}>
+      <div style={{ background: 'var(--bg)', width: '100%', maxWidth: 480, margin: '0 auto', borderRadius: '16px 16px 0 0', overflow: 'hidden' }}>
+        <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '0.5px solid var(--border)' }}>
+          <div style={{ fontWeight: 700, fontSize: 15 }}>💬 코멘트 — {record.emp_name}</div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'var(--text2)' }}>×</button>
+        </div>
+        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <textarea placeholder="코멘트 입력" value={comment} onChange={e => setComment(e.target.value)}
+            style={{ height: 120, fontSize: 14 }} autoFocus />
+          <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ marginBottom: 8 }}>
+            {saving ? '저장 중...' : '저장'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDelete, onComment }) {
   const st = STATUS_STYLE[r.status] || STATUS_STYLE['진행중'];
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -737,6 +774,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           <button onClick={() => setMenuOpen(o=>!o)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', color: 'var(--text2)', fontSize: 18 }}>⋮</button>
           {menuOpen && (
             <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', overflow: 'hidden', minWidth: 130 }}>
+              <button onClick={() => { onComment(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#5C3D8F', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>💬 코멘트</button>
               <button onClick={() => { onEdit(r); setMenuOpen(false); }} style={{ display: 'block', width: '100%', padding: '12px 16px', border: 'none', background: 'none', textAlign: 'left', fontSize: 13, cursor: 'pointer', color: '#1A4A8A', fontFamily: 'inherit', borderBottom: '0.5px solid var(--border)' }}>✏️ 수정</button>
               {r.prevPeriods?.length > 0 && (
                 <button onClick={async () => {
@@ -812,6 +850,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
         {r.return_date && <div>🔙 {['정상종료','조기종료'].includes(r.status) ? '복직일' : '복직예정'}: {r.return_date?.split('T')[0]}</div>}
         {r.expected_birth_date && <div>🍼 출산예정: {r.expected_birth_date?.split('T')[0]}</div>}
         {r.disease_name && <div>🏥 {r.disease_name}</div>}
+        {r.comment && <div style={{ fontSize: 11, color: '#5C3D8F', background: '#F0EBF8', borderRadius: 6, padding: '4px 8px', marginTop: 2 }}>💬 {r.comment}</div>}
         {r.birth_type && <div>👶 {r.birth_type}</div>}
         {r.leave_reason && <div>📝 {r.leave_reason}</div>}
         {r.reduce_hours && <div>⏰ 단축 {r.reduce_hours}시간 ({r.work_start_time}~{r.work_end_time})</div>}
@@ -857,6 +896,7 @@ export default function AttendanceMgmt() {
   const [closeModal, setCloseModal] = useState(null);
   const [extendModal, setExtendModal] = useState(null);
   const [splitModal, setSplitModal] = useState(null);
+  const [commentModal, setCommentModal] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const headerMenuRef = useRef(null);
 
@@ -1142,6 +1182,7 @@ export default function AttendanceMgmt() {
             onClose={r => setCloseModal(r)}
             onExtend={r => setExtendModal(r)}
             onSplit={r => setSplitModal(r)}
+            onComment={r => setCommentModal(r)}
             onRevert={handleRevert}
             onCalc={handleCalc}
             onDelete={handleDelete}
@@ -1149,6 +1190,10 @@ export default function AttendanceMgmt() {
         ))}
       </div>
 
+      {commentModal && (
+        <CommentModal record={commentModal} onClose={() => setCommentModal(null)}
+          onDone={msg => { setToast(msg); setCommentModal(null); load(); }} />
+      )}
       {splitModal && (
         <SplitModal record={splitModal} onClose={() => setSplitModal(null)}
           onDone={msg => { setToast(msg); setSplitModal(null); load(); }} />

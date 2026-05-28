@@ -476,6 +476,7 @@ router.patch('/:id', authMiddleware, async (req, res) => {
       retirement_date=${d.retirement_date||null}, off_start_date=${d.off_start_date||null},
       leave_deleted=${d.leave_deleted||false}, doc_completed=${d.doc_completed||false},
       expected_birth_date=${d.expected_birth_date||null},
+      comment=${d.comment !== undefined ? d.comment : null},
       extra_months=${d.extra_months !== undefined ? d.extra_months : null},
       updated_at=NOW()
     WHERE id=${req.params.id} RETURNING *
@@ -539,7 +540,7 @@ router.patch('/:id/close', authMiddleware, async (req, res) => {
 // 연장/분할 처리
 router.post('/:id/extend', authMiddleware, async (req, res) => {
   try {
-    const { start_date, end_date, return_date, is_split } = req.body;
+    const { start_date, end_date, return_date, is_split, comment } = req.body;
     const [original] = await sql`SELECT * FROM attendance WHERE id=${req.params.id}`;
     if (!original) return res.status(404).json({ error: '원본 레코드를 찾을 수 없습니다.' });
 
@@ -576,7 +577,7 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
         start_date, end_date, return_date, used_days,
         child_order, split_count, disease_name, family_target, leave_reason,
         reduce_hours, work_start_time, work_end_time, normal_return_date, contract_date,
-        retirement_date, off_start_date, leave_deleted, doc_completed, status
+        retirement_date, off_start_date, leave_deleted, doc_completed, comment, status
       ) VALUES (
         ${original.category}, ${original.type}, ${original.office_id}, ${original.org_name},
         ${original.emp_no}, ${original.emp_name},
@@ -588,7 +589,7 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
         ${original.normal_return_date||null}, ${original.contract_date||null},
         ${original.retirement_date||null}, ${original.off_start_date||null},
         ${original.leave_deleted||false}, ${original.doc_completed||false},
-        ${newStatus}
+        ${comment||null}, ${newStatus}
       ) RETURNING *
     `;
     res.status(201).json(newRec);
