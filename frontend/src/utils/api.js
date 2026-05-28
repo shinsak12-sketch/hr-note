@@ -101,10 +101,6 @@ export const api = {
     const qs = q ? '?q=' + encodeURIComponent(q) : '';
     return request('/memos' + qs);
   },
-  getAttachments: (memoId) => request('/attachments/memo/' + memoId),
-  getAttachmentSign: () => request('/attachments/sign'),
-  saveAttachment: (memoId, body) => request('/attachments/memo/' + memoId, { method: 'POST', body: JSON.stringify(body) }),
-  deleteAttachment: (id) => request('/attachments/' + id, { method: 'DELETE' }),
   getMemo: (id) => request('/memos/' + id),
   shareMemo: (id, userIds) => request('/memos/' + id + '/share', { method: 'POST', body: JSON.stringify({ user_ids: userIds }) }),
   getMemoUnreadCount: () => request('/memos/unread-count'),
