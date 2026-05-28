@@ -697,7 +697,11 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           <span style={{ fontWeight: 700, fontSize: 15 }}>{r.emp_name}</span>
           <span style={{ fontSize: 12, color: 'var(--text2)' }}>· {r.emp_no}</span>
           <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: cc+'20', color: cc, whiteSpace: 'nowrap' }}>{r.type}</span>
-          {r.split_count >= 1 && r.type !== '육아휴직(임신중)' && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>{r.split_count}회차</span>}
+          {r.split_count >= 1 && r.type !== '육아휴직(임신중)' && (
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>
+              {isExtensionCard ? (prevRecord?.split_count || r.split_count) : r.split_count}회차
+            </span>
+          )}
           {isExtensionCard && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F5E8F8', color: '#7B2D8B', whiteSpace: 'nowrap' }}>연장</span>}
           {r.child_order && childStyle && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: childStyle.bg, color: childStyle.color, whiteSpace: 'nowrap' }}>{r.child_order}</span>}
           {/* 진행중 배지: 날짜 기준 */}
