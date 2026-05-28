@@ -31,6 +31,11 @@ export default function AppHome() {
   const [memoUnread, setMemoUnread] = useState(0);
   useEffect(() => {
     api.getMemoUnreadCount().then(r => setMemoUnread(r?.count || 0)).catch(() => {});
+    // Railway 슬립 방지 - 4분마다 핑
+    const BASE = import.meta.env.VITE_API_URL || '/api';
+    const ping = () => fetch(BASE + '/health').catch(() => {});
+    const timer = setInterval(ping, 4 * 60 * 1000);
+    return () => clearInterval(timer);
   }, []);
 
   function logout() {
