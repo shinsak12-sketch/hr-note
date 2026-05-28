@@ -250,6 +250,14 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // 현황 통계
+// 신청 카운트 (홈화면용)
+router.get('/pending-count', authMiddleware, async (req, res) => {
+  const [row] = await sql`
+    SELECT COUNT(*) as cnt FROM housing_requests WHERE status IN ('신청','검토중')
+  `;
+  res.json({ count: Number(row.cnt) });
+});
+
 router.get('/stats', authMiddleware, async (req, res) => {
   const { headquarters, department, org_name } = req.query;
   let requests = await sql`

@@ -266,6 +266,8 @@ export const api = {
 
   // 근태관리
   getAttendanceSplitCount: (emp_no, type, start_date) => request('/attendance/split-count?emp_no=' + emp_no + '&type=' + encodeURIComponent(type) + '&start_date=' + (start_date||'')),
+  getAttendanceAlertCount: () => request('/attendance/alert-count'),
+  getHousingPendingCount: () => request('/housing/pending-count'),
   getAttendance: (params={}) => { const q = new URLSearchParams(params).toString(); return cachedRequest('/attendance' + (q?'?'+q:'')); },
   getAttendanceStats: (params={}) => { const q = new URLSearchParams(params).toString(); return request('/attendance/stats' + (q?'?'+q:'')); },
   createAttendance: (body) => request('/attendance', { method: 'POST', body: JSON.stringify(body) }).then(r => { invalidateCache('/attendance'); return r; }),

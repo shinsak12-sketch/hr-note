@@ -29,8 +29,13 @@ export default function AppHome() {
   });
 
   const [memoUnread, setMemoUnread] = useState(0);
+  const [attendanceAlert, setAttendanceAlert] = useState(0);
+  const [housingPending, setHousingPending] = useState(0);
+
   useEffect(() => {
     api.getMemoUnreadCount().then(r => setMemoUnread(r?.count || 0)).catch(() => {});
+    api.getAttendanceAlertCount().then(r => setAttendanceAlert(r?.count || 0)).catch(() => {});
+    api.getHousingPendingCount().then(r => setHousingPending(r?.count || 0)).catch(() => {});
     // Railway 슬립 방지 - 4분마다 핑
     const BASE = import.meta.env.VITE_API_URL || '/api';
     const ping = () => fetch(BASE + '/health').catch(() => {});
@@ -85,8 +90,14 @@ export default function AppHome() {
                 border: `0.5px solid ${accessible ? app.color + '30' : 'var(--border)'}`,
                 background: accessible ? app.bg : 'var(--bg2)',
                 cursor: 'pointer', textAlign: 'left', minHeight: 120,
-                opacity: accessible ? 1 : 0.45,
+                opacity: accessible ? 1 : 0.45, position: 'relative',
               }}>
+              {app.id === 'attendance' && attendanceAlert > 0 && (
+                <div style={{ position: 'absolute', top: 10, right: 10, minWidth: 18, height: 18, borderRadius: 9, background: '#A32D2D', color: '#fff', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{attendanceAlert}</div>
+              )}
+              {app.id === 'general' && housingPending > 0 && (
+                <div style={{ position: 'absolute', top: 10, right: 10, minWidth: 18, height: 18, borderRadius: 9, background: '#A32D2D', color: '#fff', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{housingPending}</div>
+              )}
               <div style={{ fontSize: 32, marginBottom: 10 }}>{accessible ? app.icon : '🔒'}</div>
               <div style={{ fontWeight: 700, fontSize: 15, color: accessible ? app.color : 'var(--text2)', marginBottom: 3 }}>{app.title}</div>
               {app.desc ? (

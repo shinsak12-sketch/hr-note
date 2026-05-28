@@ -332,8 +332,21 @@ router.get('/stats', authMiddleware, async (req, res) => {
   res.json({ summary, monthly, d15, endingSoon, startingSoon });
 });
 
-// 등록
-router.post('/', authMiddleware, async (req, res) => {
+// 알림 카운트 (홈화면용)
+router.get('/alert-count', authMiddleware, async (req, res) => {
+  const koreaToday = new Date(Date.now() + 9*60*60*1000).toISOString().split('T')[0];
+  const d15 = new Date(Date.now() + 9*60*60*1000 + 15*24*60*60*1000).toISOString().split('T')[0];
+  const [row] = await sql`
+    SELECT COUNT(*) as cnt FROM attendance
+    WHERE status IN ('진행중','종료예정')
+    AND end_date IS NOT NULL
+    AND end_date::date <= ${d15}::date
+    AND end_date::date >= ${koreaToday}::date
+  `;
+  res.json({ count: Number(row.cnt) });
+});
+
+
   const d = req.body;
 
   // 한국 시간 기준 오늘
