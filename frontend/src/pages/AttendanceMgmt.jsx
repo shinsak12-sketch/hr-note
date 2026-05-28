@@ -597,8 +597,20 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
     return () => { document.removeEventListener('mousedown', h); document.removeEventListener('touchstart', h); };
   }, []);
 
-  const catColor = { '휴직':'#A32D2D','휴가':'#1A4A8A','단축근무':'#3B6D11','근무OFF':'#5C3D8F' };
-  const cc = catColor[r.category] || '#854F0B';
+  const CHILD_COLORS = {
+    '첫째':  { bg: '#E8F0FB', color: '#1A4A8A' },
+    '둘째':  { bg: '#EAF3DE', color: '#3B6D11' },
+    '셋째':  { bg: '#FAEEDA', color: '#854F0B' },
+    '넷째':  { bg: '#F0EBF8', color: '#5C3D8F' },
+    '임신중':{ bg: '#FDEBF5', color: '#A32D6A' },
+  };
+  const CAT_COLOR = { '휴직':'#A32D2D','휴가':'#1A4A8A','단축근무':'#3B6D11','근무OFF':'#5C3D8F' };
+  const cc = CAT_COLOR[r.category] || '#854F0B';
+  const childStyle = r.child_order ? (CHILD_COLORS[r.child_order] || { bg: '#EAF3DE', color: '#3B6D11' }) : null;
+
+  // 총 사용일수 (이전 회차 + 현재)
+  const prevTotalDays = r.prevPeriods?.reduce((sum, p) => sum + (p.used_days || 0), 0) || 0;
+  const totalUsedDays = prevTotalDays + (r.used_days || 0);
 
   // 이상감지
   const today = new Date(); today.setHours(0,0,0,0);
@@ -632,7 +644,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: cc+'20', color: cc }}>{r.type}</span>
           {r.split_count >= 1 && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A' }}>{r.split_count}회차</span>}
           {r.is_extension && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F5E8F8', color: '#7B2D8B' }}>연장</span>}
-          {r.child_order && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#EAF3DE', color: '#3B6D11' }}>{r.child_order}</span>}
+          {r.child_order && childStyle && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: childStyle.bg, color: childStyle.color }}>{r.child_order}</span>}
           <span style={{ marginLeft: 4, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: st.bg, color: st.color }}>{r.status}</span>
         </div>
         <div ref={menuRef} style={{ position: 'relative' }}>
@@ -664,6 +676,11 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
             📋 {i+1}회차: {p.start_date?.split('T')[0]} ~ {p.end_date?.split('T')[0] || '진행중'} {p.used_days ? `(${p.used_days}일)` : ''}
           </div>
         ))}
+        {r.prevPeriods?.length > 0 && totalUsedDays > 0 && (
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#854F0B', background: '#FAEEDA', borderRadius: 6, padding: '3px 8px', display: 'inline-block', marginBottom: 2 }}>
+            📊 총 사용일수: {totalUsedDays}일
+          </div>
+        )}
         <div>📅 {r.start_date?.split('T')[0]} ~ {r.end_date?.split('T')[0] || '미정'} ({r.used_days ? r.used_days+'일' : '-'})</div>
         {r.return_date && <div>🔙 복직예정: {r.return_date?.split('T')[0]}</div>}
         {r.disease_name && <div>🏥 {r.disease_name}</div>}
