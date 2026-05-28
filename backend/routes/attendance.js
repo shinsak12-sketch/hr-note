@@ -476,12 +476,22 @@ router.patch('/:id/revert', authMiddleware, async (req, res) => {
 // 종료처리
 router.patch('/:id/close', authMiddleware, async (req, res) => {
   const { status, end_comment, end_date, close_type } = req.body;
+
+  // 조기종료 시 복직예정일 = 종료일 + 1일
+  let newReturnDate = null;
+  if (close_type === '조기종료' && end_date) {
+    const d = new Date(end_date);
+    d.setDate(d.getDate() + 1);
+    newReturnDate = d.toISOString().split('T')[0];
+  }
+
   const [rec] = await sql`
     UPDATE attendance SET 
       status=${status}, 
       end_comment=${end_comment||null},
       end_date=${end_date||null},
       close_type=${close_type||null},
+      ${newReturnDate ? sql`return_date=${newReturnDate},` : sql``}
       updated_at=NOW()
     WHERE id=${req.params.id} RETURNING *
   `;
