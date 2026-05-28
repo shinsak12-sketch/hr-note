@@ -172,12 +172,19 @@ function ContractModal({ request, onClose, onDone }) {
   const [form, setForm] = useState({
     housing_address: request.housing_address || '',
     contract_start: request.contract_start?.split?.('T')[0] || '',
+    initial_end: request.initial_end?.split?.('T')[0] || '',
     contract_end: request.contract_end?.split?.('T')[0] || '',
-    contract_note: request.contract_note || '',
+    auto_renew_years: request.auto_renew_years || '',
+    rent_type: request.rent_type || '월세',
     deposit: request.deposit || '',
     monthly_rent: request.monthly_rent || '',
+    rent_day: request.rent_day || '',
+    payment_type: request.payment_type || '후불',
+    area_sqm: request.area_sqm || '',
+    contract_note: request.contract_note || '',
   });
   const [saving, setSaving] = useState(false);
+  function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -208,7 +215,7 @@ function ContractModal({ request, onClose, onDone }) {
           <div style={{ fontWeight: 700, fontSize: 15 }}>📋 계약정보 — {request.emp_name}</div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'var(--text2)' }}>×</button>
         </div>
-        <div style={{ overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 32 }}>
           <div className="form-group">
             <label className="form-label">사택 주소</label>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -216,29 +223,79 @@ function ContractModal({ request, onClose, onDone }) {
               <button type="button" onClick={searchAddress} style={{ padding: '0 12px', height: 40, borderRadius: 8, background: '#3B6D11', color: '#EAF3DE', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>🔍 검색</button>
             </div>
           </div>
+          <div className="form-group">
+            <label className="form-label">전용평수</label>
+            <input type="number" placeholder="평" value={form.area_sqm} onChange={e => setF('area_sqm', e.target.value)} step="0.1" />
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div className="form-group">
               <label className="form-label">계약 시작일</label>
-              <input type="date" value={form.contract_start} onChange={e => setForm(f => ({ ...f, contract_start: e.target.value }))} />
+              <input type="date" value={form.contract_start} onChange={e => setF('contract_start', e.target.value)} />
             </div>
             <div className="form-group">
-              <label className="form-label">계약 만료일</label>
-              <input type="date" value={form.contract_end} onChange={e => setForm(f => ({ ...f, contract_end: e.target.value }))} />
+              <label className="form-label">최초 종료일</label>
+              <input type="date" value={form.initial_end} onChange={e => setF('initial_end', e.target.value)} />
             </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div className="form-group">
+              <label className="form-label">현재 종료일</label>
+              <input type="date" value={form.contract_end} onChange={e => setF('contract_end', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">자동갱신 (년)</label>
+              <input type="number" placeholder="년수" value={form.auto_renew_years} onChange={e => setF('auto_renew_years', e.target.value)} min="0" max="5" />
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {['월세','연세'].map(t => (
+              <button key={t} onClick={() => setF('rent_type', t)} style={{
+                flex: 1, height: 38, borderRadius: 8, fontFamily: 'inherit',
+                border: `2px solid ${form.rent_type === t ? '#1A4A8A' : 'var(--border)'}`,
+                background: form.rent_type === t ? '#E8F0FB' : 'var(--bg)',
+                color: form.rent_type === t ? '#1A4A8A' : 'var(--text2)',
+                fontSize: 13, fontWeight: form.rent_type === t ? 700 : 400, cursor: 'pointer',
+              }}>{t}</button>
+            ))}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div className="form-group">
               <label className="form-label">보증금 (만원)</label>
-              <input type="number" placeholder="보증금 (만원)" value={form.deposit} onChange={e => setForm(f => ({ ...f, deposit: e.target.value }))} />
+              <input type="number" placeholder="만원" value={form.deposit} onChange={e => setF('deposit', e.target.value)} />
             </div>
             <div className="form-group">
-              <label className="form-label">월세 (만원)</label>
-              <input type="number" placeholder="월세 (만원)" value={form.monthly_rent} onChange={e => setForm(f => ({ ...f, monthly_rent: e.target.value }))} />
+              <label className="form-label">{form.rent_type === '연세' ? '연세' : '월세'} (만원)</label>
+              <input type="number" placeholder="만원" value={form.monthly_rent} onChange={e => setF('monthly_rent', e.target.value)} />
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div className="form-group">
+              <label className="form-label">지급일</label>
+              <select value={form.rent_day} onChange={e => setF('rent_day', e.target.value)}>
+                <option value="">선택</option>
+                {Array.from({length: 31}, (_, i) => i+1).map(d => (
+                  <option key={d} value={d}>{d}일</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">지급시기</label>
+              <div style={{ display: 'flex', gap: 6, height: 40 }}>
+                {['선불','후불'].map(t => (
+                  <button key={t} onClick={() => setF('payment_type', t)} style={{
+                    flex: 1, borderRadius: 8, fontFamily: 'inherit',
+                    border: `2px solid ${form.payment_type === t ? '#854F0B' : 'var(--border)'}`,
+                    background: form.payment_type === t ? '#FAEEDA' : 'var(--bg)',
+                    color: form.payment_type === t ? '#854F0B' : 'var(--text2)',
+                    fontSize: 12, fontWeight: form.payment_type === t ? 700 : 400, cursor: 'pointer',
+                  }}>{t}</button>
+                ))}
+              </div>
             </div>
           </div>
           <div className="form-group">
             <label className="form-label">계약 특이사항</label>
-            <textarea placeholder="특이사항 입력" value={form.contract_note} onChange={e => setForm(f => ({ ...f, contract_note: e.target.value }))} style={{ height: 70 }} />
+            <textarea placeholder="특이사항 입력" value={form.contract_note} onChange={e => setF('contract_note', e.target.value)} style={{ height: 60 }} />
           </div>
           <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ background: '#3B6D11', height: 44, fontSize: 15, marginBottom: 8 }}>
             {saving ? '저장 중...' : '저장'}

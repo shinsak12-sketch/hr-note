@@ -277,7 +277,9 @@ router.get('/stats', authMiddleware, async (req, res) => {
 
 // 상태 변경 (승인 시 계약정보 포함)
 router.patch('/:id/status', authMiddleware, async (req, res) => {
-  const { status, manager_comment, housing_address, contract_start, contract_end, contract_note, deposit, monthly_rent } = req.body;
+  const { status, manager_comment, housing_address, contract_start, contract_end,
+    initial_end, auto_renew_years, rent_type, deposit, monthly_rent,
+    rent_day, payment_type, area_sqm, contract_note } = req.body;
   const [r] = await sql`
     UPDATE housing_requests SET
       status=${status},
@@ -285,9 +287,15 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
       housing_address=${housing_address||null},
       contract_start=${contract_start||null},
       contract_end=${contract_end||null},
-      contract_note=${contract_note||null},
+      initial_end=${initial_end||null},
+      auto_renew_years=${auto_renew_years||null},
+      rent_type=${rent_type||null},
       deposit=${deposit||null},
       monthly_rent=${monthly_rent||null},
+      rent_day=${rent_day||null},
+      payment_type=${payment_type||null},
+      area_sqm=${area_sqm||null},
+      contract_note=${contract_note||null},
       updated_at=NOW()
     WHERE id=${req.params.id} RETURNING *
   `;
@@ -296,15 +304,22 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
 
 // 계약정보 수정
 router.patch('/:id/contract', authMiddleware, async (req, res) => {
-  const { housing_address, contract_start, contract_end, contract_note, deposit, monthly_rent } = req.body;
+  const { housing_address, contract_start, contract_end, initial_end, auto_renew_years,
+    rent_type, deposit, monthly_rent, rent_day, payment_type, area_sqm, contract_note } = req.body;
   const [r] = await sql`
     UPDATE housing_requests SET
       housing_address=${housing_address||null},
       contract_start=${contract_start||null},
       contract_end=${contract_end||null},
-      contract_note=${contract_note||null},
+      initial_end=${initial_end||null},
+      auto_renew_years=${auto_renew_years||null},
+      rent_type=${rent_type||null},
       deposit=${deposit||null},
       monthly_rent=${monthly_rent||null},
+      rent_day=${rent_day||null},
+      payment_type=${payment_type||null},
+      area_sqm=${area_sqm||null},
+      contract_note=${contract_note||null},
       updated_at=NOW()
     WHERE id=${req.params.id} RETURNING *
   `;
