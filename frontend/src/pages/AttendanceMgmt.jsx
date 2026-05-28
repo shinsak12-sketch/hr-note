@@ -924,15 +924,16 @@ export default function AttendanceMgmt() {
 
       {/* 상태 필터 */}
       <div style={{ display: 'flex', gap: 6, padding: '6px 16px 8px', borderBottom: '0.5px solid var(--border)', overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none", msOverflowStyle: "none" }}>
-        {['진행중', '정상종료', '조기종료', '전체'].map(s => {
+        {['예정', '진행중', '정상종료', '조기종료', '전체'].map(s => {
           const st = STATUS_STYLE[s];
+          const count = s === '전체' ? list.length : list.filter(r => r.status === s).length;
           return (
             <button key={s} onClick={() => setStatusFilter(s)} style={{
               padding: '4px 12px', borderRadius: 20, border: 'none', whiteSpace: 'nowrap',
               background: statusFilter === s ? (st?.bg || 'var(--bg2)') : 'var(--bg2)',
               color: statusFilter === s ? (st?.color || 'var(--text)') : 'var(--text2)',
               fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-            }}>{s}</button>
+            }}>{s} <span style={{ fontSize: 11, opacity: 0.8 }}>{count}</span></button>
           );
         })}
       </div>
