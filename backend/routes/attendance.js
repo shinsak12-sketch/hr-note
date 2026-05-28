@@ -494,9 +494,15 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
   const [original] = await sql`SELECT * FROM attendance WHERE id=${req.params.id}`;
   if (!original) return res.status(404).json({ error: '원본 레코드를 찾을 수 없습니다.' });
 
-  // 연장: 기존 정상종료 처리 / 분할: 유지
+  // 연장: 기존을 종료예정으로 (종료일 도래 시 자동종료) / 분할: 기존 유지
   if (!is_split) {
-    await sql`UPDATE attendance SET status='정상종료', updated_at=NOW() WHERE id=${req.params.id}`;
+    await sql`
+      UPDATE attendance SET 
+        status='종료예정', 
+        close_type='정상종료',
+        updated_at=NOW() 
+      WHERE id=${req.params.id}
+    `;
   }
 
   // 연장: 같은 회차 유지 / 분할: 새 회차 계산

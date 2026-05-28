@@ -564,7 +564,9 @@ function SplitModal({ record, onClose, onDone }) {
     try {
       await api.extendAttendance(record.id, { ...form, is_split: true });
       onDone('분할 등록되었습니다.');
-    } catch(e) { } finally { setSaving(false); }
+    } catch(e) {
+      alert('오류: ' + (e.message || '분할 등록 실패'));
+    } finally { setSaving(false); }
   }
 
   return (
