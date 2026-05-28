@@ -770,11 +770,17 @@ export default function AttendanceMgmt() {
   async function handleUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
-    const result = await api.uploadAttendanceExcel(file);
-    if (result.error) { setToast('오류: ' + result.error); return; }
-    setToast(`${result.inserted}건 등록 완료${result.errors?.length ? ` (오류 ${result.errors.length}건)` : ''}`);
-    load();
-    e.target.value = '';
+    setToast('업로드 중...');
+    try {
+      const result = await api.uploadAttendanceExcel(file);
+      if (result.error) { setToast('오류: ' + result.error); return; }
+      setToast(`${result.inserted}건 등록 완료${result.errors?.length ? ` (오류 ${result.errors.length}건)` : ''}`);
+      load();
+    } catch(e) {
+      setToast('업로드 실패: ' + e.message);
+    } finally {
+      e.target.value = '';
+    }
   }
 
   async function handleRevert(id) {
