@@ -235,6 +235,16 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
 // 전체 목록
 router.get('/', authMiddleware, async (req, res) => {
   const { category, type, status, year } = req.query;
+  // 종료예정 중 종료일 도래한 것 자동 정상종료/조기종료 처리
+  const koreaToday = new Date(Date.now() + 9*60*60*1000).toISOString().split('T')[0];
+  await sql`
+    UPDATE attendance 
+    SET status = COALESCE(close_type, '정상종료'), updated_at = NOW()
+    WHERE status = '종료예정' 
+    AND end_date IS NOT NULL 
+    AND end_date::date <= ${koreaToday}::date
+  `;
+
   let list = await sql`
     SELECT a.*, o.headquarters, o.department,
       p.start_date as parent_start_date, p.end_date as parent_end_date
@@ -369,7 +379,7 @@ router.post('/', authMiddleware, async (req, res) => {
       birth_date, post_birth_days, paid_period, prenatal_days,
       birth_type,
       reduce_hours, work_start_time, work_end_time, normal_return_date, contract_date,
-      retirement_date, off_start_date, leave_deleted, doc_completed, status
+      retirement_date, off_start_date, leave_deleted, doc_completed, expected_birth_date, status
     ) VALUES (
       ${d.category}, ${d.type}, ${d.office_id||null}, ${d.org_name||null},
       ${d.emp_no}, ${d.emp_name}, ${d.start_date}, ${d.end_date||null},
@@ -383,6 +393,7 @@ router.post('/', authMiddleware, async (req, res) => {
       ${d.normal_return_date||null}, ${d.contract_date||null},
       ${d.retirement_date||null}, ${d.off_start_date||null},
       ${d.leave_deleted||false}, ${d.doc_completed||false},
+      ${d.expected_birth_date||null},
       ${d.start_date > koreaToday ? '예정' : '진행중'}
     ) RETURNING *
   `;
@@ -409,6 +420,7 @@ router.patch('/:id', authMiddleware, async (req, res) => {
       normal_return_date=${d.normal_return_date||null}, contract_date=${d.contract_date||null},
       retirement_date=${d.retirement_date||null}, off_start_date=${d.off_start_date||null},
       leave_deleted=${d.leave_deleted||false}, doc_completed=${d.doc_completed||false},
+      expected_birth_date=${d.expected_birth_date||null},
       updated_at=NOW()
     WHERE id=${req.params.id} RETURNING *
   `;
@@ -417,10 +429,14 @@ router.patch('/:id', authMiddleware, async (req, res) => {
 
 // 종료처리
 router.patch('/:id/close', authMiddleware, async (req, res) => {
-  const { status, end_comment, end_date } = req.body;
+  const { status, end_comment, end_date, close_type } = req.body;
   const [rec] = await sql`
-    UPDATE attendance SET status=${status}, end_comment=${end_comment||null},
-      end_date=${end_date||null}, updated_at=NOW()
+    UPDATE attendance SET 
+      status=${status}, 
+      end_comment=${end_comment||null},
+      end_date=${end_date||null},
+      close_type=${close_type||null},
+      updated_at=NOW()
     WHERE id=${req.params.id} RETURNING *
   `;
   res.json(rec);

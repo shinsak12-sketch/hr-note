@@ -15,6 +15,7 @@ const BIRTH_TYPES = ['일반','미숙아','다태아'];
 const STATUS_STYLE = {
   '예정':    { color: '#854F0B', bg: '#FAEEDA' },
   '진행중':  { color: '#1A4A8A', bg: '#E8F0FB' },
+  '종료예정':{ color: '#5C3D8F', bg: '#F0EBF8' },
   '정상종료':{ color: '#3B6D11', bg: '#EAF3DE' },
   '조기종료':{ color: 'var(--text2)', bg: 'var(--bg2)' },
 };
@@ -269,8 +270,11 @@ function InputModal({ record, offices, onClose, onDone }) {
                 </select>
               </div>
               <div className="form-group">
-                <label className="form-label">분할회차</label>
-                <input type="number" placeholder="회차" value={form.split_count||''} onChange={e => setF('split_count', e.target.value)} min="1" max="5" />
+                <label className="form-label">{form.type === '육아휴직(임신중)' ? '출산예정일' : '분할회차'}</label>
+                {form.type === '육아휴직(임신중)'
+                  ? <input type="date" value={form.expected_birth_date||''} onChange={e => setF('expected_birth_date', e.target.value)} />
+                  : <input type="number" placeholder="회차" value={form.split_count||''} onChange={e => setF('split_count', e.target.value)} min="1" max="5" />
+                }
               </div>
             </div>
           )}
@@ -413,15 +417,14 @@ function InputModal({ record, offices, onClose, onDone }) {
 
 // ── 종료처리 모달 ──────────────────────
 function CloseModal({ record, onClose, onDone }) {
-  const [status, setStatus] = useState('');
   const [comment, setComment] = useState('');
   const [endDate, setEndDate] = useState(record.end_date?.split('T')[0] || '');
+  const [closeType, setCloseType] = useState('정상종료');
   const [saving, setSaving] = useState(false);
 
   async function handleSave() {
-    if (!status) return;
     setSaving(true);
-    await api.closeAttendance(record.id, { status, end_comment: comment, end_date: endDate });
+    await api.closeAttendance(record.id, { status: '종료예정', close_type: closeType, end_comment: comment, end_date: endDate });
     setSaving(false);
     onDone('종료 처리되었습니다.');
   }
@@ -434,28 +437,31 @@ function CloseModal({ record, onClose, onDone }) {
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'var(--text2)' }}>×</button>
         </div>
         <div style={{ overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ fontSize: 12, color: 'var(--text2)', background: 'var(--bg2)', borderRadius: 8, padding: '8px 12px' }}>
+            종료일 도래 시 자동으로 종료 처리됩니다.
+          </div>
           <div style={{ display: 'flex', gap: 8 }}>
             {['정상종료','조기종료'].map(s => (
-              <button key={s} type="button" onClick={() => setStatus(s)} style={{
+              <button key={s} type="button" onClick={() => setCloseType(s)} style={{
                 flex: 1, height: 44, borderRadius: 10, fontFamily: 'inherit',
-                border: `2px solid ${status===s ? (s==='정상종료'?'#3B6D11':'#854F0B') : 'var(--border)'}`,
-                background: status===s ? (s==='정상종료'?'#EAF3DE':'#FAEEDA') : 'var(--bg)',
-                color: status===s ? (s==='정상종료'?'#3B6D11':'#854F0B') : 'var(--text2)',
+                border: `2px solid ${closeType===s ? (s==='정상종료'?'#3B6D11':'#854F0B') : 'var(--border)'}`,
+                background: closeType===s ? (s==='정상종료'?'#EAF3DE':'#FAEEDA') : 'var(--bg)',
+                color: closeType===s ? (s==='정상종료'?'#3B6D11':'#854F0B') : 'var(--text2)',
                 fontSize: 14, fontWeight: 700, cursor: 'pointer',
               }}>{s === '정상종료' ? '✅' : '⚡'} {s}</button>
             ))}
           </div>
           <div className="form-group">
-            <label className="form-label">실제 종료일</label>
+            <label className="form-label">종료일</label>
             <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
           </div>
           <div className="form-group">
             <label className="form-label">코멘트</label>
             <textarea placeholder="코멘트 입력" value={comment} onChange={e => setComment(e.target.value)} style={{ height: 80 }} />
           </div>
-          <button onClick={handleSave} disabled={!status || saving} className="btn-primary"
-            style={{ background: status === '정상종료' ? '#3B6D11' : '#854F0B', marginBottom: 8 }}>
-            {saving ? '처리 중...' : '종료 처리'}
+          <button onClick={handleSave} disabled={saving} className="btn-primary"
+            style={{ background: '#1A4A8A', marginBottom: 8 }}>
+            {saving ? '처리 중...' : '종료 처리 완료'}
           </button>
         </div>
       </div>
@@ -642,7 +648,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           <span style={{ fontWeight: 700, fontSize: 15 }}>{r.emp_name}</span>
           <span style={{ fontSize: 12, color: 'var(--text2)', marginLeft: 6 }}>· {r.emp_no}</span>
           <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: cc+'20', color: cc }}>{r.type}</span>
-          {r.split_count >= 1 && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A' }}>{r.split_count}회차</span>}
+          {r.split_count >= 1 && r.type !== '육아휴직(임신중)' && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A' }}>{r.split_count}회차</span>}
           {r.is_extension && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F5E8F8', color: '#7B2D8B' }}>연장</span>}
           {r.child_order && childStyle && <span style={{ marginLeft: 2, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: childStyle.bg, color: childStyle.color }}>{r.child_order}</span>}
           <span style={{ marginLeft: 4, fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: st.bg, color: st.color }}>{r.status}</span>
@@ -673,7 +679,10 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
         <div>🏢 {r.org_name || '-'}</div>
         {r.prevPeriods?.map((p, i) => (
           <div key={p.id} style={{ fontSize: 11, color: 'var(--text2)' }}>
-            📋 {i+1}회차: {p.start_date?.split('T')[0]} ~ {p.end_date?.split('T')[0] || '진행중'} {p.used_days ? `(${p.used_days}일)` : ''}
+            {p.type === '육아휴직(임신중)'
+              ? `📋 임신중: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
+              : `📋 ${i+1}회차: ${p.start_date?.split('T')[0]} ~ ${p.end_date?.split('T')[0] || '진행중'}${p.used_days ? ` (${p.used_days}일)` : ''}`
+            }
           </div>
         ))}
         <div>📅 {r.start_date?.split('T')[0]} ~ {r.end_date?.split('T')[0] || '미정'} ({r.used_days ? r.used_days+'일' : '-'})</div>
@@ -683,6 +692,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           </div>
         )}
         {r.return_date && <div>🔙 복직예정: {r.return_date?.split('T')[0]}</div>}
+        {r.expected_birth_date && <div>🍼 출산예정: {r.expected_birth_date?.split('T')[0]}</div>}
         {r.disease_name && <div>🏥 {r.disease_name}</div>}
         {r.birth_type && <div>👶 {r.birth_type}</div>}
         {r.leave_reason && <div>📝 {r.leave_reason}</div>}
@@ -691,7 +701,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
         {r.end_comment && <div style={{ color: 'var(--text)' }}>💬 {r.end_comment}</div>}
         {r.note && <div>📌 {r.note}</div>}
       </div>
-      {(r.status === '진행중' || r.status === '예정') && (
+      {(r.status === '진행중' || r.status === '예정' || r.status === '종료예정') && (
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={() => onExtend(r)} style={{ flex: 1, height: 34, borderRadius: 8, background: '#E8F0FB', color: '#1A4A8A', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
             🔄 연장
@@ -699,7 +709,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           <button onClick={() => onSplit(r)} style={{ flex: 1, height: 34, borderRadius: 8, background: '#F0EBF8', color: '#5C3D8F', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
             ✂️ 분할
           </button>
-          {r.status === '진행중' && (
+          {(r.status === '진행중' || r.status === '예정') && (
             <button onClick={() => onClose(r)} style={{ flex: 1, height: 34, borderRadius: 8, background: '#FAEEDA', color: '#854F0B', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
               종료
             </button>
@@ -952,7 +962,7 @@ export default function AttendanceMgmt() {
 
       {/* 상태 필터 */}
       <div style={{ display: 'flex', gap: 6, padding: '6px 16px 8px', borderBottom: '0.5px solid var(--border)', overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none", msOverflowStyle: "none" }}>
-        {['예정', '진행중', '정상종료', '조기종료', '전체'].map(s => {
+        {['예정', '진행중', '종료예정', '정상종료', '조기종료', '전체'].map(s => {
           const st = STATUS_STYLE[s];
           const count = s === '전체' ? list.length : list.filter(r => r.status === s).length;
           return (
