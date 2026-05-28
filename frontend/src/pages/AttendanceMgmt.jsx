@@ -678,9 +678,18 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
 
   return (
     <div style={{ background: cardBg, border: `0.5px solid ${alertBadge?.color || cc}20`, borderLeft: `4px solid ${alertBadge?.color || cc}`, borderRadius: 12, padding: '12px 14px' }}>
-      {alertBadge && (
-        <div style={{ marginBottom: 8, display: 'inline-block', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: alertBadge.bg, color: alertBadge.color }}>
-          {alertBadge.text}
+      {(alertBadge || isDone) && (
+        <div style={{ marginBottom: 8, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {alertBadge && (
+            <div style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: alertBadge.bg, color: alertBadge.color }}>
+              {alertBadge.text}
+            </div>
+          )}
+          {isDone && (
+            <div style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: '#EAF3DE', color: '#3B6D11' }}>
+              ✅ 조치완료
+            </div>
+          )}
         </div>
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
@@ -694,7 +703,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           {isExtPending ? (
             <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F0EBF8', color: '#5C3D8F', whiteSpace: 'nowrap' }}>연장예정</span>
           ) : isDone ? (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#EAF3DE', color: '#3B6D11', whiteSpace: 'nowrap' }}>조치완료</span>
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: STATUS_STYLE['정상종료'].bg, color: STATUS_STYLE['정상종료'].color, whiteSpace: 'nowrap' }}>{r.close_type || '종료예정'}</span>
           ) : (
             <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: st.bg, color: st.color, whiteSpace: 'nowrap' }}>{r.status}</span>
           )}
@@ -949,7 +958,8 @@ export default function AttendanceMgmt() {
   const filtered = list.filter(r => {
     const resolvedOrg = resolveOrgName(r.org_name);
     const matchCat = catFilter === '전체' || r.category === catFilter;
-    const matchSt = statusFilter === '전체' || r.status === statusFilter;
+    const matchSt = statusFilter === '전체' || 
+      (statusFilter === '종료' ? (r.status === '정상종료' || r.status === '조기종료') : r.status === statusFilter);
     const matchSearch = !search || r.emp_name?.includes(search) || r.emp_no?.includes(search) || r.org_name?.includes(search) || r.type?.includes(search);
     const matchHq = !hqOrgNames || hqOrgNames.has(resolvedOrg);
     const matchDept = !deptOrgNames || deptOrgNames.has(resolvedOrg);
@@ -1059,9 +1069,11 @@ export default function AttendanceMgmt() {
 
       {/* 상태 필터 */}
       <div style={{ display: 'flex', gap: 6, padding: '6px 16px 8px', borderBottom: '0.5px solid var(--border)', overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none", msOverflowStyle: "none" }}>
-        {['예정', '진행중', '정상종료', '조기종료', '전체'].map(s => {
-          const st = STATUS_STYLE[s];
-          const count = s === '전체' ? list.length : list.filter(r => r.status === s).length;
+        {['전체', '예정', '진행중', '종료'].map(s => {
+          const st = STATUS_STYLE[s === '종료' ? '정상종료' : s];
+          const count = s === '전체' ? list.length
+            : s === '종료' ? list.filter(r => r.status === '정상종료' || r.status === '조기종료').length
+            : list.filter(r => r.status === s).length;
           return (
             <button key={s} onClick={() => setStatusFilter(s)} style={{
               padding: '4px 12px', borderRadius: 20, border: 'none', whiteSpace: 'nowrap',
