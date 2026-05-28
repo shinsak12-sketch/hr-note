@@ -6,6 +6,8 @@ export function useAutoLogout(onLogout) {
   const [remaining, setRemaining] = useState(TIMEOUT);
   const countRef = useRef(TIMEOUT);
   const timerRef = useRef(null);
+  const onLogoutRef = useRef(onLogout);
+  onLogoutRef.current = onLogout;
 
   const reset = useCallback(() => {
     countRef.current = TIMEOUT;
@@ -18,7 +20,7 @@ export function useAutoLogout(onLogout) {
       setRemaining(countRef.current);
       if (countRef.current <= 0) {
         clearInterval(timerRef.current);
-        onLogout?.();
+        onLogoutRef.current?.();
       }
     }, 1000);
 
@@ -29,7 +31,7 @@ export function useAutoLogout(onLogout) {
       clearInterval(timerRef.current);
       events.forEach(e => window.removeEventListener(e, reset));
     };
-  }, [onLogout]);
+  }, []); // onLogout 의존성 제거!
 
   const minutes = Math.floor(remaining / 60);
   const seconds = remaining % 60;
