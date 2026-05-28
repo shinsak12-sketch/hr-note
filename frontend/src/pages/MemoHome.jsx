@@ -21,7 +21,8 @@ function MemoCard({ memo, dateStr, ts, onEdit, onDelete }) {
   return (
     <div style={{
       background: 'var(--bg)', border: '0.5px solid var(--border)',
-      borderLeft: '4px solid #5C3D8F',
+      borderLeft: `4px solid ${memo.is_shared ? '#1A6A6A' : '#5C3D8F'}`,
+      background: memo.is_shared ? '#F0F8F8' : 'var(--bg)',
       borderRadius: 12, padding: '14px 16px', position: 'relative',
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
