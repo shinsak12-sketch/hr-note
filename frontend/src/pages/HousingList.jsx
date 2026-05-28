@@ -163,7 +163,7 @@ function NewHousingModal({ onClose, onDone }) {
   );
 }
 
-
+function ContractModal({ request, onClose, onDone }) {
   const [form, setForm] = useState({
     housing_address: request.housing_address || '',
     contract_start: request.contract_start?.split?.('T')[0] || '',
