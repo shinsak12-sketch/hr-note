@@ -116,8 +116,6 @@ router.delete('/:id', async (req, res) => {
   res.json({ message: '삭제되었습니다.' });
 });
 
-export default router;
-
 // 댓글 목록
 router.get('/:id/comments', async (req, res) => {
   const comments = await sql`
