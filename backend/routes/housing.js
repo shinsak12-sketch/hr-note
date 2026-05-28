@@ -142,10 +142,10 @@ router.delete('/withdraw/:id', async (req, res) => {
 // 기존 사택 일괄 업로드 양식
 router.get('/template/excel', authMiddleware, (req, res) => {
   const wb = XLSX.utils.book_new();
-  const headers = [['사번', '성명', '소속(조직명)', '거주지주소', '사택주소', '계약시작일', '계약만료일', '보증금(만원)', '월세(만원)', '특이사항']];
-  const example = [['11500001', '홍길동', '강남센터', '서울시 강남구 역삼로 123', '서울시 서초구 서초대로 456', '2024-01-01', '2025-12-31', '3000', '50', '']];
+  const headers = [['사번','성명','소속(조직명)','사택주소','계약시작일','최초종료일','현재종료일','자동갱신(년)','구분(월세/연세)','보증금(만원)','월세연세(만원)','지급일(1-31)','지급시기(선불/후불)','전용평수','특이사항']];
+  const example = [['11500001','홍길동','강남센터','서울시 서초구 서초대로 456','2024-01-01','2025-12-31','2025-12-31','2','월세','3000','50','25','후불','24.5','']];
   const ws = XLSX.utils.aoa_to_sheet([...headers, ...example]);
-  ws['!cols'] = [10,8,12,25,25,12,12,10,10,20].map(w => ({ wch: w }));
+  ws['!cols'] = [10,8,12,30,12,12,12,10,12,10,12,10,12,10,20].map(w => ({ wch: w }));
   XLSX.utils.book_append_sheet(wb, ws, '사택등록양식');
   const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
   res.setHeader('Content-Disposition', 'attachment; filename=HR노트_사택등록양식.xlsx');
@@ -166,10 +166,9 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
       const emp_no = String(r['사번'] || '').trim();
       const emp_name = String(r['성명'] || '').trim();
       const org_name = String(r['소속(조직명)'] || '').trim();
-      const home_address = String(r['거주지주소'] || '').trim();
       const housing_address = String(r['사택주소'] || '').trim();
 
-      if (!emp_no || !emp_name || !home_address) {
+      if (!emp_no || !emp_name) {
         errors.push(`${rowNum}행: 필수값 누락`); continue;
       }
 
@@ -181,6 +180,7 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
 
       const parseDate = (val) => {
         if (!val) return null;
+        if (val instanceof Date) return val.toISOString().split('T')[0];
         const s = String(val).trim();
         if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
         if (!isNaN(val)) {
@@ -190,17 +190,23 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
         return null;
       };
 
+      const str = (v) => String(v||'').trim() || null;
+
       await sql`
         INSERT INTO housing_requests
-          (emp_no, emp_name, office_id, home_address, housing_address,
-           contract_start, contract_end, deposit, monthly_rent, contract_note,
-           status, password, distance_km)
+          (emp_no, emp_name, office_id, department, housing_address,
+           contract_start, initial_end, contract_end, auto_renew_years,
+           rent_type, deposit, monthly_rent, rent_day, payment_type, area_sqm,
+           contract_note, status, password, distance_km)
         VALUES
-          (${emp_no}, ${emp_name}, ${office_id}, ${home_address}, ${housing_address||null},
-           ${parseDate(r['계약시작일'])}, ${parseDate(r['계약만료일'])},
-           ${String(r['보증금(만원)']||'').trim()||null},
-           ${String(r['월세(만원)']||'').trim()||null},
-           ${String(r['특이사항']||'').trim()||null},
+          (${emp_no}, ${emp_name}, ${office_id}, ${org_name||null}, ${housing_address||null},
+           ${parseDate(r['계약시작일'])}, ${parseDate(r['최초종료일'])}, ${parseDate(r['현재종료일'])},
+           ${str(r['자동갱신(년)'])},
+           ${str(r['구분(월세/연세)'])},
+           ${str(r['보증금(만원)'])}, ${str(r['월세연세(만원)'])},
+           ${str(r['지급일(1-31)'])}, ${str(r['지급시기(선불/후불)'])},
+           ${str(r['전용평수'])},
+           ${str(r['특이사항'])},
            '승인', '1111', NULL)
         ON CONFLICT DO NOTHING
       `;
