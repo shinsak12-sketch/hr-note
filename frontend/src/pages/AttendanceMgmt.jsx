@@ -18,8 +18,6 @@ const STATUS_STYLE = {
   '정상종료':{ color: '#3B6D11', bg: '#EAF3DE' },
   '조기종료':{ color: 'var(--text2)', bg: 'var(--bg2)' },
 };
-  '조기종료': { color: '#854F0B', bg: '#FAEEDA' },
-};
 
 // ── 입력 모달 ──────────────────────────
 function InputModal({ record, offices, onClose, onDone }) {
