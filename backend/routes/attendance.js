@@ -485,16 +485,29 @@ router.patch('/:id/close', authMiddleware, async (req, res) => {
     newReturnDate = d.toISOString().split('T')[0];
   }
 
-  const [rec] = await sql`
-    UPDATE attendance SET 
-      status=${status}, 
-      end_comment=${end_comment||null},
-      end_date=${end_date||null},
-      close_type=${close_type||null},
-      ${newReturnDate ? sql`return_date=${newReturnDate},` : sql``}
-      updated_at=NOW()
-    WHERE id=${req.params.id} RETURNING *
-  `;
+  let rec;
+  if (newReturnDate) {
+    [rec] = await sql`
+      UPDATE attendance SET 
+        status=${status}, 
+        end_comment=${end_comment||null},
+        end_date=${end_date||null},
+        close_type=${close_type||null},
+        return_date=${newReturnDate},
+        updated_at=NOW()
+      WHERE id=${req.params.id} RETURNING *
+    `;
+  } else {
+    [rec] = await sql`
+      UPDATE attendance SET 
+        status=${status}, 
+        end_comment=${end_comment||null},
+        end_date=${end_date||null},
+        close_type=${close_type||null},
+        updated_at=NOW()
+      WHERE id=${req.params.id} RETURNING *
+    `;
+  }
   res.json(rec);
 });
 
