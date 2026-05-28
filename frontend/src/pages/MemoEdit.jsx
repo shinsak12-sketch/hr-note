@@ -340,7 +340,11 @@ export default function MemoEdit() {
                 return (
                   <div key={att.id} style={{ border: '0.5px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
                     {isImage && (
-                      <img src={att.file_url} alt={att.file_name} style={{ width: '100%', maxHeight: 300, objectFit: 'contain', background: 'var(--bg2)' }} />
+                      <img
+                        src={att.file_url.replace('/upload/', '/upload/w_800,c_limit,q_auto,f_auto/')}
+                        alt={att.file_name}
+                        style={{ width: '100%', height: 'auto', display: 'block', background: 'var(--bg2)' }}
+                      />
                     )}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px' }}>
                       <span style={{ fontSize: 18 }}>{isImage ? '🖼️' : '📄'}</span>
