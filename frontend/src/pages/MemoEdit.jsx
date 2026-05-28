@@ -10,14 +10,20 @@ const EMPTY = {
 
 function ShareModal({ memoId, onClose }) {
   const [users, setUsers] = useState([]);
+  const [shares, setShares] = useState([]);
   const [selected, setSelected] = useState([]);
   const [sharing, setSharing] = useState(false);
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    api.getUsers().then(data => {
-      const me = JSON.parse(localStorage.getItem('hr_user') || '{}');
-      setUsers(data.filter(u => u.status === 'active' && u.id !== me.id));
+    const me = JSON.parse(localStorage.getItem('hr_user') || '{}');
+    Promise.all([
+      api.getUsers(),
+      api.getMemoShares(memoId),
+    ]).then(([allUsers, existingShares]) => {
+      setShares(existingShares);
+      const sharedUserIds = new Set(existingShares.map(s => s.user_id));
+      setUsers(allUsers.filter(u => u.status === 'active' && u.id !== me.id && !sharedUserIds.has(u.id)));
     });
   }, []);
 
@@ -35,11 +41,12 @@ function ShareModal({ memoId, onClose }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'flex-end' }}>
-      <div style={{ background: 'var(--bg)', width: '100%', maxWidth: 480, margin: '0 auto', borderRadius: '16px 16px 0 0', maxHeight: '80vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ background: 'var(--bg)', width: '100%', maxWidth: 480, margin: '0 auto', borderRadius: '16px 16px 0 0', maxHeight: '85vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '0.5px solid var(--border)' }}>
           <div style={{ fontWeight: 700, fontSize: 15 }}>📤 메모 공유</div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: 'var(--text2)' }}>×</button>
         </div>
+
         {done ? (
           <div style={{ padding: 24, textAlign: 'center' }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
@@ -49,32 +56,60 @@ function ShareModal({ memoId, onClose }) {
         ) : (
           <>
             <div style={{ overflowY: 'auto', flex: 1 }}>
-              {users.length === 0 && <div style={{ padding: 20, textAlign: 'center', color: 'var(--text2)', fontSize: 13 }}>공유 가능한 사용자가 없습니다.</div>}
-              {users.map(u => (
-                <div key={u.id} onClick={() => toggle(u.id)} style={{
-                  display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
-                  borderBottom: '0.5px solid var(--border)', cursor: 'pointer',
-                  background: selected.includes(u.id) ? '#F0EBF8' : 'var(--bg)',
-                }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: '50%', background: '#5C3D8F',
-                    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 14, fontWeight: 700, flexShrink: 0,
-                  }}>{u.name?.[0]}</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, fontSize: 14 }}>{u.name}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text2)' }}>{u.work_type || u.username}</div>
-                  </div>
-                  {selected.includes(u.id) && <span style={{ color: '#5C3D8F', fontSize: 18 }}>✓</span>}
-                </div>
-              ))}
+              {/* 기존 공유자 */}
+              {shares.length > 0 && (
+                <>
+                  <div style={{ padding: '10px 16px 6px', fontSize: 11, fontWeight: 700, color: 'var(--text2)', background: 'var(--bg2)' }}>공유됨 ({shares.length}명)</div>
+                  {shares.map(s => (
+                    <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '0.5px solid var(--border)', background: 'var(--bg2)' }}>
+                      <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#5C3D8F', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700 }}>{s.name?.[0]}</div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600 }}>{s.name}</div>
+                      </div>
+                      <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: '#F0EBF8', color: '#5C3D8F', fontWeight: 600 }}>공유됨</span>
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {/* 추가 공유 가능한 사용자 */}
+              {users.length > 0 && (
+                <>
+                  <div style={{ padding: '10px 16px 6px', fontSize: 11, fontWeight: 700, color: 'var(--text2)' }}>추가 공유</div>
+                  {users.map(u => (
+                    <div key={u.id} onClick={() => toggle(u.id)} style={{
+                      display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
+                      borderBottom: '0.5px solid var(--border)', cursor: 'pointer',
+                      background: selected.includes(u.id) ? '#F0EBF8' : 'var(--bg)',
+                    }}>
+                      <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#5C3D8F', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, flexShrink: 0 }}>{u.name?.[0]}</div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 600, fontSize: 14 }}>{u.name}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text2)' }}>{u.work_type || u.username}</div>
+                      </div>
+                      {selected.includes(u.id) && <span style={{ color: '#5C3D8F', fontSize: 18 }}>✓</span>}
+                    </div>
+                  ))}
+                </>
+              )}
+              {users.length === 0 && shares.length === 0 && (
+                <div style={{ padding: 20, textAlign: 'center', color: 'var(--text2)', fontSize: 13 }}>공유 가능한 사용자가 없습니다.</div>
+              )}
+              {users.length === 0 && shares.length > 0 && (
+                <div style={{ padding: 16, textAlign: 'center', color: 'var(--text2)', fontSize: 13 }}>모든 사용자에게 공유되었습니다.</div>
+              )}
             </div>
-            <div style={{ padding: 16 }}>
-              <button onClick={handleShare} disabled={!selected.length || sharing} style={{
-                width: '100%', height: 44, borderRadius: 10, background: selected.length ? '#5C3D8F' : 'var(--bg2)',
-                color: selected.length ? '#fff' : 'var(--text2)', border: 'none', fontSize: 14, fontWeight: 700, cursor: selected.length ? 'pointer' : 'default',
-              }}>{sharing ? '공유 중...' : `${selected.length}명에게 공유`}</button>
-            </div>
+            {users.length > 0 && (
+              <div style={{ padding: 16, borderTop: '0.5px solid var(--border)' }}>
+                <button onClick={handleShare} disabled={!selected.length || sharing} style={{
+                  width: '100%', height: 44, borderRadius: 10,
+                  background: selected.length ? '#5C3D8F' : 'var(--bg2)',
+                  color: selected.length ? '#fff' : 'var(--text2)',
+                  border: 'none', fontSize: 14, fontWeight: 700,
+                  cursor: selected.length ? 'pointer' : 'default',
+                }}>{sharing ? '공유 중...' : selected.length ? `${selected.length}명에게 공유` : '공유할 사용자 선택'}</button>
+              </div>
+            )}
           </>
         )}
       </div>

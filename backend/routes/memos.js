@@ -60,6 +60,18 @@ router.put('/:id', async (req, res) => {
   res.json(memo);
 });
 
+// 공유 목록 조회 (내가 공유한 사람들)
+router.get('/:id/shares', async (req, res) => {
+  const shares = await sql`
+    SELECT m.id, m.user_id, u.name, u.username, m.created_at
+    FROM memos m
+    JOIN users u ON m.user_id = u.id
+    WHERE m.shared_from = ${req.params.id}
+    ORDER BY m.created_at DESC
+  `;
+  res.json(shares);
+});
+
 // 공유
 router.post('/:id/share', async (req, res) => {
   const { user_ids } = req.body; // 공유할 사용자 ID 배열
