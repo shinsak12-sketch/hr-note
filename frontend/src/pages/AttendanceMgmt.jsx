@@ -22,14 +22,33 @@ const STATUS_STYLE = {
 
 // ── 입력 모달 ──────────────────────────
 function InputModal({ record, offices, onClose, onDone }) {
-  const isEdit = !!record;
-  const [form, setForm] = useState(record || {
+  const isEdit = !!record?.id;
+  const fmt = (v) => v ? String(v).split('T')[0] : '';
+
+  const [form, setForm] = useState(record?.id ? {
+    ...record,
+    start_date: fmt(record.start_date),
+    end_date: fmt(record.end_date),
+    return_date: fmt(record.return_date),
+    normal_return_date: fmt(record.normal_return_date),
+    contract_date: fmt(record.contract_date),
+    retirement_date: fmt(record.retirement_date),
+    off_start_date: fmt(record.off_start_date),
+    birth_date: fmt(record.birth_date),
+    expected_birth_date: fmt(record.expected_birth_date),
+    office_id: record.office_id ? String(record.office_id) : '',
+    used_days: record.used_days || '',
+    split_count: record.split_count || '',
+    remaining_days: record.remaining_days || '',
+    reduce_hours: record.reduce_hours || '',
+    prenatal_days: record.prenatal_days || '',
+  } : {
     category: '휴직', type: '육아휴직', office_id: '', org_name: '',
     emp_no: '', emp_name: '', start_date: '', end_date: '', return_date: '',
     used_days: '', note: '',
     child_order: '', split_count: '', disease_name: '', remaining_days: '',
     family_target: '', leave_reason: '', multi_birth: false, premature: false,
-    birth_type: '', // 일반/미숙아/다태아
+    birth_type: '',
     birth_date: '', prenatal_days: '',
     reduce_hours: '', work_start_time: '', work_end_time: '',
     normal_return_date: '', contract_date: '',
