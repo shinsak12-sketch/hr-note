@@ -139,6 +139,9 @@ export default function MemoEdit() {
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
   const textareaRef = useRef(null);
+  const autoSaveTimer = useRef(null);
+  const memoIdRef = useRef(id || null);
+  const savedRef = useRef(true);
 
   function adjustHeight() {
     const el = textareaRef.current;
