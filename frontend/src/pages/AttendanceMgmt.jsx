@@ -839,17 +839,17 @@ export default function AttendanceMgmt() {
   const PERIOD_TYPES = ['질병휴직','질병휴가','난임휴직','가족돌봄휴직','가족돌봄휴가'];
   const FAMILY_TYPES = ['가족돌봄휴직','가족돌봄휴가'];
 
-  // 조직 필터 목록
-  const hqList = [...new Set(list.map(r => r.headquarters).filter(Boolean))].sort();
-  const deptList = [...new Set(list.filter(r => !hqFilter || r.headquarters === hqFilter).map(r => r.department).filter(Boolean))].sort();
-  const orgList = [...new Set(list.filter(r => (!hqFilter || r.headquarters === hqFilter) && (!deptFilter || r.department === deptFilter)).map(r => r.org_name).filter(Boolean))].sort();
+  // 조직 필터 목록 - 사무실 데이터 기반
+  const hqList = [...new Set(offices.map(o => o.headquarters).filter(Boolean))].sort();
+  const deptList = [...new Set(offices.filter(o => !hqFilter || o.headquarters === hqFilter).map(o => o.department).filter(Boolean))].sort();
+  const orgList = [...new Set(offices.filter(o => (!hqFilter || o.headquarters === hqFilter) && (!deptFilter || o.department === deptFilter)).map(o => o.org_name).filter(Boolean))].sort();
 
   const filtered = list.filter(r => {
     const matchCat = catFilter === '전체' || r.category === catFilter;
     const matchSt = statusFilter === '전체' || r.status === statusFilter;
     const matchSearch = !search || r.emp_name?.includes(search) || r.emp_no?.includes(search) || r.org_name?.includes(search) || r.type?.includes(search);
-    const matchHq = !hqFilter || r.headquarters === hqFilter;
-    const matchDept = !deptFilter || r.department === deptFilter;
+    const matchHq = !hqFilter || offices.find(o => o.org_name === r.org_name)?.headquarters === hqFilter;
+    const matchDept = !deptFilter || offices.find(o => o.org_name === r.org_name)?.department === deptFilter;
     const matchOrg = !orgFilter || r.org_name === orgFilter;
     return matchCat && matchSt && matchSearch && matchHq && matchDept && matchOrg;
   }).sort((a, b) => {
