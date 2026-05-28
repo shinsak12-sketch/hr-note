@@ -134,7 +134,7 @@ export default function MemoEdit() {
   const [delConfirm, setDelConfirm] = useState(false);
   const [shareModal, setShareModal] = useState(false);
   const [memoData, setMemoData] = useState(null);
-
+  const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
   const textareaRef = useRef(null);
   const autoSaveTimer = useRef(null);
