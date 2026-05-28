@@ -650,14 +650,8 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
     Math.round((new Date(r.start_date) - new Date(prevRecord.end_date)) / (1000*60*60*24)) === 1 &&
     prevRecord.type !== '육아휴직(임신중)');
 
-  // 연장예정: list에서 이 카드 종료일+1 = 다음 카드 시작일인 카드가 있으면
-  const hasNextExtension = !!(r.end_date && list.some(x =>
-    x.id !== r.id &&
-    x.emp_no === r.emp_no &&
-    x.type === r.type &&
-    x.child_order === r.child_order &&
-    Math.round((new Date(x.start_date) - new Date(r.end_date)) / (1000*60*60*24)) === 1
-  ));
+  // 연장예정: 부모에서 미리 계산해서 넘어옴
+  const hasNextExtension = r.hasNextExtension;
 
   // 조치완료: 종료예정이면서 연장예정 아닌 것
   const isDone = r.status === '종료예정' && r.close_type !== '연장예정';
@@ -1012,6 +1006,14 @@ export default function AttendanceMgmt() {
     const eb = b.end_date ? new Date(b.end_date) : new Date('9999-12-31');
     return ea - eb;
   }).map(r => {
+    // 연장예정: 다음 카드가 날짜 연속으로 연결돼 있으면
+    const hasNextExtension = !!(r.end_date && list.some(x =>
+      x.id !== r.id &&
+      x.emp_no === r.emp_no &&
+      x.type === r.type &&
+      x.child_order === r.child_order &&
+      Math.round((new Date(x.start_date) - new Date(r.end_date)) / (1000*60*60*24)) === 1
+    ));
     // 육아휴직: 사번 + 자녀구분 기준, 자신보다 시작일이 이전인 것만
     if (r.type === '육아휴직' || r.type === '육아휴직(임신중)') {
       const related = list.filter(x =>
@@ -1021,7 +1023,7 @@ export default function AttendanceMgmt() {
         x.child_order === r.child_order &&
         x.start_date < r.start_date
       ).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
-      return { ...r, prevPeriods: related };
+      return { ...r, prevPeriods: related, hasNextExtension };
     }
     const related = list.filter(x => {
       if (x.id === r.id || x.emp_no !== r.emp_no || x.type !== r.type) return false;
@@ -1031,7 +1033,7 @@ export default function AttendanceMgmt() {
       }
       return true;
     }).sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
-    return { ...r, prevPeriods: related };
+    return { ...r, prevPeriods: related, hasNextExtension };
   });
 
   const counts = { 전체: list.length };
