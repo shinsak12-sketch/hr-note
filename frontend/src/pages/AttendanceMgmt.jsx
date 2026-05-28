@@ -635,18 +635,26 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
   const cc = CAT_COLOR[r.category] || '#854F0B';
   const childStyle = r.child_order ? (CHILD_COLORS[r.child_order] || { bg: '#EAF3DE', color: '#3B6D11' }) : null;
 
-  // 연장 여부: 이전 레코드 종료일+1 = 현재 시작일 (현재 카드가 연장)
+  // 배경색 = 날짜 기준
+  const todayStr = new Date(Date.now() + 9*60*60*1000).toISOString().split('T')[0];
+  const startStr = r.start_date?.split('T')[0];
+  const endStr = r.end_date?.split('T')[0];
+  const cardBg = !startStr ? 'var(--bg)'
+    : startStr > todayStr ? '#FFF5F5'           // 시작 전 - 붉은 미색
+    : (!endStr || endStr >= todayStr) ? '#FFFDF0' // 진행 중 - 노란 미색
+    : 'var(--bg)';                               // 종료 후 - 흰 배경
+
+  // 연장 여부: 현재 카드가 이전 카드 종료일+1 시작
   const prevRecord = r.prevPeriods?.length > 0 ? r.prevPeriods[r.prevPeriods.length - 1] : null;
   const isExtensionCard = !!(prevRecord?.end_date && r.start_date &&
     Math.round((new Date(r.start_date) - new Date(prevRecord.end_date)) / (1000*60*60*24)) === 1 &&
     prevRecord.type !== '육아휴직(임신중)');
 
-  // 기존 카드가 연장예정인지 (종료예정이면서 이후에 연장 카드가 있을 수 있음)
-  // → 이건 status로만 판단, 배지/배경 조정
-  const isExtPending = r.status === '종료예정';
+  // 연장예정: 종료예정이면서 close_type이 연장예정
+  const isExtPending = r.status === '종료예정' && r.close_type === '연장예정';
 
-  // 상태별 카드 배경 - 종료예정도 진행중색으로
-  const cardBg = (r.status === '진행중' || isExtPending) ? '#FFFDF0' : r.status === '예정' ? '#FFF5F5' : 'var(--bg)';
+  // 조치완료: 종료예정이면서 연장예정이 아닌 것 (정상종료/조기종료 처리됨)
+  const isDone = r.status === '종료예정' && r.close_type !== '연장예정';
   const prevTotalDays = r.prevPeriods?.reduce((sum, p) => sum + (p.used_days || 0), 0) || 0;
   const totalUsedDays = prevTotalDays + (r.used_days || 0);
 
@@ -684,10 +692,9 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
           {isExtensionCard && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F5E8F8', color: '#7B2D8B', whiteSpace: 'nowrap' }}>연장</span>}
           {r.child_order && childStyle && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: childStyle.bg, color: childStyle.color, whiteSpace: 'nowrap' }}>{r.child_order}</span>}
           {isExtPending ? (
-            <>
-              <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A', whiteSpace: 'nowrap' }}>진행중</span>
-              <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F0EBF8', color: '#5C3D8F', whiteSpace: 'nowrap' }}>연장예정</span>
-            </>
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F0EBF8', color: '#5C3D8F', whiteSpace: 'nowrap' }}>연장예정</span>
+          ) : isDone ? (
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#EAF3DE', color: '#3B6D11', whiteSpace: 'nowrap' }}>조치완료</span>
           ) : (
             <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: st.bg, color: st.color, whiteSpace: 'nowrap' }}>{r.status}</span>
           )}
@@ -1052,7 +1059,7 @@ export default function AttendanceMgmt() {
 
       {/* 상태 필터 */}
       <div style={{ display: 'flex', gap: 6, padding: '6px 16px 8px', borderBottom: '0.5px solid var(--border)', overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none", msOverflowStyle: "none" }}>
-        {['예정', '진행중', '종료예정', '정상종료', '조기종료', '전체'].map(s => {
+        {['예정', '진행중', '정상종료', '조기종료', '전체'].map(s => {
           const st = STATUS_STYLE[s];
           const count = s === '전체' ? list.length : list.filter(r => r.status === s).length;
           return (

@@ -246,6 +246,7 @@ router.get('/', authMiddleware, async (req, res) => {
     UPDATE attendance 
     SET status = COALESCE(close_type, '정상종료'), updated_at = NOW()
     WHERE status = '종료예정' 
+    AND close_type != '연장예정'
     AND end_date IS NOT NULL 
     AND end_date::date <= ${koreaToday}::date
   `;
@@ -519,7 +520,7 @@ router.post('/:id/extend', authMiddleware, async (req, res) => {
     if (!original) return res.status(404).json({ error: '원본 레코드를 찾을 수 없습니다.' });
 
     if (!is_split) {
-      await sql`UPDATE attendance SET status='종료예정', close_type='정상종료', updated_at=NOW() WHERE id=${req.params.id}`;
+      await sql`UPDATE attendance SET status='종료예정', close_type='연장예정', updated_at=NOW() WHERE id=${req.params.id}`;
     }
 
     let newSplitCount;
