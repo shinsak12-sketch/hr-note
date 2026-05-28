@@ -138,9 +138,20 @@ export default function MemoEdit() {
   const [uploading, setUploading] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
-  const autoSaveTimer = useRef(null);
-  const memoIdRef = useRef(id || null);
-  const savedRef = useRef(true);
+  const textareaRef = useRef(null);
+
+  function adjustHeight() {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = Math.max(200, el.scrollHeight) + 'px';
+  }
+
+  useEffect(() => {
+    if (form.content !== undefined) {
+      setTimeout(adjustHeight, 50);
+    }
+  }, [form.content]);
 
   useEffect(() => {
     if (isEdit) {
@@ -293,16 +304,12 @@ export default function MemoEdit() {
 
         {/* 내용 */}
         <textarea
+          ref={textareaRef}
           placeholder="내용을 입력하세요..."
           value={form.content}
           onChange={e => {
             setF('content', e.target.value);
-            e.target.style.height = 'auto';
-            e.target.style.height = Math.max(200, e.target.scrollHeight) + 'px';
-          }}
-          onFocus={e => {
-            e.target.style.height = 'auto';
-            e.target.style.height = Math.max(200, e.target.scrollHeight) + 'px';
+            adjustHeight();
           }}
           readOnly={memoData?.is_shared}
           style={{
