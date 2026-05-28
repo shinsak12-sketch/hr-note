@@ -130,6 +130,8 @@ export default function MemoEdit() {
   const [memoData, setMemoData] = useState(null);
   const [attachments, setAttachments] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [commentText, setCommentText] = useState('');
   const autoSaveTimer = useRef(null);
   const memoIdRef = useRef(id || null);
   const savedRef = useRef(true);
@@ -147,6 +149,8 @@ export default function MemoEdit() {
         setSaved(true);
         savedRef.current = true;
         api.getAttachments(id).then(setAttachments);
+        api.getMemoComments(id).then(setComments);
+        if (memo.is_shared && !memo.is_read) api.markMemoRead(id).catch(() => {});
       });
     }
   }, [id]);
@@ -344,6 +348,60 @@ export default function MemoEdit() {
 
       {shareModal && memoIdRef.current && (
         <ShareModal memoId={memoIdRef.current} onClose={() => setShareModal(false)} />
+      )}
+
+      {/* 댓글 섹션 - 공유된 메모에서만 표시 */}
+      {memoIdRef.current && (memoData?.is_shared || comments.length > 0) && (
+        <div style={{ borderTop: '0.5px solid var(--border)', padding: '12px 16px 20px' }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 10 }}>
+            💬 댓글 {comments.length > 0 ? `(${comments.length})` : ''}
+          </div>
+          {comments.map(c => {
+            const me = JSON.parse(localStorage.getItem('hr_user') || '{}');
+            return (
+              <div key={c.id} style={{ marginBottom: 10, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#5C3D8F', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
+                  {c.user_name?.[0]}
+                </div>
+                <div style={{ flex: 1, background: 'var(--bg2)', borderRadius: 8, padding: '8px 10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700 }}>{c.user_name}</span>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      <span style={{ fontSize: 10, color: 'var(--text2)' }}>{new Date(c.created_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                      {String(c.user_id) === String(me.id) && (
+                        <button onClick={async () => {
+                          await api.deleteMemoComment(memoIdRef.current, c.id);
+                          setComments(cs => cs.filter(x => x.id !== c.id));
+                        }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#A32D2D', fontSize: 13, padding: 0 }}>×</button>
+                      )}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 13, lineHeight: 1.5 }}>{c.content}</div>
+                </div>
+              </div>
+            );
+          })}
+          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+            <input
+              type="text" placeholder="댓글 입력..." value={commentText}
+              onChange={e => setCommentText(e.target.value)}
+              onKeyDown={async (e) => {
+                if (e.key === 'Enter' && commentText.trim()) {
+                  const c = await api.addMemoComment(memoIdRef.current, commentText.trim());
+                  setComments(cs => [...cs, c]);
+                  setCommentText('');
+                }
+              }}
+              style={{ flex: 1, height: 36, fontSize: 13 }}
+            />
+            <button onClick={async () => {
+              if (!commentText.trim()) return;
+              const c = await api.addMemoComment(memoIdRef.current, commentText.trim());
+              setComments(cs => [...cs, c]);
+              setCommentText('');
+            }} style={{ height: 36, padding: '0 14px', borderRadius: 8, background: '#5C3D8F', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, flexShrink: 0 }}>등록</button>
+          </div>
+        </div>
       )}
     </div>
   );

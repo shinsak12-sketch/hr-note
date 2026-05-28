@@ -25,6 +25,15 @@ router.get('/', async (req, res) => {
   res.json(memos);
 });
 
+// 안읽은 공유 메모 수 (반드시 /:id 보다 앞에)
+router.get('/unread-count', async (req, res) => {
+  const [row] = await sql`
+    SELECT COUNT(*) as cnt FROM memos 
+    WHERE user_id=${req.user.id} AND is_shared=true AND is_read=false
+  `;
+  res.json({ count: Number(row.cnt) });
+});
+
 // 단건 조회
 router.get('/:id', async (req, res) => {
   const [memo] = await sql`
@@ -90,10 +99,10 @@ router.post('/:id/share', async (req, res) => {
     if (exists) continue;
 
     const [memo] = await sql`
-      INSERT INTO memos (user_id, memo_date, title, content, tag, is_shared, shared_from, shared_by, shared_by_name)
+      INSERT INTO memos (user_id, memo_date, title, content, tag, is_shared, shared_from, shared_by, shared_by_name, is_read)
       VALUES (
         ${target.id}, ${original.memo_date}, ${original.title}, ${original.content}, ${original.tag},
-        true, ${original.id}, ${req.user.id}, ${req.user.name}
+        true, ${original.id}, ${req.user.id}, ${req.user.name}, false
       ) RETURNING *
     `;
     shared.push(memo);
@@ -105,6 +114,40 @@ router.post('/:id/share', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   await sql`DELETE FROM memos WHERE id = ${req.params.id} AND user_id = ${req.user.id}`;
   res.json({ message: '삭제되었습니다.' });
+});
+
+export default router;
+
+// 댓글 목록
+router.get('/:id/comments', async (req, res) => {
+  const comments = await sql`
+    SELECT * FROM memo_comments WHERE memo_id=${req.params.id} ORDER BY created_at ASC
+  `;
+  res.json(comments);
+});
+
+// 댓글 등록
+router.post('/:id/comments', async (req, res) => {
+  const { content } = req.body;
+  if (!content) return res.status(400).json({ error: '내용을 입력하세요.' });
+  const [comment] = await sql`
+    INSERT INTO memo_comments (memo_id, user_id, user_name, content)
+    VALUES (${req.params.id}, ${req.user.id}, ${req.user.name}, ${content})
+    RETURNING *
+  `;
+  res.status(201).json(comment);
+});
+
+// 댓글 삭제 (본인만)
+router.delete('/:memoId/comments/:id', async (req, res) => {
+  await sql`DELETE FROM memo_comments WHERE id=${req.params.id} AND user_id=${req.user.id}`;
+  res.json({ ok: true });
+});
+
+// 읽음 처리
+router.patch('/:id/read', async (req, res) => {
+  await sql`UPDATE memos SET is_read=true WHERE id=${req.params.id} AND user_id=${req.user.id}`;
+  res.json({ ok: true });
 });
 
 export default router;

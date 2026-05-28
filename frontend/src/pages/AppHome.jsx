@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePermission } from '../utils/usePermission.js';
 import { useAutoLogout } from '../utils/useAutoLogout.js';
+import { api } from '../utils/api.js';
 
 const MAIN_APPS = [
   { id: 'tasks',      icon: '📌', title: '업무관리',   desc: '업무 진행 현황 관리',    path: '/tasks-app',      color: '#1A4A8A', bg: '#E8F0FB', menuKey: 'tasks' },
@@ -26,6 +27,11 @@ export default function AppHome() {
     localStorage.removeItem('hr_user');
     nav('/login', { replace: true });
   });
+
+  const [memoUnread, setMemoUnread] = useState(0);
+  useEffect(() => {
+    api.getMemoUnreadCount().then(r => setMemoUnread(r?.count || 0)).catch(() => {});
+  }, []);
 
   function logout() {
     localStorage.removeItem('hr_token');
@@ -102,13 +108,20 @@ export default function AppHome() {
                   border: `0.5px solid ${accessible ? app.color + '30' : 'var(--border)'}`,
                   background: accessible ? app.bg : 'var(--bg2)',
                   cursor: 'pointer', textAlign: 'left',
-                  opacity: accessible ? 1 : 0.45,
+                  opacity: accessible ? 1 : 0.45, position: 'relative',
                 }}>
                 <span style={{ fontSize: 20 }}>{accessible ? app.icon : '🔒'}</span>
-                <div>
+                <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600, fontSize: 13, color: accessible ? app.color : 'var(--text2)' }}>{app.title}</div>
                   <div style={{ fontSize: 10, color: accessible ? app.color + '99' : 'var(--text2)' }}>{app.desc}</div>
                 </div>
+                {app.id === 'memos' && memoUnread > 0 && (
+                  <div style={{
+                    minWidth: 18, height: 18, borderRadius: 9, background: '#A32D2D',
+                    color: '#fff', fontSize: 10, fontWeight: 700,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
+                  }}>{memoUnread}</div>
+                )}
               </button>
             );
           })}
