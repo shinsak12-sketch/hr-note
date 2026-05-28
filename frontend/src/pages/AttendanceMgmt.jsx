@@ -650,10 +650,16 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
     Math.round((new Date(r.start_date) - new Date(prevRecord.end_date)) / (1000*60*60*24)) === 1 &&
     prevRecord.type !== '육아휴직(임신중)');
 
-  // 연장예정: 종료예정이면서 close_type이 연장예정
-  const isExtPending = r.status === '종료예정' && r.close_type === '연장예정';
+  // 연장예정: list에서 이 카드 종료일+1 = 다음 카드 시작일인 카드가 있으면
+  const hasNextExtension = !!(r.end_date && list.some(x =>
+    x.id !== r.id &&
+    x.emp_no === r.emp_no &&
+    x.type === r.type &&
+    x.child_order === r.child_order &&
+    Math.round((new Date(x.start_date) - new Date(r.end_date)) / (1000*60*60*24)) === 1
+  ));
 
-  // 조치완료: 종료예정이면서 연장예정이 아닌 것 (정상종료/조기종료 처리됨)
+  // 조치완료: 종료예정이면서 연장예정 아닌 것
   const isDone = r.status === '종료예정' && r.close_type !== '연장예정';
   const prevTotalDays = r.prevPeriods?.reduce((sum, p) => sum + (p.used_days || 0), 0) || 0;
   const totalUsedDays = prevTotalDays + (r.used_days || 0);
@@ -735,7 +741,7 @@ function AttCard({ r, onEdit, onClose, onExtend, onSplit, onRevert, onCalc, onDe
             if (ended) return <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: STATUS_STYLE['정상종료'].bg, color: STATUS_STYLE['정상종료'].color, whiteSpace: 'nowrap' }}>{r.status === '조기종료' ? '조기종료' : '정상종료'}</span>;
           })()}
           {/* 추가 배지: 조치 상태 */}
-          {isExtPending && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F0EBF8', color: '#5C3D8F', whiteSpace: 'nowrap' }}>연장예정</span>}
+          {hasNextExtension && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 6px', borderRadius: 10, background: '#F0EBF8', color: '#5C3D8F', whiteSpace: 'nowrap' }}>연장예정</span>}
         </div>
         <div ref={menuRef} style={{ position: 'relative' }}>
           <button onClick={() => setMenuOpen(o=>!o)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', color: 'var(--text2)', fontSize: 18 }}>⋮</button>
