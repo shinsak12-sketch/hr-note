@@ -43,42 +43,41 @@ router.get('/pending-count', authMiddleware, async (req, res) => {
   res.json({ count: Number(row.cnt) });
 });
 
-// 거리 계산 (네이버 Directions API)
-router.post('/check-distance', authMiddleware, async (req, res) => {
+const NAVER_ID = process.env.NAVER_CLIENT_ID;
+const NAVER_SECRET = process.env.NAVER_CLIENT_SECRET;
+
+async function geocode(address) {
+  const res = await fetch(
+    `https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(address)}`,
+    { headers: { 'X-NCP-APIGW-API-KEY-ID': NAVER_ID, 'X-NCP-APIGW-API-KEY': NAVER_SECRET } }
+  );
+  const data = await res.json();
+  if (!data.addresses?.length) throw new Error('주소를 찾을 수 없습니다.');
+  const { x, y } = data.addresses[0];
+  return { lng: parseFloat(x), lat: parseFloat(y) };
+}
+
+async function getDistance(startLng, startLat, goalLng, goalLat) {
+  const res = await fetch(
+    `https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?start=${startLng},${startLat}&goal=${goalLng},${goalLat}&option=trafast`,
+    { headers: { 'X-NCP-APIGW-API-KEY-ID': NAVER_ID, 'X-NCP-APIGW-API-KEY': NAVER_SECRET } }
+  );
+  const data = await res.json();
+  if (data.code !== 0) throw new Error('거리 계산에 실패했습니다.');
+  const distanceM = data.route?.trafast?.[0]?.summary?.distance;
+  return Math.round(distanceM / 100) / 10;
+}
+
+// 거리 계산 (로그인 불필요)
+router.post('/check-distance', async (req, res) => {
+  const { home_address, office_id } = req.body;
+  if (!home_address || !office_id) return res.status(400).json({ error: '주소와 소속을 입력하세요.' });
   try {
-    const { home_address, office_id } = req.body;
-    const [office] = await sql`SELECT address FROM offices WHERE id=${office_id}`;
-    if (!office) return res.status(404).json({ error: '사무실 없음' });
-
-    const CLIENT_ID = process.env.NAVER_CLIENT_ID;
-    const CLIENT_SECRET = process.env.NAVER_CLIENT_SECRET;
-    if (!CLIENT_ID || !CLIENT_SECRET) return res.status(500).json({ error: 'API 키 미설정' });
-
-    async function geocode(addr) {
-      // 괄호 및 상세주소 제거 (예: 서울 강남구 테헤란로 432(대치동) DB금융센터 17층 → 서울 강남구 테헤란로 432)
-      const cleanAddr = addr.replace(/\(.*?\)/g, '').replace(/[^\s\w가-힣\d\-]/g, '').trim().split(' ').slice(0, 5).join(' ');
-      const r = await fetch(`https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(cleanAddr)}`, {
-        headers: { 'X-NCP-APIGW-API-KEY-ID': CLIENT_ID, 'X-NCP-APIGW-API-KEY': CLIENT_SECRET }
-      });
-      const d = await r.json();
-      const loc = d.addresses?.[0];
-      if (!loc) throw new Error(`주소 검색 실패: ${cleanAddr}`);
-      return { lng: loc.x, lat: loc.y };
-    }
-
-    const [home, work] = await Promise.all([geocode(home_address), geocode(office.address)]);
-    const start = `${home.lng},${home.lat}`;
-    const goal = `${work.lng},${work.lat}`;
-
-    const dr = await fetch(`https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?start=${start}&goal=${goal}&option=trafast`, {
-      headers: { 'X-NCP-APIGW-API-KEY-ID': CLIENT_ID, 'X-NCP-APIGW-API-KEY': CLIENT_SECRET }
-    });
-    const dd = await dr.json();
-    const meters = dd.route?.trafast?.[0]?.summary?.distance;
-    if (!meters) return res.status(400).json({ error: '경로 계산 실패' });
-
-    const km = Math.round(meters / 100) / 10;
-    res.json({ distance_km: km, eligible: km >= 50, home_address, office_address: office.address });
+    const [office] = await sql`SELECT * FROM offices WHERE id=${office_id}`;
+    if (!office) return res.status(404).json({ error: '소속 정보를 찾을 수 없습니다.' });
+    const [homeCoord, officeCoord] = await Promise.all([geocode(home_address), geocode(office.address)]);
+    const distance_km = await getDistance(homeCoord.lng, homeCoord.lat, officeCoord.lng, officeCoord.lat);
+    res.json({ distance_km, eligible: distance_km >= 50, office_address: office.address });
   } catch(e) {
     console.error('check-distance error:', e.message);
     res.status(500).json({ error: e.message });
