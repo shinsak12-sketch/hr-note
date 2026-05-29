@@ -197,6 +197,8 @@ export const api = {
   },
 
   // 사택신청
+  getHousingRequests: () => request('/housing/requests'),
+  updateHousingStatus: (id, body) => request('/housing/requests/' + id + '/status', { method: 'PATCH', body: JSON.stringify(body) }),
   checkDistance: (body) => request('/housing/check-distance', { method: 'POST', body: JSON.stringify(body) }),
   applyHousing: (body) => request('/housing/apply', { method: 'POST', body: JSON.stringify(body) }),
   getMyHousingStatus: (emp_no, password) => request('/housing/my-status', { method: 'POST', body: JSON.stringify({ emp_no, password }) }),

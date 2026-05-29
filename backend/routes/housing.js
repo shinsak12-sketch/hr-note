@@ -68,6 +68,27 @@ async function getDistance(startLng, startLat, goalLng, goalLat) {
   return Math.round(distanceM / 100) / 10;
 }
 
+// 신청 목록 조회 (내부, 로그인 필요)
+router.get('/requests', authMiddleware, async (req, res) => {
+  const list = await sql`
+    SELECT h.*, o.org_name, o.headquarters
+    FROM housing_requests h
+    LEFT JOIN offices o ON h.office_id = o.id
+    ORDER BY h.created_at DESC
+  `;
+  res.json(list);
+});
+
+// 신청 상태 변경 (내부, 로그인 필요)
+router.patch('/requests/:id/status', authMiddleware, async (req, res) => {
+  const { status, manager_comment } = req.body;
+  const [r] = await sql`
+    UPDATE housing_requests SET status=${status}, note=${manager_comment||null}, updated_at=NOW()
+    WHERE id=${req.params.id} RETURNING *
+  `;
+  res.json(r);
+});
+
 // 사택 신청 (로그인 불필요)
 router.post('/apply', async (req, res) => {
   const { emp_no, emp_name, department, office_id, home_address, distance_km, note, password } = req.body;
