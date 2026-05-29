@@ -359,6 +359,7 @@ export default function MemoEdit() {
             }}>🤖 AI</button>
           )}
           {!memoData?.is_shared && (
+            <button onClick={handleManualSave} style={{
               fontSize: 12, padding: '5px 12px', borderRadius: 8,
               background: '#5C3D8F', color: '#fff',
               border: 'none', cursor: 'pointer', fontWeight: 600,
