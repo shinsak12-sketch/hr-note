@@ -58,6 +58,7 @@ router.post('/check-distance', authMiddleware, async (req, res) => {
         headers: { 'X-NCP-APIGW-API-KEY-ID': CLIENT_ID, 'X-NCP-APIGW-API-KEY': CLIENT_SECRET }
       });
       const d = await r.json();
+      console.log('geocode result:', addr, JSON.stringify(d).slice(0, 200));
       const loc = d.addresses?.[0];
       if (!loc) throw new Error(`주소 검색 실패: ${addr}`);
       return { lng: loc.x, lat: loc.y };
