@@ -202,12 +202,8 @@ export const api = {
   getMyHousingStatus: (emp_no, password) => request('/housing/my-status', { method: 'POST', body: JSON.stringify({ emp_no, password }) }),
   submitSupplement: (id, emp_no, password, supplement) => request('/housing/supplement/' + id, { method: 'PATCH', body: JSON.stringify({ emp_no, password, supplement }) }),
   withdrawHousing: (id, emp_no, password) => request('/housing/withdraw/' + id, { method: 'DELETE', body: JSON.stringify({ emp_no, password }) }),
-  getHousingRequests: () => cachedRequest('/housing'),
   getHousingStats: (params = {}) => { const q = new URLSearchParams(params).toString(); return request('/housing/stats' + (q ? '?' + q : '')); },
-  updateHousingStatus: (id, body) => request('/housing/' + id + '/status', { method: 'PATCH', body: JSON.stringify(body) }),
-  updateHousingContract: (id, body) => request('/housing/' + id + '/contract', { method: 'PATCH', body: JSON.stringify(body) }),
   resetHousingPassword: (id) => request('/housing/' + id + '/reset-password', { method: 'PATCH' }),
-  deleteHousingRequest: (id) => request('/housing/' + id, { method: 'DELETE' }).then(r => { invalidateCache('/housing'); return r; }),
   downloadHousingTemplate: () => {
     const token = localStorage.getItem('hr_token');
     fetch(BASE + '/housing/template/excel', { headers: { Authorization: 'Bearer ' + token } })
@@ -269,6 +265,15 @@ export const api = {
 
   // 근태관리
   getAttendanceSplitCount: (emp_no, type, start_date) => request('/attendance/split-count?emp_no=' + emp_no + '&type=' + encodeURIComponent(type) + '&start_date=' + (start_date||'')),
+  getHousingList: () => cachedRequest('/housing'),
+  getHousingDetail: (id) => request('/housing/' + id),
+  createHousing: (body) => request('/housing', { method: 'POST', body: JSON.stringify(body) }).then(r => { invalidateCache('/housing'); return r; }),
+  updateHousing: (id, body) => request('/housing/' + id, { method: 'PATCH', body: JSON.stringify(body) }).then(r => { invalidateCache('/housing'); return r; }),
+  deleteHousing: (id) => request('/housing/' + id, { method: 'DELETE' }).then(r => { invalidateCache('/housing'); return r; }),
+  addHousingResident: (id, body) => request('/housing/' + id + '/residents', { method: 'POST', body: JSON.stringify(body) }).then(r => { invalidateCache('/housing'); return r; }),
+  checkoutResident: (hid, rid, date) => request('/housing/' + hid + '/residents/' + rid + '/checkout', { method: 'PATCH', body: JSON.stringify({ move_out_date: date }) }).then(r => { invalidateCache('/housing'); return r; }),
+  downloadHousingTemplate: () => fetch(BASE + '/housing/template/excel', { headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') } }).then(r => r.blob()),
+  uploadHousingExcel: (file) => { const fd = new FormData(); fd.append('file', file); return fetch(BASE + '/housing/upload/excel', { method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') }, body: fd }).then(r => r.json()); },
   getAttendanceAlertCount: () => request('/attendance/alert-count'),
   getHousingPendingCount: () => request('/housing/pending-count'),
   getAttendance: (params={}) => { const q = new URLSearchParams(params).toString(); return cachedRequest('/attendance' + (q?'?'+q:'')); },
