@@ -52,13 +52,13 @@ router.post('/check-distance', authMiddleware, async (req, res) => {
 
     const CLIENT_ID = process.env.NAVER_CLIENT_ID;
     const CLIENT_SECRET = process.env.NAVER_CLIENT_SECRET;
+    if (!CLIENT_ID || !CLIENT_SECRET) return res.status(500).json({ error: 'API 키 미설정' });
 
     async function geocode(addr) {
       const r = await fetch(`https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(addr)}`, {
         headers: { 'X-NCP-APIGW-API-KEY-ID': CLIENT_ID, 'X-NCP-APIGW-API-KEY': CLIENT_SECRET }
       });
       const d = await r.json();
-      console.log('geocode result:', addr, JSON.stringify(d).slice(0, 200));
       const loc = d.addresses?.[0];
       if (!loc) throw new Error(`주소 검색 실패: ${addr}`);
       return { lng: loc.x, lat: loc.y };
