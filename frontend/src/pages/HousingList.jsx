@@ -372,9 +372,8 @@ export default function HousingList() {
               {/* 현재 입주자 */}
               <div style={{ borderTop:'0.5px solid var(--border)', paddingTop:8 }}>
                 {r.emp_name ? (
-                  <div style={{ background:'#00854A', borderRadius:8, padding:'8px 12px' }}>
-                    <div style={{ fontWeight:700, fontSize:13, color:'#fff' }}>👤 {r.emp_name}</div>
-                    <div style={{ fontSize:11, color:'rgba(255,255,255,0.8)', marginTop:2 }}>{r.resident_org} · 입주 {r.move_in_date?.split?.('T')[0]}</div>
+                  <div style={{ background:'rgba(0,133,74,0.3)', borderRadius:8, padding:'8px 12px' }}>
+                    <div style={{ fontSize:12, fontWeight:700, color:'#fff' }}>🏠 {r.emp_name} · {r.resident_org} · 입주 {r.move_in_date?.split?.('T')[0]}</div>
                   </div>
                 ) : (
                   <div style={{ fontSize:12, color:'#aaa', textAlign:'center', padding:'4px 0' }}>공실</div>
