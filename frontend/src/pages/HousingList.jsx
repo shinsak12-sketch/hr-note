@@ -195,7 +195,6 @@ export default function HousingList() {
     api.getOffices().then(setOffices);
     function h(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
-      setCardMenuOpen(null);
     }
     document.addEventListener('mousedown', h);
     return () => document.removeEventListener('mousedown', h);
@@ -253,6 +252,16 @@ export default function HousingList() {
     await api.terminateHousing(terminateModal.id, terminateDate);
     setToast('임차종료 처리되었습니다.');
     setTerminateModal(null); setTerminateDate('');
+    load();
+  }
+
+  const [specialNoteModal, setSpecialNoteModal] = useState(null);
+  const [specialNote, setSpecialNote] = useState('');
+
+  async function handleSaveSpecialNote() {
+    await api.updateHousing(specialNoteModal.id, { ...specialNoteModal, special_note: specialNote });
+    setToast('특이사항이 저장되었습니다.');
+    setSpecialNoteModal(null);
     load();
   }
 
@@ -342,10 +351,11 @@ export default function HousingList() {
                   <button onClick={() => setCardMenuOpen(cardMenuOpen===r.id ? null : r.id)}
                     style={{ width:30, height:30, borderRadius:6, background:'var(--bg2)', border:'none', cursor:'pointer', fontSize:16, color:'var(--text2)' }}>⋮</button>
                   {cardMenuOpen === r.id && (
-                    <div style={{ position:'absolute', right:0, top:'110%', zIndex:50, background:'var(--bg)', border:'0.5px solid var(--border)', borderRadius:10, boxShadow:'0 4px 16px rgba(0,0,0,0.12)', minWidth:140, overflow:'hidden' }}>
+                    <div style={{ position:'absolute', right:0, top:'110%', zIndex:50, background:'var(--bg)', border:'0.5px solid var(--border)', borderRadius:10, boxShadow:'0 4px 16px rgba(0,0,0,0.12)', minWidth:150, overflow:'hidden' }}>
                       <button onClick={() => { setHousingModal(r); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#1A4A8A', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>✏️ 수정</button>
-                      <button onClick={() => { setResidentModal(r); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#3B6D11', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>👤 입주변경</button>
+                      <button onClick={() => { setResidentModal(r); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#3B6D11', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>👤 입주등록/변경</button>
                       <button onClick={() => { loadDetail(r.id); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'var(--text)', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>📋 입주이력</button>
+                      <button onClick={() => { setSpecialNoteModal(r); setSpecialNote(r.special_note||''); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#5C3D8F', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>📝 특이사항</button>
                       <button onClick={() => { setTerminateModal(r); setTerminateDate(''); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#854F0B', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>🏁 임차종료</button>
                       <button onClick={() => { handleDelete(r.id); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#A32D2D', fontFamily:'inherit' }}>🗑️ 삭제</button>
                     </div>
@@ -367,6 +377,7 @@ export default function HousingList() {
               <div style={{ fontSize:12, color:'var(--text2)', lineHeight:1.7, marginBottom:8 }}>
                 {r.contract_start && <div>📆 {r.contract_start?.split?.('T')[0]} ~ {r.contract_end?.split?.('T')[0] || '미정'}{r.initial_end && r.initial_end !== r.contract_end && <span style={{ color:'#854F0B', marginLeft:4 }}>(최초 {r.initial_end?.split?.('T')[0]})</span>}</div>}
                 {(r.deposit || r.monthly_rent) && <div>💰 보증금 {r.deposit ? Number(r.deposit).toLocaleString()+'만원' : '-'} / {r.rent_type==='연세'?'연세':'월세'} {r.monthly_rent ? Number(r.monthly_rent).toLocaleString()+'만원' : '-'}</div>}
+                {r.special_note && <div style={{ fontSize:11, fontWeight:600, color:'#fff', background:'#5C3D8F', borderRadius:6, padding:'3px 8px', marginTop:4, display:'inline-block' }}>📝 {r.special_note}</div>}
               </div>
 
               {/* 현재 입주자 */}
@@ -407,6 +418,23 @@ export default function HousingList() {
                   )}
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 특이사항 모달 */}
+      {specialNoteModal && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:200, display:'flex', alignItems:'flex-end' }}>
+          <div style={{ background:'var(--bg)', width:'100%', maxWidth:480, margin:'0 auto', borderRadius:'16px 16px 0 0' }}>
+            <div style={{ padding:'16px', display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:'0.5px solid var(--border)' }}>
+              <div style={{ fontWeight:700, fontSize:15 }}>📝 특이사항</div>
+              <button onClick={() => setSpecialNoteModal(null)} style={{ background:'none', border:'none', fontSize:22, cursor:'pointer', color:'var(--text2)' }}>×</button>
+            </div>
+            <div style={{ padding:16, display:'flex', flexDirection:'column', gap:12, paddingBottom:32 }}>
+              <textarea placeholder="예) 월세 상향 협의, 계약 갱신 예정 등" value={specialNote}
+                onChange={e => setSpecialNote(e.target.value)} style={{ height:120, fontSize:14 }} autoFocus />
+              <button onClick={handleSaveSpecialNote} className="btn-primary" style={{ background:'#5C3D8F', marginBottom:8 }}>저장</button>
             </div>
           </div>
         </div>

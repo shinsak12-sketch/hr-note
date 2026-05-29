@@ -55,7 +55,7 @@ router.patch('/:id', authMiddleware, async (req, res) => {
       rent_day=${d.rent_day||null}, payment_type=${d.payment_type||null},
       auto_renew_years=${d.auto_renew_years||null}, contract_start=${d.contract_start||null},
       initial_end=${d.initial_end||null}, contract_end=${d.contract_end||null},
-      note=${d.note||null}, updated_at=NOW()
+      note=${d.note||null}, special_note=${d.special_note !== undefined ? d.special_note : null}, updated_at=NOW()
     WHERE id=${req.params.id} RETURNING *
   `;
   res.json(h);
