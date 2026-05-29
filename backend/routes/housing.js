@@ -20,6 +20,29 @@ router.get('/', authMiddleware, async (req, res) => {
   res.json(list);
 });
 
+// 통계 (반드시 /:id 보다 앞에)
+router.get('/stats/summary', authMiddleware, async (req, res) => {
+  const [total] = await sql`SELECT COUNT(*) as cnt FROM housing`;
+  const [occupied] = await sql`SELECT COUNT(*) as cnt FROM housing_residents WHERE move_out_date IS NULL`;
+  const [expiring] = await sql`
+    SELECT COUNT(*) as cnt FROM housing
+    WHERE contract_end IS NOT NULL
+    AND contract_end::date BETWEEN CURRENT_DATE AND CURRENT_DATE + 30
+  `;
+  res.json({
+    total: Number(total.cnt),
+    occupied: Number(occupied.cnt),
+    vacant: Number(total.cnt) - Number(occupied.cnt),
+    expiring: Number(expiring.cnt),
+  });
+});
+
+// 신청 카운트 (홈화면용)
+router.get('/pending-count', authMiddleware, async (req, res) => {
+  const [row] = await sql`SELECT COUNT(*) as cnt FROM housing_residents WHERE move_out_date IS NULL`;
+  res.json({ count: Number(row.cnt) });
+});
+
 // 단건 조회 (이력 포함)
 router.get('/:id', authMiddleware, async (req, res) => {
   const [h] = await sql`SELECT * FROM housing WHERE id=${req.params.id}`;
@@ -187,23 +210,6 @@ router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, 
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
-});
-
-// 통계
-router.get('/stats/summary', authMiddleware, async (req, res) => {
-  const [total] = await sql`SELECT COUNT(*) as cnt FROM housing`;
-  const [occupied] = await sql`SELECT COUNT(*) as cnt FROM housing_residents WHERE move_out_date IS NULL`;
-  const [expiring] = await sql`
-    SELECT COUNT(*) as cnt FROM housing
-    WHERE contract_end IS NOT NULL
-    AND contract_end::date BETWEEN CURRENT_DATE AND CURRENT_DATE + 30
-  `;
-  res.json({
-    total: Number(total.cnt),
-    occupied: Number(occupied.cnt),
-    vacant: Number(total.cnt) - Number(occupied.cnt),
-    expiring: Number(expiring.cnt),
-  });
 });
 
 export default router;
