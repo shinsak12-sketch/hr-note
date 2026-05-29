@@ -48,7 +48,7 @@ const NAVER_SECRET = process.env.NAVER_CLIENT_SECRET;
 
 async function geocode(address) {
   const res = await fetch(
-    `https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(address)}`,
+    `https://maps.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(address)}`,
     { headers: { 'X-NCP-APIGW-API-KEY-ID': NAVER_ID, 'X-NCP-APIGW-API-KEY': NAVER_SECRET } }
   );
   const data = await res.json();
@@ -59,7 +59,7 @@ async function geocode(address) {
 
 async function getDistance(startLng, startLat, goalLng, goalLat) {
   const res = await fetch(
-    `https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?start=${startLng},${startLat}&goal=${goalLng},${goalLat}&option=trafast`,
+    `https://maps.apigw.ntruss.com/map-direction/v1/driving?start=${startLng},${startLat}&goal=${goalLng},${goalLat}&option=trafast`,
     { headers: { 'X-NCP-APIGW-API-KEY-ID': NAVER_ID, 'X-NCP-APIGW-API-KEY': NAVER_SECRET } }
   );
   const data = await res.json();
