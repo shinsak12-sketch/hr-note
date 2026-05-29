@@ -13,7 +13,7 @@ router.post('/chat', authMiddleware, async (req, res) => {
         'Authorization': `Bearer ${process.env.XAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'grok-2',
+        model: 'grok-2-1212',
         messages: [
           { role: 'system', content: '당신은 HR 업무를 돕는 AI 어시스턴트입니다. 한국어로 친절하게 답변해주세요.' },
           ...messages,
