@@ -344,10 +344,14 @@ export default function HousingList() {
                 </div>
               )}
 
-              {/* 주소 + 버튼 */}
+              {/* 주소(지도) + 버튼 */}
               <div style={{ marginBottom:6 }}>
-                <div style={{ fontWeight:700, fontSize:14, marginBottom:6 }}>📍 {r.address}</div>
-                <div style={{ display:'flex', alignItems:'center', gap:6, justifyContent:'flex-end' }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:6, marginBottom:4 }}>
+                  <button onClick={() => window.open(`https://map.naver.com/v5/search/${encodeURIComponent(r.address)}`, '_blank')}
+                    style={{ fontWeight:700, fontSize:14, flex:1, textAlign:'left', background:'none', border:'none', cursor:'pointer', color:'var(--text)', padding:0, fontFamily:'inherit' }}>
+                    📍 {r.address} <span style={{ fontSize:11, color:'#854F0B' }}>›</span>
+                  </button>
+                  <div style={{ display:'flex', alignItems:'center', gap:4, flexShrink:0 }}>
                   <button onClick={() => {
                     const text = [
                       `🏠 ${r.org_name || ''}`,
@@ -382,13 +386,9 @@ export default function HousingList() {
                     </div>
                   )}
                   </div>
+                  </div>
                 </div>
               </div>
-
-                  <button onClick={() => window.open(`https://map.naver.com/v5/search/${encodeURIComponent(r.address)}`, '_blank')}
-                    style={{ fontSize:11, padding:'3px 8px', borderRadius:6, background:'#FFF9E6', color:'#5A4A00', border:'0.5px solid #E8D84A50', cursor:'pointer', display:'flex', alignItems:'center', gap:3 }}>
-                    🗺️ 지도
-                  </button>
 
               {/* 정보 배지들 */}
               <div style={{ display:'flex', flexWrap:'wrap', gap:4, marginBottom:8 }}>
