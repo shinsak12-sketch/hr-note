@@ -43,6 +43,44 @@ router.get('/pending-count', authMiddleware, async (req, res) => {
   res.json({ count: Number(row.cnt) });
 });
 
+// 거리 계산 (네이버 Directions API)
+router.post('/check-distance', authMiddleware, async (req, res) => {
+  try {
+    const { home_address, office_id } = req.body;
+    const [office] = await sql`SELECT address FROM offices WHERE id=${office_id}`;
+    if (!office) return res.status(404).json({ error: '사무실 없음' });
+
+    const CLIENT_ID = process.env.NAVER_CLIENT_ID;
+    const CLIENT_SECRET = process.env.NAVER_CLIENT_SECRET;
+
+    async function geocode(addr) {
+      const r = await fetch(`https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(addr)}`, {
+        headers: { 'X-NCP-APIGW-API-KEY-ID': CLIENT_ID, 'X-NCP-APIGW-API-KEY': CLIENT_SECRET }
+      });
+      const d = await r.json();
+      const loc = d.addresses?.[0];
+      if (!loc) throw new Error(`주소 검색 실패: ${addr}`);
+      return { lng: loc.x, lat: loc.y };
+    }
+
+    const [home, work] = await Promise.all([geocode(home_address), geocode(office.address)]);
+    const start = `${home.lng},${home.lat}`;
+    const goal = `${work.lng},${work.lat}`;
+
+    const dr = await fetch(`https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?start=${start}&goal=${goal}&option=trafast`, {
+      headers: { 'X-NCP-APIGW-API-KEY-ID': CLIENT_ID, 'X-NCP-APIGW-API-KEY': CLIENT_SECRET }
+    });
+    const dd = await dr.json();
+    const meters = dd.route?.trafast?.[0]?.summary?.distance;
+    if (!meters) return res.status(400).json({ error: '경로 계산 실패' });
+
+    const km = Math.round(meters / 100) / 10;
+    res.json({ distance_km: km, eligible: km >= 50, home_address, office_address: office.address });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // 단건 조회 (이력 포함)
 router.get('/:id', authMiddleware, async (req, res) => {
   const [h] = await sql`SELECT * FROM housing WHERE id=${req.params.id}`;
