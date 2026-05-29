@@ -128,7 +128,7 @@ function HousingModal({ housing, offices, onClose, onDone }) {
 }
 
 // ── 입주자 등록 모달 ──────────────────
-function ResidentModal({ housing, onClose, onDone }) {
+function ResidentModal({ housing, offices, onClose, onDone }) {
   const [form, setForm] = useState({ emp_no: '', emp_name: '', org_name: '', move_in_date: '', note: '' });
   const [saving, setSaving] = useState(false);
   function setF(k,v) { setForm(f=>({...f,[k]:v})); }
@@ -155,7 +155,12 @@ function ResidentModal({ housing, onClose, onDone }) {
             <div className="form-group"><label className="form-label">사번 *</label><input value={form.emp_no} onChange={e=>setF('emp_no',e.target.value)} /></div>
             <div className="form-group"><label className="form-label">성명 *</label><input value={form.emp_name} onChange={e=>setF('emp_name',e.target.value)} /></div>
           </div>
-          <div className="form-group"><label className="form-label">소속</label><input value={form.org_name} onChange={e=>setF('org_name',e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">소속</label>
+            <select value={form.org_name} onChange={e=>setF('org_name',e.target.value)}>
+              <option value="">선택</option>
+              {offices.map(o=><option key={o.id} value={o.org_name}>{o.org_name}</option>)}
+            </select>
+          </div>
           <div className="form-group"><label className="form-label">입주일 *</label><input type="date" value={form.move_in_date} onChange={e=>setF('move_in_date',e.target.value)} /></div>
           <div className="form-group"><label className="form-label">비고</label><textarea value={form.note} onChange={e=>setF('note',e.target.value)} style={{ height: 60 }} /></div>
           <button onClick={handleSave} disabled={!form.emp_no||!form.emp_name||!form.move_in_date||saving} className="btn-primary" style={{ marginBottom: 8 }}>
@@ -188,7 +193,10 @@ export default function HousingList() {
   useEffect(() => {
     load();
     api.getOffices().then(setOffices);
-    function h(e) { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false); }
+    function h(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+      setCardMenuOpen(null);
+    }
     document.addEventListener('mousedown', h);
     return () => document.removeEventListener('mousedown', h);
   }, []);
@@ -234,6 +242,18 @@ export default function HousingList() {
     const a = document.createElement('a'); a.href = url; a.download = 'HR노트_사택등록양식.xlsx';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+
+  const [cardMenuOpen, setCardMenuOpen] = useState(null); // housing id
+  const [terminateModal, setTerminateModal] = useState(null);
+  const [terminateDate, setTerminateDate] = useState('');
+
+  async function handleTerminate() {
+    if (!terminateDate) return;
+    await api.terminateHousing(terminateModal.id, terminateDate);
+    setToast('임차종료 처리되었습니다.');
+    setTerminateModal(null); setTerminateDate('');
+    load();
   }
 
   const today = new Date();
@@ -308,19 +328,28 @@ export default function HousingList() {
           ) : null;
 
           return (
-            <div key={r.id} style={{ background:'var(--bg)', border:'0.5px solid var(--border)', borderLeft:`4px solid ${r.emp_name ? '#2D6A6A' : '#aaa'}`, borderRadius:12, padding:'12px 14px' }}>
+            <div key={r.id} style={{ background:'var(--bg)', border:'0.5px solid var(--border)', borderLeft:`4px solid ${r.emp_name ? '#00854A' : '#aaa'}`, borderRadius:12, padding:'12px 14px' }}>
               {expBadge && (
                 <div style={{ marginBottom:6, fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20, background:expBadge.bg, color:expBadge.color, display:'inline-block' }}>
                   ⚠️ 계약 {expBadge.label}
                 </div>
               )}
 
-              {/* 주소 + 버튼 */}
+              {/* 주소 + 햄버거 */}
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:6 }}>
                 <div style={{ fontWeight:700, fontSize:14, flex:1, marginRight:8 }}>📍 {r.address}</div>
-                <div style={{ display:'flex', gap:4, flexShrink:0 }}>
-                  <button onClick={() => { setHousingModal(r); }} style={{ fontSize:11, padding:'3px 8px', borderRadius:6, background:'var(--bg2)', border:'0.5px solid var(--border)', cursor:'pointer' }}>수정</button>
-                  <button onClick={() => handleDelete(r.id)} style={{ fontSize:11, padding:'3px 8px', borderRadius:6, background:'var(--bg2)', border:'0.5px solid var(--border)', cursor:'pointer', color:'#A32D2D' }}>삭제</button>
+                <div style={{ position:'relative', flexShrink:0 }}>
+                  <button onClick={() => setCardMenuOpen(cardMenuOpen===r.id ? null : r.id)}
+                    style={{ width:30, height:30, borderRadius:6, background:'var(--bg2)', border:'none', cursor:'pointer', fontSize:16, color:'var(--text2)' }}>⋮</button>
+                  {cardMenuOpen === r.id && (
+                    <div style={{ position:'absolute', right:0, top:'110%', zIndex:50, background:'var(--bg)', border:'0.5px solid var(--border)', borderRadius:10, boxShadow:'0 4px 16px rgba(0,0,0,0.12)', minWidth:140, overflow:'hidden' }}>
+                      <button onClick={() => { setHousingModal(r); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#1A4A8A', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>✏️ 수정</button>
+                      <button onClick={() => { setResidentModal(r); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#3B6D11', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>👤 입주변경</button>
+                      <button onClick={() => { loadDetail(r.id); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'var(--text)', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>📋 입주이력</button>
+                      <button onClick={() => { setTerminateModal(r); setTerminateDate(''); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#854F0B', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>🏁 임차종료</button>
+                      <button onClick={() => { handleDelete(r.id); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#A32D2D', fontFamily:'inherit' }}>🗑️ 삭제</button>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -343,24 +372,12 @@ export default function HousingList() {
               {/* 현재 입주자 */}
               <div style={{ borderTop:'0.5px solid var(--border)', paddingTop:8 }}>
                 {r.emp_name ? (
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                    <div>
-                      <span style={{ fontSize:13, fontWeight:700, color:'#2D6A6A' }}>👤 {r.emp_name}</span>
-                      <span style={{ fontSize:11, color:'var(--text2)', marginLeft:6 }}>{r.resident_org} · 입주 {r.move_in_date?.split?.('T')[0]}</span>
-                    </div>
-                    <div style={{ display:'flex', gap:4 }}>
-                      <button onClick={() => setResidentModal(r)} style={{ fontSize:11, padding:'3px 8px', borderRadius:6, background:'#E8F0FB', color:'#1A4A8A', border:'none', cursor:'pointer', fontWeight:600 }}>입주변경</button>
-                      <button onClick={() => { loadDetail(r.id); }} style={{ fontSize:11, padding:'3px 8px', borderRadius:6, background:'var(--bg2)', border:'0.5px solid var(--border)', cursor:'pointer' }}>이력</button>
-                    </div>
+                  <div style={{ background:'#00854A', borderRadius:8, padding:'8px 12px' }}>
+                    <div style={{ fontWeight:700, fontSize:13, color:'#fff' }}>👤 {r.emp_name}</div>
+                    <div style={{ fontSize:11, color:'rgba(255,255,255,0.8)', marginTop:2 }}>{r.resident_org} · 입주 {r.move_in_date?.split?.('T')[0]}</div>
                   </div>
                 ) : (
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                    <span style={{ fontSize:12, color:'#aaa' }}>공실</span>
-                    <div style={{ display:'flex', gap:4 }}>
-                      <button onClick={() => setResidentModal(r)} style={{ fontSize:11, padding:'3px 8px', borderRadius:6, background:'#EAF3DE', color:'#3B6D11', border:'none', cursor:'pointer', fontWeight:600 }}>입주 등록</button>
-                      <button onClick={() => { loadDetail(r.id); }} style={{ fontSize:11, padding:'3px 8px', borderRadius:6, background:'var(--bg2)', border:'0.5px solid var(--border)', cursor:'pointer' }}>이력</button>
-                    </div>
-                  </div>
+                  <div style={{ fontSize:12, color:'#aaa', textAlign:'center', padding:'4px 0' }}>공실</div>
                 )}
               </div>
             </div>
@@ -396,13 +413,34 @@ export default function HousingList() {
         </div>
       )}
 
+      {/* 임차종료 모달 */}
+      {terminateModal && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:200, display:'flex', alignItems:'flex-end' }}>
+          <div style={{ background:'var(--bg)', width:'100%', maxWidth:480, margin:'0 auto', borderRadius:'16px 16px 0 0' }}>
+            <div style={{ padding:'16px', display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:'0.5px solid var(--border)' }}>
+              <div style={{ fontWeight:700, fontSize:15 }}>🏁 임차종료 — {terminateModal.address}</div>
+              <button onClick={() => setTerminateModal(null)} style={{ background:'none', border:'none', fontSize:22, cursor:'pointer', color:'var(--text2)' }}>×</button>
+            </div>
+            <div style={{ padding:16, display:'flex', flexDirection:'column', gap:12, paddingBottom:32 }}>
+              <div className="form-group">
+                <label className="form-label">종료일 *</label>
+                <input type="date" value={terminateDate} onChange={e => setTerminateDate(e.target.value)} />
+              </div>
+              <button onClick={handleTerminate} disabled={!terminateDate} className="btn-primary" style={{ background:'#854F0B', marginBottom:8 }}>
+                임차종료 처리
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {housingModal !== null && (
         <HousingModal housing={housingModal?.id ? housingModal : null} offices={offices}
           onClose={() => setHousingModal(null)}
           onDone={msg => { setToast(msg); setHousingModal(null); load(); }} />
       )}
       {residentModal && (
-        <ResidentModal housing={residentModal} onClose={() => setResidentModal(null)}
+        <ResidentModal housing={residentModal} offices={offices} onClose={() => setResidentModal(null)}
           onDone={msg => { setToast(msg); setResidentModal(null); load(); }} />
       )}
       {toast && <Toast msg={toast} onDone={() => setToast('')} />}

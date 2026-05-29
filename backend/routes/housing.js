@@ -83,6 +83,21 @@ router.post('/:id/residents', authMiddleware, async (req, res) => {
   res.status(201).json(r);
 });
 
+// 임차종료
+router.patch('/:id/terminate', authMiddleware, async (req, res) => {
+  const { terminate_date } = req.body;
+  const [h] = await sql`
+    UPDATE housing SET contract_end=${terminate_date}, updated_at=NOW()
+    WHERE id=${req.params.id} RETURNING *
+  `;
+  // 입주자 퇴거 처리
+  await sql`
+    UPDATE housing_residents SET move_out_date=${terminate_date}
+    WHERE housing_id=${req.params.id} AND move_out_date IS NULL
+  `;
+  res.json(h);
+});
+
 // 퇴거 처리
 router.patch('/:id/residents/:rid/checkout', authMiddleware, async (req, res) => {
   const { move_out_date } = req.body;

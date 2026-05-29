@@ -271,6 +271,7 @@ export const api = {
   updateHousing: (id, body) => request('/housing/' + id, { method: 'PATCH', body: JSON.stringify(body) }).then(r => { invalidateCache('/housing'); return r; }),
   deleteHousing: (id) => request('/housing/' + id, { method: 'DELETE' }).then(r => { invalidateCache('/housing'); return r; }),
   addHousingResident: (id, body) => request('/housing/' + id + '/residents', { method: 'POST', body: JSON.stringify(body) }).then(r => { invalidateCache('/housing'); return r; }),
+  terminateHousing: (id, date) => request('/housing/' + id + '/terminate', { method: 'PATCH', body: JSON.stringify({ terminate_date: date }) }).then(r => { invalidateCache('/housing'); return r; }),
   checkoutResident: (hid, rid, date) => request('/housing/' + hid + '/residents/' + rid + '/checkout', { method: 'PATCH', body: JSON.stringify({ move_out_date: date }) }).then(r => { invalidateCache('/housing'); return r; }),
   downloadHousingTemplate: () => fetch(BASE + '/housing/template/excel', { headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') } }).then(r => r.blob()),
   uploadHousingExcel: (file) => { const fd = new FormData(); fd.append('file', file); return fetch(BASE + '/housing/upload/excel', { method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') }, body: fd }).then(r => r.json()); },
