@@ -9,7 +9,7 @@ const EMPTY = {
 };
 
 // ── AI 대화 모달 ──────────────────────────
-function AIChatModal({ onClose, onSave }) {
+function AIChatModal({ onClose, onSave, memoContent }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,7 +27,7 @@ function AIChatModal({ onClose, onSave }) {
     setInput('');
     setLoading(true);
     try {
-      const res = await api.aiChat(newMessages);
+      const res = await api.aiChat(newMessages, memoContent);
       setMessages(m => [...m, { role: 'assistant', content: res.content }]);
     } catch(e) {
       setMessages(m => [...m, { role: 'assistant', content: '오류가 발생했습니다: ' + e.message }]);
@@ -62,7 +62,7 @@ function AIChatModal({ onClose, onSave }) {
         <div style={{ flex:1, overflowY:'auto', padding:16, display:'flex', flexDirection:'column', gap:12 }}>
           {messages.length === 0 && (
             <div style={{ textAlign:'center', color:'var(--text2)', fontSize:13, marginTop:40 }}>
-              무엇이든 물어보세요 😊
+              {memoContent ? '📄 현재 메모 내용을 기반으로 대화해요!' : '무엇이든 물어보세요 😊'}
             </div>
           )}
           {messages.map((m, i) => (
@@ -483,6 +483,7 @@ export default function MemoEdit() {
       {aiModal && (
         <AIChatModal
           onClose={() => setAiModal(false)}
+          memoContent={form.content || ''}
           onSave={async (content) => {
             const me = JSON.parse(localStorage.getItem('hr_user') || '{}');
             const newMemo = await api.createMemo({

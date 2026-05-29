@@ -4,8 +4,12 @@ import { authMiddleware } from '../middleware/auth.js';
 const router = Router();
 
 router.post('/chat', authMiddleware, async (req, res) => {
-  const { messages } = req.body;
+  const { messages, memoContent } = req.body;
   try {
+    const systemPrompt = memoContent
+      ? `당신은 HR 업무를 돕는 AI 어시스턴트입니다. 한국어로 친절하게 답변해주세요.\n\n현재 메모 내용:\n${memoContent}`
+      : '당신은 HR 업무를 돕는 AI 어시스턴트입니다. 한국어로 친절하게 답변해주세요.';
+
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -15,7 +19,7 @@ router.post('/chat', authMiddleware, async (req, res) => {
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
         messages: [
-          { role: 'system', content: '당신은 HR 업무를 돕는 AI 어시스턴트입니다. 한국어로 친절하게 답변해주세요.' },
+          { role: 'system', content: systemPrompt },
           ...messages,
         ],
         max_tokens: 1000,
