@@ -487,8 +487,23 @@ export default function HousingList() {
                 {r.housing_address
                   ? <>
                       <div>📍 {r.housing_address}</div>
-                      {r.contract_start && <div>📆 {r.contract_start?.split?.('T')[0]} ~ {r.contract_end?.split?.('T')[0]}</div>}
-                      {r.deposit && <div>💰 보증금 {Number(r.deposit).toLocaleString()}만원 / 월세 {Number(r.monthly_rent).toLocaleString()}만원</div>}
+                      {r.area_sqm && <div>📐 전용 {r.area_sqm}평</div>}
+                      {r.contract_start && (
+                        <div>📆 {r.contract_start?.split?.('T')[0]} ~ {r.contract_end?.split?.('T')[0] || '미정'}
+                          {r.initial_end && r.initial_end !== r.contract_end &&
+                            <span style={{ color: '#854F0B', marginLeft: 4 }}>(최초 {r.initial_end?.split?.('T')[0]})</span>
+                          }
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+                        {r.rent_type && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 10, background: '#E8F0FB', color: '#1A4A8A' }}>{r.rent_type}</span>}
+                        {r.auto_renew_years > 0 && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 10, background: '#EAF3DE', color: '#3B6D11' }}>자동갱신 {r.auto_renew_years}년</span>}
+                        {r.payment_type && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 10, background: '#FAEEDA', color: '#854F0B' }}>{r.payment_type}</span>}
+                        {r.rent_day && <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 10, background: 'var(--bg2)', color: 'var(--text2)' }}>{r.rent_day}일 납부</span>}
+                      </div>
+                      {(r.deposit || r.monthly_rent) && (
+                        <div>💰 보증금 {r.deposit ? Number(r.deposit).toLocaleString() + '만원' : '-'} / {r.rent_type === '연세' ? '연세' : '월세'} {r.monthly_rent ? Number(r.monthly_rent).toLocaleString() + '만원' : '-'}</div>
+                      )}
                       {r.contract_note && <div>📝 {r.contract_note}</div>}
                     </>
                   : <div style={{ color: '#A32D2D' }}>⚠️ 계약정보 미입력</div>
