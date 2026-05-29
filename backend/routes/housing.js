@@ -78,6 +78,7 @@ router.post('/check-distance', authMiddleware, async (req, res) => {
     const km = Math.round(meters / 100) / 10;
     res.json({ distance_km: km, eligible: km >= 50, home_address, office_address: office.address });
   } catch(e) {
+    console.error('check-distance error:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
