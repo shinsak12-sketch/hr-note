@@ -8,6 +8,103 @@ const EMPTY = {
   title: '', content: '', tag: ''
 };
 
+// ── AI 대화 모달 ──────────────────────────
+function AIChatModal({ onClose, onSave }) {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  async function handleSend() {
+    if (!input.trim() || loading) return;
+    const userMsg = { role: 'user', content: input.trim() };
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
+    setInput('');
+    setLoading(true);
+    try {
+      const res = await api.aiChat(newMessages);
+      setMessages(m => [...m, { role: 'assistant', content: res.content }]);
+    } catch(e) {
+      setMessages(m => [...m, { role: 'assistant', content: '오류가 발생했습니다: ' + e.message }]);
+    } finally { setLoading(false); }
+  }
+
+  async function handleSaveMemo() {
+    if (messages.length === 0) return;
+    // 대화 내용을 메모 형식으로 변환
+    const content = messages.map(m =>
+      `${m.role === 'user' ? '👤 나' : '🤖 AI'}: ${m.content}`
+    ).join('\n\n');
+    onSave(content);
+  }
+
+  return (
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:200, display:'flex', alignItems:'flex-end' }}>
+      <div style={{ background:'var(--bg)', width:'100%', maxWidth:480, margin:'0 auto', borderRadius:'16px 16px 0 0', height:'80vh', display:'flex', flexDirection:'column' }}>
+        <div style={{ padding:'16px', display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:'0.5px solid var(--border)', flexShrink:0 }}>
+          <div style={{ fontWeight:700, fontSize:15 }}>🤖 AI 대화</div>
+          <div style={{ display:'flex', gap:8 }}>
+            {messages.length > 0 && (
+              <button onClick={handleSaveMemo} style={{ fontSize:12, padding:'5px 12px', borderRadius:8, background:'#5C3D8F', color:'#fff', border:'none', cursor:'pointer', fontWeight:600 }}>
+                요약 저장
+              </button>
+            )}
+            <button onClick={onClose} style={{ background:'none', border:'none', fontSize:22, cursor:'pointer', color:'var(--text2)' }}>×</button>
+          </div>
+        </div>
+
+        {/* 대화 영역 */}
+        <div style={{ flex:1, overflowY:'auto', padding:16, display:'flex', flexDirection:'column', gap:12 }}>
+          {messages.length === 0 && (
+            <div style={{ textAlign:'center', color:'var(--text2)', fontSize:13, marginTop:40 }}>
+              무엇이든 물어보세요 😊
+            </div>
+          )}
+          {messages.map((m, i) => (
+            <div key={i} style={{ display:'flex', justifyContent: m.role==='user' ? 'flex-end' : 'flex-start' }}>
+              <div style={{
+                maxWidth:'80%', padding:'10px 14px', borderRadius: m.role==='user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                background: m.role==='user' ? '#5C3D8F' : 'var(--bg2)',
+                color: m.role==='user' ? '#fff' : 'var(--text)',
+                fontSize:13, lineHeight:1.6, whiteSpace:'pre-wrap'
+              }}>
+                {m.content}
+              </div>
+            </div>
+          ))}
+          {loading && (
+            <div style={{ display:'flex', justifyContent:'flex-start' }}>
+              <div style={{ padding:'10px 14px', borderRadius:'16px 16px 16px 4px', background:'var(--bg2)', fontSize:13, color:'var(--text2)' }}>
+                ···
+              </div>
+            </div>
+          )}
+          <div ref={bottomRef} />
+        </div>
+
+        {/* 입력 영역 */}
+        <div style={{ padding:'12px 16px', borderTop:'0.5px solid var(--border)', display:'flex', gap:8, flexShrink:0, paddingBottom:28 }}>
+          <input
+            value={input} onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
+            placeholder="메시지 입력..." style={{ flex:1, height:40, fontSize:13 }}
+            disabled={loading}
+          />
+          <button onClick={handleSend} disabled={!input.trim() || loading}
+            style={{ height:40, padding:'0 16px', borderRadius:8, background:'#5C3D8F', color:'#fff', border:'none', cursor:'pointer', fontSize:13, fontWeight:600, flexShrink:0 }}>
+            전송
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ShareModal({ memoId, onClose }) {
   const [users, setUsers] = useState([]);
   const [shares, setShares] = useState([]);
@@ -134,7 +231,7 @@ export default function MemoEdit() {
   const [delConfirm, setDelConfirm] = useState(false);
   const [shareModal, setShareModal] = useState(false);
   const [memoData, setMemoData] = useState(null);
-  const [comments, setComments] = useState([]);
+  const [aiModal, setAiModal] = useState(false);
   const [commentText, setCommentText] = useState('');
   const textareaRef = useRef(null);
   const autoSaveTimer = useRef(null);
@@ -255,7 +352,13 @@ export default function MemoEdit() {
             }}>{delConfirm ? '확인?' : '삭제'}</button>
           )}
           {!memoData?.is_shared && (
-            <button onClick={handleManualSave} style={{
+            <button onClick={() => setAiModal(true)} style={{
+              fontSize: 12, padding: '5px 10px', borderRadius: 8,
+              background: '#1A4A8A', color: '#E8F0FB',
+              border: 'none', cursor: 'pointer', fontWeight: 600,
+            }}>🤖 AI</button>
+          )}
+          {!memoData?.is_shared && (
               fontSize: 12, padding: '5px 12px', borderRadius: 8,
               background: '#5C3D8F', color: '#fff',
               border: 'none', cursor: 'pointer', fontWeight: 600,
@@ -375,6 +478,23 @@ export default function MemoEdit() {
 
       </div>
 
+      {aiModal && (
+        <AIChatModal
+          onClose={() => setAiModal(false)}
+          onSave={async (content) => {
+            const me = JSON.parse(localStorage.getItem('hr_user') || '{}');
+            const newMemo = await api.createMemo({
+              title: `AI 대화 ${new Date().toLocaleDateString('ko-KR')}`,
+              content,
+              memo_date: new Date().toISOString().split('T')[0],
+              tag: 'AI',
+              is_ai: true,
+            });
+            setAiModal(false);
+            nav('/memos/' + newMemo.id);
+          }}
+        />
+      )}
       {shareModal && memoIdRef.current && (
         <ShareModal memoId={memoIdRef.current} onClose={() => setShareModal(false)} />
       )}

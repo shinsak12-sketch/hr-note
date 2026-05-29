@@ -36,6 +36,11 @@ function MemoCard({ memo, dateStr, ts, onEdit, onDelete }) {
                 background: ts.bg, color: ts.color,
               }}>#{memo.tag}</span>
             )}
+            {memo.is_ai && (
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: '#1A4A8A', color: '#fff' }}>
+                🤖 AI
+              </span>
+            )}
             {memo.is_shared && (
               <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20, background: '#F0EBF8', color: '#5C3D8F' }}>
                 📤 공유받음 · {memo.shared_by_name}

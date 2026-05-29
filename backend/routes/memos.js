@@ -36,11 +36,10 @@ router.get('/:id', async (req, res) => {
 
 // 등록
 router.post('/', async (req, res) => {
-  const { memo_date, title, content, tag } = req.body;
-  if (!memo_date) return res.status(400).json({ error: '일자는 필수입니다.' });
+  const { memo_date, title, content, tag, is_ai } = req.body;
   const [memo] = await sql`
-    INSERT INTO memos (user_id, memo_date, title, content, tag)
-    VALUES (${req.user.id}, ${memo_date}, ${title||null}, ${content||null}, ${tag||null})
+    INSERT INTO memos (user_id, memo_date, title, content, tag, is_ai)
+    VALUES (${req.user.id}, ${memo_date}, ${title||null}, ${content||null}, ${tag||null}, ${is_ai||false})
     RETURNING *
   `;
   res.status(201).json(memo);
