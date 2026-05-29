@@ -344,43 +344,32 @@ export default function HousingList() {
                 </div>
               )}
 
-              {/* 주소(지도) + 버튼 */}
-              <div style={{ marginBottom:6 }}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:6 }}>
-                  <button onClick={() => window.open(`https://map.naver.com/v5/search/${encodeURIComponent(r.address)}`, '_blank')}
-                    style={{ fontWeight:700, fontSize:14, flex:1, textAlign:'left', background:'none', border:'none', cursor:'pointer', color:'var(--text)', padding:0, fontFamily:'inherit', lineHeight:1.4 }}>
-                    📍 {r.address} <span style={{ fontSize:11, color:'#854F0B' }}>›</span>
-                  </button>
-                  <div style={{ position:'relative', flexShrink:0 }}>
-                    <button onClick={() => setCardMenuOpen(cardMenuOpen===r.id ? null : r.id)}
-                      style={{ width:28, height:28, borderRadius:6, background:'var(--bg2)', border:'0.5px solid var(--border)', cursor:'pointer', fontSize:15, color:'var(--text2)' }}>⋮</button>
-                    {cardMenuOpen === r.id && (
-                      <div style={{ position:'absolute', right:0, top:'110%', zIndex:50, background:'var(--bg)', border:'0.5px solid var(--border)', borderRadius:10, boxShadow:'0 4px 16px rgba(0,0,0,0.12)', minWidth:150, overflow:'hidden' }}>
-                        <button onClick={() => { setHousingModal(r); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#1A4A8A', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>✏️ 수정</button>
-                        <button onClick={() => { setResidentModal(r); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#3B6D11', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>👤 입주등록/변경</button>
-                        <button onClick={() => { loadDetail(r.id); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'var(--text)', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>📋 입주이력</button>
-                        <button onClick={() => { setSpecialNoteModal(r); setSpecialNote(r.special_note||''); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#5C3D8F', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>📝 특이사항</button>
-                        <button onClick={() => { setTerminateModal(r); setTerminateDate(''); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#854F0B', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>🏁 임차종료</button>
-                        <button onClick={() => { handleDelete(r.id); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#A32D2D', fontFamily:'inherit' }}>🗑️ 삭제</button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                {/* 공유/주소복사 - 주소 아래 우측 정렬 */}
-                <div style={{ display:'flex', gap:4, justifyContent:'flex-end', marginTop:4 }}>
-                  <button onClick={() => { navigator.clipboard.writeText(r.address); setToast('주소가 복사되었습니다.'); }}
-                    style={{ fontSize:10, padding:'2px 6px', borderRadius:5, background:'var(--bg2)', color:'var(--text2)', border:'0.5px solid var(--border)', cursor:'pointer', display:'flex', alignItems:'center', gap:2 }}>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                    주소복사
-                  </button>
-                  <button onClick={() => {
-                    const text = [`🏠 ${r.org_name||''}`,`🗺️ ${r.address}`,r.rent_type?`구분: ${r.rent_type}`:null,r.deposit?`보증금: ${Number(r.deposit).toLocaleString()}만원`:null,r.monthly_rent?`${r.rent_type==='연세'?'연세':'월세'}: ${Number(r.monthly_rent).toLocaleString()}만원`:null,r.emp_name?`입주자: ${r.emp_name} (${r.resident_org})`:'공실'].filter(Boolean).join('\n');
-                    if (navigator.share) navigator.share({ title: r.address, text });
-                    else { navigator.clipboard.writeText(text); setToast('복사되었습니다.'); }
-                  }} style={{ fontSize:10, padding:'2px 6px', borderRadius:5, background:'var(--bg2)', color:'var(--text2)', border:'0.5px solid var(--border)', cursor:'pointer', display:'flex', alignItems:'center', gap:2 }}>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                    공유
-                  </button>
+              {/* 주소(지도) + 햄버거 */}
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:6, marginBottom:8 }}>
+                <button onClick={() => window.open(`https://map.naver.com/v5/search/${encodeURIComponent(r.address)}`, '_blank')}
+                  style={{ fontWeight:700, fontSize:14, flex:1, textAlign:'left', background:'none', border:'none', cursor:'pointer', color:'var(--text)', padding:0, fontFamily:'inherit', lineHeight:1.5 }}>
+                  📍 {r.address}
+                </button>
+                <div style={{ position:'relative', flexShrink:0 }}>
+                  <button onClick={() => setCardMenuOpen(cardMenuOpen===r.id ? null : r.id)}
+                    style={{ width:28, height:28, borderRadius:6, background:'var(--bg2)', border:'0.5px solid var(--border)', cursor:'pointer', fontSize:15, color:'var(--text2)' }}>⋮</button>
+                  {cardMenuOpen === r.id && (
+                    <div style={{ position:'absolute', right:0, top:'110%', zIndex:50, background:'var(--bg)', border:'0.5px solid var(--border)', borderRadius:10, boxShadow:'0 4px 16px rgba(0,0,0,0.12)', minWidth:150, overflow:'hidden' }}>
+                      <button onClick={() => { setHousingModal(r); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#1A4A8A', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>✏️ 수정</button>
+                      <button onClick={() => { setResidentModal(r); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#3B6D11', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>👤 입주등록/변경</button>
+                      <button onClick={() => { loadDetail(r.id); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'var(--text)', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>📋 입주이력</button>
+                      <button onClick={() => { setSpecialNoteModal(r); setSpecialNote(r.special_note||''); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#5C3D8F', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>📝 특이사항</button>
+                      <button onClick={() => { navigator.clipboard.writeText(r.address); setToast('주소가 복사되었습니다.'); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'var(--text)', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>📋 주소복사</button>
+                      <button onClick={() => {
+                        const text = [`🏠 ${r.org_name||''}`,`🗺️ ${r.address}`,r.rent_type?`구분: ${r.rent_type}`:null,r.deposit?`보증금: ${Number(r.deposit).toLocaleString()}만원`:null,r.monthly_rent?`${r.rent_type==='연세'?'연세':'월세'}: ${Number(r.monthly_rent).toLocaleString()}만원`:null,r.emp_name?`입주자: ${r.emp_name} (${r.resident_org})`:'공실'].filter(Boolean).join('\n');
+                        if (navigator.share) navigator.share({ title: r.address, text });
+                        else navigator.clipboard.writeText(text);
+                        setCardMenuOpen(null); setToast('복사되었습니다.');
+                      }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'var(--text)', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>↗️ 공유</button>
+                      <button onClick={() => { setTerminateModal(r); setTerminateDate(''); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#854F0B', fontFamily:'inherit', borderBottom:'0.5px solid var(--border)' }}>🏁 임차종료</button>
+                      <button onClick={() => { handleDelete(r.id); setCardMenuOpen(null); }} style={{ display:'block', width:'100%', padding:'11px 14px', border:'none', background:'none', textAlign:'left', fontSize:13, cursor:'pointer', color:'#A32D2D', fontFamily:'inherit' }}>🗑️ 삭제</button>
+                    </div>
+                  )}
                 </div>
               </div>
 
