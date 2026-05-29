@@ -12,7 +12,7 @@ router.get('/', authMiddleware, async (req, res) => {
   const list = await sql`
     SELECT h.*,
       r.id as resident_id, r.emp_no, r.emp_name, r.org_name as resident_org,
-      r.move_in_date, r.move_out_date
+      r.move_in_date, r.move_out_date, r.note as resident_note
     FROM housing h
     LEFT JOIN housing_residents r ON r.housing_id = h.id AND r.move_out_date IS NULL
     ORDER BY h.org_name, h.address

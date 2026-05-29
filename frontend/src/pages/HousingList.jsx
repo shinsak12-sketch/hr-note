@@ -375,20 +375,34 @@ export default function HousingList() {
 
               {/* 계약 정보 */}
               <div style={{ fontSize:12, color:'var(--text2)', lineHeight:1.7, marginBottom:8 }}>
-                {r.contract_start && <div>📆 {r.contract_start?.split?.('T')[0]} ~ {r.contract_end?.split?.('T')[0] || '미정'}{r.initial_end && r.initial_end !== r.contract_end && <span style={{ color:'#854F0B', marginLeft:4 }}>(최초 {r.initial_end?.split?.('T')[0]})</span>}</div>}
+                {r.contract_start && <div>📆 {r.contract_start?.split?.('T')[0]} ~ {r.contract_end?.split?.('T')[0] || '미정'}</div>}
                 {(r.deposit || r.monthly_rent) && <div>💰 보증금 {r.deposit ? Number(r.deposit).toLocaleString()+'만원' : '-'} / {r.rent_type==='연세'?'연세':'월세'} {r.monthly_rent ? Number(r.monthly_rent).toLocaleString()+'만원' : '-'}</div>}
-                {r.special_note && <div style={{ fontSize:11, fontWeight:600, color:'#fff', background:'#5C3D8F', borderRadius:6, padding:'3px 8px', marginTop:4, display:'inline-block' }}>📝 {r.special_note}</div>}
+                {r.special_note && <div style={{ fontSize:11, fontWeight:600, color:'#fff', background:'#5C3D8F', borderRadius:6, padding:'3px 8px', marginTop:4, display:'inline-block' }}>특이사항: {r.special_note}</div>}
               </div>
 
               {/* 현재 입주자 */}
               <div style={{ borderTop:'0.5px solid var(--border)', paddingTop:8 }}>
                 {r.emp_name ? (
                   <div style={{ background:'rgba(0,133,74,0.7)', borderRadius:8, padding:'8px 12px' }}>
-                    <div style={{ fontSize:12, fontWeight:700, color:'#fff' }}>🏠 {r.emp_name} · {r.resident_org} · 입주 {r.move_in_date?.split?.('T')[0]}</div>
+                    <div style={{ fontSize:12, fontWeight:700, color:'#fff' }}>{r.emp_no} · {r.emp_name} · {r.resident_org}</div>
+                    <div style={{ fontSize:11, color:'rgba(255,255,255,0.85)', marginTop:2 }}>입주 {r.move_in_date?.split?.('T')[0]}{r.resident_note ? ` · ${r.resident_note}` : ''}</div>
                   </div>
                 ) : (
                   <div style={{ fontSize:12, color:'#aaa', textAlign:'center', padding:'4px 0' }}>공실</div>
                 )}
+              </div>
+
+              {/* 지도/주소복사/공유 */}
+              <div style={{ display:'flex', gap:6, marginTop:8 }}>
+                <button onClick={() => window.open(`https://map.kakao.com/link/search/${encodeURIComponent(r.address)}`,'_blank')}
+                  style={{ flex:1, height:32, borderRadius:8, background:'var(--bg2)', border:'0.5px solid var(--border)', fontSize:11, cursor:'pointer', fontFamily:'inherit' }}>🗺️ 지도</button>
+                <button onClick={() => { navigator.clipboard.writeText(r.address); setToast('주소가 복사되었습니다.'); }}
+                  style={{ flex:1, height:32, borderRadius:8, background:'var(--bg2)', border:'0.5px solid var(--border)', fontSize:11, cursor:'pointer', fontFamily:'inherit' }}>📋 주소복사</button>
+                <button onClick={() => {
+                  const text = `[사택] ${r.address}${r.org_name ? ` (${r.org_name})` : ''}`;
+                  if (navigator.share) navigator.share({ title:'사택 주소', text });
+                  else { navigator.clipboard.writeText(text); setToast('복사되었습니다.'); }
+                }} style={{ flex:1, height:32, borderRadius:8, background:'var(--bg2)', border:'0.5px solid var(--border)', fontSize:11, cursor:'pointer', fontFamily:'inherit' }}>공유</button>
               </div>
             </div>
           );
