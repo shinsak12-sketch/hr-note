@@ -372,7 +372,7 @@ export default function HousingList() {
               {/* 현재 입주자 */}
               <div style={{ borderTop:'0.5px solid var(--border)', paddingTop:8 }}>
                 {r.emp_name ? (
-                  <div style={{ background:'rgba(0,133,74,0.3)', borderRadius:8, padding:'8px 12px' }}>
+                  <div style={{ background:'rgba(0,133,74,0.7)', borderRadius:8, padding:'8px 12px' }}>
                     <div style={{ fontSize:12, fontWeight:700, color:'#fff' }}>🏠 {r.emp_name} · {r.resident_org} · 입주 {r.move_in_date?.split?.('T')[0]}</div>
                   </div>
                 ) : (
