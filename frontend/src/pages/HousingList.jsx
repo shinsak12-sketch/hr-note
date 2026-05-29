@@ -385,13 +385,10 @@ export default function HousingList() {
                 </div>
               </div>
 
-              {/* 네이버 지도 */}
-              <button onClick={() => window.open(`https://map.naver.com/v5/search/${encodeURIComponent(r.address)}`, '_blank')}
-                style={{ display:'flex', alignItems:'center', gap:6, width:'100%', background:'#FFF9E6', border:'0.5px solid #E8D84A30', borderRadius:8, padding:'7px 10px', cursor:'pointer', textAlign:'left', marginBottom:8 }}>
-                <span style={{ fontSize:13, flexShrink:0 }}>🗺️</span>
-                <span style={{ fontSize:12, color:'#5A4A00', flex:1, lineHeight:1.4 }}>{r.address}</span>
-                <span style={{ fontSize:11, color:'#5A4A00', flexShrink:0 }}>지도 ›</span>
-              </button>
+                  <button onClick={() => window.open(`https://map.naver.com/v5/search/${encodeURIComponent(r.address)}`, '_blank')}
+                    style={{ fontSize:11, padding:'3px 8px', borderRadius:6, background:'#FFF9E6', color:'#5A4A00', border:'0.5px solid #E8D84A50', cursor:'pointer', display:'flex', alignItems:'center', gap:3 }}>
+                    🗺️ 지도
+                  </button>
 
               {/* 정보 배지들 */}
               <div style={{ display:'flex', flexWrap:'wrap', gap:4, marginBottom:8 }}>
