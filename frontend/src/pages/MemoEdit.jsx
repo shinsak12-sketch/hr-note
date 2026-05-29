@@ -232,6 +232,7 @@ export default function MemoEdit() {
   const [shareModal, setShareModal] = useState(false);
   const [memoData, setMemoData] = useState(null);
   const [aiModal, setAiModal] = useState(false);
+  const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
   const textareaRef = useRef(null);
   const autoSaveTimer = useRef(null);
