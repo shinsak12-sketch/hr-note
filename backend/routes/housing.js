@@ -55,12 +55,14 @@ router.post('/check-distance', authMiddleware, async (req, res) => {
     if (!CLIENT_ID || !CLIENT_SECRET) return res.status(500).json({ error: 'API 키 미설정' });
 
     async function geocode(addr) {
-      const r = await fetch(`https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(addr)}`, {
+      // 괄호 및 상세주소 제거 (예: 서울 강남구 테헤란로 432(대치동) DB금융센터 17층 → 서울 강남구 테헤란로 432)
+      const cleanAddr = addr.replace(/\(.*?\)/g, '').replace(/[^\s\w가-힣\d\-]/g, '').trim().split(' ').slice(0, 5).join(' ');
+      const r = await fetch(`https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(cleanAddr)}`, {
         headers: { 'X-NCP-APIGW-API-KEY-ID': CLIENT_ID, 'X-NCP-APIGW-API-KEY': CLIENT_SECRET }
       });
       const d = await r.json();
       const loc = d.addresses?.[0];
-      if (!loc) throw new Error(`주소 검색 실패: ${addr}`);
+      if (!loc) throw new Error(`주소 검색 실패: ${cleanAddr}`);
       return { lng: loc.x, lat: loc.y };
     }
 
