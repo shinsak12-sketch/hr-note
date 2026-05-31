@@ -265,14 +265,32 @@ export default function HousingList() {
     load();
   }
 
+  const [hqFilter, setHqFilter] = useState('');
+  const [deptFilter, setDeptFilter] = useState('');
+  const [orgFilter, setOrgFilter] = useState('');
+
+  // 본부/부서/센터 목록 추출 (현재 입주자 기준)
+  const hqList = [...new Set(list.map(r => r.resident_org ? offices.find(o => o.org_name === r.resident_org)?.headquarters : null).filter(Boolean))].sort();
+  const deptList = [...new Set(list.map(r => r.resident_org ? offices.find(o => o.org_name === r.resident_org)?.department : null).filter(Boolean))].sort();
+  const orgList = [...new Set(list.map(r => r.resident_org).filter(Boolean))].sort();
+
   const today = new Date();
   const filtered = list.filter(r => {
-    const matchSearch = !search || r.address?.includes(search) || r.emp_name?.includes(search) || r.org_name?.includes(search);
+    const matchSearch = !search ||
+      r.address?.includes(search) ||
+      r.emp_name?.includes(search) ||
+      r.emp_no?.includes(search) ||
+      r.resident_org?.includes(search) ||
+      r.org_name?.includes(search);
     const matchFilter = filter === '전체' ||
       (filter === '입주중' && r.emp_name) ||
       (filter === '공실' && !r.emp_name) ||
       (filter === '만료임박' && r.contract_end && Math.ceil((new Date(r.contract_end) - today) / (1000*60*60*24)) <= 30);
-    return matchSearch && matchFilter;
+    const residentOffice = offices.find(o => o.org_name === r.resident_org);
+    const matchHq = !hqFilter || residentOffice?.headquarters === hqFilter;
+    const matchDept = !deptFilter || residentOffice?.department === deptFilter;
+    const matchOrg = !orgFilter || r.resident_org === orgFilter;
+    return matchSearch && matchFilter && matchHq && matchDept && matchOrg;
   });
 
   return (
@@ -302,12 +320,12 @@ export default function HousingList() {
 
       {/* 검색 */}
       <div style={{ padding: '10px 16px 0' }}>
-        <input placeholder="🔍 주소, 직원명, 소속 검색" value={search} onChange={e => setSearch(e.target.value)}
+        <input placeholder="🔍 주소, 직원명, 사번, 소속 검색" value={search} onChange={e => setSearch(e.target.value)}
           style={{ width: '100%', boxSizing: 'border-box' }} />
       </div>
 
-      {/* 필터 */}
-      <div style={{ display:'flex', gap:6, padding:'8px 16px', overflowX:'auto', scrollbarWidth:'none' }}>
+      {/* 상태 필터 */}
+      <div style={{ display:'flex', gap:6, padding:'8px 16px 0', overflowX:'auto', scrollbarWidth:'none' }}>
         {['전체','입주중','공실','만료임박'].map(f => (
           <button key={f} onClick={() => setFilter(f)} style={{
             padding:'4px 12px', borderRadius:20, border:'none', whiteSpace:'nowrap',
@@ -323,6 +341,31 @@ export default function HousingList() {
             </span>
           </button>
         ))}
+      </div>
+
+      {/* 조직 필터 */}
+      <div style={{ display:'flex', gap:6, padding:'6px 16px 0', overflowX:'auto', scrollbarWidth:'none' }}>
+        <select value={hqFilter} onChange={e => { setHqFilter(e.target.value); setDeptFilter(''); setOrgFilter(''); }}
+          style={{ height:30, fontSize:11, borderRadius:8, border:'0.5px solid var(--border)', padding:'0 8px', background:'var(--bg)', color:'var(--text)', maxWidth:110 }}>
+          <option value="">전체 본부</option>
+          {hqList.map(h => <option key={h} value={h}>{h}</option>)}
+        </select>
+        <select value={deptFilter} onChange={e => { setDeptFilter(e.target.value); setOrgFilter(''); }}
+          style={{ height:30, fontSize:11, borderRadius:8, border:'0.5px solid var(--border)', padding:'0 8px', background:'var(--bg)', color:'var(--text)', maxWidth:110 }}>
+          <option value="">전체 부서</option>
+          {deptList.map(d => <option key={d} value={d}>{d}</option>)}
+        </select>
+        <select value={orgFilter} onChange={e => setOrgFilter(e.target.value)}
+          style={{ height:30, fontSize:11, borderRadius:8, border:'0.5px solid var(--border)', padding:'0 8px', background:'var(--bg)', color:'var(--text)', maxWidth:110 }}>
+          <option value="">전체 센터</option>
+          {orgList.map(o => <option key={o} value={o}>{o}</option>)}
+        </select>
+        {(hqFilter || deptFilter || orgFilter) && (
+          <button onClick={() => { setHqFilter(''); setDeptFilter(''); setOrgFilter(''); }}
+            style={{ height:30, padding:'0 10px', borderRadius:8, background:'#FCEBEB', color:'#A32D2D', border:'none', fontSize:11, cursor:'pointer', whiteSpace:'nowrap' }}>
+            초기화
+          </button>
+        )}
       </div>
 
       {/* 카드 목록 */}
