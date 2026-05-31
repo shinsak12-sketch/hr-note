@@ -269,6 +269,7 @@ export const api = {
   // 근태관리
   getAttendanceSplitCount: (emp_no, type, start_date) => request('/attendance/split-count?emp_no=' + emp_no + '&type=' + encodeURIComponent(type) + '&start_date=' + (start_date||'')),
   getHousingList: () => cachedRequest('/housing'),
+  getHousingStats: () => request('/housing/stats/summary'),
   getHousingDetail: (id) => request('/housing/' + id),
   createHousing: (body) => request('/housing', { method: 'POST', body: JSON.stringify(body) }).then(r => { invalidateCache('/housing'); return r; }),
   updateHousing: (id, body) => request('/housing/' + id, { method: 'PATCH', body: JSON.stringify(body) }).then(r => { invalidateCache('/housing'); return r; }),

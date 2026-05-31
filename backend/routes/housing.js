@@ -22,18 +22,60 @@ router.get('/', authMiddleware, async (req, res) => {
 
 // 통계 (반드시 /:id 보다 앞에)
 router.get('/stats/summary', authMiddleware, async (req, res) => {
+  const today = new Date().toISOString().split('T')[0];
+  const d30 = new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
+  const d60 = new Date(Date.now() + 60*24*60*60*1000).toISOString().split('T')[0];
+  const d90 = new Date(Date.now() + 90*24*60*60*1000).toISOString().split('T')[0];
+
+  // 전체/입주중/공실/만료임박
   const [total] = await sql`SELECT COUNT(*) as cnt FROM housing`;
   const [occupied] = await sql`SELECT COUNT(*) as cnt FROM housing_residents WHERE move_out_date IS NULL`;
-  const [expiring] = await sql`
-    SELECT COUNT(*) as cnt FROM housing
-    WHERE contract_end IS NOT NULL
-    AND contract_end::date BETWEEN CURRENT_DATE AND CURRENT_DATE + 30
+  const [exp30] = await sql`SELECT COUNT(*) as cnt FROM housing WHERE contract_end::date BETWEEN ${today}::date AND ${d30}::date`;
+  const [exp60] = await sql`SELECT COUNT(*) as cnt FROM housing WHERE contract_end::date BETWEEN ${today}::date AND ${d60}::date`;
+  const [exp90] = await sql`SELECT COUNT(*) as cnt FROM housing WHERE contract_end::date BETWEEN ${today}::date AND ${d90}::date`;
+
+  // 본부별 현황
+  const byHq = await sql`
+    SELECT o.headquarters, COUNT(*) as cnt
+    FROM housing_residents r
+    JOIN offices o ON o.org_name = r.org_name
+    WHERE r.move_out_date IS NULL
+    GROUP BY o.headquarters
+    ORDER BY cnt DESC
   `;
+
+  // 만료 임박 목록
+  const expiring = await sql`
+    SELECT h.*, r.emp_name, r.emp_no, r.org_name as resident_org, r.move_in_date,
+      CEIL((h.contract_end::date - CURRENT_DATE)::numeric) as days_left
+    FROM housing h
+    LEFT JOIN housing_residents r ON r.housing_id = h.id AND r.move_out_date IS NULL
+    WHERE h.contract_end IS NOT NULL AND h.contract_end::date <= ${d90}::date AND h.contract_end::date >= ${today}::date
+    ORDER BY h.contract_end ASC
+  `;
+
+  // 장기 입주자 TOP 10
+  const longTerm = await sql`
+    SELECT r.*, h.address,
+      EXTRACT(YEAR FROM AGE(CURRENT_DATE, r.move_in_date::date)) * 12 +
+      EXTRACT(MONTH FROM AGE(CURRENT_DATE, r.move_in_date::date)) as months
+    FROM housing_residents r
+    JOIN housing h ON h.id = r.housing_id
+    WHERE r.move_out_date IS NULL AND r.move_in_date IS NOT NULL
+    ORDER BY r.move_in_date ASC
+    LIMIT 10
+  `;
+
   res.json({
     total: Number(total.cnt),
     occupied: Number(occupied.cnt),
     vacant: Number(total.cnt) - Number(occupied.cnt),
-    expiring: Number(expiring.cnt),
+    exp30: Number(exp30.cnt),
+    exp60: Number(exp60.cnt),
+    exp90: Number(exp90.cnt),
+    byHq,
+    expiring,
+    longTerm,
   });
 });
 
