@@ -14,6 +14,7 @@ import AccountMgmt from './pages/AccountMgmt.jsx';
 import AccountRequest from './pages/AccountRequest.jsx';
 import Settings from './pages/Settings.jsx';
 import PermissionSettings from './pages/PermissionSettings.jsx';
+import LogMgmt from './pages/LogMgmt.jsx';
 import Scoring from './pages/Scoring.jsx';
 import TaskHome from './pages/TaskHome.jsx';
 import TaskInput from './pages/TaskInput.jsx';
@@ -136,6 +137,7 @@ export default function App() {
 
       {/* 설정/계정 */}
       <Route path="/settings/permissions" element={<MasterRoute><PermissionSettings /></MasterRoute>} />
+      <Route path="/settings/logs" element={<MasterRoute><LogMgmt /></MasterRoute>} />
       <Route path="/settings" element={<MasterRoute><Settings /></MasterRoute>} />
       <Route path="/accounts" element={<MasterRoute><AccountMgmt /></MasterRoute>} />
 

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { writeLog } from './logs.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import sql from '../db.js';
@@ -34,6 +34,8 @@ router.post('/login', async (req, res) => {
     process.env.JWT_SECRET,
     { expiresIn: '8h' }
   );
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  writeLog({ id: user.id, name: user.name }, '로그인', null, null, ip);
   res.json({
     token,
     user: { id: user.id, username: user.username, name: user.name, role: user.role, work_type: user.work_type, allowed_menus: allowedMenus }

@@ -256,7 +256,11 @@ export default function Settings() {
           <EmployeeSection />
         </AccordionSection>
 
-        {/* 조직명 매핑 */}
+        {/* 로그 관리 */}
+        <button onClick={() => nav('/settings/logs')} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', width:'100%', padding:'14px 16px', background:'var(--bg)', border:'0.5px solid var(--border)', borderRadius:12, cursor:'pointer', fontFamily:'inherit', marginBottom:8 }}>
+          <span style={{ fontWeight:600, fontSize:14 }}>📋 접속/이용 로그</span>
+          <span style={{ color:'var(--text2)', fontSize:18 }}>›</span>
+        </button>
         <AccordionSection title="조직명 매핑 관리" icon="🗂️">
           <OrgMapSection />
         </AccordionSection>

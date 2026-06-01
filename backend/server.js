@@ -13,6 +13,7 @@ import attendanceRouter from './routes/attendance.js';
 import orgmapRouter from './routes/orgmap.js';
 import employeesRouter from './routes/employees.js';
 import aiRouter from './routes/ai.js';
+import logsRouter from './routes/logs.js';
 
 dotenv.config();
 
@@ -39,6 +40,32 @@ app.use('/api/attendance', attendanceRouter);
 app.use('/api/orgmap', orgmapRouter);
 app.use('/api/employees', employeesRouter);
 app.use('/api/ai', aiRouter);
+app.use('/api/logs', logsRouter);
+
+// 접속/이용 로그 미들웨어
+import { writeLog } from './routes/logs.js';
+const LOG_ACTIONS = {
+  'POST /api/auth/login': '로그인',
+  'POST /api/attendance': '근태등록',
+  'DELETE /api/attendance/:id': '근태삭제',
+  'POST /api/housing': '사택등록',
+  'POST /api/housing/apply': '사택신청',
+  'POST /api/memos': '메모작성',
+  'DELETE /api/memos/:id': '메모삭제',
+};
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    if (res.statusCode < 400) {
+      const key = `${req.method} ${req.path.replace(/\/\d+/g, '/:id')}`;
+      const action = LOG_ACTIONS[key];
+      if (action && req.user) {
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        writeLog(req.user, action, req.path, null, ip);
+      }
+    }
+  });
+  next();
+});
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

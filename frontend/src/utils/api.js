@@ -157,6 +157,7 @@ export const api = {
   downloadEmployeeTemplate: () => fetch(BASE + '/employees/template', { headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') } }).then(r => r.blob()),
   uploadEmployees: (file) => { const fd = new FormData(); fd.append('file', file); return fetch(BASE + '/employees/upload', { method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('hr_token') }, body: fd }).then(r => r.json()); },
   aiChat: (messages, memoContent) => request('/ai/chat', { method: 'POST', body: JSON.stringify({ messages, memoContent }) }),
+  getLogs: (params={}) => { const q = new URLSearchParams(params).toString(); return request('/logs' + (q?'?'+q:'')); },
   getOrgMap: () => cachedRequest('/orgmap'),
   addOrgMap: (body) => request('/orgmap', { method: 'POST', body: JSON.stringify(body) }),
   deleteOrgMap: (id) => request('/orgmap/' + id, { method: 'DELETE' }),
