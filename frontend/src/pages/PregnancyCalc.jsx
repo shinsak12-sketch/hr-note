@@ -43,7 +43,7 @@ export default function PregnancyCalc() {
           뒤로
         </button>
         <div className="header-title">🤱 임신중 단축근무 계산기</div>
-        <button onClick={() => nav("/attendance-app")} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#FAEEDA", color: "#854F0B", border: "none", cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap" }}>근태관리</button>
+        {!window.location.pathname.startsWith("/field") && <button onClick={() => nav("/attendance-app")} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#FAEEDA", color: "#854F0B", border: "none", cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap" }}>근태관리</button>}
       </div>
 
       <div className="page-content" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 20, paddingBottom: 40 }}>

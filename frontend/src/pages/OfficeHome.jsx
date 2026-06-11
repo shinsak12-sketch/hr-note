@@ -103,7 +103,7 @@ export default function OfficeHome() {
           홈
         </button>
         <div className="header-title">사무실 주소</div>
-        {isMaster && (
+        {isMaster && !window.location.pathname.startsWith('/field') && (
           <button onClick={() => nav('/offices/new')} style={{
             background: '#5A4A00', color: '#FFF9E6', border: 'none',
             borderRadius: 8, padding: '6px 12px', fontSize: 13,
