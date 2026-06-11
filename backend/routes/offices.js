@@ -6,9 +6,8 @@ import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
-router.use(authMiddleware);
 
-// 목록 조회
+// 목록 조회 - 인증 불필요 (현장 공개 페이지용)
 router.get('/', async (req, res) => {
   const { headquarters, department, org_name, q } = req.query;
   let offices = await sql`SELECT * FROM offices ORDER BY headquarters, department NULLS FIRST, org_name`;
@@ -62,7 +61,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // 등록 (마스터만)
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   if (req.user.role !== 'master') return res.status(403).json({ error: '권한이 없습니다.' });
   const { headquarters, department, org_name, address, manager_name, phone } = req.body;
   if (!headquarters || !org_name || !address)
@@ -76,7 +75,7 @@ router.post('/', async (req, res) => {
 });
 
 // 수정 (마스터만)
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
   if (req.user.role !== 'master') return res.status(403).json({ error: '권한이 없습니다.' });
   const { headquarters, department, org_name, address, manager_name, phone } = req.body;
   const [office] = await sql`
@@ -89,7 +88,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // 삭제 (마스터만)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   if (req.user.role !== 'master') return res.status(403).json({ error: '권한이 없습니다.' });
   await sql`DELETE FROM offices WHERE id = ${req.params.id}`;
   res.json({ message: '삭제되었습니다.' });
@@ -129,7 +128,7 @@ router.get('/template/excel', (req, res) => {
 });
 
 // 엑셀 업로드 (마스터만)
-router.post('/upload/excel', upload.single('file'), async (req, res) => {
+router.post('/upload/excel', authMiddleware, upload.single('file'), async (req, res) => {
   if (req.user.role !== 'master') return res.status(403).json({ error: '권한이 없습니다.' });
   try {
     const wb = XLSX.read(req.file.buffer, { type: 'buffer' });
