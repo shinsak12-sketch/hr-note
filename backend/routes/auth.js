@@ -1,3 +1,4 @@
+import { Router } from 'express';
 import { writeLog } from '../utils/writeLog.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
