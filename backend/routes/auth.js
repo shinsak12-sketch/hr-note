@@ -1,4 +1,4 @@
-import { writeLog } from './logs.js';
+import { writeLog } from '../utils/writeLog.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import sql from '../db.js';

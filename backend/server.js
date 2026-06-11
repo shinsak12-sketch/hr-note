@@ -14,7 +14,7 @@ import orgmapRouter from './routes/orgmap.js';
 import employeesRouter from './routes/employees.js';
 import aiRouter from './routes/ai.js';
 import logsRouter from './routes/logs.js';
-import { writeLog } from './routes/logs.js';
+import { writeLog } from './utils/writeLog.js';
 
 dotenv.config();
 
