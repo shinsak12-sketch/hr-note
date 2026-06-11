@@ -14,6 +14,7 @@ import orgmapRouter from './routes/orgmap.js';
 import employeesRouter from './routes/employees.js';
 import aiRouter from './routes/ai.js';
 import logsRouter from './routes/logs.js';
+import { writeLog } from './routes/logs.js';
 
 dotenv.config();
 
@@ -43,7 +44,6 @@ app.use('/api/ai', aiRouter);
 app.use('/api/logs', logsRouter);
 
 // 접속/이용 로그 미들웨어
-import { writeLog } from './routes/logs.js';
 const LOG_ACTIONS = {
   'POST /api/auth/login': '로그인',
   'POST /api/attendance': '근태등록',
