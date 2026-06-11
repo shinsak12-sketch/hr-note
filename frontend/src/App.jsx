@@ -15,6 +15,7 @@ import AccountRequest from './pages/AccountRequest.jsx';
 import Settings from './pages/Settings.jsx';
 import PermissionSettings from './pages/PermissionSettings.jsx';
 import LogMgmt from './pages/LogMgmt.jsx';
+import FieldHub from './pages/FieldHub.jsx';
 import Scoring from './pages/Scoring.jsx';
 import TaskHome from './pages/TaskHome.jsx';
 import TaskInput from './pages/TaskInput.jsx';
@@ -69,6 +70,13 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/request" element={<AccountRequest />} />
+      {/* 현장 공개 페이지 - 로그인 불필요 */}
+      <Route path="/field" element={<FieldHub />} />
+      <Route path="/field/parental-leave" element={<ParentalLeaveCalc />} />
+      <Route path="/field/maternity" element={<MaternityCalc />} />
+      <Route path="/field/pregnancy" element={<PregnancyCalc />} />
+      <Route path="/field/leave" element={<LeaveCalc />} />
+      <Route path="/field/office" element={<OfficeHome />} />
 
       {/* 자산관리 */}
       <Route path="/asset-mgmt" element={<PrivateRoute><PermissionGuard menuKey="general"><AssetHome /></PermissionGuard></PrivateRoute>} />
