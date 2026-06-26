@@ -29,6 +29,14 @@ export default function FieldHub() {
             </div>
           </button>
         ))}
+        <button onClick={() => window.open('https://sonsa-mu.vercel.app/', '_blank')}
+          style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px', borderRadius: 14, border: '0.5px solid #A32D2D30', background: '#FCEBEB', cursor: 'pointer', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}>
+          <span style={{ fontSize: 28, flexShrink: 0 }}>🤱</span>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#A32D2D', marginBottom: 3 }}>모성보호제도 안내</div>
+            <div style={{ fontSize: 12, color: '#A32D2D99' }}>출산·육아 관련 모성보호제도 안내</div>
+          </div>
+        </button>
       </div>
     </div>
   );
