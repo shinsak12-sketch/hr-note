@@ -19,9 +19,6 @@ export default function FieldHub() {
         <div style={{ width: 40 }} />
       </div>
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 4, textAlign: 'center' }}>
-          현장 관리자를 위한 HR 계산기 및 사무실 주소 안내
-        </div>
         {CARDS.map((c, i) => (
           <button key={i} onClick={() => nav(c.path)}
             style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px', borderRadius: 14, border: `0.5px solid ${c.color}30`, background: c.bg, cursor: 'pointer', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}>
