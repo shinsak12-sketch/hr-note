@@ -41,23 +41,21 @@ function calcEndDate(startStr, remainMonths) {
   if (!startStr || remainMonths <= 0) return null;
   const start = new Date(startStr);
 
-  const fullMonths = Math.floor(remainMonths);         // 정수 개월 (n)
-  const fraction = remainMonths - fullMonths;           // 소수 부분 (o)
+  const fullMonths = Math.floor(remainMonths);
+  const fraction = remainMonths - fullMonths;
 
-  // Q5: 예상시작일 + 정수개월 - 1일 (엑셀 방식)
+  // 정수개월 후 날짜
   const q = new Date(start);
   q.setMonth(q.getMonth() + fullMonths);
-  q.setDate(q.getDate() - 1);
 
-  // U5: Q5 달의 일수 (1월이면 31)
+  // 해당 달(정수개월 후 달)의 일수로 소수 계산 (노동부 방식)
   const daysInMonth = new Date(q.getFullYear(), q.getMonth() + 1, 0).getDate();
-
-  // V5 = Q5 + ROUNDDOWN(O5 * U5, 0)
   const extraDays = Math.floor(fraction * daysInMonth);
-  const end = new Date(q);
-  end.setDate(end.getDate() + extraDays);
 
-  return end.toISOString().split('T')[0];
+  // 최종 종료일 = 정수개월 후 - 1일 + 소수일수
+  q.setDate(q.getDate() - 1 + extraDays);
+
+  return q.toISOString().split('T')[0];
 }
 
 function fmt(dateStr) {
