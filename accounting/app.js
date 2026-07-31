@@ -47,9 +47,10 @@ function mix(h1,h2,t){ const a=hexToRgb(h1),b=hexToRgb(h2); return rgbToHex([a[0
 function shade(hex,amt){ return amt>=0? mix(hex,"#ffffff",amt) : mix(hex,"#000000",-amt); }
 const CAT = ["#3987e5","#d95926","#199e70","#c98500","#d55181","#008300","#9085e9","#e66767"];
 function catColor(i){ return CAT[i] || "#7f8796"; }
-const EXEC_STOPS = [[0,"#2f6fe0"],[0.60,"#1f9e6b"],[0.85,"#e0a11a"],[1.00,"#e0631f"],[1.20,"#cf2f2f"]];
+/* 색 = 연말 추정 ÷ 예산 (= 집행률/시간진도). 예산 내면 파랑/초록, 초과 예상이면 빨강 */
+const EXEC_STOPS = [[0,"#2f6fe0"],[0.80,"#1f9e6b"],[1.00,"#1f9e6b"],[1.06,"#e0a11a"],[1.15,"#e0631f"],[1.35,"#cf2f2f"]];
 function execColor(r, pace){
-  let v = pace ? r/Math.max(pace,0.001) : r; if(isNaN(v)) v=0; v=Math.max(0,Math.min(1.2,v));
+  let v = pace ? r/Math.max(pace,0.001) : r; if(isNaN(v)) v=0; v=Math.max(0,Math.min(1.35,v));
   for(let i=0;i<EXEC_STOPS.length-1;i++){ const [a,ca]=EXEC_STOPS[i],[b,cb]=EXEC_STOPS[i+1]; if(v<=b) return mix(ca,cb,(v-a)/(b-a)); }
   return EXEC_STOPS[EXEC_STOPS.length-1][1];
 }
@@ -333,82 +334,127 @@ function renderEmpty(root){
   $("#btnSample",root).onclick=actions.useSample;
 }
 
+/* ------------------------------ 연도 진도(pace) / 추정 ------------------------------ */
+function yearPace(year){
+  const now=new Date(), y=now.getFullYear();
+  if(year<y) return 1; if(year>y) return 0.02;
+  const s=new Date(y,0,1), e=new Date(y+1,0,1);
+  return Math.min(1,Math.max(0.02,(now-s)/(e-s)));
+}
+function forecast(actual,pace){ return pace>0? actual/pace : actual; }
+
 /* ------------------------------ 홈 (3D 대시보드) ------------------------------ */
 function renderHome(root){
   const leaves=ctx.data.leaves||[]; root.innerHTML="";
   if(!leaves.length){ root.appendChild(h(`<div class="soon"><div class="big">📊</div>
     <h3>표시할 사업비 데이터가 없습니다</h3><p>기준정보에서 폴더를 읽거나, 샘플로 둘러보세요.</p></div>`)); return; }
   const tree=buildTree(leaves);
-  const totB=sumBudget(tree), totA=sumActual(tree), rate=totA/totB, remain=totB-totA;
-  const over=tree.filter(n=>n.actual>n.budget).length;
+  const pace=yearPace(Number(ctx.year));
 
-  const kpis=h(`<div class="kpis"></div>`);
-  const kpi=(label,val,unit,accent,delta)=>h(`<div class="kpi" style="--accent:${accent}">
-    <div class="kpi__label">${label}</div><div class="kpi__val">${val}<span class="unit">${unit||""}</span></div>${delta||""}</div>`);
-  kpis.append(
-    kpi("연간 계획 사업비",fmtCompact(totB),"원","var(--cat-1)"),
-    kpi("집행액",fmtCompact(totA),"원","var(--cat-3)",`<div class="kpi__delta ${rate<=1?'up':'down'}">집행률 ${fmtPct(rate,1)}</div>`),
-    kpi("잔여 예산",fmtCompact(remain),"원",remain>=0?"var(--st-good)":"var(--st-crit)"),
-    kpi("초과 대분류",String(over),"개",over?"var(--st-crit)":"var(--st-good)",`<div class="kpi__delta ${over?'down':'up'}">${over?'예산 초과 주의':'모두 예산 내'}</div>`),
-  );
-  root.appendChild(kpis);
-
+  const kpis=h(`<div class="kpis" id="kpis"></div>`);
   const layout=h(`<div class="grid-2" style="grid-template-columns:1.7fr 1fr;align-items:stretch"></div>`);
   const cityCard=h(`<div class="card city-wrap" style="padding:0;overflow:hidden">
     <div class="card__hd" style="padding:16px 18px 14px"><div>
       <div class="card__title"><span class="dot" style="background:var(--cat-1)"></span>사업비 구성 · 3D</div>
-      <div class="card__sub">바닥면적 = 계획예산 · 높이 = 집행액 · 색 = 집행률 (클릭하여 드릴다운)</div>
+      <div class="card__sub">바닥면적=예산 · 높이=집행 · 색=시간진도 대비 속도 · <b>드래그 회전 / 휠 확대 / 블록 드래그 이동</b></div>
     </div></div><div class="city" id="city"></div></div>`);
-  layout.append(cityCard, renderRankPanel(tree));
-  root.appendChild(layout);
-  buildCity($("#city",cityCard), tree, {path:[]});
+  const side=h(`<div id="sidewrap"></div>`);
+  layout.append(cityCard, side);
+  root.append(kpis, layout);
+
+  const state={path:[], pace};
+  function scopeNodes(){ let ns=tree; for(const name of state.path){ const f=ns.find(n=>n.name===name); if(!f) break; ns=f.children; } return ns; }
+  state.update=function(){
+    const nodes=scopeNodes();
+    renderKpis(kpis, nodes, pace, state.path);
+    side.innerHTML=""; side.appendChild(renderRankPanel(nodes, pace, state.path, state));
+    buildCity($("#city",cityCard), nodes, state);
+    el("viewSub").textContent = state.path.length? "현재 보기: "+state.path.join(" › ") : "사업비 구성 3D 히트맵";
+  };
+  state.update();
 }
-function renderRankPanel(tree){
-  const rows=[...tree].sort((a,b)=>b.budget-a.budget);
+function renderKpis(container, nodes, pace, path){
+  const totB=sumBudget(nodes), totA=sumActual(nodes), rate=totB? totA/totB:0;
+  const proj=forecast(totA,pace), projDiff=proj-totB;
+  const overCount=nodes.filter(n=>forecast(n.actual,pace)>n.budget*1.0001).length;
+  const scope = path.length? path[path.length-1] : "전체";
+  const kpi=(label,val,unit,accent,delta)=>h(`<div class="kpi" style="--accent:${accent}">
+    <div class="kpi__label">${label}</div><div class="kpi__val">${val}<span class="unit">${unit||""}</span></div>${delta||""}</div>`);
+  container.innerHTML="";
+  container.append(
+    kpi(`계획 사업비 · ${scope}`, fmtCompact(totB),"원","var(--cat-1)",
+        `<div class="kpi__delta" style="color:var(--ink-mut)">잔여 ${fmtCompact(totB-totA)}</div>`),
+    kpi("집행액", fmtCompact(totA),"원","var(--cat-3)",
+        `<div class="kpi__delta ${rate<=pace?'up':'down'}">집행률 ${fmtPct(rate,1)} · 시간 ${fmtPct(pace,0)} 경과</div>`),
+    kpi("연말 추정(이 속도면)", fmtCompact(proj),"원", projDiff>0?"var(--st-crit)":"var(--st-good)",
+        `<div class="kpi__delta ${projDiff>0?'down':'up'}">계획 대비 ${projDiff>0?'▲ 초과 '+fmtCompact(projDiff):'▼ 여유 '+fmtCompact(-projDiff)}</div>`),
+    kpi("초과 예상 항목", String(overCount),"개", overCount?"var(--st-crit)":"var(--st-good)",
+        `<div class="kpi__delta ${overCount?'down':'up'}">${overCount?'연말 초과 예상':'모두 예산 내'}</div>`),
+  );
+}
+function renderRankPanel(nodes, pace, path, state){
+  const rows=[...nodes].sort((a,b)=>b.budget-a.budget);
+  const title = path.length? path[path.length-1]+" · 하위 항목" : "대분류 집행 현황";
   const card=h(`<div class="card"><div class="card__hd"><div>
-    <div class="card__title"><span class="dot" style="background:var(--cat-3)"></span>대분류 집행 현황</div>
-    <div class="card__sub">예산 규모순 · 막대색은 집행률</div></div></div>
+    <div class="card__title"><span class="dot" style="background:var(--cat-3)"></span>${title}</div>
+    <div class="card__sub">막대=집행률 · 색=시간 대비 속도 · ◆=연말 추정</div></div></div>
     <div class="card__bd" id="rankbd" style="padding-top:6px"></div></div>`);
   const bd=$("#rankbd",card);
-  rows.forEach((n,i)=>{ const r=n.actual/n.budget, col=execColor(r);
-    bd.appendChild(h(`<div style="padding:11px 2px;border-bottom:1px solid var(--line)">
+  rows.forEach((n,i)=>{ const r=n.budget? n.actual/n.budget:0, col=execColor(r,pace);
+    const proj=forecast(n.actual,pace), projPct=n.budget? proj/n.budget:0, over=proj>n.budget*1.0001;
+    const rowEl=h(`<div class="rankrow" style="padding:11px 2px;border-bottom:1px solid var(--line);cursor:${n.children&&n.children.length?'pointer':'default'}">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
         <div style="font-weight:650;display:flex;gap:9px;align-items:center"><span class="swatch" style="width:10px;height:10px;border-radius:3px;background:${catColor(i)}"></span>${n.name}</div>
         <div style="font-variant-numeric:tabular-nums;font-size:12.5px"><b>${fmtCompact(n.actual)}</b><span style="color:var(--ink-mut)"> / ${fmtCompact(n.budget)}</span></div>
       </div>
       <div style="height:8px;border-radius:99px;background:var(--surface-3);overflow:hidden;position:relative">
         <i style="display:block;height:100%;width:${Math.min(100,r*100)}%;background:${col};border-radius:99px"></i>
-        ${r>1?`<span style="position:absolute;right:6px;top:-1px;font-size:9px;color:var(--st-crit);font-weight:800">▲${fmtPct(r-1,0)} 초과</span>`:""}
+        <span title="연말 추정 위치" style="position:absolute;left:calc(${Math.min(100,projPct*100)}% - 4px);top:-2px;color:${over?'var(--st-crit)':'var(--ink-2)'};font-size:10px">◆</span>
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:11px;color:var(--ink-mut)">
-        <span>집행률 ${fmtPct(r,1)}</span><span>잔여 ${fmtCompact(n.budget-n.actual)}</span></div>
-    </div>`)); });
+        <span>집행률 ${fmtPct(r,1)}</span><span style="color:${over?'var(--st-crit)':'var(--ink-mut)'}">연말 추정 ${fmtPct(projPct,0)}${over?' ⚠':''}</span></div>
+    </div>`);
+    if(n.children && n.children.length) rowEl.onclick=()=>{ state.path=path.concat([n.name]); state.update(); };
+    bd.appendChild(rowEl); });
   return card;
 }
 
-/* --- 3D 도시 --- */
+/* --- 3D 도시 (드래그 회전/이동 + 휠 확대) --- */
+function layoutKey(state){ return "cockpit:layout:"+ctx.year+":"+((state.path||[]).join(">")||"root"); }
 function buildCity(cityEl, nodes, state){
-  cityEl._yaw = cityEl._yaw==null? -42 : cityEl._yaw;
+  const pace=state.pace||0;
+  if(cityEl._yaw==null){ cityEl._yaw=-42; cityEl._tilt=56; cityEl._zoom=1; }
   cityEl.innerHTML=`
     <div class="city__hud" id="hud"></div>
     <div class="city__spin">
-      <button class="iconbtn" id="rotL" title="회전" style="width:36px;height:36px">⟲</button>
-      <button class="iconbtn" id="rotR" title="회전" style="width:36px;height:36px">⟳</button>
+      <button class="iconbtn" id="rotL" title="왼쪽 회전">⟲</button>
+      <button class="iconbtn" id="rotR" title="오른쪽 회전">⟳</button>
+      <button class="iconbtn" id="zReset" title="시점 초기화" style="font-size:14px">⌂</button>
     </div>
-    <div class="city__stage" id="stage" style="--yaw:${cityEl._yaw}deg"></div>
-    <div class="city__legend"><div>집행률</div><div class="legend__bar"></div>
+    <div class="city__stage" id="stage"></div>
+    <div class="city__legend"><div>집행 속도 (시간 대비)</div><div class="legend__bar"></div>
       <div class="legend__scale"><span>여유</span><span>정상</span><span>주의</span><span>초과</span></div></div>`;
   const stage=$("#stage",cityEl);
+  stage.style.transition="transform .12s ease-out";
+  function applyView(){ stage.style.transform=`translate(-50%,-50%) rotateX(${cityEl._tilt}deg) rotateZ(${cityEl._yaw}deg) scale(${cityEl._zoom})`; }
+  applyView();
+
   const cols=Math.ceil(Math.sqrt(nodes.length))||1, rows=Math.ceil(nodes.length/cols), cell=150;
   const boardW=cols*cell, boardH=rows*cell;
   const maxB=Math.max(...nodes.map(n=>n.budget),1), maxA=Math.max(...nodes.map(n=>n.actual),1);
   const board=h(`<div class="board" style="left:${-boardW/2}px;top:${-boardH/2}px;width:${boardW}px;height:${boardH}px;--cell:${cell}px"></div>`);
   stage.appendChild(board);
+
+  // 저장된 배치 불러오기
+  const saved=LS.getJSON(layoutKey(state))||{};
+  const used=new Set(); Object.values(saved).forEach(c=>used.add(c.gx+","+c.gy));
+  let free=0; const nextFree=()=>{ while(used.has((free%cols)+","+Math.floor(free/cols)) && free<cols*rows) free++; const g={gx:free%cols,gy:Math.floor(free/cols)}; used.add(g.gx+","+g.gy); free++; return g; };
+
   nodes.forEach((n,i)=>{
-    const col=i%cols, row=Math.floor(i/cols);
+    const g = saved[n.name] || nextFree();
     const fp=44+70*Math.sqrt(n.budget/maxB), hz=14+188*(n.actual/maxA);
-    const bx=col*cell+(cell-fp)/2, by=row*cell+(cell-fp)/2;
-    const r=n.actual/n.budget, base=execColor(r);
+    const bx=g.gx*cell+(cell-fp)/2, by=g.gy*cell+(cell-fp)/2;
+    const r=n.budget? n.actual/n.budget:0, base=execColor(r,pace);
     const cTop=shade(base,.22), cA=shade(base,-.12), cB=shade(base,-.34);
     const bldg=h(`<div class="bldg" style="left:${bx}px;top:${by}px;width:${fp}px;height:${fp}px">
       <div class="bldg__face" style="width:${fp}px;height:${fp}px;background:${cTop};transform:translateZ(${hz}px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)"></div>
@@ -419,38 +465,88 @@ function buildCity(cityEl, nodes, state){
       <div class="bldg__cap">${n.name}</div></div>`);
     board.appendChild(bldg);
     const cap=bldg.querySelector(".bldg__cap");
-    bldg.addEventListener("pointerenter",(e)=>{ showTip(e,n); cap.style.opacity="1"; });
-    bldg.addEventListener("pointermove",moveTip);
+    bldg._node=n; bldg._fp=fp; bldg._g=g;
+    bldg.addEventListener("pointerenter",(e)=>{ if(!cityEl._drag){ showTip(e,n,pace); cap.style.opacity="1"; } });
+    bldg.addEventListener("pointermove",(e)=>{ if(!cityEl._drag) moveTip(e); });
     bldg.addEventListener("pointerleave",()=>{ hideTip(); cap.style.opacity="0"; });
-    bldg.addEventListener("click",()=>{ if(n.children && n.children.length){
-      cityEl.classList.add("is-drill");
-      buildCity(cityEl, n.children.map(c=>({...c})), {path:(state.path||[]).concat([n.name])});
-    }});
+    bldg.addEventListener("pointerdown",(e)=>startBldgDrag(e,cityEl,board,bldg,state,cell,cols,rows));
   });
+
+  // 배경 드래그 = 회전
+  cityEl.onpointerdown=(e)=>{ if(e.target.closest(".bldg")||e.target.closest(".iconbtn")||e.target.closest(".city__crumb")) return;
+    startOrbit(e,cityEl,applyView); };
+  cityEl.onwheel=(e)=>{ e.preventDefault(); cityEl._zoom=Math.min(2.2,Math.max(.5,cityEl._zoom*(e.deltaY<0?1.1:0.9))); applyView(); };
   cityEl.addEventListener("pointerleave", hideTip);
-  $("#rotL",cityEl).onclick=()=>{ cityEl._yaw-=22; stage.style.setProperty("--yaw",cityEl._yaw+"deg"); };
-  $("#rotR",cityEl).onclick=()=>{ cityEl._yaw+=22; stage.style.setProperty("--yaw",cityEl._yaw+"deg"); };
+  $("#rotL",cityEl).onclick=()=>{ cityEl._yaw-=22; applyView(); };
+  $("#rotR",cityEl).onclick=()=>{ cityEl._yaw+=22; applyView(); };
+  $("#zReset",cityEl).onclick=()=>{ cityEl._yaw=-42; cityEl._tilt=56; cityEl._zoom=1; applyView(); };
+  cityEl._applyView=applyView;
   renderCrumb(cityEl, state);
+}
+function startOrbit(e,cityEl,applyView){
+  cityEl._drag="orbit"; hideTip();
+  const sx=e.clientX, sy=e.clientY, y0=cityEl._yaw, t0=cityEl._tilt;
+  const mv=(ev)=>{ cityEl._yaw=y0+(ev.clientX-sx)*0.35; cityEl._tilt=Math.min(80,Math.max(18,t0-(ev.clientY-sy)*0.25)); applyView(); };
+  const up=()=>{ cityEl._drag=null; window.removeEventListener("pointermove",mv); window.removeEventListener("pointerup",up); };
+  window.addEventListener("pointermove",mv); window.addEventListener("pointerup",up);
+}
+function startBldgDrag(e,cityEl,board,bldg,state,cell,cols,rows){
+  e.stopPropagation(); hideTip();
+  const sx=e.clientX, sy=e.clientY;
+  const startLeft=parseFloat(bldg.style.left), startTop=parseFloat(bldg.style.top);
+  const yaw=cityEl._yaw*Math.PI/180, tilt=cityEl._tilt*Math.PI/180, zoom=cityEl._zoom;
+  const cos=Math.cos(yaw), sin=Math.sin(yaw), ct=Math.max(0.15,Math.cos(tilt));
+  let moved=false;
+  const mv=(ev)=>{
+    const dsx=(ev.clientX-sx), dsy=(ev.clientY-sy);
+    if(!moved && Math.hypot(dsx,dsy)<5) return;
+    moved=true; cityEl._drag="bldg"; bldg.style.zIndex=50;
+    // 화면 이동량 → 보드 평면 이동량(회전/틸트/줌 역변환)
+    const xp=dsx/zoom, yp=(dsy/zoom)/ct;
+    const dbx= xp*cos + yp*sin, dby= -xp*sin + yp*cos;
+    bldg.style.left=(startLeft+dbx)+"px"; bldg.style.top=(startTop+dby)+"px";
+  };
+  const up=()=>{
+    window.removeEventListener("pointermove",mv); window.removeEventListener("pointerup",up);
+    if(moved){
+      const fp=bldg._fp;
+      let gx=Math.round((parseFloat(bldg.style.left)-(cell-fp)/2)/cell);
+      let gy=Math.round((parseFloat(bldg.style.top)-(cell-fp)/2)/cell);
+      gx=Math.min(cols-1,Math.max(0,gx)); gy=Math.min(rows-1,Math.max(0,gy));
+      const saved=LS.getJSON(layoutKey(state))||{};
+      saved[bldg._node.name]={gx,gy}; LS.setJSON(layoutKey(state),saved);
+      bldg.style.zIndex="";
+      setTimeout(()=>state.update(),0);   // 스냅 반영 재배치
+    }
+    cityEl._drag=null;
+  };
+  window.addEventListener("pointermove",mv); window.addEventListener("pointerup",up);
+  // 이동이 아니면(클릭) 드릴다운
+  const clickUp=()=>{ window.removeEventListener("pointerup",clickUp);
+    if(!moved && bldg._node.children && bldg._node.children.length){ cityEl.classList.add("is-drill"); state.path=(state.path||[]).concat([bldg._node.name]); state.update(); } };
+  window.addEventListener("pointerup",clickUp);
 }
 function renderCrumb(cityEl, state){
   const hud=$("#hud",cityEl); if(!hud) return; const path=state.path||[]; hud.innerHTML="";
   const crumb=h(`<div class="city__crumb"></div>`);
-  crumb.append(h(`<button data-lvl="-1">🏙️ 전체</button>`));
-  path.forEach(p=>crumb.append(h(`<span>›</span>`),h(`<b>${p}</b>`)));
-  crumb.querySelector('[data-lvl="-1"]').onclick=()=>{ cityEl.classList.remove("is-drill");
-    buildCity(cityEl, ctx.data.tree||buildTree(ctx.data.leaves||[]), {path:[]}); };
+  const home=h(`<button>🏙️ 전체</button>`); home.onclick=()=>{ cityEl.classList.remove("is-drill"); state.path=[]; state.update(); };
+  crumb.appendChild(home);
+  path.forEach((p,idx)=>{ crumb.append(h(`<span>›</span>`)); const b=h(`<button><b>${p}</b></button>`);
+    b.onclick=()=>{ state.path=path.slice(0,idx+1); state.update(); }; crumb.appendChild(b); });
   hud.appendChild(crumb);
 }
 let tipEl=null;
 function tip(){ if(!tipEl){ tipEl=h(`<div class="city-tip"></div>`); document.body.appendChild(tipEl);} return tipEl; }
-function showTip(e,n){ const r=n.actual/n.budget, t=tip();
-  t.innerHTML=`<div class="city-tip__t"><span class="swatch" style="background:${execColor(r)}"></span>${n.name}</div>
+function showTip(e,n,pace){ const r=n.budget? n.actual/n.budget:0, t=tip(), col=execColor(r,pace);
+  const proj=forecast(n.actual,pace), over=proj>n.budget*1.0001;
+  t.innerHTML=`<div class="city-tip__t"><span class="swatch" style="background:${col}"></span>${n.name}</div>
     <div class="city-tip__row"><span>계획예산</span><b>${fmtWon(n.budget)}원</b></div>
     <div class="city-tip__row"><span>집행액</span><b>${fmtWon(n.actual)}원</b></div>
     <div class="city-tip__row"><span>잔여</span><b>${fmtWon(n.budget-n.actual)}원</b></div>
-    <div class="city-tip__bar"><i style="width:${Math.min(100,r*100)}%;background:${execColor(r)}"></i></div>
-    <div class="city-tip__row" style="margin-top:7px"><span>집행률</span><b style="color:${execColor(r)}">${fmtPct(r,1)}</b></div>
-    ${n.children&&n.children.length?`<div class="city-tip__row"><span style="color:var(--cat-1)">클릭 → 하위 ${n.children.length}개 보기</span></div>`:""}`;
+    <div class="city-tip__bar"><i style="width:${Math.min(100,r*100)}%;background:${col}"></i></div>
+    <div class="city-tip__row" style="margin-top:7px"><span>집행률 (시간 ${fmtPct(pace,0)})</span><b style="color:${col}">${fmtPct(r,1)}</b></div>
+    <div class="city-tip__row"><span>연말 추정</span><b style="color:${over?'var(--st-crit)':'var(--st-good)'}">${fmtWon(proj)}원${over?' ⚠초과':''}</b></div>
+    ${n.children&&n.children.length?`<div class="city-tip__row"><span style="color:var(--cat-1)">클릭 → 하위 ${n.children.length}개 · 드래그 → 이동</span></div>`:`<div class="city-tip__row"><span style="color:var(--ink-mut)">드래그 → 이동</span></div>`}`;
   moveTip(e); t.classList.add("show"); }
 function moveTip(e){ const t=tip(); t.style.left=Math.min(e.clientX+16,innerWidth-t.offsetWidth-12)+"px"; t.style.top=Math.min(e.clientY+16,innerHeight-t.offsetHeight-12)+"px"; }
 function hideTip(){ if(tipEl) tipEl.classList.remove("show"); }
