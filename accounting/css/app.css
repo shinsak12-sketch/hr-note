@@ -538,3 +538,15 @@ select.input{max-width:280px}
 /* 계획대비 월 선택 행 */
 .mrow-sel:hover td{background:var(--surface-3)}
 .mrow-sel.on td{background:color-mix(in srgb,var(--cat-1) 16%,transparent)}
+
+/* 진행 막대 */
+.pbar{height:9px;border-radius:99px;background:var(--surface-3);position:relative;overflow:visible}
+.pbar i{display:block;height:100%;border-radius:99px;transition:width .3s var(--ease)}
+.pbar--lg{height:15px}
+.pbar__tick{position:absolute;top:-4px;width:2px;height:calc(100% + 8px);background:var(--ink);opacity:.75;border-radius:2px}
+.pbar__scale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-mut);margin-top:6px}
+.inbtn{padding:5px 12px}
+/* 금액 입력(콤마+단위변환) */
+.moneyin{display:flex;flex-direction:column;align-items:flex-end;gap:1px;width:100%}
+.moneyin .mi-in{width:100%;text-align:right}
+.mi-hint{font-size:10px;color:var(--cat-1);font-weight:700;font-variant-numeric:tabular-nums;min-height:12px}

@@ -189,6 +189,17 @@ function pickFile(accept,cb){
   i.onchange=()=>{ const f=i.files[0]; i.remove(); if(f) cb(f); }; i.click();
 }
 function escAttr(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); }
+/* 금액 입력: 원 단위로 쳐도 천단위 콤마 + 설정단위 즉시 변환 힌트 */
+function moneyInput(val, onChange){
+  const wrap=h(`<div class="moneyin"><input class="cell num-cell mi-in" inputmode="numeric" value="${(+val)?Number(val).toLocaleString('ko-KR'):''}"><span class="mi-hint">${(+val)?fmtCompact(+val):''}</span></div>`);
+  const inp=wrap.querySelector(".mi-in"), hint=wrap.querySelector(".mi-hint");
+  inp.addEventListener("input",()=>{ let raw=inp.value.replace(/[^0-9-]/g,""); const n=Number(raw)||0;
+    inp.value=(raw===""||raw==="-")?raw:n.toLocaleString("ko-KR");
+    hint.textContent=(raw==="")?"":fmtCompact(n); try{inp.setSelectionRange(inp.value.length,inp.value.length);}catch(e){}
+    onChange(n); });
+  return { wrap, value:()=>Number(inp.value.replace(/[^0-9-]/g,""))||0,
+    set:(v)=>{ inp.value=(+v)?Number(v).toLocaleString("ko-KR"):""; hint.textContent=(+v)?fmtCompact(+v):""; } };
+}
 function pickFolder(cb){
   const inp=document.createElement("input");
   inp.type="file"; inp.multiple=true;
@@ -879,7 +890,7 @@ function openCalcModal(item, onDone){
     return Array(12).fill(0).map(()=>q(t/12)); };
   const confirmed=()=>monthVals().reduce((a,b)=>a+b,0);
 
-  const fldNum=(val,onCh,w=200)=>{ const i=h(`<input class="input" type="number" value="${val}" style="max-width:${w}px">`); i.oninput=()=>onCh(Number(i.value)||0); return i; };
+  const fldNum=(val,onCh,w=200)=>{ const mi=moneyInput(val,onCh); mi.wrap.style.maxWidth=w+"px"; mi.wrap.style.alignItems="stretch"; return mi.wrap; };
   const stepper=(val,step,onCh)=>{ const s=h(`<div class="stepper"><button data-d="-1">−</button><input value="${val}"><button data-d="1">+</button></div>`);
     const inp=s.querySelector("input"); s.querySelectorAll("button").forEach(b=>b.onclick=()=>{ inp.value=(Number(inp.value)||0)+step*Number(b.dataset.d); onCh(Number(inp.value)||0); }); inp.oninput=()=>onCh(Number(inp.value)||0); return s; };
 
@@ -1063,88 +1074,96 @@ function renderVariance(root){
   const planM=(l)=> (l.months&&l.months.length===12)?l.months.map(x=>+x||0):Array(12).fill(Math.round((+l.budget||0)/12));
   const actM=(l)=>{ if(!(l.actualMonths&&l.actualMonths.length===12)){
       if((+l.actual||0)>0){ let ew=0; for(let m=0;m<cm;m++) ew+=MONTH_W[m];
-        l.actualMonths=MONTH_W.map((w,m)=> (m<cm&&ew>0)? Math.round((+l.actual)*w/ew) : 0); }
+        l.actualMonths=MONTH_W.map((w,m)=>(m<cm&&ew>0)?Math.round((+l.actual)*w/ew):0); }
       else l.actualMonths=Array(12).fill(0);
     } return l.actualMonths; };
-  leaves.forEach(actM);
+  const noteM=(l)=>{ if(!(l.actualNotes&&l.actualNotes.length===12)) l.actualNotes=Array(12).fill(""); return l.actualNotes; };
+  leaves.forEach(l=>{ actM(l); noteM(l); });
   const persist=()=>{ leaves.forEach(l=>{ l.actual=(l.actualMonths||[]).reduce((a,b)=>a+(+b||0),0); }); ctx.data.sample=false; ctx.data.tree=buildTree(leaves); saveCache(); };
-  let selM=Math.max(0,Math.min(11,cm-1));
 
   const kp=h(`<div id="vkpi"></div>`); root.appendChild(kp);
-  const grid=h(`<div class="grid-2" style="grid-template-columns:1.05fr 1fr;align-items:start"></div>`);
+  const progCard=h(`<div class="card" style="margin:0 0 18px"><div class="card__bd" id="progbd" style="padding:16px 20px"></div></div>`); root.appendChild(progCard);
+  const grid=h(`<div class="grid-2" style="grid-template-columns:1.25fr 1fr;align-items:start"></div>`);
   const monthCard=h(`<div class="card"><div class="card__hd"><div>
     <div class="card__title"><span class="dot" style="background:var(--cat-2)"></span>월별 계획 vs 집행</div>
-    <div class="card__sub">매달 계획·집행·차이·집행률 · 행을 누르면 그 달 실적 입력</div></div></div>
+    <div class="card__sub">매달 계획·집행·차이·집행률 · <b>입력</b> 버튼으로 그 달 실적 입력(팝업)</div></div></div>
     <div class="card__bd" id="mtbl" style="padding-top:6px"></div></div>`);
   const chartCard=h(`<div class="card"><div class="card__hd"><div>
     <div class="card__title"><span class="dot" style="background:var(--cat-3)"></span>월별 추이</div>
-    <div class="card__sub">회색=계획 · 색=집행(빨강=계획 초과)</div></div></div>
+    <div class="card__sub">회색=계획 · 색=집행(빨강=초과)</div></div></div>
     <div class="card__bd" id="mchart" style="padding-top:12px"></div></div>`);
   grid.append(monthCard,chartCard); root.appendChild(grid);
-  const inputCard=h(`<div class="card" style="margin-top:18px"><div class="card__hd"><div>
-    <div class="card__title"><span class="dot" style="background:var(--cat-4)"></span><span id="inTitle">실적 입력</span></div>
-    <div class="card__sub">선택한 달의 항목별 집행액(실적)을 입력하세요</div></div>
-    <button class="btn btn--primary btn--sm" id="saveAct">💾 실적 저장</button></div>
-    <div class="card__bd" style="padding-top:6px;overflow:auto" id="inbd"></div></div>`);
-  root.appendChild(inputCard);
-  $("#saveAct",inputCard).onclick=()=>{ persist(); toast("ok","실적 저장","실적을 이 브라우저에 저장했습니다 (대시보드 반영)"); renderSummary(); };
 
-  function totals(){ const pm=Array(12).fill(0), am=Array(12).fill(0);
+  function totals(){ const pm=Array(12).fill(0),am=Array(12).fill(0);
     leaves.forEach(l=>{ const p=planM(l),a=actM(l); for(let m=0;m<12;m++){ pm[m]+=+p[m]||0; am[m]+=+a[m]||0; } }); return {pm,am}; }
+  const bar=(rate,over)=>`<div class="pbar"><i style="width:${Math.min(100,(rate||0)*100)}%;background:${over?'var(--st-crit)':'var(--cat-3)'}"></i></div>`;
 
   function renderSummary(){
     const {pm,am}=totals();
     const totP=pm.reduce((a,b)=>a+b,0), totA=am.reduce((a,b)=>a+b,0);
-    let cumP=0,cumA=0; for(let m=0;m<=selM;m++){ cumP+=pm[m]; cumA+=am[m]; }
+    let cumP=0,cumA=0; for(let m=0;m<cm;m++){ cumP+=pm[m]; cumA+=am[m]; }
+    const pace=cm/12, rate=totP?totA/totP:0;
     kp.innerHTML=""; kp.appendChild(kpiRow([
       {label:"연간 계획",val:fmtCompact(totP),accent:"var(--cat-1)"},
-      {label:`누적 집행 (~${selM+1}월)`,val:fmtCompact(cumA),accent:"var(--cat-3)",delta:`누적 계획 ${fmtCompact(cumP)}`,dcls:cumA<=cumP?"up":"down"},
+      {label:`누적 집행 (~${cm}월)`,val:fmtCompact(cumA),accent:"var(--cat-3)",delta:`누적 계획 ${fmtCompact(cumP)}`,dcls:cumA<=cumP?"up":"down"},
       {label:"누적 집행률",val:cumP?fmtPct(cumA/cumP,1):"-",accent:cumA<=cumP?"var(--st-good)":"var(--st-crit)",delta:cumA<=cumP?`▼ ${fmtCompact(cumP-cumA)} 덜 씀`:`▲ ${fmtCompact(cumA-cumP)} 더 씀`,dcls:cumA<=cumP?"up":"down"},
-      {label:"연 집행률",val:totP?fmtPct(totA/totP,1):"-",accent:"var(--cat-7)",delta:"12월 마감 시 확정",dcls:""},
+      {label:"연 집행률",val:totP?fmtPct(rate,1):"-",accent:"var(--cat-7)",delta:"12월 마감 시 확정",dcls:""},
     ]));
+    const over=totA>(totP*pace);
+    $("#progbd",progCard).innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <b style="font-size:14px">연간 집행 진행</b>
+        <span style="font-size:12.5px;color:var(--ink-2)">집행 <b style="color:var(--ink)">${fmtCompact(totA)}</b> / 계획 ${fmtCompact(totP)} · 집행률 <b style="color:${over?'var(--st-crit)':'var(--st-good)'}">${fmtPct(rate,1)}</b></span></div>
+      <div class="pbar pbar--lg"><i style="width:${Math.min(100,rate*100)}%;background:${over?'var(--st-crit)':'var(--cat-3)'}"></i>
+        <span class="pbar__tick" style="left:${Math.min(100,pace*100)}%"></span></div>
+      <div class="pbar__scale"><span>0</span><span>⏱ 시간진도 ${fmtPct(pace,0)}</span><span>계획 100%</span></div>`;
     const tb=$("#mtbl",monthCard); tb.innerHTML="";
-    const tbl=h(`<table class="tbl"><thead><tr><th>월</th><th class="num">계획</th><th class="num">집행</th><th class="num">차이</th><th class="num">집행률</th></tr></thead><tbody></tbody></table>`);
+    const tbl=h(`<table class="tbl"><thead><tr><th>월</th><th class="num">계획</th><th class="num">집행</th><th class="num">차이</th><th class="num">집행률</th><th style="width:104px">진행</th><th style="width:52px"></th></tr></thead><tbody></tbody></table>`);
     const bd=tbl.querySelector("tbody");
-    for(let m=0;m<12;m++){ const diff=am[m]-pm[m], rate=pm[m]?am[m]/pm[m]:0, has=am[m]>0;
-      const tr=h(`<tr class="mrow-sel ${m===selM?'on':''}" style="cursor:pointer">
+    for(let m=0;m<12;m++){ const diff=am[m]-pm[m], r=pm[m]?am[m]/pm[m]:0, has=am[m]>0;
+      const tr=h(`<tr class="${m+1===cm?'mrow-sel on':''}">
         <td><b>${m+1}월</b>${m+1===cm?' <span class="tag" style="padding:0 6px;font-size:10px">이번달</span>':''}</td>
         <td class="num">${fmtCompact(pm[m])}</td>
         <td class="num">${has?fmtCompact(am[m]):'-'}</td>
         <td class="num" style="color:${!has?'var(--ink-mut)':diff>0?'var(--st-crit)':'var(--st-good)'}">${has?(diff>0?'+':'')+fmtCompact(diff):'-'}</td>
-        <td class="num" style="color:${!has?'var(--ink-mut)':rate>1?'var(--st-crit)':'var(--ink)'}">${has?fmtPct(rate,0):'-'}</td></tr>`);
-      tr.onclick=()=>{ selM=m; renderSummary(); renderInput(); };
+        <td class="num" style="color:${!has?'var(--ink-mut)':r>1?'var(--st-crit)':'var(--ink)'}">${has?fmtPct(r,0):'-'}</td>
+        <td>${has?bar(r,r>1):'<div class="pbar"></div>'}</td>
+        <td><button class="btn btn--sm inbtn">입력</button></td></tr>`);
+      tr.querySelector(".inbtn").onclick=()=>openActualModal(m);
       bd.appendChild(tr);
     }
     const dd=totA-totP;
     bd.appendChild(h(`<tr style="font-weight:800;background:color-mix(in srgb,var(--surface-3) 55%,transparent)">
       <td>합계</td><td class="num">${fmtCompact(totP)}</td><td class="num">${fmtCompact(totA)}</td>
       <td class="num" style="color:${dd>0?'var(--st-crit)':'var(--st-good)'}">${(dd>0?'+':'')+fmtCompact(dd)}</td>
-      <td class="num">${totP?fmtPct(totA/totP,0):'-'}</td></tr>`));
+      <td class="num">${totP?fmtPct(totA/totP,0):'-'}</td><td>${bar(totP?totA/totP:0,totA>totP)}</td><td></td></tr>`));
     tb.appendChild(tbl);
     const mc=$("#mchart",chartCard); mc.innerHTML="";
-    mc.appendChild(dualMonthChart(pm, am.map((v,m)=> (m<=selM)? v : null), (m,pl,ac)=> ac>pl?'var(--st-crit)':'var(--cat-3)'));
+    mc.appendChild(dualMonthChart(pm, am.map((v,m)=>(m<cm)?v:null), (m,pl,ac)=>ac>pl?'var(--st-crit)':'var(--cat-3)'));
   }
-  function renderInput(){
-    $("#inTitle",inputCard).textContent=`${selM+1}월 실적 입력`;
-    const bd=$("#inbd",inputCard); bd.innerHTML="";
-    const tbl=h(`<table class="tbl"><thead><tr><th>대분류</th><th>중분류</th><th>소분류</th>
-      <th class="num">${selM+1}월 계획</th><th class="num" style="width:150px">${selM+1}월 집행(입력)</th><th class="num">차이</th><th class="num">집행률</th></tr></thead><tbody></tbody></table>`);
-    const bdy=tbl.querySelector("tbody");
-    leaves.forEach(l=>{ const pmv=planM(l)[selM]||0, a=actM(l);
-      const tr=h(`<tr>
-        <td style="color:var(--ink-mut)">${l.l1||''}</td><td>${l.l2||''}</td><td>${l.l3||''}</td>
-        <td class="num">${fmtCompact(pmv)}</td>
-        <td class="num tight"><input class="cell num-cell" type="number" value="${a[selM]||0}"></td>
-        <td class="num" data-diff></td><td class="num" data-rate></td></tr>`);
-      const inp=tr.querySelector("input"), dc=tr.querySelector("[data-diff]"), rc=tr.querySelector("[data-rate]");
-      const upd=()=>{ const v=Number(inp.value)||0; a[selM]=v; const diff=v-pmv, rate=pmv?v/pmv:0;
-        dc.textContent=(diff>0?'+':'')+fmtCompact(diff); dc.style.color=diff>0?'var(--st-crit)':'var(--st-good)';
-        rc.textContent=pmv?fmtPct(rate,0):'-'; rc.style.color=rate>1?'var(--st-crit)':'var(--ink)'; };
-      upd(); inp.oninput=()=>{ upd(); renderSummary(); };
-      bdy.appendChild(tr); });
-    bd.appendChild(tbl);
+  function openActualModal(m){
+    const tmpA=leaves.map(l=>actM(l)[m]||0), tmpN=leaves.map(l=>noteM(l)[m]||"");
+    const body=h(`<div>
+      <div class="modal__sub" style="margin-bottom:10px">집행액은 <b>원 단위</b>로 입력하면 자동으로 콤마·설정단위로 변환됩니다. 비고에 내용을 적을 수 있어요.</div>
+      <div style="overflow:auto;max-height:54vh"><table class="tbl"><thead><tr>
+        <th>항목</th><th class="num">${m+1}월 계획</th><th class="num" style="width:190px">${m+1}월 집행</th><th style="width:210px">비고</th></tr></thead><tbody id="amb"></tbody></table></div>
+      <div class="calc-total" style="margin-top:12px"><span>${m+1}월 집행 합계</span><b id="amtot">0원</b></div></div>`);
+    const tbody=body.querySelector("#amb");
+    const recomp=()=>{ const s=tmpA.reduce((a,b)=>a+(+b||0),0); body.querySelector("#amtot").textContent=fmtWon(s)+"원 · "+fmtCompact(s); };
+    leaves.forEach((l,i)=>{ const pmv=planM(l)[m]||0;
+      const tr=h(`<tr><td>${[l.l1,l.l2,l.l3].filter(Boolean).join(" › ")||"(항목)"}</td>
+        <td class="num" style="color:var(--ink-mut)">${fmtCompact(pmv)}</td>
+        <td class="tight amt"></td>
+        <td class="tight"><input class="cell" value="${escAttr(tmpN[i])}" placeholder="비고/내용"></td></tr>`);
+      const mi=moneyInput(tmpA[i], v=>{ tmpA[i]=v; recomp(); });
+      tr.querySelector(".amt").appendChild(mi.wrap);
+      tr.querySelector("td:last-child input").oninput=(e)=>{ tmpN[i]=e.target.value; };
+      tbody.appendChild(tr); });
+    recomp();
+    modal({title:`${m+1}월 실적 입력`, sub:`${ctx.year}년 · ${m+1}월`, body, okLabel:"저장",
+      onOk:()=>{ leaves.forEach((l,i)=>{ actM(l)[m]=tmpA[i]; noteM(l)[m]=tmpN[i]; }); persist(); toast("ok","실적 저장",`${m+1}월 실적을 저장했습니다`); renderSummary(); }});
   }
-  renderSummary(); renderInput();
+  renderSummary();
 }
 /* --- 수입 · 수수료 --- */
 const CASE_DEF=[{type:"대인",unit:220000,avg:480},{type:"대물",unit:150000,avg:850},{type:"자차",unit:110000,avg:400}];
