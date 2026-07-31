@@ -534,3 +534,7 @@ select.input{max-width:280px}
 .plan-tbl th.mcol-h{font-size:10px;color:var(--ink-mut);width:66px;padding-bottom:8px}
 .plan-tbl td.mcolcell{font-size:11px;color:var(--ink-2);white-space:nowrap;font-variant-numeric:tabular-nums;
   border-left:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+
+/* 계획대비 월 선택 행 */
+.mrow-sel:hover td{background:var(--surface-3)}
+.mrow-sel.on td{background:color-mix(in srgb,var(--cat-1) 16%,transparent)}

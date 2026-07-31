@@ -1056,33 +1056,95 @@ function renderPlan(root){
 }
 /* --- 계획 vs 실적 --- */
 function renderVariance(root){
-  root.innerHTML=""; const leaves=ctx.data.leaves||[];
-  if(!leaves.length){ root.appendChild(soonNote("📊","계획 vs 실적","폴더를 읽거나 샘플로 둘러보면 표가 표시됩니다.")); return; }
-  const tree=buildTree(leaves), pace=yearPace(Number(ctx.year));
-  const totB=sumBudget(tree),totA=sumActual(tree),proj=forecast(totA,pace);
-  root.appendChild(kpiRow([
-    {label:"계획",val:fmtCompact(totB),unit:"원",accent:"var(--cat-1)"},
-    {label:"집행",val:fmtCompact(totA),unit:"원",accent:"var(--cat-3)",delta:`집행률 ${fmtPct(totA/totB,1)}`,dcls:totA/totB<=pace?"up":"down"},
-    {label:"연말 추정",val:fmtCompact(proj),unit:"원",accent:proj>totB?"var(--st-crit)":"var(--st-good)",delta:`계획 대비 ${proj>totB?'▲'+fmtCompact(proj-totB):'▼'+fmtCompact(totB-proj)}`,dcls:proj>totB?"down":"up"},
-    {label:"초과 예상 대분류",val:tree.filter(n=>forecast(n.actual,pace)>n.budget).length,unit:"개",accent:"var(--st-crit)"},
-  ]));
-  const card=h(`<div class="card"><div class="card__hd"><div>
-    <div class="card__title"><span class="dot" style="background:var(--cat-2)"></span>계획 대비 실적 · 연말 추정</div>
-    <div class="card__sub">시간진도 ${fmtPct(pace,0)} 기준 · 상태는 연말 추정 대비 예산</div></div></div>
-    <div class="card__bd" style="padding-top:8px"><table class="tbl"><thead><tr>
-      <th>구분</th><th class="num">계획</th><th class="num">집행</th><th class="num">집행률</th><th class="num">잔여</th><th class="num">연말 추정</th><th>상태</th>
-    </tr></thead><tbody id="vtb"></tbody></table></div></div>`);
-  const tb=$("#vtb",card);
-  const rowFor=(n,depth,i)=>{ const r=n.budget?n.actual/n.budget:0, proj=forecast(n.actual,pace), pj=n.budget?proj/n.budget:0;
-    const st = pj>1.05?["초과","tag--crit"]:pj>1.0?["주의","tag--warn"]:["정상","tag--good"];
-    return h(`<tr><td style="padding-left:${12+depth*20}px">${depth?"":`<span class="swatch" style="background:${catColor(i)}"></span>`}${depth?"└ ":""}${n.name}</td>
-      <td class="num">${fmtCompact(n.budget)}</td><td class="num">${fmtCompact(n.actual)}</td>
-      <td class="num">${fmtPct(r,0)}</td><td class="num">${fmtCompact(n.budget-n.actual)}</td>
-      <td class="num" style="color:${pj>1?'var(--st-crit)':'var(--ink)'}">${fmtPct(pj,0)}</td>
-      <td><span class="tag ${st[1]}">${st[0]}</span></td></tr>`); };
-  tree.forEach((n1,i)=>{ const t=rowFor(n1,0,i); t.style.fontWeight="700"; tb.appendChild(t);
-    n1.children.forEach(n2=>tb.appendChild(rowFor(n2,1,i))); });
-  root.appendChild(card);
+  root.innerHTML="";
+  const leaves=ctx.data.leaves||[];
+  if(!leaves.length){ root.appendChild(soonNote("📊","계획 vs 실적","사업비계획에서 계획을 먼저 입력(또는 샘플로 둘러보기)하면, 여기서 실적을 넣고 비교합니다.")); return; }
+  const cm=currentMonth(Number(ctx.year))||12;
+  const planM=(l)=> (l.months&&l.months.length===12)?l.months.map(x=>+x||0):Array(12).fill(Math.round((+l.budget||0)/12));
+  const actM=(l)=>{ if(!(l.actualMonths&&l.actualMonths.length===12)){
+      if((+l.actual||0)>0){ let ew=0; for(let m=0;m<cm;m++) ew+=MONTH_W[m];
+        l.actualMonths=MONTH_W.map((w,m)=> (m<cm&&ew>0)? Math.round((+l.actual)*w/ew) : 0); }
+      else l.actualMonths=Array(12).fill(0);
+    } return l.actualMonths; };
+  leaves.forEach(actM);
+  const persist=()=>{ leaves.forEach(l=>{ l.actual=(l.actualMonths||[]).reduce((a,b)=>a+(+b||0),0); }); ctx.data.sample=false; ctx.data.tree=buildTree(leaves); saveCache(); };
+  let selM=Math.max(0,Math.min(11,cm-1));
+
+  const kp=h(`<div id="vkpi"></div>`); root.appendChild(kp);
+  const grid=h(`<div class="grid-2" style="grid-template-columns:1.05fr 1fr;align-items:start"></div>`);
+  const monthCard=h(`<div class="card"><div class="card__hd"><div>
+    <div class="card__title"><span class="dot" style="background:var(--cat-2)"></span>월별 계획 vs 집행</div>
+    <div class="card__sub">매달 계획·집행·차이·집행률 · 행을 누르면 그 달 실적 입력</div></div></div>
+    <div class="card__bd" id="mtbl" style="padding-top:6px"></div></div>`);
+  const chartCard=h(`<div class="card"><div class="card__hd"><div>
+    <div class="card__title"><span class="dot" style="background:var(--cat-3)"></span>월별 추이</div>
+    <div class="card__sub">회색=계획 · 색=집행(빨강=계획 초과)</div></div></div>
+    <div class="card__bd" id="mchart" style="padding-top:12px"></div></div>`);
+  grid.append(monthCard,chartCard); root.appendChild(grid);
+  const inputCard=h(`<div class="card" style="margin-top:18px"><div class="card__hd"><div>
+    <div class="card__title"><span class="dot" style="background:var(--cat-4)"></span><span id="inTitle">실적 입력</span></div>
+    <div class="card__sub">선택한 달의 항목별 집행액(실적)을 입력하세요</div></div>
+    <button class="btn btn--primary btn--sm" id="saveAct">💾 실적 저장</button></div>
+    <div class="card__bd" style="padding-top:6px;overflow:auto" id="inbd"></div></div>`);
+  root.appendChild(inputCard);
+  $("#saveAct",inputCard).onclick=()=>{ persist(); toast("ok","실적 저장","실적을 이 브라우저에 저장했습니다 (대시보드 반영)"); renderSummary(); };
+
+  function totals(){ const pm=Array(12).fill(0), am=Array(12).fill(0);
+    leaves.forEach(l=>{ const p=planM(l),a=actM(l); for(let m=0;m<12;m++){ pm[m]+=+p[m]||0; am[m]+=+a[m]||0; } }); return {pm,am}; }
+
+  function renderSummary(){
+    const {pm,am}=totals();
+    const totP=pm.reduce((a,b)=>a+b,0), totA=am.reduce((a,b)=>a+b,0);
+    let cumP=0,cumA=0; for(let m=0;m<=selM;m++){ cumP+=pm[m]; cumA+=am[m]; }
+    kp.innerHTML=""; kp.appendChild(kpiRow([
+      {label:"연간 계획",val:fmtCompact(totP),accent:"var(--cat-1)"},
+      {label:`누적 집행 (~${selM+1}월)`,val:fmtCompact(cumA),accent:"var(--cat-3)",delta:`누적 계획 ${fmtCompact(cumP)}`,dcls:cumA<=cumP?"up":"down"},
+      {label:"누적 집행률",val:cumP?fmtPct(cumA/cumP,1):"-",accent:cumA<=cumP?"var(--st-good)":"var(--st-crit)",delta:cumA<=cumP?`▼ ${fmtCompact(cumP-cumA)} 덜 씀`:`▲ ${fmtCompact(cumA-cumP)} 더 씀`,dcls:cumA<=cumP?"up":"down"},
+      {label:"연 집행률",val:totP?fmtPct(totA/totP,1):"-",accent:"var(--cat-7)",delta:"12월 마감 시 확정",dcls:""},
+    ]));
+    const tb=$("#mtbl",monthCard); tb.innerHTML="";
+    const tbl=h(`<table class="tbl"><thead><tr><th>월</th><th class="num">계획</th><th class="num">집행</th><th class="num">차이</th><th class="num">집행률</th></tr></thead><tbody></tbody></table>`);
+    const bd=tbl.querySelector("tbody");
+    for(let m=0;m<12;m++){ const diff=am[m]-pm[m], rate=pm[m]?am[m]/pm[m]:0, has=am[m]>0;
+      const tr=h(`<tr class="mrow-sel ${m===selM?'on':''}" style="cursor:pointer">
+        <td><b>${m+1}월</b>${m+1===cm?' <span class="tag" style="padding:0 6px;font-size:10px">이번달</span>':''}</td>
+        <td class="num">${fmtCompact(pm[m])}</td>
+        <td class="num">${has?fmtCompact(am[m]):'-'}</td>
+        <td class="num" style="color:${!has?'var(--ink-mut)':diff>0?'var(--st-crit)':'var(--st-good)'}">${has?(diff>0?'+':'')+fmtCompact(diff):'-'}</td>
+        <td class="num" style="color:${!has?'var(--ink-mut)':rate>1?'var(--st-crit)':'var(--ink)'}">${has?fmtPct(rate,0):'-'}</td></tr>`);
+      tr.onclick=()=>{ selM=m; renderSummary(); renderInput(); };
+      bd.appendChild(tr);
+    }
+    const dd=totA-totP;
+    bd.appendChild(h(`<tr style="font-weight:800;background:color-mix(in srgb,var(--surface-3) 55%,transparent)">
+      <td>합계</td><td class="num">${fmtCompact(totP)}</td><td class="num">${fmtCompact(totA)}</td>
+      <td class="num" style="color:${dd>0?'var(--st-crit)':'var(--st-good)'}">${(dd>0?'+':'')+fmtCompact(dd)}</td>
+      <td class="num">${totP?fmtPct(totA/totP,0):'-'}</td></tr>`));
+    tb.appendChild(tbl);
+    const mc=$("#mchart",chartCard); mc.innerHTML="";
+    mc.appendChild(dualMonthChart(pm, am.map((v,m)=> (m<=selM)? v : null), (m,pl,ac)=> ac>pl?'var(--st-crit)':'var(--cat-3)'));
+  }
+  function renderInput(){
+    $("#inTitle",inputCard).textContent=`${selM+1}월 실적 입력`;
+    const bd=$("#inbd",inputCard); bd.innerHTML="";
+    const tbl=h(`<table class="tbl"><thead><tr><th>대분류</th><th>중분류</th><th>소분류</th>
+      <th class="num">${selM+1}월 계획</th><th class="num" style="width:150px">${selM+1}월 집행(입력)</th><th class="num">차이</th><th class="num">집행률</th></tr></thead><tbody></tbody></table>`);
+    const bdy=tbl.querySelector("tbody");
+    leaves.forEach(l=>{ const pmv=planM(l)[selM]||0, a=actM(l);
+      const tr=h(`<tr>
+        <td style="color:var(--ink-mut)">${l.l1||''}</td><td>${l.l2||''}</td><td>${l.l3||''}</td>
+        <td class="num">${fmtCompact(pmv)}</td>
+        <td class="num tight"><input class="cell num-cell" type="number" value="${a[selM]||0}"></td>
+        <td class="num" data-diff></td><td class="num" data-rate></td></tr>`);
+      const inp=tr.querySelector("input"), dc=tr.querySelector("[data-diff]"), rc=tr.querySelector("[data-rate]");
+      const upd=()=>{ const v=Number(inp.value)||0; a[selM]=v; const diff=v-pmv, rate=pmv?v/pmv:0;
+        dc.textContent=(diff>0?'+':'')+fmtCompact(diff); dc.style.color=diff>0?'var(--st-crit)':'var(--st-good)';
+        rc.textContent=pmv?fmtPct(rate,0):'-'; rc.style.color=rate>1?'var(--st-crit)':'var(--ink)'; };
+      upd(); inp.oninput=()=>{ upd(); renderSummary(); };
+      bdy.appendChild(tr); });
+    bd.appendChild(tbl);
+  }
+  renderSummary(); renderInput();
 }
 /* --- 수입 · 수수료 --- */
 const CASE_DEF=[{type:"대인",unit:220000,avg:480},{type:"대물",unit:150000,avg:850},{type:"자차",unit:110000,avg:400}];
