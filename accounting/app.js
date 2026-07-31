@@ -30,8 +30,14 @@ const LS = (function(){
 
 /* ------------------------------ 포맷 ------------------------------ */
 function fmtWon(n){ if(n==null||isNaN(n)) return "-"; return Math.round(n).toLocaleString("ko-KR"); }
+const UNIT={"억":1e8,"백만":1e6,"만":1e4,"원":1};
 function fmtCompact(n){
   if(n==null||isNaN(n)) return "-";
+  const u=(typeof ctx!=="undefined")&&ctx.unit;
+  if(u && UNIT[u]){ const f=UNIT[u]; const v=n/f;
+    const dp = f>=1e8 ? (Math.abs(v)<10?2:Math.abs(v)<100?1:0) : (f>=1e6? (Math.abs(v)<100?1:0):0);
+    return v.toLocaleString("ko-KR",{maximumFractionDigits:dp})+(u==="원"?"":u);
+  }
   const a=Math.abs(n), s=n<0?"-":"";
   if(a>=1e8) return s+(a/1e8).toFixed(a>=1e9?0:2).replace(/\.00$/,"")+"억";
   if(a>=1e4) return s+Math.round(a/1e4).toLocaleString("ko-KR")+"만";
@@ -177,6 +183,12 @@ function download(name, data, mime){
   const a=document.createElement("a"); a.href=url; a.download=name; document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },1500);
 }
+function pickFile(accept,cb){
+  const i=document.createElement("input"); i.type="file"; if(accept)i.accept=accept;
+  i.style.display="none"; document.body.appendChild(i);
+  i.onchange=()=>{ const f=i.files[0]; i.remove(); if(f) cb(f); }; i.click();
+}
+function escAttr(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); }
 function pickFolder(cb){
   const inp=document.createElement("input");
   inp.type="file"; inp.multiple=true;
@@ -216,6 +228,7 @@ const ctx = {
   route:"home",
   year:new Date().getFullYear(),
   files:null,            // 마지막으로 선택한 폴더의 File[]
+  unit:"",               // 금액 표시 단위 ("" = 자동)
   data:emptyData(),
 };
 function emptyData(){ return {leaves:[],fees:[],caseTypes:[],errors:{},orphans:[],settings:defSettings(),sample:false,folderName:"",cached:false}; }
@@ -812,43 +825,83 @@ function dualMonthChart(plan, actual, actColorFn){
 }
 /* --- 사업비 계획 --- */
 function driverType(l1){ return {"인건비":"인원연동","지급수수료":"수입연동","임차관리비":"고정(월정액)","마케팅":"증감률(전년대비)","일반관리":"단가×수량"}[l1]||"고정(월정액)"; }
+const DRIVERS=["고정(월정액)","단가×수량","수입연동","인원연동","증감률(전년대비)","직접입력"];
+const XLSX_MIME="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 function renderPlan(root){
-  root.innerHTML=""; const leaves=ctx.data.leaves||[];
-  if(!leaves.length){ root.appendChild(soonNote("🧭","사업비 계획","폴더를 읽거나 샘플로 둘러보면 계획 표가 표시됩니다.")); return; }
-  const tree=buildTree(leaves), tot=sumBudget(tree);
-  root.appendChild(kpiRow([
-    {label:"연간 계획 사업비",val:fmtCompact(tot),unit:"원",accent:"var(--cat-1)"},
-    {label:"대분류 수",val:tree.length,unit:"개",accent:"var(--cat-3)"},
-    {label:"전년 대비(예시)",val:"+7.0",unit:"%",accent:"var(--cat-4)",delta:"산출근거 롤링 반영",dcls:"down"},
-    {label:"산출근거 항목",val:leaves.length,unit:"개",accent:"var(--cat-7)",delta:"드라이버 기반",dcls:"up"},
-  ]));
-  const card=h(`<div class="card"><div class="card__hd"><div>
-    <div class="card__title"><span class="dot" style="background:var(--cat-1)"></span>사업비 계획 · 산출근거</div>
-    <div class="card__sub">각 항목은 산출근거(드라이버) 기반 — 내년엔 숫자만 바꿔 자동 재계산 (예시 더미)</div></div>
-    <button class="btn btn--sm" id="planTag">＋ 항목 추가(예정)</button></div>
-    <div class="card__bd" style="padding-top:8px"><table class="tbl"><thead><tr>
-      <th>대분류</th><th>중분류</th><th>소분류</th><th>산출근거 유형</th><th>산출근거(예시)</th><th class="num">계획액</th>
+  root.innerHTML="";
+  if(!Array.isArray(ctx.data.leaves)) ctx.data.leaves=[];
+  const leaves=ctx.data.leaves;
+  const persist=()=>{ ctx.data.sample=false; ctx.data.folderName=ctx.data.folderName||"직접 입력";
+    ctx.data.leaves=leaves; ctx.data.tree=buildTree(leaves); saveCache(); };
+
+  const totB=leaves.reduce((s,l)=>s+(+l.budget||0),0), totA=leaves.reduce((s,l)=>s+(+l.actual||0),0);
+  const kp=h(`<div id="planKpi"></div>`); root.appendChild(kp);
+  const drawKpi=()=>{ const b=leaves.reduce((s,l)=>s+(+l.budget||0),0), a=leaves.reduce((s,l)=>s+(+l.actual||0),0);
+    kp.innerHTML=""; kp.appendChild(kpiRow([
+      {label:"연간 계획 사업비",val:fmtCompact(b),unit:"",accent:"var(--cat-1)"},
+      {label:"집행액(입력)",val:fmtCompact(a),unit:"",accent:"var(--cat-3)",delta:`집행률 ${b?fmtPct(a/b,1):'-'}`,dcls:b&&a/b<=1?"up":"down"},
+      {label:"잔여",val:fmtCompact(b-a),unit:"",accent:(b-a)>=0?"var(--st-good)":"var(--st-crit)"},
+      {label:"항목 수",val:leaves.length,unit:"개",accent:"var(--cat-7)"},
+    ])); };
+  drawKpi();
+
+  const bar=h(`<div class="editbar">
+    <button class="btn btn--primary btn--sm" id="addRow">＋ 항목 추가</button>
+    <button class="btn btn--sm" id="saveBook">💾 저장</button>
+    <button class="btn btn--sm" id="expX">⬇ 엑셀 내보내기</button>
+    <button class="btn btn--sm" id="impX">⬆ 엑셀 불러오기</button>
+    <span class="hint-inline">여기서 <b>직접 입력·수정</b> → 저장하면 이 브라우저에 보관되고 대시보드에 즉시 반영됩니다.</span>
+    <span class="spacer"></span><span class="hint-inline">표시 단위: ${ctx.unit? ctx.unit+'원':'자동'}</span>
+  </div>`);
+  root.appendChild(bar);
+
+  const card=h(`<div class="card"><div class="card__bd" style="padding-top:6px;overflow:auto">
+    <table class="tbl"><thead><tr>
+      <th style="width:150px">대분류</th><th style="width:140px">중분류</th><th style="width:150px">소분류</th>
+      <th style="width:80px">코드</th><th style="width:150px">산출근거</th>
+      <th class="num" style="width:130px">계획액(원)</th><th class="num" style="width:130px">집행액(원)</th><th style="width:36px"></th>
     </tr></thead><tbody id="ptb"></tbody></table></div></div>`);
-  const tb=$("#ptb",card);
-  tree.forEach((n1,i)=>{
-    tb.appendChild(h(`<tr style="background:color-mix(in srgb,var(--surface-3) 50%,transparent)">
-      <td colspan="5"><span class="swatch" style="background:${catColor(i)}"></span><b>${n1.name}</b></td>
-      <td class="num"><b>${fmtWon(n1.budget)}</b></td></tr>`));
-    n1.children.forEach(n2=>n2.children.forEach(n3=>{
-      const dt=driverType(n1.name), basis={
-        "고정(월정액)":`월 ${fmtCompact(Math.round(n3.budget/12))} × 12개월`,
-        "단가×수량":`단가 ${fmtCompact(Math.round(n3.budget/50))} × 50`,
-        "수입연동":`수수료 수입의 ${(n3.budget/1e8).toFixed(1)}%`,
-        "인원연동":`인당 ${fmtCompact(Math.round(n3.budget/20/12))} × 20명 × 12`,
-        "증감률(전년대비)":`전년 ${fmtCompact(Math.round(n3.budget/1.07))} × (1+7%)`,
-      }[dt];
-      tb.appendChild(h(`<tr><td style="color:var(--ink-mut)">${n1.name}</td><td>${n2.name}</td><td>${n3.name}</td>
-        <td><span class="tag">${dt}</span></td><td style="color:var(--ink-2)">${basis}</td>
-        <td class="num">${fmtWon(n3.budget)}</td></tr>`));
-    }));
+  const tb=$("#ptb",card); root.appendChild(card);
+
+  function addRowEl(l,idx){
+    const tr=h(`<tr>
+      <td class="tight"><input class="cell" data-f="l1" value="${escAttr(l.l1)}" placeholder="예: 인건비"></td>
+      <td class="tight"><input class="cell" data-f="l2" value="${escAttr(l.l2)}" placeholder="중분류"></td>
+      <td class="tight"><input class="cell" data-f="l3" value="${escAttr(l.l3)}" placeholder="소분류"></td>
+      <td class="tight"><input class="cell" data-f="code" value="${escAttr(l.code)}" placeholder="코드"></td>
+      <td class="tight"><select class="cell" data-f="driver">${DRIVERS.map(d=>`<option ${l.driver===d?'selected':''}>${d}</option>`).join("")}</select></td>
+      <td class="tight"><input class="cell num-cell" data-f="budget" type="number" value="${+l.budget||0}"></td>
+      <td class="tight"><input class="cell num-cell" data-f="actual" type="number" value="${+l.actual||0}"></td>
+      <td class="tight"><button class="rowdel" title="삭제">🗑</button></td></tr>`);
+    tr.querySelectorAll(".cell").forEach(inp=>{ const f=inp.dataset.f;
+      inp.addEventListener("input",()=>{ l[f]= (f==="budget"||f==="actual")? (Number(inp.value)||0) : inp.value; if(f==="budget"||f==="actual") drawKpi(); });
+    });
+    tr.querySelector(".rowdel").onclick=()=>{ leaves.splice(idx,1); rebuild(); };
+    return tr;
+  }
+  function rebuild(){ tb.innerHTML=""; leaves.forEach((l,i)=>tb.appendChild(addRowEl(l,i))); drawKpi(); }
+  rebuild();
+
+  $("#addRow",bar).onclick=()=>{ leaves.push({code:"",l1:"",l2:"",l3:"",driver:"직접입력",budget:0,actual:0}); rebuild();
+    tb.lastElementChild.querySelector("input").focus(); };
+  $("#saveBook",bar).onclick=()=>{ persist(); toast("ok","저장됨",`${leaves.length}개 항목을 이 브라우저에 저장했습니다`); };
+  $("#expX",bar).onclick=()=>{
+    const aoa=[["코드","대분류","중분류","소분류","산출근거","계획액","집행액"]];
+    leaves.forEach(l=>aoa.push([l.code||"",l.l1||"",l.l2||"",l.l3||"",l.driver||"",Math.round(+l.budget||0),Math.round(+l.actual||0)]));
+    download("사업비_"+ctx.year+".xlsx", wbAOA("사업비",aoa,[10,14,14,16,14,14,14]), XLSX_MIME);
+    toast("ok","엑셀 내보냄","다운로드 폴더를 확인하세요");
+  };
+  $("#impX",bar).onclick=()=>pickFile(".xlsx,.csv",async(file)=>{
+    try{ const buf=await file.arrayBuffer(); const rows=sheetRows(buf); const out=[];
+      rows.forEach(r=>{ const code=norm(pick(r,["코드","code"])), l1=norm(pick(r,["대분류","l1"]));
+        if(!code&&!l1) return;
+        out.push({code,l1,l2:norm(pick(r,["중분류"])),l3:norm(pick(r,["소분류"])),driver:norm(pick(r,["산출근거"]))||"직접입력",
+          budget:Number(String(pick(r,["계획액","금액","budget"])).replace(/[,\s]/g,""))||0,
+          actual:Number(String(pick(r,["집행액","actual"])).replace(/[,\s]/g,""))||0}); });
+      if(!out.length){ toast("warn","불러올 항목 없음","코드/대분류 열을 확인하세요"); return; }
+      ctx.data.leaves=out; persist(); renderPlan(root); toast("ok","불러옴",`${out.length}개 항목을 불러왔습니다`);
+    }catch(e){ toast("err","불러오기 실패",e.message); }
   });
-  root.appendChild(card);
-  $("#planTag",card).onclick=()=>toast("warn","준비 중","항목 추가/편집은 다음 단계에서 열립니다");
 }
 /* --- 계획 vs 실적 --- */
 function renderVariance(root){
@@ -1009,10 +1062,12 @@ el("yearPrev").onclick=()=>{ ctx.year--; loadCache(); render(); };
 el("yearNext").onclick=()=>{ ctx.year++; loadCache(); render(); };
 el("themeToggle").onclick=()=>{ const cur=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
   document.documentElement.setAttribute("data-theme",cur); LS.set("cockpit:theme",cur); };
+el("unitSel").onchange=(e)=>{ ctx.unit=e.target.value; LS.set("cockpit:unit",ctx.unit); render(); };
 
 /* ------------------------------ 시작 ------------------------------ */
 (function boot(){
   const savedTheme=LS.get("cockpit:theme"); if(savedTheme) document.documentElement.setAttribute("data-theme",savedTheme);
+  ctx.unit=LS.get("cockpit:unit")||""; const us=el("unitSel"); if(us) us.value=ctx.unit;
   loadCache();                 // 지난번 읽은 데이터가 있으면 복원
   go(ctx.data.leaves && ctx.data.leaves.length ? "home" : "home");
 })();

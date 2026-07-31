@@ -460,3 +460,20 @@ select.input{max-width:280px}
 .sbar{width:44%;max-width:22px}
 .scol__pos .sbar{border-radius:4px 4px 0 0}
 .scol__neg .sbar{border-radius:0 0 4px 4px}
+
+/* 단위 선택기 */
+.unitsel{background:var(--surface-2);border:1px solid var(--line);color:var(--ink);
+  border-radius:99px;padding:7px 12px;font-size:12.5px;font-weight:650;cursor:pointer;font-family:inherit}
+.unitsel:hover{border-color:var(--cat-1)}
+/* 편집 표 */
+.editbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.editbar .spacer{flex:1}
+.hint-inline{color:var(--ink-mut);font-size:12px}
+.tbl .cell{width:100%;background:transparent;border:1px solid transparent;border-radius:6px;
+  color:var(--ink);font-family:inherit;font-size:13px;padding:6px 8px}
+.tbl .cell:hover{border-color:var(--line-2)}
+.tbl .cell:focus{outline:none;border-color:var(--cat-1);background:var(--surface-1);box-shadow:0 0 0 3px var(--glow)}
+.tbl .num-cell{text-align:right;font-variant-numeric:tabular-nums}
+.rowdel{border:0;background:transparent;color:var(--ink-mut);cursor:pointer;font-size:15px;border-radius:6px;padding:3px 8px}
+.rowdel:hover{color:var(--st-crit);background:color-mix(in srgb,var(--st-crit) 12%,transparent)}
+.tbl td.tight{padding:4px 6px}
