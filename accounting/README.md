@@ -9,11 +9,12 @@
 폴더 연결 기능(File System Access API)은 보안상 `localhost`에서만 동작하므로,
 HTML을 더블클릭(`file://`)하면 안 되고 아래처럼 로컬 서버로 띄웁니다. (Node.js 필요)
 
-- **Windows**: `실행-Windows.bat` 더블클릭
-- **Mac**: `실행-Mac.command` 더블클릭 (최초 1회: 우클릭 → 열기)
+- **Windows**: `START-Windows.bat` 더블클릭 (Node.js 없이 PowerShell로 실행됨)
+- **Mac**: `START-Mac.command` 더블클릭 (최초 1회: 우클릭 → 열기)
 - **직접 실행**: 이 폴더에서 `node server.js` → 브라우저가 자동으로 `http://localhost:4173` 을 엽니다.
 
-> Node.js 가 없으면 https://nodejs.org 에서 LTS 버전을 먼저 설치하세요.
+> Windows는 내장 PowerShell로 실행되어 별도 설치가 필요 없습니다.
+> Mac은 Node.js 또는 python3 중 하나가 필요합니다.
 
 ## 처음 사용 순서
 
