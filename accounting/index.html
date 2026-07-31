@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>경리 콕핏 · 사업비 관리</title>
+  <link rel="preconnect" href="/" />
+  <link rel="stylesheet" href="./css/app.css" />
+</head>
+<body>
+  <div id="app" class="app" data-view="loading">
+    <!-- 좌측 내비게이션 레일 -->
+    <aside class="rail" aria-label="주 메뉴">
+      <div class="rail__brand" title="경리 콕핏">
+        <span class="brand-mark">₩</span>
+      </div>
+      <nav class="rail__nav" id="nav"></nav>
+      <div class="rail__foot">
+        <button class="iconbtn" id="themeToggle" title="테마 전환" aria-label="테마 전환">◐</button>
+      </div>
+    </aside>
+
+    <!-- 상단 바 -->
+    <header class="topbar">
+      <div class="topbar__left">
+        <h1 class="topbar__title" id="viewTitle">대시보드</h1>
+        <span class="topbar__sub" id="viewSub"></span>
+      </div>
+      <div class="topbar__right">
+        <div class="yearpick" id="yearPick" hidden>
+          <button class="yearpick__btn" id="yearPrev" aria-label="이전 연도">‹</button>
+          <span class="yearpick__val" id="yearVal">2026</span>
+          <button class="yearpick__btn" id="yearNext" aria-label="다음 연도">›</button>
+        </div>
+        <button class="pill" id="reloadBtn" title="엑셀 다시 읽기" hidden>
+          <span class="pill__dot"></span><span id="reloadLabel">다시 읽기</span>
+        </button>
+        <div class="folderstat" id="folderStat">
+          <span class="folderstat__icon">📁</span>
+          <span class="folderstat__text" id="folderText">폴더 미연결</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 본문 -->
+    <main class="content" id="content"></main>
+
+    <!-- 토스트 -->
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+  </div>
+
+  <script src="./vendor/xlsx.full.min.js"></script>
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
