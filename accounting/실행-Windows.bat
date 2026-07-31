@@ -5,13 +5,24 @@ cd /d "%~dp0"
 echo.
 echo   경리 콕핏을 시작합니다...
 echo.
-where node >nul 2>nul
-if errorlevel 1 (
-  echo   [오류] Node.js 가 설치되어 있지 않습니다.
-  echo   https://nodejs.org 에서 LTS 버전을 설치한 뒤 다시 실행하세요.
-  echo.
-  pause
-  exit /b 1
+
+rem 1) 윈도우 기본 PowerShell 로 실행 (Node.js 불필요)
+where powershell >nul 2>nul
+if %errorlevel%==0 (
+  powershell -ExecutionPolicy Bypass -NoProfile -File "%~dp0server.ps1"
+  goto :end
 )
-node server.js
+
+rem 2) PowerShell 이 없으면 Node.js 로 시도
+where node >nul 2>nul
+if %errorlevel%==0 (
+  node server.js
+  goto :end
+)
+
+echo   [오류] PowerShell 과 Node.js 를 모두 찾을 수 없습니다.
+echo   보통 윈도우에는 PowerShell 이 기본 설치되어 있습니다. 관리자에게 문의하세요.
+echo.
 pause
+
+:end

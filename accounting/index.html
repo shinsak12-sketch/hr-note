@@ -49,6 +49,24 @@
     <div class="toasts" id="toasts" aria-live="polite"></div>
   </div>
 
+  <!-- file:// 로 직접 열면 모듈 로딩·폴더연결이 모두 막히므로 안내 -->
+  <script>
+    if (location.protocol === "file:") {
+      var c = document.getElementById("content");
+      if (c) c.innerHTML =
+        '<div class="empty"><div class="empty__card">'
+        + '<div class="empty__ico">🚫</div>'
+        + '<h2>이 방식으로는 실행되지 않습니다</h2>'
+        + '<p><b>index.html 을 직접 더블클릭</b>하면 크롬 보안정책 때문에 화면이 뜨지 않고, 폴더 연결도 안 됩니다.</p>'
+        + '<div style="text-align:left;background:var(--surface-1);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:18px auto 0;max-width:460px;line-height:2">'
+        + '<b>올바른 실행 방법</b><br>'
+        + '① 이 폴더의 <b>실행-Windows.bat</b> (Mac은 <b>실행-Mac.command</b>) 더블클릭<br>'
+        + '② 잠시 후 브라우저가 <b>http://localhost:4173</b> 으로 자동으로 열립니다'
+        + '</div>'
+        + '<div class="empty__hint">Node.js가 없어도 윈도우에서는 그대로 실행됩니다 (PowerShell 사용).</div>'
+        + '</div></div>';
+    }
+  </script>
   <script src="./vendor/xlsx.full.min.js"></script>
   <script type="module" src="./js/main.js"></script>
 </body>
