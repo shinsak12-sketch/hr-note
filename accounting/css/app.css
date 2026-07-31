@@ -512,3 +512,14 @@ select.input{max-width:280px}
 .mfld{display:flex;flex-direction:column;gap:3px}
 .mfld span{font-size:10.5px;color:var(--ink-mut)}
 .mfld input{border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);border-radius:8px;padding:6px;font:inherit;font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* 계획 연도 헤더 / 월별 펼치기 / 비율 셀 */
+.planyear{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.planyear__lb{font-weight:750;font-size:15px}
+.mtoggle.open{border-style:solid;color:var(--cat-1);border-color:var(--cat-1)}
+.mdetail>td{background:color-mix(in srgb,var(--surface-3) 40%,transparent)}
+.mrow{display:grid;grid-template-columns:repeat(12,1fr);gap:6px}
+.mcell{background:var(--surface-1);border:1px solid var(--line);border-radius:8px;padding:6px 3px;text-align:center}
+.mcell span{display:block;font-size:9.5px;color:var(--ink-mut);margin-bottom:2px}
+.mcell b{font-size:11px;font-variant-numeric:tabular-nums}
+.mfld .ratio-amt{font-variant-numeric:tabular-nums}

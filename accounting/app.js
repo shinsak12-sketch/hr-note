@@ -850,13 +850,14 @@ function openCalcModal(item, onDone){
   const prev=+item.prevActual||0;
   let method=(item.calc&&item.calc.method)||"%증감";
   const P=Object.assign({pct:0,delta:0,per:0,heads:0,unit:0,qty:0,mult:1,manual:+item.budget||0}, (item.calc&&item.calc.params)||{});
-  let split=item.split||"even";
-  let months=(item.months&&item.months.length===12)?item.months.slice():Array(12).fill(0);
-  let basisEdited=item.note||"";
-  let basisTouched=!!(item.note&&item.calc);
+  let split=item.split||"even";                 // even | manual | ratio
+  let rUnit=(item.round&&item.round.unit)||1, rMode=(item.round&&item.round.mode)||"round";
+  let amt=(item.amtRaw&&item.amtRaw.length===12)?item.amtRaw.slice():((item.months&&item.months.length===12)?item.months.slice():Array(12).fill(0));
+  let pct=(item.ratios&&item.ratios.length===12)?item.ratios.slice():Array(12).fill(0);
+  let basisEdited=item.note||""; let basisTouched=!!(item.note&&item.calc);
 
   const body=h(`<div></div>`);
-  const total=()=>{ switch(method){
+  const rawTotal=()=>{ switch(method){
     case "수기": return Math.round(+P.manual||0);
     case "%증감": return Math.round(prev*(1+(+P.pct||0)/100));
     case "절대증감": return Math.round(prev+(+P.delta||0));
@@ -870,22 +871,17 @@ function openCalcModal(item, onDone){
     case "인원": return `인당 ${fmtCompact(+P.per||0)} × ${(+P.heads||0)}명`;
     case "단가×수량": return `${fmtCompact(+P.unit||0)} × ${(+P.qty||0)}${(+P.mult||1)>1?' × '+(+P.mult||1)+'개월':''}`;
   } return ""; };
+  const roundFns={round:Math.round,ceil:Math.ceil,floor:Math.floor};
+  const q=(x)=>{ const u=+rUnit||1; if(u<=1) return Math.round(x); return (roundFns[rMode]||Math.round)(x/u)*u; };
+  const monthVals=()=>{ const t=rawTotal();
+    if(split==="manual") return amt.map(v=>q(+v||0));
+    if(split==="ratio") return pct.map(p=>q(t*(+p||0)/100));
+    return Array(12).fill(0).map(()=>q(t/12)); };
+  const confirmed=()=>monthVals().reduce((a,b)=>a+b,0);
 
-  const fldNum=(val,onCh,w=200)=>{ const i=h(`<input class="input" type="number" value="${val}" style="max-width:${w}px">`);
-    i.oninput=()=>onCh(Number(i.value)||0); return i; };
+  const fldNum=(val,onCh,w=200)=>{ const i=h(`<input class="input" type="number" value="${val}" style="max-width:${w}px">`); i.oninput=()=>onCh(Number(i.value)||0); return i; };
   const stepper=(val,step,onCh)=>{ const s=h(`<div class="stepper"><button data-d="-1">−</button><input value="${val}"><button data-d="1">+</button></div>`);
-    const inp=s.querySelector("input");
-    s.querySelectorAll("button").forEach(b=>b.onclick=()=>{ inp.value=(Number(inp.value)||0)+step*Number(b.dataset.d); onCh(Number(inp.value)||0); });
-    inp.oninput=()=>onCh(Number(inp.value)||0); return s; };
-
-  function recompute(){ const t=total();
-    const te=body.querySelector("#tot"); if(te) te.textContent=fmtWon(t)+"원";
-    const bi=body.querySelector("#basis"); if(bi&&!basisTouched) bi.value=basisAuto();
-    if(split==="even"){ months=Array(12).fill(Math.round(t/12)); const eh=body.querySelector("#evenhint"); if(eh) eh.textContent=`월 ${fmtWon(Math.round(t/12))}원 × 12개월`; }
-    updMsum();
-  }
-  function updMsum(){ const el=body.querySelector("#msum"); if(!el) return; const s=months.reduce((a,b)=>a+(+b||0),0); const diff=total()-s;
-    el.innerHTML=`합계 <b>${fmtWon(s)}원</b> · 계획액과 차이 ${fmtWon(diff)}원`; el.style.color=diff===0?"var(--st-good)":"var(--st-warn)"; }
+    const inp=s.querySelector("input"); s.querySelectorAll("button").forEach(b=>b.onclick=()=>{ inp.value=(Number(inp.value)||0)+step*Number(b.dataset.d); onCh(Number(inp.value)||0); }); inp.oninput=()=>onCh(Number(inp.value)||0); return s; };
 
   function inputsFor(){ const w=h(`<div></div>`);
     if(method==="%증감"){ const f=h(`<div class="fld"><label>증감률</label></div>`); f.appendChild(stepper(P.pct,1,v=>{P.pct=v;recompute();})); f.appendChild(h(`<span class="hint-inline">% (전년 대비)</span>`)); w.appendChild(f); }
@@ -896,46 +892,69 @@ function openCalcModal(item, onDone){
       const f2=h(`<div class="fld"><label>수량</label></div>`); f2.appendChild(stepper(P.qty,1,v=>{P.qty=v;recompute();})); w.appendChild(f2);
       const f3=h(`<div class="fld"><label>개월(선택)</label></div>`); f3.appendChild(stepper(P.mult,1,v=>{P.mult=v;recompute();})); f3.appendChild(h(`<span class="hint-inline">×개월 (1이면 미적용)</span>`)); w.appendChild(f3); }
     else { const f=h(`<div class="fld"><label>금액</label></div>`); f.appendChild(fldNum(P.manual,v=>{P.manual=v;recompute();},240)); f.appendChild(h(`<span class="hint-inline">원 (직접 입력)</span>`)); w.appendChild(f); }
-    return w;
+    return w; }
+  function roundControls(){
+    const w=h(`<div class="fld" style="margin-top:8px"><label>반올림</label></div>`);
+    const us=h(`<select class="input" style="max-width:100px"><option value="1">원</option><option value="1000">천원</option><option value="10000">만원</option></select>`);
+    us.value=String(rUnit); us.onchange=()=>{ rUnit=Number(us.value); recompute(); };
+    const ms=h(`<select class="input" style="max-width:100px"><option value="round">반올림</option><option value="ceil">절상</option><option value="floor">절하</option></select>`);
+    ms.value=rMode; ms.onchange=()=>{ rMode=ms.value; recompute(); };
+    w.appendChild(us); w.appendChild(ms); w.appendChild(h(`<span class="hint-inline">월별로 절상/절하/반올림 → 그 합이 확정 계획액</span>`)); return w;
   }
-  function paintMon(){ const mon=body.querySelector("#mon"); if(!mon) return;
-    if(split==="even"){ mon.innerHTML=`<div class="hint-inline" id="evenhint"></div>`; }
-    else { if(months.reduce((a,b)=>a+(+b||0),0)===0){ const t=total(); months=Array(12).fill(Math.round(t/12)); }
-      const grid=h(`<div class="months-grid"></div>`);
-      for(let m=0;m<12;m++){ const f=h(`<div class="mfld"><span>${m+1}월</span><input type="number" value="${months[m]}"></div>`);
-        f.querySelector("input").oninput=e=>{ months[m]=Number(e.target.value)||0; updMsum(); }; grid.appendChild(f); }
-      mon.innerHTML=""; mon.appendChild(grid); mon.appendChild(h(`<div class="hint-inline" id="msum" style="margin-top:8px"></div>`)); }
+  function refreshMonths(){ const mon=body.querySelector("#mon"); if(!mon) return; const mv=monthVals();
+    if(split==="even"){ mon.innerHTML=`<div class="hint-inline">월 ${fmtWon(mv[0]||0)}원 × 12개월 = 확정 ${fmtWon(confirmed())}원</div>`; return; }
+    const grid=h(`<div class="months-grid"></div>`);
+    for(let m=0;m<12;m++){
+      if(split==="manual"){ const f=h(`<div class="mfld"><span>${m+1}월</span><input type="number" value="${amt[m]}"></div>`);
+        f.querySelector("input").oninput=e=>{ amt[m]=Number(e.target.value)||0; refreshSum(); }; grid.appendChild(f); }
+      else { const f=h(`<div class="mfld"><span>${m+1}월 (%)</span><input type="number" value="${pct[m]}"><div class="ratio-amt" style="font-size:9.5px;color:var(--ink-mut);text-align:right">${fmtCompact(mv[m])}</div></div>`);
+        f.querySelector("input").oninput=e=>{ pct[m]=Number(e.target.value)||0; refreshSum(); }; grid.appendChild(f); }
+    }
+    mon.innerHTML=""; mon.appendChild(grid); mon.appendChild(h(`<div class="hint-inline" id="msum" style="margin-top:8px"></div>`)); refreshSum();
+    function refreshSum(){ const mv=monthVals(); const s=mv.reduce((a,b)=>a+b,0); const el=body.querySelector("#msum");
+      if(split==="ratio"){ grid.querySelectorAll(".ratio-amt").forEach((d,i)=>d.textContent=fmtCompact(mv[i]));
+        const ps=pct.reduce((a,b)=>a+(+b||0),0); if(el){ el.innerHTML=`확정 합계 <b>${fmtWon(s)}원</b> · 비율 합 ${ps.toFixed(1)}%`; el.style.color=Math.abs(ps-100)<0.5?"var(--st-good)":"var(--st-warn)"; } }
+      else if(el){ const diff=rawTotal()-s; el.innerHTML=`확정 합계 <b>${fmtWon(s)}원</b> · 산출액과 차이 ${fmtWon(diff)}원`; el.style.color="var(--ink-mut)"; }
+      const te=body.querySelector("#tot"); if(te) te.textContent=fmtWon(s)+"원";
+    }
+  }
+  function recompute(){ const raw=rawTotal();
+    const re=body.querySelector("#rawtot"); if(re) re.textContent=fmtWon(raw)+"원";
+    const bi=body.querySelector("#basis"); if(bi&&!basisTouched) bi.value=basisAuto();
+    refreshMonths();
+    const te=body.querySelector("#tot"); if(te) te.textContent=fmtWon(confirmed())+"원";
+  }
+  function paint(){ body.innerHTML=`
+    <div class="modal__sub" style="margin-bottom:12px">기준(전년 실적): <b style="color:var(--ink)">${fmtWon(prev)}원</b></div>
+    <div class="methods" id="mth"></div>
+    <div id="inp"></div>
+    <div class="calc-total">
+      <div><div style="font-size:11.5px;color:var(--ink-mut)">산출 금액</div><b id="rawtot" style="font-size:16px">0원</b></div>
+      <div style="text-align:right"><div style="font-size:11.5px;color:var(--ink-mut)">확정 계획액 (월 반올림 합계)</div><b id="tot">0원</b></div></div>
+    <div class="fld"><label>산출근거</label><input class="input" id="basis" style="max-width:none;flex:1" value="${escAttr(basisTouched?basisEdited:basisAuto())}"></div>
+    <div style="margin-top:14px"><b style="font-size:13px">월 분할</b>
+      <div class="radio-row">
+        <label><input type="radio" name="sp" value="even" ${split==="even"?"checked":""}> 12개월 균등</label>
+        <label><input type="radio" name="sp" value="manual" ${split==="manual"?"checked":""}> 수기(금액)</label>
+        <label><input type="radio" name="sp" value="ratio" ${split==="ratio"?"checked":""}> 비율(%)</label>
+      </div><div id="rc"></div><div id="mon" style="margin-top:8px"></div></div>`;
+    const mth=body.querySelector("#mth"); CALC_METHODS.forEach(m=>{ const b=h(`<button class="${m===method?"on":""}">${m}</button>`); b.onclick=()=>{ method=m; paint(); }; mth.appendChild(b); });
+    body.querySelector("#inp").appendChild(inputsFor());
+    body.querySelector("#rc").appendChild(roundControls());
+    const bi=body.querySelector("#basis"); bi.oninput=()=>{ basisTouched=true; basisEdited=bi.value; };
+    body.querySelectorAll('input[name="sp"]').forEach(r=>r.onchange=()=>{ split=r.value;
+      if(split==="ratio"&&pct.reduce((a,b)=>a+(+b||0),0)===0) pct=Array(12).fill(Math.round(1000/12)/10);
+      if(split==="manual"&&amt.reduce((a,b)=>a+(+b||0),0)===0){ const t=rawTotal(); amt=Array(12).fill(Math.round(t/12)); }
+      recompute(); });
     recompute();
   }
-  function paint(){
-    body.innerHTML=`
-      <div class="modal__sub" style="margin-bottom:12px">기준(전년 실적): <b style="color:var(--ink)">${fmtWon(prev)}원</b></div>
-      <div class="methods" id="mth"></div>
-      <div id="inp"></div>
-      <div class="calc-total"><span>금년 계획액</span><b id="tot">0원</b></div>
-      <div class="fld"><label>산출근거</label><input class="input" id="basis" style="max-width:none;flex:1" value="${escAttr(basisTouched?basisEdited:basisAuto())}"></div>
-      <div style="margin-top:16px"><b style="font-size:13px">월 분할</b>
-        <div class="radio-row">
-          <label><input type="radio" name="sp" value="even" ${split==="even"?"checked":""}> 12개월 균등</label>
-          <label><input type="radio" name="sp" value="manual" ${split==="manual"?"checked":""}> 수기 분할</label>
-        </div><div id="mon"></div></div>`;
-    const mth=body.querySelector("#mth");
-    CALC_METHODS.forEach(m=>{ const b=h(`<button class="${m===method?"on":""}">${m}</button>`); b.onclick=()=>{ method=m; paint(); }; mth.appendChild(b); });
-    body.querySelector("#inp").appendChild(inputsFor());
-    const bi=body.querySelector("#basis"); bi.oninput=()=>{ basisTouched=true; basisEdited=bi.value; };
-    body.querySelectorAll('input[name="sp"]').forEach(r=>r.onchange=()=>{ split=r.value; paintMon(); });
-    paintMon();
-  }
   paint();
-
   modal({ title:`${item.l3||item.l2||item.l1||"항목"} · 계획액 계산`, sub:[item.l1,item.l2,item.l3].filter(Boolean).join(" › "), body, okLabel:"확인",
-    onOk:()=>{ const t=split==="manual"? months.reduce((a,b)=>a+(+b||0),0) : total();
-      item.budget=t; item.calc={method,params:{...P}}; item.split=split;
-      item.months= split==="manual"? months.slice() : Array(12).fill(Math.round(total()/12));
-      item.note= basisTouched? basisEdited : basisAuto();
-      onDone&&onDone(); } });
+    onOk:()=>{ const mv=monthVals(); item.months=mv; item.budget=mv.reduce((a,b)=>a+b,0);
+      item.calc={method,params:{...P}}; item.split=split; item.round={unit:rUnit,mode:rMode};
+      item.amtRaw= split==="manual"? amt.slice():null; item.ratios= split==="ratio"? pct.slice():null;
+      item.note= basisTouched? basisEdited : basisAuto(); onDone&&onDone(); } });
 }
-
 /* 전년도 가져오기 */
 function samplePrev(){ return sampleLeaves().map(l=>({code:l.code,l1:l.l1,l2:l.l2,l3:l.l3,actual:l.actual})); }
 function prevYearItems(){
@@ -950,6 +969,14 @@ function renderPlan(root){
   if(!Array.isArray(ctx.data.leaves)) ctx.data.leaves=[];
   const leaves=ctx.data.leaves;
   const persist=()=>{ ctx.data.sample=false; ctx.data.folderName=ctx.data.folderName||"직접 입력"; ctx.data.leaves=leaves; ctx.data.tree=buildTree(leaves); saveCache(); };
+
+  const yh=h(`<div class="planyear">
+    <span class="planyear__lb">📅 계획 연도</span>
+    <div class="yearpick"><button class="yearpick__btn" id="pyPrev">‹</button><span class="yearpick__val">${ctx.year}</span><button class="yearpick__btn" id="pyNext">›</button></div>
+    <span class="hint-inline">먼저 연도를 고르세요 · 연도별로 따로 저장됩니다</span></div>`);
+  root.appendChild(yh);
+  $("#pyPrev",yh).onclick=()=>{ ctx.year--; loadCache(); render(); };
+  $("#pyNext",yh).onclick=()=>{ ctx.year++; loadCache(); render(); };
 
   const kp=h(`<div id="pkpi"></div>`); root.appendChild(kp);
   const drawKpi=()=>{ const tot=leaves.reduce((s,l)=>s+(+l.budget||0),0), prev=leaves.reduce((s,l)=>s+(+l.prevActual||0),0);
@@ -981,6 +1008,8 @@ function renderPlan(root){
   const tb=$("#ptb",card); root.appendChild(card);
 
   function rowEl(l,idx){
+    const mv=(l.months&&l.months.length===12)?l.months:Array(12).fill(Math.round((+l.budget||0)/12));
+    const splitLbl=l.split==="ratio"?"비율":l.split==="manual"?"수기":"균등";
     const tr=h(`<tr>
       <td class="tight"><input class="cell" data-f="l1" value="${escAttr(l.l1)}"></td>
       <td class="tight"><input class="cell" data-f="l2" value="${escAttr(l.l2)}"></td>
@@ -989,14 +1018,17 @@ function renderPlan(root){
       <td class="num" style="color:var(--ink-mut)">${(+l.prevActual)?fmtCompact(l.prevActual):"-"}</td>
       <td class="num tight"><button class="cellbtn ${(+l.budget>0)?"has":""}" data-plan>${(+l.budget>0)?fmtCompact(l.budget):"입력 ▸"}</button></td>
       <td class="tight"><input class="cell" data-f="note" value="${escAttr(l.note)}" placeholder="산출근거"></td>
-      <td class="tight"><button class="cellbtn" data-plan style="text-align:center">${l.split==="manual"?"수기":"균등"}</button></td>
+      <td class="tight"><button class="cellbtn mtoggle" title="1~12월 펼치기" style="text-align:center">▸ ${splitLbl}</button></td>
       <td class="tight"><button class="rowdel" title="삭제">🗑</button></td></tr>`);
+    const detail=h(`<tr class="mdetail" hidden><td colspan="9" style="padding:2px 8px 8px">
+      <div class="mrow">${mv.map((v,m)=>`<div class="mcell"><span>${m+1}월</span><b>${(+l.budget>0)?fmtCompact(v):"-"}</b></div>`).join("")}</div></td></tr>`);
     tr.querySelectorAll("input.cell").forEach(inp=>{ const f=inp.dataset.f; inp.oninput=()=>{ l[f]=inp.value; }; });
-    tr.querySelectorAll("[data-plan]").forEach(b=>b.onclick=()=>openCalcModal(l,()=>{ persist(); rebuild(); }));
+    tr.querySelector("[data-plan]").onclick=()=>openCalcModal(l,()=>{ persist(); rebuild(); });
+    tr.querySelector(".mtoggle").onclick=()=>{ detail.hidden=!detail.hidden; tr.querySelector(".mtoggle").classList.toggle("open",!detail.hidden); };
     tr.querySelector(".rowdel").onclick=()=>{ leaves.splice(idx,1); persist(); rebuild(); };
-    return tr;
+    return {main:tr, detail};
   }
-  function rebuild(){ tb.innerHTML=""; leaves.forEach((l,i)=>tb.appendChild(rowEl(l,i))); drawKpi(); }
+  function rebuild(){ tb.innerHTML=""; leaves.forEach((l,i)=>{ const r=rowEl(l,i); tb.appendChild(r.main); tb.appendChild(r.detail); }); drawKpi(); }
   rebuild();
 
   $("#prevY",bar).onclick=()=>{ const {items,sample}=prevYearItems();
