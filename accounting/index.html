@@ -4,23 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>경리 콕핏 · 사업비 관리</title>
-  <link rel="preconnect" href="/" />
   <link rel="stylesheet" href="./css/app.css" />
 </head>
 <body>
-  <div id="app" class="app" data-view="loading">
-    <!-- 좌측 내비게이션 레일 -->
+  <div id="app" class="app">
     <aside class="rail" aria-label="주 메뉴">
-      <div class="rail__brand" title="경리 콕핏">
-        <span class="brand-mark">₩</span>
-      </div>
+      <div class="rail__brand" title="경리 콕핏"><span class="brand-mark">₩</span></div>
       <nav class="rail__nav" id="nav"></nav>
       <div class="rail__foot">
         <button class="iconbtn" id="themeToggle" title="테마 전환" aria-label="테마 전환">◐</button>
       </div>
     </aside>
 
-    <!-- 상단 바 -->
     <header class="topbar">
       <div class="topbar__left">
         <h1 class="topbar__title" id="viewTitle">대시보드</h1>
@@ -32,42 +27,22 @@
           <span class="yearpick__val" id="yearVal">2026</span>
           <button class="yearpick__btn" id="yearNext" aria-label="다음 연도">›</button>
         </div>
-        <button class="pill" id="reloadBtn" title="엑셀 다시 읽기" hidden>
-          <span class="pill__dot"></span><span id="reloadLabel">다시 읽기</span>
+        <button class="pill" id="reloadBtn" title="폴더에서 다시 읽기" hidden>
+          <span class="pill__dot"></span><span>다시 읽기</span>
         </button>
         <div class="folderstat" id="folderStat">
           <span class="folderstat__icon">📁</span>
-          <span class="folderstat__text" id="folderText">폴더 미연결</span>
+          <span class="folderstat__text" id="folderText">폴더 미선택</span>
         </div>
       </div>
     </header>
 
-    <!-- 본문 -->
     <main class="content" id="content"></main>
-
-    <!-- 토스트 -->
     <div class="toasts" id="toasts" aria-live="polite"></div>
   </div>
 
-  <!-- file:// 로 직접 열면 모듈 로딩·폴더연결이 모두 막히므로 안내 -->
-  <script>
-    if (location.protocol === "file:") {
-      var c = document.getElementById("content");
-      if (c) c.innerHTML =
-        '<div class="empty"><div class="empty__card">'
-        + '<div class="empty__ico">🚫</div>'
-        + '<h2>이 방식으로는 실행되지 않습니다</h2>'
-        + '<p><b>index.html 을 직접 더블클릭</b>하면 크롬 보안정책 때문에 화면이 뜨지 않고, 폴더 연결도 안 됩니다.</p>'
-        + '<div style="text-align:left;background:var(--surface-1);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:18px auto 0;max-width:460px;line-height:2">'
-        + '<b>올바른 실행 방법</b><br>'
-        + '① 이 폴더의 <b>START-Windows.bat</b> (Mac은 <b>START-Mac.command</b>) 더블클릭<br>'
-        + '② 잠시 후 브라우저가 <b>http://localhost:4173</b> 으로 자동으로 열립니다'
-        + '</div>'
-        + '<div class="empty__hint">Node.js가 없어도 윈도우에서는 그대로 실행됩니다 (PowerShell 사용).</div>'
-        + '</div></div>';
-    }
-  </script>
+  <!-- 일반 스크립트 → file:// 더블클릭으로도 로딩됨 (모듈 아님) -->
   <script src="./vendor/xlsx.full.min.js"></script>
-  <script type="module" src="./js/main.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
