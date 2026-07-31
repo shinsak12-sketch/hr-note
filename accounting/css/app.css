@@ -523,3 +523,14 @@ select.input{max-width:280px}
 .mcell span{display:block;font-size:9.5px;color:var(--ink-mut);margin-bottom:2px}
 .mcell b{font-size:11px;font-variant-numeric:tabular-nums}
 .mfld .ratio-amt{font-variant-numeric:tabular-nums}
+
+/* 계획 표 단일행 (계획액+배지 → 1~12월 → 비고) */
+.plan-tbl{min-width:1560px}
+.plancell{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.split-badge{font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;border:1px solid var(--line-2);color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.split-badge.sb-even{color:var(--cat-3);border-color:color-mix(in srgb,var(--cat-3) 45%,transparent)}
+.split-badge.sb-ratio{color:var(--cat-4);border-color:color-mix(in srgb,var(--cat-4) 45%,transparent)}
+.split-badge.sb-manual{color:var(--cat-7);border-color:color-mix(in srgb,var(--cat-7) 45%,transparent)}
+.plan-tbl th.mcol-h{font-size:10px;color:var(--ink-mut);width:66px;padding-bottom:8px}
+.plan-tbl td.mcolcell{font-size:11px;color:var(--ink-2);white-space:nowrap;font-variant-numeric:tabular-nums;
+  border-left:1px solid color-mix(in srgb,var(--line) 60%,transparent)}

@@ -1000,14 +1000,16 @@ function renderPlan(root){
   root.appendChild(bar);
 
   const card=h(`<div class="card"><div class="card__bd" style="padding-top:6px;overflow:auto">
-    <table class="tbl"><thead><tr>
-      <th style="width:130px">대분류</th><th style="width:120px">중분류</th><th style="width:130px">소분류</th><th style="width:64px">코드</th>
-      <th class="num" style="width:110px">전년 실적</th><th class="num" style="width:120px">금년 계획액</th>
-      <th>비고(산출근거)</th><th style="width:66px">월 분할</th><th style="width:28px"></th>
+    <table class="tbl plan-tbl"><thead><tr>
+      <th style="width:118px">대분류</th><th style="width:104px">중분류</th><th style="width:118px">소분류</th><th style="width:56px">코드</th>
+      <th class="num" style="width:92px">전년 실적</th><th class="num" style="width:150px">금년 계획액</th>
+      ${Array.from({length:12},(_,m)=>`<th class="num mcol-h">${m+1}월</th>`).join("")}
+      <th style="width:210px">비고(산출근거)</th><th style="width:26px"></th>
     </tr></thead><tbody id="ptb"></tbody></table></div></div>`);
   const tb=$("#ptb",card); root.appendChild(card);
 
   function rowEl(l,idx){
+    const has=+l.budget>0;
     const mv=(l.months&&l.months.length===12)?l.months:Array(12).fill(Math.round((+l.budget||0)/12));
     const splitLbl=l.split==="ratio"?"비율":l.split==="manual"?"수기":"균등";
     const tr=h(`<tr>
@@ -1016,19 +1018,18 @@ function renderPlan(root){
       <td class="tight"><input class="cell" data-f="l3" value="${escAttr(l.l3)}"></td>
       <td class="tight"><input class="cell" data-f="code" value="${escAttr(l.code)}"></td>
       <td class="num" style="color:var(--ink-mut)">${(+l.prevActual)?fmtCompact(l.prevActual):"-"}</td>
-      <td class="num tight"><button class="cellbtn ${(+l.budget>0)?"has":""}" data-plan>${(+l.budget>0)?fmtCompact(l.budget):"입력 ▸"}</button></td>
+      <td class="num tight"><div class="plancell">
+        <button class="cellbtn ${has?"has":""}" data-plan>${has?fmtCompact(l.budget):"입력 ▸"}</button>
+        ${has?`<span class="split-badge sb-${l.split||"even"}" data-plan>${splitLbl}</span>`:""}</div></td>
+      ${mv.map(v=>`<td class="num mcolcell">${has?fmtCompact(v):"-"}</td>`).join("")}
       <td class="tight"><input class="cell" data-f="note" value="${escAttr(l.note)}" placeholder="산출근거"></td>
-      <td class="tight"><button class="cellbtn mtoggle" title="1~12월 펼치기" style="text-align:center">▸ ${splitLbl}</button></td>
       <td class="tight"><button class="rowdel" title="삭제">🗑</button></td></tr>`);
-    const detail=h(`<tr class="mdetail" hidden><td colspan="9" style="padding:2px 8px 8px">
-      <div class="mrow">${mv.map((v,m)=>`<div class="mcell"><span>${m+1}월</span><b>${(+l.budget>0)?fmtCompact(v):"-"}</b></div>`).join("")}</div></td></tr>`);
     tr.querySelectorAll("input.cell").forEach(inp=>{ const f=inp.dataset.f; inp.oninput=()=>{ l[f]=inp.value; }; });
-    tr.querySelector("[data-plan]").onclick=()=>openCalcModal(l,()=>{ persist(); rebuild(); });
-    tr.querySelector(".mtoggle").onclick=()=>{ detail.hidden=!detail.hidden; tr.querySelector(".mtoggle").classList.toggle("open",!detail.hidden); };
+    tr.querySelectorAll("[data-plan]").forEach(b=>b.onclick=()=>openCalcModal(l,()=>{ persist(); rebuild(); }));
     tr.querySelector(".rowdel").onclick=()=>{ leaves.splice(idx,1); persist(); rebuild(); };
-    return {main:tr, detail};
+    return tr;
   }
-  function rebuild(){ tb.innerHTML=""; leaves.forEach((l,i)=>{ const r=rowEl(l,i); tb.appendChild(r.main); tb.appendChild(r.detail); }); drawKpi(); }
+  function rebuild(){ tb.innerHTML=""; leaves.forEach((l,i)=>tb.appendChild(rowEl(l,i))); drawKpi(); }
   rebuild();
 
   $("#prevY",bar).onclick=()=>{ const {items,sample}=prevYearItems();
