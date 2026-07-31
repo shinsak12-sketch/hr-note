@@ -289,10 +289,10 @@ function render(){
     case "home": renderHome(content); break;
     case "masters": renderMasters(content); break;
     case "settings": renderSettings(content); break;
-    case "plan": renderSoon(content,{icon:"🧭",title:"사업비 계획 — 다음 단계",desc:"산출근거(드라이버) 기반 예산 수립 + 내년 롤링.",plan:["고정/단가×수량/수입연동/인원연동/증감률","월별 자동 배분","브라우저 저장 + 백업 내려받기"]}); break;
-    case "variance": renderSoon(content,{icon:"📊",title:"계획 vs 실적 — 다음 단계",desc:"실적 엑셀을 읽어 집행률과 연말 추정을 분석.",plan:["집행률·잔여·초과","이벤트 반영 추정","월별 추이"]}); break;
-    case "income": renderSoon(content,{icon:"💳",title:"수입 · 수수료 — 다음 단계",desc:"유형×구간 단가와 처리건수로 월별 수수료 집계.",plan:["예상/실제 처리건수","단가 적용","월별 수입"]}); break;
-    case "pnl": renderSoon(content,{icon:"💰",title:"손익 · 현금흐름 — 다음 단계",desc:"수입−사업비 손익, 입·출금 타이밍 기반 현금 잔액.",plan:["월별 손익","현금흐름 시뮬","현금 부족 경보"]}); break;
+    case "plan": renderPlan(content); break;
+    case "variance": renderVariance(content); break;
+    case "income": renderIncome(content); break;
+    case "pnl": renderPnl(content); break;
     default: renderHome(content);
   }
 }
@@ -343,35 +343,77 @@ function yearPace(year){
 }
 function forecast(actual,pace){ return pace>0? actual/pace : actual; }
 
-/* ------------------------------ 홈 (3D 대시보드) ------------------------------ */
+/* ------------------------------ 홈 (대시보드) ------------------------------ */
 function renderHome(root){
   const leaves=ctx.data.leaves||[]; root.innerHTML="";
   if(!leaves.length){ root.appendChild(h(`<div class="soon"><div class="big">📊</div>
     <h3>표시할 사업비 데이터가 없습니다</h3><p>기준정보에서 폴더를 읽거나, 샘플로 둘러보세요.</p></div>`)); return; }
   const tree=buildTree(leaves);
   const pace=yearPace(Number(ctx.year));
+  const curMonth=currentMonth(Number(ctx.year));
 
+  const crumbBar=h(`<div class="crumbbar" id="crumbbar"></div>`);
   const kpis=h(`<div class="kpis" id="kpis"></div>`);
-  const layout=h(`<div class="grid-2" style="grid-template-columns:1.7fr 1fr;align-items:stretch"></div>`);
-  const cityCard=h(`<div class="card city-wrap" style="padding:0;overflow:hidden">
-    <div class="card__hd" style="padding:16px 18px 14px"><div>
-      <div class="card__title"><span class="dot" style="background:var(--cat-1)"></span>사업비 구성 · 3D</div>
-      <div class="card__sub">바닥면적=예산 · 높이=집행 · 색=시간진도 대비 속도 · <b>드래그 회전 / 휠 확대 / 블록 드래그 이동</b></div>
-    </div></div><div class="city" id="city"></div></div>`);
+  const layout=h(`<div class="grid-2" style="grid-template-columns:1.62fr 1fr;align-items:stretch"></div>`);
+  const vizCard=h(`<div class="card city-wrap" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
+    <div class="card__hd" style="padding:14px 16px 12px">
+      <div><div class="card__title"><span class="dot" style="background:var(--cat-1)"></span>사업비 구성</div>
+        <div class="card__sub" id="vizSub">면적=예산 · 높이=집행 · 색=연말 추정(초과 예상=빨강)</div></div>
+      <div class="viztoggle" id="vizToggle">
+        <button data-v="city" class="is-on">🏙️ 3D</button>
+        <button data-v="donut">◔ 비중</button>
+        <button data-v="bars">▦ 막대</button>
+      </div>
+    </div>
+    <div class="vizbody" id="vizbody" style="flex:1"></div></div>`);
   const side=h(`<div id="sidewrap"></div>`);
-  layout.append(cityCard, side);
-  root.append(kpis, layout);
+  layout.append(vizCard, side);
+  const monthCard=h(`<div class="card" style="margin-top:18px"><div class="card__hd"><div>
+    <div class="card__title"><span class="dot" style="background:var(--cat-4)"></span>월별 계획 vs 집행 <span id="monthScope" style="color:var(--ink-mut);font-weight:500"></span></div>
+    <div class="card__sub">회색=계획 · 색=집행(당월까지) · 점선=오늘</div></div></div>
+    <div class="card__bd" id="monthbd" style="padding-top:8px"></div></div>`);
+  root.append(crumbBar, kpis, layout, monthCard);
 
-  const state={path:[], pace};
+  const state={path:[], pace, viz:"city", curMonth, tree, cityEl:h(`<div class="city"></div>`)};
   function scopeNodes(){ let ns=tree; for(const name of state.path){ const f=ns.find(n=>n.name===name); if(!f) break; ns=f.children; } return ns; }
+  state.scopeNodes=scopeNodes;
   state.update=function(){
     const nodes=scopeNodes();
+    renderCrumbBar(crumbBar, state);
     renderKpis(kpis, nodes, pace, state.path);
     side.innerHTML=""; side.appendChild(renderRankPanel(nodes, pace, state.path, state));
-    buildCity($("#city",cityCard), nodes, state);
-    el("viewSub").textContent = state.path.length? "현재 보기: "+state.path.join(" › ") : "사업비 구성 3D 히트맵";
+    renderViz($("#vizbody",vizCard), nodes, state);
+    renderMonthly($("#monthbd",monthCard), nodes, pace, curMonth);
+    $("#monthScope",monthCard).textContent = state.path.length? "· "+state.path[state.path.length-1] : "· 전체";
+    el("viewSub").textContent = state.path.length? "현재 보기: "+state.path.join(" › ") : "사업비 구성 · 월별 추이";
   };
+  $("#vizToggle",vizCard).querySelectorAll("button").forEach(b=>b.onclick=()=>{
+    state.viz=b.dataset.v;
+    $("#vizToggle",vizCard).querySelectorAll("button").forEach(x=>x.classList.toggle("is-on",x===b));
+    renderViz($("#vizbody",vizCard), scopeNodes(), state);
+  });
   state.update();
+}
+function renderViz(container, nodes, state){
+  container.innerHTML="";
+  if(state.viz==="donut") buildDonut(container, nodes, state);
+  else if(state.viz==="bars") buildBars(container, nodes, state);
+  else { container.appendChild(state.cityEl); buildCity(state.cityEl, nodes, state); }
+}
+/* 상단 경로바 (세부 ↔ 전체 이동을 쉽게) */
+function renderCrumbBar(bar, state){
+  const path=state.path||[]; bar.innerHTML="";
+  const back=h(`<button class="crumbbar__back" ${path.length?"":"disabled"}>◀ 뒤로</button>`);
+  back.onclick=()=>{ if(path.length){ state.path=path.slice(0,-1); state.update(); } };
+  bar.appendChild(back);
+  const chips=h(`<div class="crumbbar__path"></div>`);
+  const home=h(`<button class="crumbbar__chip ${path.length?"":"is-cur"}">🏙️ 전체</button>`);
+  home.onclick=()=>{ state.path=[]; state.update(); };
+  chips.appendChild(home);
+  path.forEach((p,idx)=>{ chips.append(h(`<span class="crumbbar__sep">›</span>`));
+    const c=h(`<button class="crumbbar__chip ${idx===path.length-1?"is-cur":""}">${p}</button>`);
+    c.onclick=()=>{ state.path=path.slice(0,idx+1); state.update(); }; chips.appendChild(c); });
+  bar.appendChild(chips);
 }
 function renderKpis(container, nodes, pace, path){
   const totB=sumBudget(nodes), totA=sumActual(nodes), rate=totB? totA/totB:0;
@@ -419,69 +461,98 @@ function renderRankPanel(nodes, pace, path, state){
   return card;
 }
 
-/* --- 3D 도시 (드래그 회전/이동 + 휠 확대) --- */
+/* --- 3D 도시 (정방향·전체 바닥·상시 라벨·초과 느낌표) --- */
 function layoutKey(state){ return "cockpit:layout:"+ctx.year+":"+((state.path||[]).join(">")||"root"); }
+const D2R=Math.PI/180;
+function project(rx,ry,rz,yaw,tilt,zoom){
+  const cy=Math.cos(yaw*D2R), sy=Math.sin(yaw*D2R), ct=Math.cos(tilt*D2R), st=Math.sin(tilt*D2R);
+  const X=rx*cy-ry*sy, Y=rx*sy+ry*cy;
+  return [X*zoom, (Y*ct - rz*st)*zoom];
+}
 function buildCity(cityEl, nodes, state){
   const pace=state.pace||0;
-  if(cityEl._yaw==null){ cityEl._yaw=-42; cityEl._tilt=56; cityEl._zoom=1; }
   cityEl.innerHTML=`
-    <div class="city__hud" id="hud"></div>
     <div class="city__spin">
       <button class="iconbtn" id="rotL" title="왼쪽 회전">⟲</button>
       <button class="iconbtn" id="rotR" title="오른쪽 회전">⟳</button>
-      <button class="iconbtn" id="zReset" title="시점 초기화" style="font-size:14px">⌂</button>
+      <button class="iconbtn" id="zReset" title="정방향 초기화" style="font-size:14px">⌂</button>
     </div>
     <div class="city__stage" id="stage"></div>
-    <div class="city__legend"><div>집행 속도 (시간 대비)</div><div class="legend__bar"></div>
+    <div class="city__labels" id="labels"></div>
+    <div class="city__legend"><div>색 = 연말 추정 ÷ 예산</div><div class="legend__bar"></div>
       <div class="legend__scale"><span>여유</span><span>정상</span><span>주의</span><span>초과</span></div></div>`;
-  const stage=$("#stage",cityEl);
+  const stage=$("#stage",cityEl), labels=$("#labels",cityEl);
   stage.style.transition="transform .12s ease-out";
-  function applyView(){ stage.style.transform=`translate(-50%,-50%) rotateX(${cityEl._tilt}deg) rotateZ(${cityEl._yaw}deg) scale(${cityEl._zoom})`; }
-  applyView();
 
-  const cols=Math.ceil(Math.sqrt(nodes.length))||1, rows=Math.ceil(nodes.length/cols), cell=150;
-  const boardW=cols*cell, boardH=rows*cell;
+  const layCols=Math.ceil(Math.sqrt(nodes.length))||1, layRows=Math.ceil(nodes.length/layCols), cell=128;
+  const floorCols=Math.max(6,layCols+2), floorRows=Math.max(4,layRows+1);
+  const offC=Math.floor((floorCols-layCols)/2), offR=Math.floor((floorRows-layRows)/2);
+  const boardW=floorCols*cell, boardH=floorRows*cell;
   const maxB=Math.max(...nodes.map(n=>n.budget),1), maxA=Math.max(...nodes.map(n=>n.actual),1);
+
+  if(cityEl._yaw==null){ cityEl._yaw=0; cityEl._tilt=58; cityEl._zoom=null; }
+  // 화면에 맞게 초기 줌
+  if(cityEl._zoom==null){
+    const ct=Math.cos(58*D2R), st=Math.sin(58*D2R);
+    const projW=boardW, projH=boardH*ct+250*st;
+    cityEl._zoom=Math.max(.35,Math.min((cityEl.clientWidth-46)/projW,(cityEl.clientHeight-56)/projH,1.1));
+  }
+  function origin(){ return [cityEl.clientWidth*0.5, cityEl.clientHeight*0.60]; }
   const board=h(`<div class="board" style="left:${-boardW/2}px;top:${-boardH/2}px;width:${boardW}px;height:${boardH}px;--cell:${cell}px"></div>`);
   stage.appendChild(board);
 
-  // 저장된 배치 불러오기
   const saved=LS.getJSON(layoutKey(state))||{};
-  const used=new Set(); Object.values(saved).forEach(c=>used.add(c.gx+","+c.gy));
-  let free=0; const nextFree=()=>{ while(used.has((free%cols)+","+Math.floor(free/cols)) && free<cols*rows) free++; const g={gx:free%cols,gy:Math.floor(free/cols)}; used.add(g.gx+","+g.gy); free++; return g; };
-
+  const items=[];
   nodes.forEach((n,i)=>{
-    const g = saved[n.name] || nextFree();
-    const fp=44+70*Math.sqrt(n.budget/maxB), hz=14+188*(n.actual/maxA);
-    const bx=g.gx*cell+(cell-fp)/2, by=g.gy*cell+(cell-fp)/2;
+    const def={gx:offC+(i%layCols), gy:offR+Math.floor(i/layCols)};
+    const g=saved[n.name]||def;
+    const fp=40+66*Math.sqrt(n.budget/maxB), hz=14+186*(n.actual/maxA);
     const r=n.budget? n.actual/n.budget:0, base=execColor(r,pace);
+    const proj=forecast(n.actual,pace), over=proj>n.budget*1.0001;
     const cTop=shade(base,.22), cA=shade(base,-.12), cB=shade(base,-.34);
+    const bx=g.gx*cell+(cell-fp)/2, by=g.gy*cell+(cell-fp)/2;
     const bldg=h(`<div class="bldg" style="left:${bx}px;top:${by}px;width:${fp}px;height:${fp}px">
       <div class="bldg__face" style="width:${fp}px;height:${fp}px;background:${cTop};transform:translateZ(${hz}px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)"></div>
       <div class="bldg__face" style="width:${fp}px;height:${hz}px;background:${cA};transform-origin:0 0;transform:rotateX(90deg)"></div>
       <div class="bldg__face" style="width:${fp}px;height:${hz}px;background:${cA};transform-origin:0 0;transform:translateY(${fp}px) rotateX(90deg)"></div>
       <div class="bldg__face" style="width:${hz}px;height:${fp}px;background:${cB};transform-origin:0 0;transform:rotateY(-90deg)"></div>
       <div class="bldg__face" style="width:${hz}px;height:${fp}px;background:${cB};transform-origin:0 0;transform:translateX(${fp}px) rotateY(-90deg)"></div>
-      <div class="bldg__cap">${n.name}</div></div>`);
+    </div>`);
     board.appendChild(bldg);
-    const cap=bldg.querySelector(".bldg__cap");
-    bldg._node=n; bldg._fp=fp; bldg._g=g;
-    bldg.addEventListener("pointerenter",(e)=>{ if(!cityEl._drag){ showTip(e,n,pace); cap.style.opacity="1"; } });
+    bldg._node=n; bldg._fp=fp; bldg._hz=hz;
+    // 상시 라벨(스크린 오버레이) + 초과 느낌표
+    const lab=h(`<div class="blabel ${over?'is-over':''}">
+      ${over?`<span class="blabel__bang" title="연말 예산 초과 예상">!</span>`:""}
+      <div class="blabel__name">${n.name}</div>
+      <div class="blabel__num"><b style="color:${base}">${fmtPct(r,0)}</b> · ${fmtCompact(n.actual)}</div>
+    </div>`);
+    labels.appendChild(lab);
+    bldg._lab=lab; items.push(bldg);
+    bldg.addEventListener("pointerenter",(e)=>{ if(!cityEl._drag){ showTip(e,n,pace); lab.classList.add("hi"); } });
     bldg.addEventListener("pointermove",(e)=>{ if(!cityEl._drag) moveTip(e); });
-    bldg.addEventListener("pointerleave",()=>{ hideTip(); cap.style.opacity="0"; });
-    bldg.addEventListener("pointerdown",(e)=>startBldgDrag(e,cityEl,board,bldg,state,cell,cols,rows));
+    bldg.addEventListener("pointerleave",()=>{ hideTip(); lab.classList.remove("hi"); });
+    bldg.addEventListener("pointerdown",(e)=>startBldgDrag(e,cityEl,board,bldg,state,cell,floorCols,floorRows,positionLabels));
   });
 
-  // 배경 드래그 = 회전
-  cityEl.onpointerdown=(e)=>{ if(e.target.closest(".bldg")||e.target.closest(".iconbtn")||e.target.closest(".city__crumb")) return;
-    startOrbit(e,cityEl,applyView); };
-  cityEl.onwheel=(e)=>{ e.preventDefault(); cityEl._zoom=Math.min(2.2,Math.max(.5,cityEl._zoom*(e.deltaY<0?1.1:0.9))); applyView(); };
+  function positionLabels(){
+    const [ox,oy]=origin();
+    for(const b of items){
+      const cx=parseFloat(b.style.left)+b._fp/2 - boardW/2;
+      const cy=parseFloat(b.style.top)+b._fp/2 - boardH/2;
+      const [sx,sy]=project(cx,cy,b._hz+18,cityEl._yaw,cityEl._tilt,cityEl._zoom);
+      b._lab.style.left=(ox+sx)+"px"; b._lab.style.top=(oy+sy)+"px";
+    }
+  }
+  function applyView(){ stage.style.transform=`translate(-50%,-50%) rotateX(${cityEl._tilt}deg) rotateZ(${cityEl._yaw}deg) scale(${cityEl._zoom})`; positionLabels(); }
+  cityEl._positionLabels=positionLabels; cityEl._applyView=applyView;
+  applyView();
+
+  cityEl.onpointerdown=(e)=>{ if(e.target.closest(".bldg")||e.target.closest(".iconbtn")) return; startOrbit(e,cityEl,applyView); };
+  cityEl.onwheel=(e)=>{ e.preventDefault(); cityEl._zoom=Math.min(2.4,Math.max(.3,cityEl._zoom*(e.deltaY<0?1.1:0.9))); applyView(); };
   cityEl.addEventListener("pointerleave", hideTip);
   $("#rotL",cityEl).onclick=()=>{ cityEl._yaw-=22; applyView(); };
   $("#rotR",cityEl).onclick=()=>{ cityEl._yaw+=22; applyView(); };
-  $("#zReset",cityEl).onclick=()=>{ cityEl._yaw=-42; cityEl._tilt=56; cityEl._zoom=1; applyView(); };
-  cityEl._applyView=applyView;
-  renderCrumb(cityEl, state);
+  $("#zReset",cityEl).onclick=()=>{ cityEl._yaw=0; cityEl._tilt=58; cityEl._zoom=null; buildCity(cityEl,nodes,state); };
 }
 function startOrbit(e,cityEl,applyView){
   cityEl._drag="orbit"; hideTip();
@@ -490,7 +561,7 @@ function startOrbit(e,cityEl,applyView){
   const up=()=>{ cityEl._drag=null; window.removeEventListener("pointermove",mv); window.removeEventListener("pointerup",up); };
   window.addEventListener("pointermove",mv); window.addEventListener("pointerup",up);
 }
-function startBldgDrag(e,cityEl,board,bldg,state,cell,cols,rows){
+function startBldgDrag(e,cityEl,board,bldg,state,cell,cols,rows,positionLabels){
   e.stopPropagation(); hideTip();
   const sx=e.clientX, sy=e.clientY;
   const startLeft=parseFloat(bldg.style.left), startTop=parseFloat(bldg.style.top);
@@ -500,11 +571,12 @@ function startBldgDrag(e,cityEl,board,bldg,state,cell,cols,rows){
   const mv=(ev)=>{
     const dsx=(ev.clientX-sx), dsy=(ev.clientY-sy);
     if(!moved && Math.hypot(dsx,dsy)<5) return;
-    moved=true; cityEl._drag="bldg"; bldg.style.zIndex=50;
+    moved=true; cityEl._drag="bldg"; bldg.style.zIndex=50; bldg._lab&&bldg._lab.classList.add("hi");
     // 화면 이동량 → 보드 평면 이동량(회전/틸트/줌 역변환)
     const xp=dsx/zoom, yp=(dsy/zoom)/ct;
     const dbx= xp*cos + yp*sin, dby= -xp*sin + yp*cos;
     bldg.style.left=(startLeft+dbx)+"px"; bldg.style.top=(startTop+dby)+"px";
+    positionLabels&&positionLabels();
   };
   const up=()=>{
     window.removeEventListener("pointermove",mv); window.removeEventListener("pointerup",up);
@@ -535,6 +607,95 @@ function renderCrumb(cityEl, state){
     b.onclick=()=>{ state.path=path.slice(0,idx+1); state.update(); }; crumb.appendChild(b); });
   hud.appendChild(crumb);
 }
+/* --- 도넛(비중) --- */
+function buildDonut(container, nodes, state){
+  container.innerHTML="";
+  const rows=[...nodes].map((n,i)=>({n,i})).sort((a,b)=>b.n.budget-a.n.budget);
+  const tot=sumBudget(nodes)||1;
+  const R=120, r=78, C=2*Math.PI*R, cx=150, cy=150;
+  const wrap=h(`<div class="donutwrap"></div>`);
+  const svg=`<svg class="donut" viewBox="0 0 300 300" width="300" height="300">
+    <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--surface-3)" stroke-width="${R-r}"/>
+    ${rows.map((o,k)=>{ const f=o.n.budget/tot; const off=rows.slice(0,k).reduce((s,x)=>s+x.n.budget/tot,0);
+      return `<circle class="donut__seg" data-name="${o.n.name}" cx="${cx}" cy="${cy}" r="${R}" fill="none"
+        stroke="${catColor(o.i)}" stroke-width="${R-r}" stroke-dasharray="${f*C} ${C}"
+        stroke-dashoffset="${-off*C}" transform="rotate(-90 ${cx} ${cy})"/>`; }).join("")}
+    <text x="${cx}" y="${cy-6}" text-anchor="middle" fill="var(--ink-mut)" font-size="12">총 계획예산</text>
+    <text x="${cx}" y="${cy+18}" text-anchor="middle" fill="var(--ink)" font-size="21" font-weight="800">${fmtCompact(tot)}</text>
+  </svg>`;
+  const legend=h(`<div class="donutleg"></div>`);
+  rows.forEach((o)=>{ const share=o.n.budget/tot; const r2=o.n.budget?o.n.actual/o.n.budget:0;
+    const row=h(`<div class="dleg ${o.n.children&&o.n.children.length?'clk':''}">
+      <span class="swatch" style="background:${catColor(o.i)}"></span>
+      <span class="dleg__nm">${o.n.name}</span>
+      <span class="dleg__pc">${fmtPct(share,0)}</span>
+      <span class="dleg__am">${fmtCompact(o.n.budget)}</span></div>`);
+    if(o.n.children&&o.n.children.length) row.onclick=()=>{ state.path=state.path.concat([o.n.name]); state.update(); };
+    legend.appendChild(row); });
+  wrap.innerHTML=svg; wrap.appendChild(legend);
+  container.appendChild(wrap);
+  wrap.querySelectorAll(".donut__seg").forEach(seg=>{
+    seg.addEventListener("pointerenter",()=>seg.style.strokeWidth=(R-r+8)+"px");
+    seg.addEventListener("pointerleave",()=>seg.style.strokeWidth=(R-r)+"px");
+    seg.addEventListener("click",()=>{ const nm=seg.dataset.name; const nn=nodes.find(x=>x.name===nm);
+      if(nn&&nn.children&&nn.children.length){ state.path=state.path.concat([nm]); state.update(); } });
+  });
+}
+/* --- 2D 가로 막대(정밀) --- */
+function buildBars(container, nodes, state){
+  container.innerHTML="";
+  const pace=state.pace||0;
+  const rows=[...nodes].sort((a,b)=>b.budget-a.budget);
+  const wrap=h(`<div class="hbars"></div>`);
+  rows.forEach((n,i)=>{ const r=n.budget?n.actual/n.budget:0, col=execColor(r,pace);
+    const proj=forecast(n.actual,pace), pj=n.budget?proj/n.budget:0, over=proj>n.budget*1.0001;
+    const row=h(`<div class="hbar ${n.children&&n.children.length?'clk':''}">
+      <div class="hbar__lbl"><span class="swatch" style="background:${catColor(i)}"></span>${n.name}${over?' <span class="bang-i">!</span>':''}</div>
+      <div class="hbar__track">
+        <i style="width:${Math.min(100,r*100)}%;background:${col}"></i>
+        <span class="hbar__proj" style="left:${Math.min(100,pj*100)}%" title="연말 추정"></span>
+      </div>
+      <div class="hbar__val"><b>${fmtCompact(n.actual)}</b><span> / ${fmtCompact(n.budget)}</span><br>
+        <span class="${over?'ov':''}">집행 ${fmtPct(r,0)} · 추정 ${fmtPct(pj,0)}</span></div>
+    </div>`);
+    if(n.children&&n.children.length) row.onclick=()=>{ state.path=state.path.concat([n.name]); state.update(); };
+    wrap.appendChild(row); });
+  container.appendChild(wrap);
+}
+/* --- 월별 계획 vs 집행 --- */
+const MONTH_W=[0.92,0.86,0.95,1.0,1.06,1.0,0.97,1.02,1.05,1.06,1.08,1.13];
+function currentMonth(year){ const now=new Date(), y=now.getFullYear(); if(year<y) return 12; if(year>y) return 0; return now.getMonth()+1; }
+function monthlySeries(totB,totA,curMonth){
+  const ws=MONTH_W.reduce((a,b)=>a+b,0);
+  const plan=MONTH_W.map(w=>totB*w/ws);
+  let ew=0; for(let m=0;m<curMonth;m++) ew+=MONTH_W[m];
+  const actual=MONTH_W.map((w,m)=> m<curMonth ? (ew>0? totA*w/ew : 0) : null);
+  return {plan,actual};
+}
+function renderMonthly(container, nodes, pace, curMonth){
+  container.innerHTML="";
+  const totB=sumBudget(nodes), totA=sumActual(nodes);
+  const {plan,actual}=monthlySeries(totB,totA,curMonth);
+  const maxV=Math.max(...plan, ...actual.filter(x=>x!=null), 1);
+  const bars=h(`<div class="mbars"></div>`);
+  for(let m=0;m<12;m++){
+    const ph=Math.round(plan[m]/maxV*100), ah=actual[m]!=null?Math.round(actual[m]/maxV*100):0;
+    const acol=actual[m]!=null? execColor(plan[m]?actual[m]/plan[m]:0,1) : "var(--cat-3)";
+    const col=h(`<div class="mcol ${m+1===curMonth?'is-now':''}" title="${m+1}월 · 계획 ${fmtCompact(plan[m])}${actual[m]!=null?' · 집행 '+fmtCompact(actual[m]):''}">
+      <div class="mcol__bars">
+        <div class="mbar plan" style="height:${ph}%"></div>
+        <div class="mbar act" style="height:${ah}%;background:${acol}"></div>
+      </div>
+      <div class="mcol__lbl">${m+1}</div></div>`);
+    bars.appendChild(col);
+  }
+  const legend=h(`<div style="display:flex;gap:16px;justify-content:flex-end;margin-bottom:8px;font-size:11.5px;color:var(--ink-mut)">
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--surface-3);border:1px solid var(--line-2);vertical-align:-1px"></span> 계획</span>
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--cat-3);vertical-align:-1px"></span> 집행(당월까지)</span>
+    <span>계획 합계 ${fmtCompact(totB)} · 집행 ${fmtCompact(totA)}</span></div>`);
+  container.append(legend, bars);
+}
+
 let tipEl=null;
 function tip(){ if(!tipEl){ tipEl=h(`<div class="city-tip"></div>`); document.body.appendChild(tipEl);} return tipEl; }
 function showTip(e,n,pace){ const r=n.budget? n.actual/n.budget:0, t=tip(), col=execColor(r,pace);
@@ -631,6 +792,179 @@ function renderCaseTypes(types){
 }
 
 /* ------------------------------ 설정 ------------------------------ */
+/* ============================================================================
+   나머지 화면 (더미/샘플 데이터 기반 미리보기)
+   ============================================================================ */
+function kpiRow(items){ const row=h(`<div class="kpis"></div>`);
+  items.forEach(k=>row.appendChild(h(`<div class="kpi" style="--accent:${k.accent||'var(--cat-1)'}">
+    <div class="kpi__label">${k.label}</div><div class="kpi__val">${k.val}<span class="unit">${k.unit||""}</span></div>
+    ${k.delta?`<div class="kpi__delta ${k.dcls||''}">${k.delta}</div>`:""}</div>`))); return row; }
+function dualMonthChart(plan, actual, actColorFn){
+  const maxV=Math.max(...plan, ...actual.filter(x=>x!=null),1);
+  const bars=h(`<div class="mbars"></div>`);
+  const cm=currentMonth(Number(ctx.year));
+  for(let m=0;m<12;m++){ const ph=Math.round(plan[m]/maxV*100), ah=actual[m]!=null?Math.round(actual[m]/maxV*100):0;
+    const acol=actColorFn?actColorFn(m,plan[m],actual[m]):"var(--cat-3)";
+    bars.appendChild(h(`<div class="mcol ${m+1===cm?'is-now':''}" title="${m+1}월 · 계획 ${fmtCompact(plan[m])}${actual[m]!=null?' · 실적 '+fmtCompact(actual[m]):''}">
+      <div class="mcol__bars"><div class="mbar plan" style="height:${ph}%"></div><div class="mbar act" style="height:${ah}%;background:${acol}"></div></div>
+      <div class="mcol__lbl">${m+1}</div></div>`)); }
+  return bars;
+}
+/* --- 사업비 계획 --- */
+function driverType(l1){ return {"인건비":"인원연동","지급수수료":"수입연동","임차관리비":"고정(월정액)","마케팅":"증감률(전년대비)","일반관리":"단가×수량"}[l1]||"고정(월정액)"; }
+function renderPlan(root){
+  root.innerHTML=""; const leaves=ctx.data.leaves||[];
+  if(!leaves.length){ root.appendChild(soonNote("🧭","사업비 계획","폴더를 읽거나 샘플로 둘러보면 계획 표가 표시됩니다.")); return; }
+  const tree=buildTree(leaves), tot=sumBudget(tree);
+  root.appendChild(kpiRow([
+    {label:"연간 계획 사업비",val:fmtCompact(tot),unit:"원",accent:"var(--cat-1)"},
+    {label:"대분류 수",val:tree.length,unit:"개",accent:"var(--cat-3)"},
+    {label:"전년 대비(예시)",val:"+7.0",unit:"%",accent:"var(--cat-4)",delta:"산출근거 롤링 반영",dcls:"down"},
+    {label:"산출근거 항목",val:leaves.length,unit:"개",accent:"var(--cat-7)",delta:"드라이버 기반",dcls:"up"},
+  ]));
+  const card=h(`<div class="card"><div class="card__hd"><div>
+    <div class="card__title"><span class="dot" style="background:var(--cat-1)"></span>사업비 계획 · 산출근거</div>
+    <div class="card__sub">각 항목은 산출근거(드라이버) 기반 — 내년엔 숫자만 바꿔 자동 재계산 (예시 더미)</div></div>
+    <button class="btn btn--sm" id="planTag">＋ 항목 추가(예정)</button></div>
+    <div class="card__bd" style="padding-top:8px"><table class="tbl"><thead><tr>
+      <th>대분류</th><th>중분류</th><th>소분류</th><th>산출근거 유형</th><th>산출근거(예시)</th><th class="num">계획액</th>
+    </tr></thead><tbody id="ptb"></tbody></table></div></div>`);
+  const tb=$("#ptb",card);
+  tree.forEach((n1,i)=>{
+    tb.appendChild(h(`<tr style="background:color-mix(in srgb,var(--surface-3) 50%,transparent)">
+      <td colspan="5"><span class="swatch" style="background:${catColor(i)}"></span><b>${n1.name}</b></td>
+      <td class="num"><b>${fmtWon(n1.budget)}</b></td></tr>`));
+    n1.children.forEach(n2=>n2.children.forEach(n3=>{
+      const dt=driverType(n1.name), basis={
+        "고정(월정액)":`월 ${fmtCompact(Math.round(n3.budget/12))} × 12개월`,
+        "단가×수량":`단가 ${fmtCompact(Math.round(n3.budget/50))} × 50`,
+        "수입연동":`수수료 수입의 ${(n3.budget/1e8).toFixed(1)}%`,
+        "인원연동":`인당 ${fmtCompact(Math.round(n3.budget/20/12))} × 20명 × 12`,
+        "증감률(전년대비)":`전년 ${fmtCompact(Math.round(n3.budget/1.07))} × (1+7%)`,
+      }[dt];
+      tb.appendChild(h(`<tr><td style="color:var(--ink-mut)">${n1.name}</td><td>${n2.name}</td><td>${n3.name}</td>
+        <td><span class="tag">${dt}</span></td><td style="color:var(--ink-2)">${basis}</td>
+        <td class="num">${fmtWon(n3.budget)}</td></tr>`));
+    }));
+  });
+  root.appendChild(card);
+  $("#planTag",card).onclick=()=>toast("warn","준비 중","항목 추가/편집은 다음 단계에서 열립니다");
+}
+/* --- 계획 vs 실적 --- */
+function renderVariance(root){
+  root.innerHTML=""; const leaves=ctx.data.leaves||[];
+  if(!leaves.length){ root.appendChild(soonNote("📊","계획 vs 실적","폴더를 읽거나 샘플로 둘러보면 표가 표시됩니다.")); return; }
+  const tree=buildTree(leaves), pace=yearPace(Number(ctx.year));
+  const totB=sumBudget(tree),totA=sumActual(tree),proj=forecast(totA,pace);
+  root.appendChild(kpiRow([
+    {label:"계획",val:fmtCompact(totB),unit:"원",accent:"var(--cat-1)"},
+    {label:"집행",val:fmtCompact(totA),unit:"원",accent:"var(--cat-3)",delta:`집행률 ${fmtPct(totA/totB,1)}`,dcls:totA/totB<=pace?"up":"down"},
+    {label:"연말 추정",val:fmtCompact(proj),unit:"원",accent:proj>totB?"var(--st-crit)":"var(--st-good)",delta:`계획 대비 ${proj>totB?'▲'+fmtCompact(proj-totB):'▼'+fmtCompact(totB-proj)}`,dcls:proj>totB?"down":"up"},
+    {label:"초과 예상 대분류",val:tree.filter(n=>forecast(n.actual,pace)>n.budget).length,unit:"개",accent:"var(--st-crit)"},
+  ]));
+  const card=h(`<div class="card"><div class="card__hd"><div>
+    <div class="card__title"><span class="dot" style="background:var(--cat-2)"></span>계획 대비 실적 · 연말 추정</div>
+    <div class="card__sub">시간진도 ${fmtPct(pace,0)} 기준 · 상태는 연말 추정 대비 예산</div></div></div>
+    <div class="card__bd" style="padding-top:8px"><table class="tbl"><thead><tr>
+      <th>구분</th><th class="num">계획</th><th class="num">집행</th><th class="num">집행률</th><th class="num">잔여</th><th class="num">연말 추정</th><th>상태</th>
+    </tr></thead><tbody id="vtb"></tbody></table></div></div>`);
+  const tb=$("#vtb",card);
+  const rowFor=(n,depth,i)=>{ const r=n.budget?n.actual/n.budget:0, proj=forecast(n.actual,pace), pj=n.budget?proj/n.budget:0;
+    const st = pj>1.05?["초과","tag--crit"]:pj>1.0?["주의","tag--warn"]:["정상","tag--good"];
+    return h(`<tr><td style="padding-left:${12+depth*20}px">${depth?"":`<span class="swatch" style="background:${catColor(i)}"></span>`}${depth?"└ ":""}${n.name}</td>
+      <td class="num">${fmtCompact(n.budget)}</td><td class="num">${fmtCompact(n.actual)}</td>
+      <td class="num">${fmtPct(r,0)}</td><td class="num">${fmtCompact(n.budget-n.actual)}</td>
+      <td class="num" style="color:${pj>1?'var(--st-crit)':'var(--ink)'}">${fmtPct(pj,0)}</td>
+      <td><span class="tag ${st[1]}">${st[0]}</span></td></tr>`); };
+  tree.forEach((n1,i)=>{ const t=rowFor(n1,0,i); t.style.fontWeight="700"; tb.appendChild(t);
+    n1.children.forEach(n2=>tb.appendChild(rowFor(n2,1,i))); });
+  root.appendChild(card);
+}
+/* --- 수입 · 수수료 --- */
+const CASE_DEF=[{type:"대인",unit:220000,avg:480},{type:"대물",unit:150000,avg:850},{type:"자차",unit:110000,avg:400}];
+function caseMonthly(){ const cm=currentMonth(Number(ctx.year));
+  return CASE_DEF.map(c=>{ const cnt=MONTH_W.map(w=>Math.round(c.avg*w));
+    const actCnt=cnt.map((v,m)=>m<cm?v:null); return {...c,cnt,actCnt}; }); }
+function revenueMonthly(){ const cases=caseMonthly();
+  const plan=Array(12).fill(0), actual=Array(12).fill(null);
+  cases.forEach(c=>c.cnt.forEach((v,m)=>{ plan[m]+=v*c.unit; if(c.actCnt[m]!=null){ actual[m]=(actual[m]||0)+c.actCnt[m]*c.unit; } }));
+  return {plan,actual,cases}; }
+function renderIncome(root){
+  root.innerHTML=""; const {plan,actual,cases}=revenueMonthly();
+  const annual=plan.reduce((a,b)=>a+b,0), totCnt=cases.reduce((s,c)=>s+c.cnt.reduce((a,b)=>a+b,0),0);
+  root.appendChild(kpiRow([
+    {label:"연간 수수료 수입(추정)",val:fmtCompact(annual),unit:"원",accent:"var(--cat-3)"},
+    {label:"연간 처리건수",val:totCnt.toLocaleString("ko-KR"),unit:"건",accent:"var(--cat-1)"},
+    {label:"평균 건당 수수료",val:fmtCompact(Math.round(annual/totCnt)),unit:"원",accent:"var(--cat-4)"},
+    {label:"월평균 처리건",val:Math.round(totCnt/12).toLocaleString("ko-KR"),unit:"건",accent:"var(--cat-7)"},
+  ]));
+  const grid=h(`<div class="grid-2" style="grid-template-columns:1.5fr 1fr;align-items:start"></div>`);
+  const chart=h(`<div class="card"><div class="card__hd"><div>
+    <div class="card__title"><span class="dot" style="background:var(--cat-3)"></span>월별 수수료 수입</div>
+    <div class="card__sub">회색=계획 · 색=실적(당월까지) · 예시 더미</div></div></div>
+    <div class="card__bd" id="revbd" style="padding-top:10px"></div></div>`);
+  $("#revbd",chart).appendChild(dualMonthChart(plan,actual,()=>"var(--cat-3)"));
+  const tbl=h(`<div class="card"><div class="card__hd"><div>
+    <div class="card__title"><span class="dot" style="background:var(--cat-2)"></span>유형별 처리건 · 수입</div>
+    <div class="card__sub">건당 단가 × 연간 건수</div></div></div>
+    <div class="card__bd" style="padding-top:6px"><table class="tbl"><thead><tr>
+      <th>사고유형</th><th class="num">건당 단가</th><th class="num">연간 건수</th><th class="num">연간 수입</th></tr></thead><tbody id="itb"></tbody></table></div></div>`);
+  const itb=$("#itb",tbl);
+  cases.forEach((c,i)=>{ const cnt=c.cnt.reduce((a,b)=>a+b,0);
+    itb.appendChild(h(`<tr><td><span class="swatch" style="background:${catColor(i)}"></span>${c.type}</td>
+      <td class="num">${fmtWon(c.unit)}원</td><td class="num">${cnt.toLocaleString("ko-KR")}</td>
+      <td class="num"><b>${fmtCompact(cnt*c.unit)}</b></td></tr>`)); });
+  grid.append(chart,tbl); root.appendChild(grid);
+}
+/* --- 손익 · 현금흐름 --- */
+function renderPnl(root){
+  root.innerHTML=""; const leaves=ctx.data.leaves||[];
+  if(!leaves.length){ root.appendChild(soonNote("💰","손익 · 현금흐름","폴더를 읽거나 샘플로 둘러보면 표시됩니다.")); return; }
+  const s=ctx.data.settings||defSettings();
+  const rev=revenueMonthly().plan;                       // 월 수입
+  const cost=monthlySeries(sumBudget(buildTree(leaves)),0,0).plan; // 월 비용(계획)
+  const feeLag=Number(s.feeLag||1);
+  const profit=rev.map((r,m)=>r-cost[m]);
+  const annualProfit=profit.reduce((a,b)=>a+b,0);
+  // 현금흐름: 수입은 feeLag 개월 뒤 입금
+  let cash=Number(s.openingCash||0); const cashArr=[]; let minCash=cash, minM=0;
+  for(let m=0;m<12;m++){ const inflow = m-feeLag>=0? rev[m-feeLag]:0; cash += inflow - cost[m]; cashArr.push(cash); if(cash<minCash){minCash=cash;minM=m;} }
+  root.appendChild(kpiRow([
+    {label:"연간 손익(추정)",val:fmtCompact(annualProfit),unit:"원",accent:annualProfit>=0?"var(--st-good)":"var(--st-crit)",delta:annualProfit>=0?"흑자 예상":"적자 예상",dcls:annualProfit>=0?"up":"down"},
+    {label:"연간 수입",val:fmtCompact(rev.reduce((a,b)=>a+b,0)),unit:"원",accent:"var(--cat-3)"},
+    {label:"연간 비용",val:fmtCompact(cost.reduce((a,b)=>a+b,0)),unit:"원",accent:"var(--cat-2)"},
+    {label:"최저 현금(예상)",val:fmtCompact(minCash),unit:"원",accent:minCash<0?"var(--st-crit)":"var(--st-good)",delta:`${minM+1}월 · 수수료 ${feeLag}개월 후 입금 가정`,dcls:minCash<0?"down":"up"},
+  ]));
+  // 월별 손익 (부호 막대)
+  const maxAbs=Math.max(...profit.map(Math.abs),1);
+  const pcard=h(`<div class="card"><div class="card__hd"><div>
+    <div class="card__title"><span class="dot" style="background:var(--cat-4)"></span>월별 손익 (수입 − 비용)</div>
+    <div class="card__sub">초록=흑자 · 빨강=적자 · 예시 더미</div></div></div><div class="card__bd"><div class="signbars" id="sb"></div></div></div>`);
+  const sb=$("#sb",pcard);
+  profit.forEach((v,m)=>{ const hpct=Math.round(Math.abs(v)/maxAbs*46); const pos=v>=0;
+    sb.appendChild(h(`<div class="scol" title="${m+1}월 손익 ${fmtCompact(v)}">
+      <div class="scol__pos">${pos?`<div class="sbar" style="height:${hpct}%;background:var(--st-good)"></div>`:""}</div>
+      <div class="scol__mid"></div>
+      <div class="scol__neg">${!pos?`<div class="sbar" style="height:${hpct}%;background:var(--st-crit)"></div>`:""}</div>
+      <div class="mcol__lbl">${m+1}</div></div>`)); });
+  root.appendChild(pcard);
+  // 현금 잔액 라인
+  const minV=Math.min(0,...cashArr), maxV=Math.max(...cashArr,1), span=maxV-minV||1;
+  const pts=cashArr.map((c,m)=>`${40+m*(920/11)},${180-(c-minV)/span*150}`).join(" ");
+  const zeroY=180-(0-minV)/span*150;
+  const ccard=h(`<div class="card" style="margin-top:18px"><div class="card__hd"><div>
+    <div class="card__title"><span class="dot" style="background:var(--cat-1)"></span>현금 잔액 추이</div>
+    <div class="card__sub">시작 현금 ${fmtCompact(s.openingCash||0)} · 수수료 ${feeLag}개월 후 입금 가정</div></div></div>
+    <div class="card__bd"><svg viewBox="0 0 1000 200" width="100%" height="190" preserveAspectRatio="none">
+      <line x1="40" y1="${zeroY}" x2="960" y2="${zeroY}" stroke="var(--st-crit)" stroke-dasharray="4 4" opacity=".6"/>
+      <polyline points="${pts}" fill="none" stroke="var(--cat-1)" stroke-width="2.5"/>
+      ${cashArr.map((c,m)=>`<circle cx="${40+m*(920/11)}" cy="${180-(c-minV)/span*150}" r="3.5" fill="${c<0?'var(--st-crit)':'var(--cat-1)'}"/>`).join("")}
+      ${cashArr.map((c,m)=>`<text x="${40+m*(920/11)}" y="196" text-anchor="middle" fill="var(--ink-mut)" font-size="11">${m+1}</text>`).join("")}
+    </svg><div style="text-align:right;font-size:11.5px;color:var(--ink-mut);margin-top:4px">빨간 점선 아래 = 현금 부족 구간</div></div></div>`);
+  root.appendChild(ccard);
+}
+function soonNote(icon,title,desc){ return h(`<div class="soon"><div class="big">${icon}</div><h3>${title}</h3><p>${desc}</p></div>`); }
+
 function renderSettings(root){
   root.innerHTML=""; const s=ctx.data.settings||defSettings();
   const card=h(`<div class="card" style="max-width:760px"><div class="card__hd"><div>
