@@ -477,3 +477,38 @@ select.input{max-width:280px}
 .rowdel{border:0;background:transparent;color:var(--ink-mut);cursor:pointer;font-size:15px;border-radius:6px;padding:3px 8px}
 .rowdel:hover{color:var(--st-crit);background:color-mix(in srgb,var(--st-crit) 12%,transparent)}
 .tbl td.tight{padding:4px 6px}
+
+/* =========================== 계획 입력 모달 =========================== */
+.cellbtn{border:1px dashed var(--line-2);background:transparent;color:var(--ink-mut);border-radius:8px;
+  padding:6px 10px;font:inherit;font-size:12.5px;cursor:pointer;width:100%;text-align:right;font-variant-numeric:tabular-nums}
+.cellbtn:hover{border-color:var(--cat-1);color:var(--ink)}
+.cellbtn.has{border-style:solid;color:var(--ink);font-weight:650}
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:100;display:grid;place-items:center;animation:fade .15s}
+@keyframes fade{from{opacity:0}}
+.modal{width:min(640px,94vw);max-height:90vh;display:flex;flex-direction:column;background:var(--surface-1);
+  border:1px solid var(--line-2);border-radius:var(--r-xl);box-shadow:var(--shadow-pop);overflow:hidden}
+.modal__hd{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.modal__hd h3{margin:0;font-size:17px}
+.modal__x{border:0;background:transparent;color:var(--ink-mut);font-size:18px;cursor:pointer;line-height:1}
+.modal__bd{padding:18px 22px;overflow:auto}
+.modal__ft{padding:14px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px}
+.modal__sub{color:var(--ink-mut);font-size:12.5px}
+.methods{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 16px}
+.methods button{border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink-2);border-radius:99px;
+  padding:8px 14px;font-size:12.5px;font-weight:650;cursor:pointer}
+.methods button.on{background:var(--cat-1);color:#fff;border-color:transparent}
+.fld{display:flex;align-items:center;gap:12px;margin:11px 0}
+.fld>label{width:96px;color:var(--ink-2);font-size:13px;flex:0 0 auto}
+.stepper{display:flex;align-items:center;border:1px solid var(--line-2);border-radius:10px;overflow:hidden}
+.stepper button{border:0;background:var(--surface-2);color:var(--ink);width:36px;height:38px;font-size:17px;cursor:pointer}
+.stepper button:hover{background:var(--surface-3)}
+.stepper input{border:0;background:transparent;color:var(--ink);text-align:center;width:120px;height:38px;font:inherit;font-variant-numeric:tabular-nums}
+.calc-total{margin:16px 0 8px;padding:14px 18px;background:linear-gradient(180deg,var(--surface-2),var(--surface-3));
+  border-radius:12px;display:flex;justify-content:space-between;align-items:center}
+.calc-total b{font-size:23px;font-variant-numeric:tabular-nums}
+.radio-row{display:flex;gap:16px;margin:8px 0}
+.radio-row label{display:flex;gap:7px;align-items:center;cursor:pointer;font-size:13px}
+.months-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px}
+.mfld{display:flex;flex-direction:column;gap:3px}
+.mfld span{font-size:10.5px;color:var(--ink-mut)}
+.mfld input{border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);border-radius:8px;padding:6px;font:inherit;font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
