@@ -192,6 +192,12 @@ strong{font-weight:800;color:var(--ink)}
 .mini-btn{border:none;background:var(--indigo);color:#fff;font-family:inherit;font-weight:800;
   font-size:clamp(15px,1.8vw,22px);padding:.55em 1.3em;border-radius:12px;cursor:pointer}
 .toast{font-size:clamp(14px,1.6vw,20px);color:var(--teal);font-weight:800;min-height:1.3em}
+.fl{font-size:clamp(13px,1.5vw,18px);font-weight:800;color:var(--ink-soft)}
+.restin{width:100%;max-width:460px;font-family:inherit;font-size:clamp(15px,1.7vw,21px);padding:.55em .85em;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.reacts{display:grid;gap:7px;width:100%;max-width:460px}
+.react-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:.32em .5em}
+.react-row .nm{font-weight:800;font-size:clamp(14px,1.6vw,20px);text-align:left;padding-left:.5em}
+.react-row .rate{padding:.28em .75em}
 
 /* 탭 */
 .tabs{display:flex;gap:8px;margin-bottom:clamp(16px,2.4vh,26px);border-bottom:2px solid var(--line)}
@@ -233,7 +239,8 @@ strong{font-weight:800;color:var(--ink)}
 .fund-balance .l{font-size:clamp(13px,1.5vw,19px);color:var(--ink-faint);font-weight:700;margin-top:6px}
 .exp-form{display:grid;gap:9px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:clamp(13px,1.7vw,20px)}
 .exp-form .fl{font-size:clamp(13px,1.5vw,18px);font-weight:800;color:var(--ink-soft)}
-.exp-form input{font-family:inherit;font-size:clamp(15px,1.7vw,21px);padding:.55em .8em;border-radius:11px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.exp-form input,.exp-form select{font-family:inherit;font-size:clamp(15px,1.7vw,21px);padding:.55em .8em;border-radius:11px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .prow{display:grid;grid-template-columns:1fr 7.5em 2.2em;gap:8px;align-items:center}
 .prow .del{border:none;background:var(--line-strong);color:var(--ink);border-radius:9px;cursor:pointer;font-weight:800;height:100%;font-family:inherit;font-size:1.1em}
 .prow .del:hover{background:var(--coral);color:#fff}
@@ -330,7 +337,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
       <div class="meta-row">
         <span class="chip">⏱ 2시간</span>
         <span class="chip">👥 3년차 미만 실무자</span>
-        <span class="chip">🌐 claude.ai</span>
+        <span class="chip">🌐 claude.ai · ChatGPT</span>
         <span class="chip">💻 코딩 지식 0에서 시작</span>
       </div>
       <div class="callout"><span class="bang">!</span>
@@ -472,7 +479,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
             잘 쓰고 있는데 <b>통계가 없네</b>. 오늘 먹은 메뉴를 <b>직원들이 좋아했는지, 맛집은 어디였는지 기록</b>하고 — <b>이번 주·이번 달에 뭘 몇 번</b> 먹었는지, <b>한·양·일·중은 각각 몇 번</b>인지 데이터를 쌓아서, <b>너무 자주 먹거나 겹치는 걸 알려주는 참고자료</b>도 나오게 해줘.</div></div>
         <div class="turn ai"><span class="avatar">AI</span>
           <div class="bubble"><span class="who">Claude</span>
-            기록·통계를 붙였어요. 메뉴를 뽑고 <b>맛집·반응</b>을 기록하면 최근 7일·이번 달 횟수, <b>분류별 분포</b>, '<b>이번 주 자주 먹은 메뉴</b>' 알림까지 자동 정리됩니다 👉</div></div>
+            기록·통계를 붙였어요. 메뉴를 뽑고 <b>맛집</b>과 <b>수석님별 좋아요/별로</b>를 체크해 기록하면, 최근 7일·이번 달 횟수, <b>분류별 분포</b>, '<b>이번 주 자주 먹은 메뉴</b>' 알림까지 자동 정리됩니다 👉</div></div>
       </div>
     </div>
   </section>
@@ -481,7 +488,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
   <section class="slide center wide" data-accent="coral" data-title="② 결과 (통계 작동!)"
     data-notes="[00:25] 개선 결과 = 추천 + 통계. 왼쪽에서 메뉴 뽑고 맛집 적고 '기록하기' → 오른쪽 통계 숫자·막대가 바뀌는 걸 보여주기(라이브의 하이라이트!). '자주 먹은 메뉴' 알림도 짚기. '저는 표·그래프 만드는 법 몰라요. 그냥 원하는 걸 말했을 뿐.' 마지막 요청 하나 더 예고.">
     <div class="slide-inner">
-      <div class="result-head"><span class="badge">결과 ② · 실제 작동</span> <span class="tap-hint">👆 기록하면 오른쪽 통계가 바뀝니다</span></div>
+      <div class="result-head"><span class="badge">결과 ② · 실제 작동</span> <span class="tap-hint">👆 수석님별로 평가·기록하면 오른쪽 통계가 바뀝니다</span></div>
       <div class="browser wideframe">
         <div class="browser-bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">점심 매니저 · 2단계 (기록·통계)</span></div>
         <div class="browser-body">
@@ -505,14 +512,14 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
             우리가 밥 먹고 <b>과비로 결제</b>하거든. 근데 과비를 아직 <b>수기로 관리</b>해. 그날 먹은 걸 <b>각자 얼마씩 냈는지</b> 넣으면, <b>잔액이랑 가계부 형태까지 연결</b>해서 관리되게 만들어줘.</div></div>
         <div class="turn ai"><span class="avatar">AI</span>
           <div class="bubble"><span class="who">Claude</span>
-            과비 가계부를 추가했어요. 참여자별 금액을 넣어 지출을 기록하면 <b>잔액이 자동 계산</b>되고, 충전·지출 내역이 <b>가계부</b>로 쌓입니다. 이제 <b>[추천 · 통계 · 과비]</b> 한 앱에서 다 돼요 👉</div></div>
+            과비 가계부를 추가했어요. <b>날짜는 달력</b>에서 고르고 <b>음식은 목록</b>에서 선택, 참여자별 금액을 넣으면 <b>잔액이 자동 계산</b>되고 충전·지출이 <b>가계부</b>로 쌓입니다. 이제 <b>[추천·통계·과비]</b> 한 앱에서 다 돼요 👉</div></div>
       </div>
     </div>
   </section>
 
   <!-- 14. Result 3 (완성 앱) -->
   <section class="slide center wide" data-accent="coral" data-title="③ 완성! (전체 앱 시연)"
-    data-notes="[00:30] 완성본. 탭 전환하며 라이브 시연: [추천]에서 뽑고 기록 → [통계]에서 반영 확인 → [과비]에서 참여자·금액 넣고 '지출 기록' → 잔액 자동 계산·가계부에 쌓임. 청중 참여 유도('근처 맛집 하나 외쳐보세요' → 즉석 추가). 마무리 멘트: 'HTML 파일 하나. 코드 0줄. 대화 3번.'  ※ 입력창엔 한글·스페이스·숫자 다 정상 입력(슬라이드 안 넘어감).">
+    data-notes="[00:30] 완성본. 탭 전환하며 라이브 시연: [추천]에서 뽑고 수석님별 좋아요/별로 체크 후 기록 → [통계]에서 반영 확인 → [과비]에서 '일자(달력)·음식(드롭다운)·참여자별 금액' 넣고 '지출 기록' → 잔액 자동 계산·가계부에 쌓임. 청중 참여 유도('근처 맛집 하나 외쳐보세요'). 마무리 멘트: 'HTML 파일 하나. 코드 0줄. 대화 3번.'  ※ 입력창엔 한글·스페이스·숫자 다 정상 입력(슬라이드 안 넘어감).">
     <div class="slide-inner">
       <div class="result-head"><span class="badge">완성 ③ · 전체 앱</span> <span class="tap-hint">👆 탭을 눌러 추천·통계·과비를 모두 써보세요</span></div>
       <div class="browser wideframe">
@@ -548,7 +555,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
 
   <!-- 16. Divider 실습 -->
   <section class="slide divider center" data-accent="indigo" data-title="STEP 3 · 여러분 차례"
-    data-notes="[00:35] (필요시 휴식 10분 후 시작) 에너지 올리기. '방금 본 걸 그대로 해봅니다.' claude.ai 로그인 확인. 막히면 손 들기.">
+    data-notes="[00:35] (필요시 휴식 10분 후 시작) 에너지 올리기. '방금 본 걸 그대로 해봅니다.' AI 챗봇(claude.ai·ChatGPT 등) 로그인 확인. 조별로 진행. 막히면 손 들기.">
     <div class="slide-inner">
       <p class="idx">YOU</p>
       <span class="eyebrow"><span class="dot"></span> STEP 3 · 실습</span>
@@ -565,7 +572,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
       <div class="grid cols-2">
         <div class="card"><span class="k">준비 3단계</span>
           <p style="color:var(--ink);font-weight:600;font-size:clamp(17px,2vw,26px);line-height:1.8">
-            1. <b>claude.ai</b> 접속 &amp; 로그인<br>2. <b>새 대화</b> 시작<br>3. 아래 4요소로 <b>첫 요청</b> 쓰기</p></div>
+            1. <b>AI 챗봇</b> 접속 <span class="muted">(claude.ai · ChatGPT 등)</span><br>2. <b>새 대화</b> 시작<br>3. 아래 4요소로 <b>첫 요청</b> 쓰기</p></div>
         <div class="card"><span class="k">좋은 요청 4요소</span>
           <p style="color:var(--ink);font-weight:600;font-size:clamp(17px,2vw,26px);line-height:1.8">
             ① <b>무엇을</b> 만들지<br>② <b>누가·언제</b> 쓰나<br>③ <b>어떻게 보이길</b><br>④ <b>예시·규칙</b> (조건)</p></div>
@@ -574,21 +581,21 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
     </div>
   </section>
 
-  <!-- 18. 뭘 만들까 -->
-  <section class="slide" data-accent="coral" data-title="뭘 만들까 (실습 메뉴)"
-    data-notes="[00:40] 뭘 만들지 예시. 고민되면 방금 본 점심 매니저를 그대로 따라 만들어도 OK. 내 업무와 가까운 걸로. 결정 못 하면 D-day 계산기 추천.">
+  <!-- 18. 조별 미션 -->
+  <section class="slide" data-accent="coral" data-title="조별 미션"
+    data-notes="[00:40] 조별 미션 안내. 4개 조가 각자 '우리 업무에 진짜 도움될 프로그램' 하나를 골라 완성 → 마지막에 조별 30초 발표. 정답 없음: 우리 조가 매일 반복하는 일 하나를 도구로. 배부한 '시작 프롬프트 카드'(핸드아웃)를 채워서 첫 요청 → 방금 본 것처럼 '이렇게 바꿔줘' 반복. 아이디어 예시는 참고용, 우리 조 업무로 바꿔도 좋음.">
     <div class="slide-inner">
-      <span class="eyebrow"><span class="dot"></span> 뭘 만들까?</span>
-      <h2 class="subhead">내 업무와 <span class="mark">가까운 걸로</span></h2>
+      <span class="eyebrow"><span class="dot"></span> 조별 미션 · 4개 조</span>
+      <h2 class="subhead">우리 조 업무에 <span class="mark">진짜 쓸 프로그램</span> 하나</h2>
       <div class="grid cols-2">
-        <div class="card"><span class="k">초급 · 5분이면 첫 결과</span>
+        <div class="card"><span class="k">미션</span>
           <p style="color:var(--ink);font-weight:600;font-size:clamp(17px,2vw,26px);line-height:1.7">
-            🍚 점심 메뉴 추천기(따라하기)<br>📅 D-day 계산기<br>📝 간단 설문 페이지</p></div>
-        <div class="card"><span class="k">중급 · 조금 더 도전</span>
-          <p style="color:var(--ink);font-weight:600;font-size:clamp(17px,2vw,26px);line-height:1.7">
-            🗓 연차·근속 계산기<br>🧾 경비·과비 정산 도우미<br>✅ 나만의 업무 체크리스트</p></div>
+            조별로 <b>1개</b> 골라 완성 →<br>마지막에 <b>조별 30초 발표</b><br><span class="muted">배부된 '시작 프롬프트 카드'로 첫 요청</span></p></div>
+        <div class="card"><span class="k">아이디어 예시 (우리 조 업무로!)</span>
+          <p style="color:var(--ink);font-weight:600;font-size:clamp(16px,1.9vw,24px);line-height:1.7">
+            🗓 연차·근속 계산기<br>🧾 경비·과비 정산 도우미<br>📅 회의실·비품 예약 현황판<br>✅ 신규 입사자 체크리스트<br>📊 설문 취합·요약 페이지</p></div>
       </div>
-      <div class="callout"><span class="bang">?</span><p>고민되면 → 방금 본 <strong>점심 매니저를 그대로 따라</strong> 만들어 보세요.</p></div>
+      <div class="callout"><span class="bang">?</span><p>정답 없음 — <strong>우리 조가 매일 반복하는 일</strong> 하나를 도구로 만들어 보세요.</p></div>
     </div>
   </section>
 
@@ -803,26 +810,39 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
     var stage=el('div','stage','?'); host.appendChild(stage);
     var btn=el('button','pick-btn','🎲 오늘 뭐 먹지?'); btn.type='button'; host.appendChild(btn);
 
-    var lastMenu=null, lastCat=null, logbox=null, restIn=null, toast=null, likeState=true, goodBtn, badBtn;
+    var lastMenu=null, lastCat=null, logbox=null, restIn=null, toast=null;
+    var ROSTER=['A수석','B수석','C수석','막내'];
+    var reactState={};
     if(opts.withLog){
       logbox=el('div','logbox'); logbox.hidden=true;
-      var row=el('div','logrow');
-      restIn=el('input'); restIn.type='text'; restIn.placeholder='맛집 이름 (예: 종로 김치찌개)'; restIn.setAttribute('aria-label','맛집 이름');
-      goodBtn=el('button','rate good on','😋 좋아요'); goodBtn.type='button';
-      badBtn=el('button','rate bad','😐 별로'); badBtn.type='button';
-      goodBtn.addEventListener('click',function(){ likeState=true; goodBtn.classList.add('on'); badBtn.classList.remove('on'); });
-      badBtn.addEventListener('click',function(){ likeState=false; badBtn.classList.add('on'); goodBtn.classList.remove('on'); });
+      logbox.appendChild(el('div','fl','맛집 & 수석님별 평가'));
+      restIn=el('input','restin'); restIn.type='text'; restIn.placeholder='맛집 이름 (예: 종로 김치찌개)'; restIn.setAttribute('aria-label','맛집 이름');
+      logbox.appendChild(restIn);
+      var reacts=el('div','reacts');
+      ROSTER.forEach(function(nm){
+        reactState[nm]=true;
+        var rr=el('div','react-row');
+        rr.appendChild(el('span','nm',nm+'님'));
+        var g=el('button','rate good on','😋 좋아요'); g.type='button';
+        var bd=el('button','rate bad','😐 별로'); bd.type='button';
+        g.addEventListener('click',function(){ reactState[nm]=true; g.classList.add('on'); bd.classList.remove('on'); });
+        bd.addEventListener('click',function(){ reactState[nm]=false; bd.classList.add('on'); g.classList.remove('on'); });
+        rr.appendChild(g); rr.appendChild(bd); reacts.appendChild(rr);
+      });
+      logbox.appendChild(reacts);
       var logBtn=el('button','mini-btn','기록하기'); logBtn.type='button';
       logBtn.addEventListener('click',function(){
         if(!lastMenu){ return; }
-        state.history.unshift({d:new Date(), menu:lastMenu, cat:lastCat, r:(restIn.value.trim()||'—'), liked:likeState});
-        toast.textContent='✓ "'+lastMenu+'" 기록됐어요! (통계 반영)';
-        restIn.value=''; likeState=true; goodBtn.classList.add('on'); badBtn.classList.remove('on');
+        var reactions=ROSTER.map(function(nm){ return {name:nm, liked:reactState[nm]}; });
+        var good=reactions.filter(function(x){return x.liked;}).length;
+        state.history.unshift({d:new Date(), menu:lastMenu, cat:lastCat, r:(restIn.value.trim()||'—'), liked:(good*2>=reactions.length), reactions:reactions});
+        toast.textContent='✓ "'+lastMenu+'" 기록! (😋'+good+' / 😐'+(reactions.length-good)+') — 통계 반영';
+        restIn.value='';
         if(opts.onLog) opts.onLog();
       });
-      row.appendChild(restIn); row.appendChild(goodBtn); row.appendChild(badBtn); row.appendChild(logBtn);
-      toast=el('div','toast','');
-      logbox.appendChild(row); logbox.appendChild(toast); host.appendChild(logbox);
+      logbox.appendChild(logBtn);
+      toast=el('div','toast',''); logbox.appendChild(toast);
+      host.appendChild(logbox);
     }
 
     var spinning=false;
@@ -854,8 +874,12 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
     var top=Object.keys(mc).map(function(k){return {menu:k,c:mc[k]};}).sort(function(a,b){return b.c-a.c;}).slice(0,4);
     var wc={}; w.forEach(function(h){ wc[h.menu]=(wc[h.menu]||0)+1; });
     var warns=Object.keys(wc).filter(function(k){return wc[k]>=2;}).map(function(k){return {menu:k,c:wc[k]};});
-    var liked=history.filter(function(h){return h.liked;}).length;
-    var likeRate=history.length? Math.round(liked/history.length*100):0;
+    var totR=0, goodR=0;
+    history.forEach(function(h){
+      if(h.reactions&&h.reactions.length){ totR+=h.reactions.length; goodR+=h.reactions.filter(function(x){return x.liked;}).length; }
+      else { totR+=1; goodR+=h.liked?1:0; }
+    });
+    var likeRate=totR? Math.round(goodR/totR*100):0;
     return {w:w,m:m,catCount:catCount,top:top,warns:warns,likeRate:likeRate};
   }
   function buildStats(host, state, opts){
@@ -894,7 +918,10 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
       list.forEach(function(h){
         var it=el('div','rec-item');
         var left=el('div'); var m=el('span','m',h.menu); var r=el('span','r',' · '+h.r); left.appendChild(m); left.appendChild(r);
-        it.appendChild(left); it.appendChild(el('span',null,(h.liked?'😋':'😐')+' '+md(h.d)));
+        var rt;
+        if(h.reactions&&h.reactions.length){ var g=h.reactions.filter(function(x){return x.liked;}).length; rt='😋'+g+' 😐'+(h.reactions.length-g)+' · '+md(h.d); }
+        else rt=(h.liked?'😋':'😐')+' '+md(h.d);
+        it.appendChild(left); it.appendChild(el('span',null,rt));
         rec.appendChild(it);
       });
       host.appendChild(rec);
@@ -913,9 +940,16 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
     balBox.appendChild(balV); balBox.appendChild(balL); left.appendChild(balBox);
 
     var form=el('div','exp-form');
-    form.appendChild(el('div','fl','지출 기록 — 내용 & 참여자별 금액'));
-    var descIn=el('input'); descIn.type='text'; descIn.placeholder='내용 (예: 팀 점심 @종로김치찌개)'; descIn.setAttribute('aria-label','지출 내용');
-    form.appendChild(descIn);
+    form.appendChild(el('div','fl','지출 기록 — 일자 · 음식 · 참여자별 금액'));
+    var frow=el('div','frow2');
+    var dateIn=el('input'); dateIn.type='date'; dateIn.setAttribute('aria-label','일자');
+    (function(){ var t=new Date(); var mm=String(t.getMonth()+1).padStart(2,'0'), dd=String(t.getDate()).padStart(2,'0'); dateIn.value=t.getFullYear()+'-'+mm+'-'+dd; })();
+    var foodSel=el('select'); foodSel.setAttribute('aria-label','음식');
+    var ph=el('option'); ph.value=''; ph.textContent='🍽 음식 선택'; foodSel.appendChild(ph);
+    CATS.forEach(function(c){ var og=document.createElement('optgroup'); og.label=c; BASE_MENUS[c].forEach(function(m){ var o=el('option',null,m); o.value=m; og.appendChild(o); }); foodSel.appendChild(og); });
+    var ogx=document.createElement('optgroup'); ogx.label='기타'; ['간식','커피','회식','기타'].forEach(function(m){ var o=el('option',null,m); o.value=m; ogx.appendChild(o); }); foodSel.appendChild(ogx);
+    foodSel.value='';
+    frow.appendChild(dateIn); frow.appendChild(foodSel); form.appendChild(frow);
     var prows=el('div'); form.appendChild(prows);
     function addRow(name,amt){
       var r=el('div','prow');
@@ -961,8 +995,9 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
       });
       if(!people.length){ return; }
       var amount=people.reduce(function(s,p){return s+p.amt;},0);
-      state.fund.push({d:new Date(), type:'지출', desc:(descIn.value.trim()||'점심'), amount:-amount, people:people});
-      descIn.value=''; prows.innerHTML=''; addRow('',''); addRow('','');
+      var dv=dateIn.value, dObj; if(dv){ var pz=dv.split('-'); dObj=new Date(+pz[0], +pz[1]-1, +pz[2], 12); } else dObj=new Date();
+      state.fund.push({d:dObj, type:'지출', desc:(foodSel.value||'점심'), amount:-amount, people:people});
+      foodSel.value=''; prows.innerHTML=''; addRow('',''); addRow('','');
       renderLedger();
     });
     chBtn.addEventListener('click',function(){
