@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>바이브코딩 — 코딩을 몰라도, 말로 만드는 시대</title>
+<meta name="description" content="비개발 직군을 위한 2시간 AI 바이브코딩 강의 자료. 이 자료도 바이브코딩으로 만들었습니다." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<style>
+/* ============================================================
+   바이브코딩 강의 덱 — 단일 파일, 오프라인 동작
+   컬러/타입/레이아웃 토큰 → 라이트·다크 양쪽 지원
+   ============================================================ */
+:root{
+  --coral:#FF5A4D;
+  --coral-deep:#E23F33;
+  --indigo:#342FBE;
+  --indigo-soft:#5D57E8;
+  --teal:#0FB6A4;
+  --amber:#F0A020;
+
+  /* 라이트 (기본) */
+  --bg:#FAF8F5;
+  --bg-2:#F1EEE8;
+  --surface:#FFFFFF;
+  --ink:#171528;
+  --ink-soft:#4A465F;
+  --ink-faint:#8B8799;
+  --line:#E4DFD6;
+  --line-strong:#D3CCBF;
+  --code-bg:#141326;
+  --code-ink:#F2EFEA;
+  --shadow:0 24px 60px -28px rgba(30,24,60,.28), 0 8px 24px -18px rgba(30,24,60,.22);
+
+  --font-sans:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono","SF Mono","D2Coding",ui-monospace,"Cascadia Code",Consolas,monospace;
+
+  --maxw:1120px;
+  --pad:clamp(24px,5vw,88px);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#100F20;
+    --bg-2:#171630;
+    --surface:#1C1B36;
+    --ink:#EDEBF7;
+    --ink-soft:#B6B2CE;
+    --ink-faint:#7C789A;
+    --line:#2C2A4C;
+    --line-strong:#3A386198;
+    --code-bg:#08081A;
+    --code-ink:#EDEBF7;
+    --coral:#FF6E62;
+    --indigo-soft:#8681FF;
+    --teal:#2FD4C1;
+    --shadow:0 30px 70px -30px rgba(0,0,0,.7), 0 10px 30px -18px rgba(0,0,0,.6);
+  }
+}
+/* 뷰어 토글이 미디어쿼리를 이겨야 함 */
+:root[data-theme="light"]{
+  --bg:#FAF8F5;--bg-2:#F1EEE8;--surface:#FFFFFF;--ink:#171528;--ink-soft:#4A465F;--ink-faint:#8B8799;
+  --line:#E4DFD6;--line-strong:#D3CCBF;--code-bg:#141326;--code-ink:#F2EFEA;--coral:#FF5A4D;--indigo-soft:#5D57E8;--teal:#0FB6A4;
+  --shadow:0 24px 60px -28px rgba(30,24,60,.28), 0 8px 24px -18px rgba(30,24,60,.22);
+}
+:root[data-theme="dark"]{
+  --bg:#100F20;--bg-2:#171630;--surface:#1C1B36;--ink:#EDEBF7;--ink-soft:#B6B2CE;--ink-faint:#7C789A;
+  --line:#2C2A4C;--line-strong:#3A386198;--code-bg:#08081A;--code-ink:#EDEBF7;--coral:#FF6E62;--indigo-soft:#8681FF;--teal:#2FD4C1;
+  --shadow:0 30px 70px -30px rgba(0,0,0,.7), 0 10px 30px -18px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--font-sans);
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow:hidden;
+  letter-spacing:-.01em;
+}
+.deck{position:fixed;inset:0}
+
+/* ---------- 슬라이드 ---------- */
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:var(--pad);
+  opacity:0;visibility:hidden;
+  transform:translateY(14px) scale(.995);
+  transition:opacity .5s ease, transform .5s ease, visibility .5s;
+  overflow:auto;
+}
+.slide.active{opacity:1;visibility:visible;transform:none;z-index:2}
+.slide.prev{transform:translateY(-14px) scale(.995)}
+.slide-inner{width:100%;max-width:var(--maxw);margin:0 auto}
+
+/* 배경 장식(파트별 은은한 오라) */
+.slide::before{
+  content:"";position:absolute;pointer-events:none;
+  width:60vmax;height:60vmax;border-radius:50%;
+  top:-24vmax;right:-20vmax;
+  background:radial-gradient(circle at center, color-mix(in srgb, var(--accent,var(--coral)) 22%, transparent), transparent 62%);
+  opacity:.5;filter:blur(6px);
+}
+.slide[data-accent="indigo"]{--accent:var(--indigo-soft)}
+.slide[data-accent="teal"]{--accent:var(--teal)}
+.slide[data-accent="amber"]{--accent:var(--amber)}
+.slide[data-accent="coral"]{--accent:var(--coral)}
+
+/* ---------- 공통 타이포 ---------- */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:.6em;
+  font-size:clamp(12px,1.4vw,15px);font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent,var(--coral));
+  margin:0 0 clamp(16px,2.4vh,28px);
+}
+.eyebrow .dot{width:.5em;height:.5em;border-radius:50%;background:currentColor;display:inline-block}
+.eyebrow .part-no{
+  font-variant-numeric:tabular-nums;color:var(--ink-faint);
+  border-left:1px solid var(--line-strong);padding-left:.7em;letter-spacing:.08em;
+}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.06;font-weight:800;letter-spacing:-.03em}
+.headline{font-size:clamp(30px,5.6vw,68px)}
+.headline .accent{color:var(--coral)}
+.subhead{font-size:clamp(22px,3.6vw,42px)}
+.lead{
+  font-size:clamp(17px,2.2vw,26px);line-height:1.5;color:var(--ink-soft);
+  max-width:34ch;margin:clamp(18px,2.6vh,28px) 0 0;font-weight:500;
+}
+.lead.wide{max-width:52ch}
+.big-quote{font-size:clamp(24px,4vw,50px);font-weight:800;line-height:1.14;letter-spacing:-.03em}
+.mark{
+  background:linear-gradient(transparent 62%, color-mix(in srgb,var(--coral) 42%, transparent) 0);
+  padding:0 .05em;
+}
+.muted{color:var(--ink-faint)}
+strong{font-weight:800;color:var(--ink)}
+
+/* ---------- 리스트 / 그리드 ---------- */
+.list{list-style:none;margin:clamp(20px,3vh,34px) 0 0;padding:0;display:grid;gap:clamp(12px,1.8vh,20px)}
+.list li{
+  display:flex;gap:.85em;align-items:flex-start;
+  font-size:clamp(16px,2vw,23px);line-height:1.42;color:var(--ink-soft);
+}
+.list li b{color:var(--ink);font-weight:700}
+.list .mk{
+  flex:0 0 auto;margin-top:.15em;color:var(--accent,var(--coral));font-weight:800;
+}
+.num-list{counter-reset:n}
+.num-list li .mk{
+  counter-increment:n;
+  width:1.7em;height:1.7em;border-radius:.5em;
+  display:grid;place-items:center;font-size:.85em;
+  background:color-mix(in srgb,var(--accent,var(--coral)) 15%, transparent);
+  color:var(--accent,var(--coral));margin-top:0;
+}
+.num-list li .mk::before{content:counter(n,decimal-leading-zero)}
+
+.grid{display:grid;gap:clamp(14px,2vw,22px);margin-top:clamp(22px,3vh,34px)}
+.grid.cols-2{grid-template-columns:repeat(2,1fr)}
+.grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:18px;
+  padding:clamp(18px,2.4vw,28px);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:.5em;
+}
+.card .k{font-size:clamp(13px,1.5vw,16px);font-weight:800;letter-spacing:.02em;
+  color:var(--accent,var(--coral));text-transform:uppercase}
+.card h3{font-size:clamp(18px,2.1vw,25px)}
+.card p{margin:0;color:var(--ink-soft);font-size:clamp(14px,1.7vw,19px);line-height:1.45}
+.card .big{font-size:clamp(30px,4vw,52px);font-weight:800;letter-spacing:-.03em;line-height:1}
+
+/* 비교 카드 */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,22px);margin-top:clamp(20px,3vh,32px)}
+.vs .card{gap:.7em}
+.vs .bad{border-color:color-mix(in srgb,var(--coral) 45%, var(--line))}
+.vs .bad .k{color:var(--coral)}
+.vs .good{border-color:color-mix(in srgb,var(--teal) 55%, var(--line))}
+.vs .good .k{color:var(--teal)}
+.vs .quote{font-size:clamp(15px,1.9vw,21px);line-height:1.5;color:var(--ink);font-weight:500}
+
+/* 프롬프트(코드 느낌) 블록 */
+.prompt{
+  font-family:var(--font-mono);background:var(--code-bg);color:var(--code-ink);
+  border-radius:16px;padding:clamp(18px,2.4vw,28px) clamp(20px,2.6vw,30px);
+  font-size:clamp(14px,1.7vw,20px);line-height:1.6;letter-spacing:-.01em;
+  box-shadow:var(--shadow);position:relative;overflow:auto;
+}
+.prompt::before{
+  content:"you ▸";position:sticky;left:0;
+  display:block;color:var(--indigo-soft);font-weight:700;font-size:.8em;
+  margin-bottom:.7em;letter-spacing:.06em;
+}
+.prompt .hl{color:var(--coral);font-weight:600}
+
+/* ---------- 아젠다 ---------- */
+.agenda{display:grid;gap:clamp(6px,.9vh,11px);margin-top:clamp(14px,2vh,24px)}
+.agenda .row{
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:clamp(12px,2vw,22px);
+  padding:clamp(8px,1.2vh,15px) clamp(14px,1.8vw,22px);
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+}
+.agenda .row.break{background:var(--bg-2);border-style:dashed}
+.agenda .t{font-family:var(--font-mono);font-variant-numeric:tabular-nums;
+  font-weight:700;color:var(--indigo-soft);font-size:clamp(14px,1.7vw,20px)}
+.agenda .l{font-size:clamp(15px,1.9vw,22px);font-weight:600}
+.agenda .l small{display:block;color:var(--ink-faint);font-weight:500;font-size:.72em;margin-top:.15em}
+.agenda .d{font-size:clamp(12px,1.4vw,15px);color:var(--ink-faint);font-weight:600;
+  background:var(--bg-2);border-radius:999px;padding:.3em .8em;white-space:nowrap}
+
+/* 파트 표지 슬라이드 */
+.divider .idx{
+  font-family:var(--font-mono);font-size:clamp(56px,14vw,180px);font-weight:800;
+  line-height:.85;letter-spacing:-.05em;
+  color:transparent;-webkit-text-stroke:2px var(--accent,var(--coral));
+  margin:0 0 clamp(6px,1vh,14px);
+}
+.divider .headline{font-size:clamp(34px,7vw,84px)}
+.divider .lead{max-width:40ch}
+
+/* 타이틀 슬라이드 */
+.title-slide .kicker{
+  display:inline-block;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--indigo-soft);font-size:clamp(12px,1.5vw,16px);margin-bottom:clamp(18px,3vh,30px);
+}
+.title-slide .headline{font-size:clamp(48px,11vw,140px);line-height:.92}
+.title-slide .tagline{font-size:clamp(19px,3vw,34px);color:var(--ink-soft);font-weight:600;margin-top:clamp(14px,2vh,22px)}
+.meta-row{display:flex;flex-wrap:wrap;gap:.7em;margin-top:clamp(22px,3.5vh,40px)}
+.chip{
+  font-size:clamp(13px,1.5vw,16px);font-weight:600;color:var(--ink-soft);
+  background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:.5em 1em;
+}
+.callout{
+  margin-top:clamp(26px,4vh,44px);display:flex;gap:.9em;align-items:flex-start;
+  background:color-mix(in srgb,var(--coral) 12%, var(--surface));
+  border:1px solid color-mix(in srgb,var(--coral) 40%, var(--line));
+  border-radius:16px;padding:clamp(16px,2vw,22px) clamp(18px,2.2vw,26px);max-width:60ch;
+  box-shadow:var(--shadow);
+}
+.callout .bang{
+  flex:0 0 auto;width:2em;height:2em;border-radius:50%;display:grid;place-items:center;
+  background:var(--coral);color:#fff;font-weight:800;font-size:1.05em;
+}
+.callout p{margin:0;font-size:clamp(15px,1.9vw,21px);line-height:1.45;color:var(--ink);font-weight:600}
+.callout.tip{background:color-mix(in srgb,var(--teal) 12%, var(--surface));border-color:color-mix(in srgb,var(--teal) 45%,var(--line))}
+.callout.tip .bang{background:var(--teal)}
+.callout.warn{background:color-mix(in srgb,var(--amber) 14%, var(--surface));border-color:color-mix(in srgb,var(--amber) 50%,var(--line))}
+.callout.warn .bang{background:var(--amber);color:#3a2a00}
+
+/* 휴식 슬라이드 */
+.break-slide{align-items:center;text-align:center}
+.break-slide .big-time{font-family:var(--font-mono);font-size:clamp(80px,22vw,260px);font-weight:800;
+  letter-spacing:-.04em;line-height:.85;color:var(--teal)}
+
+/* 강조 3요소 등 인라인 태그 */
+.tags{display:flex;flex-wrap:wrap;gap:.6em;margin-top:clamp(18px,2.6vh,26px)}
+.tag{font-size:clamp(14px,1.7vw,19px);font-weight:700;padding:.45em .9em;border-radius:10px;
+  background:var(--bg-2);border:1px solid var(--line);color:var(--ink)}
+
+/* ---------- 컨트롤 UI ---------- */
+.progress{position:fixed;left:0;right:0;bottom:0;height:4px;background:transparent;z-index:40}
+.progress .bar{height:100%;width:0;background:linear-gradient(90deg,var(--coral),var(--indigo-soft));transition:width .4s ease}
+
+.hud{position:fixed;z-index:41;display:flex;gap:8px;align-items:center}
+.hud.br{right:16px;bottom:16px}
+.hud.tr{right:16px;top:16px}
+.btn{
+  appearance:none;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 82%, transparent);
+  color:var(--ink);font-family:var(--font-sans);font-weight:600;font-size:14px;
+  height:38px;min-width:38px;padding:0 12px;border-radius:11px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  backdrop-filter:blur(8px);transition:transform .12s ease, border-color .12s ease, background .12s ease;
+}
+.btn:hover{border-color:var(--line-strong);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn:focus-visible{outline:2px solid var(--indigo-soft);outline-offset:2px}
+.counter{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:700;
+  color:var(--ink-soft);font-size:14px;padding:0 6px;user-select:none}
+
+/* 타이머 패널 */
+.timer{
+  font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:700;
+  background:color-mix(in srgb,var(--surface) 85%, transparent);border:1px solid var(--line);
+  border-radius:11px;height:38px;display:flex;align-items:center;gap:10px;padding:0 12px;
+  backdrop-filter:blur(8px);
+}
+.timer .clock{font-size:15px}
+.timer .clock.warn{color:var(--coral)}
+.timer .mini{border:none;background:transparent;cursor:pointer;color:var(--ink-soft);font-size:15px;padding:2px}
+.timer .mini:hover{color:var(--ink)}
+.timer[hidden]{display:none}
+
+/* 강사 노트 */
+.notes{
+  position:fixed;left:0;right:0;bottom:0;z-index:45;
+  background:var(--code-bg);color:var(--code-ink);
+  padding:18px clamp(20px,4vw,60px);border-top:2px solid var(--coral);
+  transform:translateY(101%);transition:transform .3s ease;max-height:38vh;overflow:auto;
+}
+.notes.show{transform:none}
+.notes .lab{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);margin-bottom:8px}
+.notes .body{font-size:clamp(15px,1.8vw,19px);line-height:1.55;white-space:pre-wrap;color:#E9E7F5}
+
+/* 전체보기 */
+.overview{
+  position:fixed;inset:0;z-index:60;background:color-mix(in srgb,var(--bg) 94%, transparent);
+  backdrop-filter:blur(10px);padding:clamp(24px,5vw,60px);overflow:auto;
+  display:none;
+}
+.overview.show{display:block}
+.overview h2{font-size:clamp(20px,3vw,30px);margin-bottom:24px}
+.ov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.ov-item{
+  text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:14px 16px;cursor:pointer;color:var(--ink);font-family:var(--font-sans);
+  display:flex;flex-direction:column;gap:6px;transition:border-color .12s,transform .12s;
+}
+.ov-item:hover{border-color:var(--coral);transform:translateY(-2px)}
+.ov-item.current{border-color:var(--coral);box-shadow:0 0 0 2px color-mix(in srgb,var(--coral) 40%,transparent)}
+.ov-item .n{font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);font-weight:700}
+.ov-item .ti{font-size:15px;font-weight:700;line-height:1.3}
+
+/* 단축키 도움말 */
+.help{
+  position:fixed;inset:0;z-index:70;display:none;place-items:center;
+  background:rgba(10,8,24,.55);backdrop-filter:blur(6px);padding:20px;
+}
+.help.show{display:grid}
+.help .box{background:var(--surface);border:1px solid var(--line);border-radius:18px;
+  padding:clamp(24px,4vw,40px);max-width:440px;width:100%;box-shadow:var(--shadow)}
+.help h2{font-size:22px;margin-bottom:18px}
+.help dl{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;margin:0}
+.help dt{font-family:var(--font-mono);font-weight:700;color:var(--indigo-soft)}
+.help dd{margin:0;color:var(--ink-soft)}
+kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:6px;padding:1px 7px;font-size:.85em;font-weight:700}
+
+.hint{position:fixed;left:16px;bottom:14px;z-index:40;color:var(--ink-faint);font-size:13px;font-weight:600;user-select:none}
+.hint kbd{font-size:12px}
+
+/* 반응형 */
+@media (max-width:760px){
+  .grid.cols-2,.grid.cols-3,.vs{grid-template-columns:1fr}
+  .agenda .row{grid-template-columns:auto 1fr;grid-template-areas:"t l" "d d"}
+  .agenda .d{justify-self:start}
+  .hint{display:none}
+  .lead{max-width:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .slide{transition:opacity .01s}
+  .slide,.btn,.ov-item{transform:none!important}
+  *{scroll-behavior:auto}
+}
+@media print{
+  body{overflow:visible}
+  .slide{position:relative;opacity:1!important;visibility:visible!important;transform:none!important;
+    page-break-after:always;min-height:100vh;border-bottom:1px solid #ccc}
+  .hud,.progress,.hint,.notes,.overview,.help{display:none!important}
+}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- 1. 타이틀 -->
+  <section class="slide title-slide active" data-accent="coral"
+    data-title="타이틀"
+    data-notes="[00:00] 오프닝. 밝게 인사. 한 줄로 시작: '오늘 여러분이 보실 이 슬라이드, 제가 코드 한 줄 직접 안 짰습니다. AI한테 말로 시켜서 만든 겁니다.' → 자연스럽게 오늘 주제로 연결. 청중이 코딩 입문(비개발)임을 인지시키고 '겁먹지 마세요'로 안심시키기.">
+    <div class="slide-inner">
+      <span class="kicker">사내 연수 · AI 활용 실무 과정</span>
+      <h1 class="headline">바이브<span class="accent">코딩</span></h1>
+      <p class="tagline">코딩을 몰라도, <strong>말로</strong> 만드는 시대</p>
+      <div class="meta-row">
+        <span class="chip">⏱ 2시간 과정</span>
+        <span class="chip">👥 3년차 미만 실무자</span>
+        <span class="chip">🌐 claude.ai 실습</span>
+        <span class="chip">💻 코딩 지식 0에서 시작</span>
+      </div>
+      <div class="callout">
+        <span class="bang">!</span>
+        <p>지금 보시는 이 강의 자료도 <strong>코드 한 줄 직접 짜지 않고</strong>, AI에게 말로 시켜서 만든 '바이브코딩' 결과물입니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 이 자료의 정체 -->
+  <section class="slide" data-accent="coral"
+    data-title="이 자료의 정체"
+    data-notes="[00:02] 이 슬라이드 자체를 증거물로 사용. F로 전체화면, 화살표로 넘긴다는 것도 보여주며 '이게 하나의 프로그램(HTML)이다' 강조. '개발자가 아니어도 이런 걸 만든다'는 오늘의 약속.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 잠깐, 이거 뭐예요?</span>
+      <h2 class="headline">여러분이 보는 이 화면 =<br><span class="accent">하나의 프로그램</span>입니다</h2>
+      <p class="lead wide">파워포인트가 아니라 브라우저에서 돌아가는 웹 프로그램(HTML)이에요.
+        개발자가 만든 게 아니라, AI에게 <strong>"이런 강의 자료 만들어줘"</strong>라고 대화해서 만들었습니다.</p>
+      <div class="callout tip">
+        <span class="bang">✓</span>
+        <p>오늘 2시간 뒤, 여러분도 이렇게 <strong>작동하는 무언가</strong>를 직접 만들어 봅니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 오늘의 약속 -->
+  <section class="slide" data-accent="indigo"
+    data-title="오늘의 목표"
+    data-notes="[00:05] 학습 목표 3가지. 청중이 '2시간 뒤 나는 뭘 할 수 있나'를 명확히 그리게. 특히 3번(실무 적용)이 동기부여 포인트.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 오늘의 약속</span>
+      <h2 class="headline">2시간 뒤, 여러분은</h2>
+      <ol class="list num-list">
+        <li><span class="mk"></span><span><b>AI에게 원하는 걸 '제대로' 요청</b>할 수 있습니다 — 문법이 아니라 대화로.</span></li>
+        <li><span class="mk"></span><span>claude.ai로 <b>실제 작동하는 도구를 하나 완성</b>합니다.</span></li>
+        <li><span class="mk"></span><span>내 업무에 <b>당장 뭘 적용할지</b> 알고 돌아갑니다.</span></li>
+      </ol>
+      <div class="callout">
+        <span class="bang">!</span>
+        <p>선행 조건 없음. <strong>코딩 지식 0</strong>에서 출발합니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 진행 순서 -->
+  <section class="slide" data-accent="indigo"
+    data-title="진행 순서"
+    data-notes="[00:08] 전체 흐름 안내. 휴식 시간과 실습 비중(절반 이상이 실습)을 강조. 타이머(T 키)를 여기서 켜두면 시간 관리에 좋음. 시간은 상황따라 유연하게.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 진행 순서 · 총 120분</span>
+      <h2 class="subhead">절반 이상이 <span class="mark">직접 만드는 실습</span>입니다</h2>
+      <div class="agenda">
+        <div class="row"><span class="t">00:00</span><span class="l">도입 — 바이브코딩이 뭐길래<small>개념과 기대치 잡기</small></span><span class="d">15분</span></div>
+        <div class="row"><span class="t">00:15</span><span class="l">원리 — AI와 대화하는 법<small>좋은 요청의 레시피</small></span><span class="d">20분</span></div>
+        <div class="row"><span class="t">00:35</span><span class="l">라이브 데모 — 눈으로 확인<small>강사가 직접 만들어 보이기</small></span><span class="d">15분</span></div>
+        <div class="row break"><span class="t">00:50</span><span class="l">☕ 휴식</span><span class="d">10분</span></div>
+        <div class="row"><span class="t">01:00</span><span class="l">실습 1 — 내 도구 만들기<small>각자 하나씩 완성</small></span><span class="d">35분</span></div>
+        <div class="row"><span class="t">01:35</span><span class="l">실습 2 — 다듬고 공유<small>기능 추가 · 발표</small></span><span class="d">15분</span></div>
+        <div class="row"><span class="t">01:50</span><span class="l">마무리 — 실무 적용 & Q&amp;A</span><span class="d">10분</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. PART 1 -->
+  <section class="slide divider" data-accent="coral"
+    data-title="PART 1 표지"
+    data-notes="[00:12→ Part1] 파트 전환. 톤 전환 잠깐. '먼저 이게 대체 뭔지부터'.">
+    <div class="slide-inner">
+      <p class="idx">01</p>
+      <span class="eyebrow"><span class="dot"></span> Part 1 · 개념</span>
+      <h2 class="headline">바이브코딩이란?</h2>
+      <p class="lead">단어는 낯설지만, 핵심은 아주 단순합니다.</p>
+    </div>
+  </section>
+
+  <!-- 6. 정의 -->
+  <section class="slide" data-accent="coral"
+    data-title="정의"
+    data-notes="[00:15] 한 문장 정의. '어떻게 만드는지'(문법/기술)가 아니라 '무엇을 원하는지'(의도)에 집중한다는 대비가 핵심 메시지. 천천히.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 한 문장 정의</span>
+      <p class="big-quote">코드를 직접 타이핑하는 대신,<br>
+      AI에게 <span class="mark">우리말로 원하는 걸 설명</span>하면<br>
+      AI가 대신 만들어 주는 방식.</p>
+      <div class="grid cols-2">
+        <div class="card"><span class="k">예전 방식</span><p><b>어떻게</b> 만드는지에 집중<br>→ 문법·기술을 사람이 익힘</p></div>
+        <div class="card"><span class="k">바이브코딩</span><p><b>무엇을</b> 원하는지에 집중<br>→ 설명은 사람, 구현은 AI</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. 어디서 나온 말 -->
+  <section class="slide" data-accent="coral"
+    data-title="유래"
+    data-notes="[00:18] 가볍게. 2025년 AI 연구자 안드레이 카파시가 쓴 표현. '코드의 존재를 잊고 vibe에 맡긴다'. 너무 깊게 들어가지 말고 '요즘 전 세계가 쓰는 말' 정도로.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 어디서 나온 말?</span>
+      <p class="big-quote">"코드가 있다는 것조차 잊고,<br>그냥 <span class="mark">vibe(느낌)</span>에 맡긴다."</p>
+      <p class="lead wide">2025년, AI 연구자 <strong>안드레이 카파시</strong>가 툭 던진 이 표현이
+        전 세계로 퍼지며 하나의 흐름이 됐습니다. 이제는 개발자만의 것이 아니에요.</p>
+    </div>
+  </section>
+
+  <!-- 8. 왜 지금 -->
+  <section class="slide" data-accent="coral"
+    data-title="무엇이 바뀌었나"
+    data-notes="[00:21] '진입장벽이 사라졌다'가 핵심. 비개발 직군에게 의미: 남에게 부탁/외주 하지 않고 내가 직접, 지금 당장. 청중의 실제 업무 답답함(IT팀 대기 등)을 살짝 언급하면 공감 큼.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 무엇이 바뀌었나</span>
+      <h2 class="subhead">진입장벽이 <span class="mark">사라졌습니다</span></h2>
+      <div class="grid cols-2">
+        <div class="card"><span class="k">예전</span><p class="big">몇 달~몇 년</p><p>언어 배우고 · 문법 외우고 · 에러 잡고…</p></div>
+        <div class="card"><span class="k">지금</span><p class="big">몇 분</p><p>원하는 걸 말로 설명하면 끝.</p></div>
+      </div>
+      <div class="callout tip">
+        <span class="bang">✓</span>
+        <p>비개발 직군에게 의미: <strong>남에게 부탁하지 않고, 내가 직접, 지금 당장</strong> 만든다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. 무엇을 만드나 -->
+  <section class="slide" data-accent="teal"
+    data-title="무엇을 만드나"
+    data-notes="[00:24] 사무/HR 실무 예시로 구체화. 청중 업무와 가까운 예를 즉석에서 물어봐도 좋음. 마지막 문장: 거창한 앱 X, 내 손이 덜 가게 하는 작은 도구부터.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 무엇을 만들 수 있나</span>
+      <h2 class="subhead">사무·실무에서 바로 쓰는 <span class="mark">작은 도구들</span></h2>
+      <div class="grid cols-3">
+        <div class="card"><span class="k">계산</span><h3>자동 계산기</h3><p>연차·수당·근속·D-day 등 반복 계산</p></div>
+        <div class="card"><span class="k">정리</span><h3>데이터 도우미</h3><p>붙여넣은 표를 정리·변환·요약</p></div>
+        <div class="card"><span class="k">수집</span><h3>설문·체크리스트</h3><p>간단한 입력 웹페이지</p></div>
+        <div class="card"><span class="k">작성</span><h3>문서 초안 생성기</h3><p>이메일·공지·템플릿 자동 초안</p></div>
+        <div class="card"><span class="k">현황</span><h3>개인용 대시보드</h3><p>내 업무 현황 한눈에</p></div>
+        <div class="card"><span class="k">…</span><h3>내 업무 그 무엇이든</h3><p>반복되고 귀찮은 일 = 후보</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. 마법은 아니다 -->
+  <section class="slide" data-accent="amber"
+    data-title="기대치 조정"
+    data-notes="[00:28] 기대치 관리. 과신 방지. AI는 '그럴듯한' 걸 잘 만들지만 항상 정답은 아니다 → 확인은 사람 몫. 결과물은 '초안', 다듬는 게 진짜 실력. 이 메시지는 뒤 '주의사항'과 연결.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 하지만, 마법은 아닙니다</span>
+      <h2 class="subhead">알고 시작하면 실망하지 않아요</h2>
+      <ul class="list">
+        <li><span class="mk">•</span><span>AI는 <b>'그럴듯한' 걸 잘 만들지만 항상 정확하진 않습니다</b> → 확인은 사람 몫.</span></li>
+        <li><span class="mk">•</span><span>복잡할수록 <b>여러 번 대화</b>가 필요합니다.</span></li>
+        <li><span class="mk">•</span><span>결과물은 언제나 <b>'초안'</b>. 다듬어 완성하는 게 진짜 실력입니다.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11. PART 2 -->
+  <section class="slide divider" data-accent="indigo"
+    data-title="PART 2 표지"
+    data-notes="[00:35→ Part2] 원리 파트. '그럼 어떻게 대화하느냐'. 여기가 실습의 성패를 가르는 핵심 구간.">
+    <div class="slide-inner">
+      <p class="idx">02</p>
+      <span class="eyebrow"><span class="dot"></span> Part 2 · 원리</span>
+      <h2 class="headline">AI와 대화하는 법</h2>
+      <p class="lead">오늘 실습의 성패는 여기서 갈립니다.</p>
+    </div>
+  </section>
+
+  <!-- 12. 반복 -->
+  <section class="slide" data-accent="indigo"
+    data-title="핵심: 반복"
+    data-notes="[00:35] 가장 중요한 마인드셋. 한 번에 완성하려 하지 마라. '완벽한 첫 요청보다, 빠른 두 번째 요청'. 이 문장 꼭 각인. 청중이 실습에서 한 번에 안 나온다고 좌절 안 하도록 미리 예방주사.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 핵심 원리</span>
+      <h2 class="headline">한 번에 완성 <span class="accent">X</span><br>대화로 <span class="mark">가까워지는 것</span></h2>
+      <div class="tags">
+        <span class="tag">요청</span><span class="tag">→ 결과</span><span class="tag">→ "이 부분 이렇게"</span><span class="tag">→ 결과</span><span class="tag">→ …</span>
+      </div>
+      <div class="callout">
+        <span class="bang">!</span>
+        <p><strong>완벽한 첫 요청보다, 빠른 두 번째 요청.</strong> 안 나와도 정상입니다 — 대화를 이어가세요.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13. 좋은 요청의 4요소 -->
+  <section class="slide" data-accent="indigo"
+    data-title="좋은 요청 4요소"
+    data-notes="[00:39] 실습에서 그대로 쓸 '레시피'. 이 4가지를 채우면 요청이 완성된다고 알려주기. 실습 슬라이드에서 다시 등장하니, 여기서 확실히. 예시(연차 계산기)로 구체화.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 좋은 요청의 레시피</span>
+      <h2 class="subhead">이 <span class="mark">4가지</span>만 채우세요</h2>
+      <ol class="list num-list">
+        <li><span class="mk"></span><span><b>무엇을</b> — 만들고 싶은 것 <span class="muted">(예: 연차 계산기)</span></span></li>
+        <li><span class="mk"></span><span><b>누가·언제 쓰나</b> — 맥락 <span class="muted">(예: HR 담당자가 입사일을 넣으면)</span></span></li>
+        <li><span class="mk"></span><span><b>어떻게 보이길</b> — 형태 <span class="muted">(예: 웹페이지, 버튼 하나로 깔끔하게)</span></span></li>
+        <li><span class="mk"></span><span><b>예시·규칙</b> — 구체적 조건 <span class="muted">(예: 1년 미만은 매월 1개씩)</span></span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 14. 나쁜 vs 좋은 -->
+  <section class="slide" data-accent="indigo"
+    data-title="나쁜 vs 좋은 요청"
+    data-notes="[00:44] 가장 실용적인 슬라이드. 왼쪽처럼 하면 엉뚱한 게 나오고, 오른쪽처럼 하면 원하는 게 나온다. 오른쪽 프롬프트를 소리내어 읽어주기. '이 정도 길이가 부담? 아니에요, 그냥 머릿속 생각을 적은 것뿐'.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 같은 목표, 다른 결과</span>
+      <h2 class="subhead">요청이 구체적일수록 결과가 좋아집니다</h2>
+      <div class="vs">
+        <div class="card bad">
+          <span class="k">✕ 막연한 요청</span>
+          <p class="quote">"연차 계산기 만들어줘"</p>
+          <p class="muted">→ 뭘 기준으로? 어떤 화면으로? AI가 추측 → 엉뚱한 결과</p>
+        </div>
+        <div class="card good">
+          <span class="k">✓ 구체적인 요청</span>
+          <p class="quote">"입사일을 넣으면 오늘 기준 연차 일수를 계산해 보여주는 웹페이지를 만들어줘. 1년 미만은 매월 1개씩, 1년 이상은 15개부터. 화면은 깔끔하게 버튼 하나로."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15. 마법의 문장들 -->
+  <section class="slide" data-accent="indigo"
+    data-title="대화를 잇는 문장"
+    data-notes="[00:47] 실습 중 계속 쓸 '수정 요청' 문장 템플릿. 화면 보며 바로 따라 쓸 수 있게. 이 슬라이드는 실습 중에도 다시 띄워두면 좋음(전체보기 O로 점프).">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 복붙해서 쓰는 마법의 문장</span>
+      <h2 class="subhead">대화를 이어가는 한마디</h2>
+      <div class="grid cols-2">
+        <div class="card"><p class="quote">"좋아, 그런데 <b>OO를 △△로</b> 바꿔줘"</p></div>
+        <div class="card"><p class="quote">"OO가 이상해. <b>이렇게 되게</b> 해줘"</p></div>
+        <div class="card"><p class="quote">"색을 더 <b>차분하게</b> / 글씨를 <b>크게</b>"</p></div>
+        <div class="card"><p class="quote">"<b>모바일</b>에서도 잘 보이게 해줘"</p></div>
+        <div class="card"><p class="quote">"<b>왜 이렇게 했는지</b> 쉽게 설명해줘"</p></div>
+        <div class="card"><p class="quote">"이거 <b>안전한지 / 문제 없는지</b> 알려줘"</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16. 막혔을 때 -->
+  <section class="slide" data-accent="indigo"
+    data-title="막혔을 때"
+    data-notes="[00:50 근처] 트러블슈팅. 실습 전 미리 안내해두면 손 덜 든다. '막히는 건 실패가 아니라 대화의 재료'. 화면 그대로 복붙해서 고쳐달라고 하는 게 최고의 팁.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 막혔을 때</span>
+      <h2 class="subhead">막히는 건 실패가 아니라 <span class="mark">대화의 재료</span></h2>
+      <ul class="list">
+        <li><span class="mk">→</span><span>결과가 이상하면 → <b>화면에 나온 걸 그대로 복붙</b>하며 "이렇게 나와, 고쳐줘"</span></li>
+        <li><span class="mk">→</span><span>뭐가 뭔지 모르면 → <b>"초등학생도 알게 설명해줘"</b></span></li>
+        <li><span class="mk">→</span><span>너무 복잡해지면 → <b>"처음부터 더 간단하게 다시"</b></span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 17. PART 3 데모 표지 -->
+  <section class="slide divider" data-accent="teal"
+    data-title="PART 3 표지"
+    data-notes="[00:35 계획상 →실제 시연은 여기] 라이브 데모 시작. 강사는 미리 준비한 예시 하나를 '처음부터' claude.ai에서 시연. 실패/수정 과정도 일부러 보여주면 더 좋음(반복의 힘 증명).">
+    <div class="slide-inner">
+      <p class="idx">03</p>
+      <span class="eyebrow"><span class="dot"></span> Part 3 · 시연</span>
+      <h2 class="headline">라이브 데모</h2>
+      <p class="lead">말로만 들으면 안 믿기죠. 직접 보여드립니다.</p>
+    </div>
+  </section>
+
+  <!-- 18. 데모 안내 -->
+  <section class="slide break-slide" data-accent="teal"
+    data-title="데모: 지금 만들 것"
+    data-notes="[데모] 강사 실연 구간. 이 슬라이드는 잠깐 띄우고 곧바로 claude.ai 화면으로 전환. 관찰 포인트를 미리 말해주기: (1)어떻게 요청하는지 (2)결과가 바로 나오는지 (3)수정 요청으로 어떻게 좋아지는지. 준비한 예시: 예) '연차 D-day 계산기' 또는 '점심 메뉴 랜덤 추천기'.">
+    <div class="slide-inner" style="text-align:center">
+      <span class="eyebrow" style="justify-content:center"><span class="dot"></span> 지금부터 claude.ai에서 직접</span>
+      <h2 class="headline">요청 → 결과 → 수정 → 완성</h2>
+      <p class="lead wide" style="margin-left:auto;margin-right:auto">화면을 보며 <strong>세 가지</strong>만 관찰하세요.<br>
+        ① 어떻게 요청하는지 ② 결과가 얼마나 빨리 나오는지 ③ 수정으로 어떻게 좋아지는지</p>
+      <div class="callout tip" style="margin-left:auto;margin-right:auto">
+        <span class="bang">▶</span>
+        <p>강사 화면 전환 → 잠시 후 여러분 차례입니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 19. 휴식 -->
+  <section class="slide break-slide" data-accent="teal"
+    data-title="휴식"
+    data-notes="[00:50] 휴식 10분. 화장실·환기·claude.ai 로그인 미리 준비 안내. 돌아오면 바로 실습이니 브라우저 켜두라고.">
+    <div class="slide-inner">
+      <span class="eyebrow" style="justify-content:center"><span class="dot"></span> 잠깐 쉬어요</span>
+      <div class="big-time">10:00</div>
+      <p class="lead" style="margin-left:auto;margin-right:auto;text-align:center">돌아오면 바로 실습입니다.<br>
+        <strong>claude.ai 로그인</strong>은 미리 해두세요 🙂</p>
+    </div>
+  </section>
+
+  <!-- 20. PART 4 실습1 표지 -->
+  <section class="slide divider" data-accent="coral"
+    data-title="PART 4 표지"
+    data-notes="[01:00] 메인 실습. 에너지 올리기. '이제 여러분 차례'. 손드는 것 환영, 조교 순회 안내.">
+    <div class="slide-inner">
+      <p class="idx">04</p>
+      <span class="eyebrow"><span class="dot"></span> Part 4 · 실습 1 · 35분</span>
+      <h2 class="headline">내 도구 만들기</h2>
+      <p class="lead">이제 여러분 차례입니다. 막히면 손 드세요!</p>
+    </div>
+  </section>
+
+  <!-- 21. 실습 준비 -->
+  <section class="slide" data-accent="coral"
+    data-title="실습 준비"
+    data-notes="[01:00] 3단계 준비. 접속 안 되는 사람 먼저 체크. 옆사람과 짝 지어도 좋음. claude.ai 접속 → 새 대화.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 시작 전 3단계</span>
+      <h2 class="subhead">준비되셨나요?</h2>
+      <ol class="list num-list">
+        <li><span class="mk"></span><span>브라우저에서 <b>claude.ai</b> 접속 &amp; 로그인</span></li>
+        <li><span class="mk"></span><span><b>새 대화</b> 시작</span></li>
+        <li><span class="mk"></span><span>다음 메뉴에서 <b>오늘 만들 것 하나</b> 고르기</span></li>
+      </ol>
+      <div class="callout tip"><span class="bang">✓</span><p>안 되면 지금 손 드세요. 옆 사람과 함께 봐도 좋습니다.</p></div>
+    </div>
+  </section>
+
+  <!-- 22. 실습 메뉴 -->
+  <section class="slide" data-accent="coral"
+    data-title="실습 메뉴"
+    data-notes="[01:03] 골라 만들기. 초급/중급 나눠 부담 없게. '뭘 골라도 좋다, 내 업무와 가까운 걸로'. 결정 못 하는 사람은 초급 D-day 계산기 추천.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 골라서 만들기</span>
+      <h2 class="subhead">뭘 골라도 좋아요 — <span class="mark">내 업무와 가까운 걸로</span></h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <span class="k">초급 · 5분이면 첫 결과</span>
+          <p style="color:var(--ink);font-weight:600;font-size:clamp(15px,1.9vw,21px);line-height:1.7">
+            🍚 점심 메뉴 랜덤 추천기<br>📅 D-day 계산기<br>📝 간단 설문 페이지</p>
+        </div>
+        <div class="card">
+          <span class="k">중급 · 조금 더 도전</span>
+          <p style="color:var(--ink);font-weight:600;font-size:clamp(15px,1.9vw,21px);line-height:1.7">
+            🗓 연차·근속 계산기<br>🧾 경비 정산 도우미<br>✅ 나만의 업무 체크리스트</p>
+        </div>
+      </div>
+      <div class="callout"><span class="bang">?</span><p>고민되면 → <strong>D-day 계산기</strong>로 시작하세요. 가장 빨리 성공합니다.</p></div>
+    </div>
+  </section>
+
+  <!-- 23. 실습 단계 -->
+  <section class="slide" data-accent="coral"
+    data-title="실습 단계"
+    data-notes="[01:06] 따라할 5단계. 특히 3번(한 군데 콕 집어 수정)과 5번(옆사람 보여주기)이 몰입 포인트. 강사·조교 순회하며 개별 코칭. 이 슬라이드 띄워두고 진행.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 따라하기 · 35분</span>
+      <h2 class="subhead">이 순서대로 하면 됩니다</h2>
+      <ol class="list num-list">
+        <li><span class="mk"></span><span>'좋은 요청 <b>4요소</b>'로 첫 요청 쓰기</span></li>
+        <li><span class="mk"></span><span>결과 <b>확인</b> (미리보기로 실제 작동 보기)</span></li>
+        <li><span class="mk"></span><span>마음에 안 드는 곳 <b>한 군데만 콕 집어</b> 수정 요청</span></li>
+        <li><span class="mk"></span><span>3~5번 <b>반복</b>하며 다듬기</span></li>
+        <li><span class="mk"></span><span>완성되면 <b>옆 사람에게 보여주기</b> 🙌</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 24. 실습 팁 -->
+  <section class="slide" data-accent="coral"
+    data-title="실습 팁"
+    data-notes="[실습 중 참고] 이 슬라이드는 실습 중 O(전체보기)로 다시 띄워도 좋음. 핵심: 한 번에 하나씩. 순회하며 이 팁들을 개별 상황에 맞게 코칭.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 실습 중 팁</span>
+      <div class="grid cols-2">
+        <div class="card"><span class="k">01</span><h3>한 번에 하나씩</h3><p>여러 개 한꺼번에 바꾸라 하면 꼬여요.</p></div>
+        <div class="card"><span class="k">02</span><h3>그림 그리듯 묘사</h3><p>머릿속 화면을 말로 그려주세요.</p></div>
+        <div class="card"><span class="k">03</span><h3>안 되면 "다시 간단하게"</h3><p>엉키면 리셋이 빠릅니다.</p></div>
+        <div class="card"><span class="k">04</span><h3>막히면 손 들기</h3><p>강사·조교가 갑니다. 혼자 끙끙 X.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 25. PART 5 실습2 표지 -->
+  <section class="slide divider" data-accent="teal"
+    data-title="PART 5 표지"
+    data-notes="[01:35] 실습2. 이미 만든 것에 '한 가지만' 더. 완성한 사람은 새 기능 추가, 아직인 사람은 계속 다듬기. 곧 발표 있음을 예고.">
+    <div class="slide-inner">
+      <p class="idx">05</p>
+      <span class="eyebrow"><span class="dot"></span> Part 5 · 실습 2 · 15분</span>
+      <h2 class="headline">다듬고 공유하기</h2>
+      <p class="lead">한 가지만 더 얹어볼까요?</p>
+    </div>
+  </section>
+
+  <!-- 26. 한 단계 더 -->
+  <section class="slide" data-accent="teal"
+    data-title="한 단계 더"
+    data-notes="[01:35] 기능 추가 아이디어. 하나만 고르게. 완성 못 한 사람은 이 단계 건너뛰고 계속 다듬어도 OK.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 한 가지만 추가</span>
+      <h2 class="subhead">내 도구를 한 단계 업그레이드</h2>
+      <div class="grid cols-2">
+        <div class="card"><p class="quote">"결과를 <b>복사하는 버튼</b> 추가해줘"</p></div>
+        <div class="card"><p class="quote">"<b>색·디자인</b>을 더 예쁘게 바꿔줘"</p></div>
+        <div class="card"><p class="quote">"<b>설명 문구</b>를 추가해줘"</p></div>
+        <div class="card"><p class="quote">"<b>모바일</b>에서도 잘 보이게 해줘"</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 27. 공유 & 회고 -->
+  <section class="slide" data-accent="teal"
+    data-title="공유 & 회고"
+    data-notes="[01:44] 2~3명 30초씩 자기 화면 발표. 잘 된 요청/의외였던 점을 물어 상호 학습. 발표자 없으면 강사가 순회 중 인상적이었던 것 지목. 박수로 마무리.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 함께 보기</span>
+      <h2 class="subhead">2~3명, <span class="mark">30초씩</span> 자랑해요</h2>
+      <ul class="list">
+        <li><span class="mk">Q</span><span>어떤 <b>요청</b>이 특히 잘 먹혔나요?</span></li>
+        <li><span class="mk">Q</span><span><b>예상과 달랐던</b> 점은 무엇이었나요?</span></li>
+        <li><span class="mk">Q</span><span>내일 <b>바로 써먹을</b> 아이디어가 생겼나요?</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 28. PART 6 마무리 표지 -->
+  <section class="slide divider" data-accent="indigo"
+    data-title="PART 6 표지"
+    data-notes="[01:50] 마무리 파트. 실무 적용 + 주의사항 + 핵심 정리 + Q&A. 톤 차분하게 정리.">
+    <div class="slide-inner">
+      <p class="idx">06</p>
+      <span class="eyebrow"><span class="dot"></span> Part 6 · 마무리</span>
+      <h2 class="headline">실무 적용 &amp; 정리</h2>
+      <p class="lead">오늘을 내일로 이어가려면.</p>
+    </div>
+  </section>
+
+  <!-- 29. 실무 적용 -->
+  <section class="slide" data-accent="indigo"
+    data-title="실무 적용"
+    data-notes="[01:50] '작게 시작해서, 자주'. 거창한 프로젝트 말고 반복 업무 1개부터. 팀 공용 도구는 규정 허락 범위에서.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 내일부터 뭘 할까</span>
+      <h2 class="subhead"><span class="mark">작게</span> 시작해서, <span class="mark">자주</span></h2>
+      <ul class="list">
+        <li><span class="mk">1</span><span>반복되는 <b>계산·정리 업무 1개</b> 골라 도구로 만들기</span></li>
+        <li><span class="mk">2</span><span><b>문서 초안·이메일 템플릿</b> 생성기 만들기</span></li>
+        <li><span class="mk">3</span><span>허락된 범위에서 <b>팀 공용 작은 도구</b> 공유</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 30. 주의사항 -->
+  <section class="slide" data-accent="amber"
+    data-title="주의사항"
+    data-notes="[01:54] 반드시 강조. 특히 ① 민감·개인정보 입력 금지 ② 계산/법규 결과는 사람이 검증 ③ 회사 보안·규정 확인 후 실무 반영. 책임은 사용자에게. 이 슬라이드는 진지하게.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 꼭 지킬 것</span>
+      <h2 class="subhead">편리한 만큼, <span class="mark">지켜야 할 선</span></h2>
+      <ul class="list">
+        <li><span class="mk">⚠</span><span><b>민감정보 입력 금지</b> — 주민번호·개인정보·회사 기밀은 넣지 않기</span></li>
+        <li><span class="mk">⚠</span><span><b>결과는 사람이 검증</b> — 특히 계산·법규·수치</span></li>
+        <li><span class="mk">⚠</span><span><b>회사 보안·규정 확인 후</b> 실제 업무에 반영</span></li>
+        <li><span class="mk">⚠</span><span>만든 결과물의 <b>책임은 사용하는 사람</b>에게 있음</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 31. 핵심 3가지 -->
+  <section class="slide" data-accent="coral"
+    data-title="핵심 3가지"
+    data-notes="[01:57] 오늘의 압축. 딱 3개만 기억하게. 청중에게 소리내어 따라 읽게 해도 좋음.">
+    <div class="slide-inner">
+      <span class="eyebrow"><span class="dot"></span> 오늘의 핵심</span>
+      <h2 class="subhead">딱 <span class="mark">세 가지</span>만 기억하세요</h2>
+      <div class="grid cols-3">
+        <div class="card"><span class="k">01</span><h3>말로 만든다</h3><p>문법이 아니라 의도. 우리말로 설명하면 됩니다.</p></div>
+        <div class="card"><span class="k">02</span><h3>반복에서 완성</h3><p>한 번에 X. 대화로 가까워집니다.</p></div>
+        <div class="card"><span class="k">03</span><h3>검증은 사람</h3><p>작게 시작, 확인은 내가.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 32. 기억하세요 -->
+  <section class="slide" data-accent="coral"
+    data-title="기억하세요"
+    data-notes="[01:59] 감성 마무리. 오늘의 메타 메시지 회수: 이 자료도 그렇게 만들어졌다 = 여러분도 만드는 사람이 되었다.">
+    <div class="slide-inner" style="text-align:center">
+      <span class="eyebrow" style="justify-content:center"><span class="dot"></span> 마지막으로</span>
+      <p class="big-quote">여러분은 오늘<br><span class="mark">'프로그램을 만들 수 있는 사람'</span>이<br>되었습니다.</p>
+      <p class="lead wide" style="margin-left:auto;margin-right:auto">그리고 — 이 강의 자료도, 바로 그렇게 만들어졌습니다.</p>
+    </div>
+  </section>
+
+  <!-- 33. Q&A -->
+  <section class="slide" data-accent="indigo"
+    data-title="Q&A / 감사합니다"
+    data-notes="[02:00] Q&A. 질문 없으면 강사가 하나 던지기('가장 만들어보고 싶은 도구는?'). 자료·연락처 공유 안내. 밝게 마무리.">
+    <div class="slide-inner" style="text-align:center">
+      <h2 class="headline">질문, <span class="accent">환영합니다</span></h2>
+      <p class="lead wide" style="margin-left:auto;margin-right:auto">무엇이든 물어보세요.<br>오늘 만든 도구를 내일 업무에서 꼭 한 번 써보시길 🙌</p>
+      <div class="meta-row" style="justify-content:center">
+        <span class="chip">감사합니다</span>
+        <span class="chip">🌐 claude.ai</span>
+        <span class="chip">이 자료 = 바이브코딩 결과물</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===== 컨트롤 ===== -->
+<div class="progress"><div class="bar" id="bar"></div></div>
+
+<div class="hud tr">
+  <div class="timer" id="timer" hidden>
+    <button class="mini" id="tPlay" title="시작/일시정지" aria-label="타이머 시작/일시정지">▶</button>
+    <span class="clock" id="tClock">0:00 / 120:00</span>
+    <button class="mini" id="tReset" title="리셋" aria-label="타이머 리셋">↺</button>
+  </div>
+  <button class="btn" id="btnTimer" title="발표 타이머 (T)" aria-label="발표 타이머 켜기/끄기">⏱</button>
+  <button class="btn" id="btnTheme" title="라이트/다크 (D)" aria-label="테마 전환">◐</button>
+</div>
+
+<div class="hud br">
+  <button class="btn" id="btnPrev" title="이전 (←)" aria-label="이전 슬라이드">‹</button>
+  <span class="counter" id="counter">1 / 33</span>
+  <button class="btn" id="btnNext" title="다음 (→)" aria-label="다음 슬라이드">›</button>
+  <button class="btn" id="btnOverview" title="전체보기 (O)" aria-label="전체보기">▦</button>
+</div>
+
+<div class="hint">화살표로 이동 · <kbd>F</kbd> 전체화면 · <kbd>N</kbd> 강사노트 · <kbd>?</kbd> 도움말</div>
+
+<div class="notes" id="notes" aria-live="polite">
+  <div class="lab">강사 노트</div>
+  <div class="body" id="notesBody"></div>
+</div>
+
+<div class="overview" id="overview" role="dialog" aria-label="전체 슬라이드">
+  <h2>전체 슬라이드 — 클릭해서 이동</h2>
+  <div class="ov-grid" id="ovGrid"></div>
+</div>
+
+<div class="help" id="help" role="dialog" aria-label="단축키 도움말">
+  <div class="box">
+    <h2>단축키</h2>
+    <dl>
+      <dt>← → / Space</dt><dd>이전 · 다음 슬라이드</dd>
+      <dt>Home / End</dt><dd>처음 · 마지막</dd>
+      <dt>F</dt><dd>전체화면 켜기/끄기</dd>
+      <dt>N</dt><dd>강사 노트 보기/숨기기</dd>
+      <dt>T</dt><dd>발표 타이머 (2시간)</dd>
+      <dt>O</dt><dd>전체 슬라이드 보기</dd>
+      <dt>D</dt><dd>라이트 / 다크 전환</dd>
+      <dt>? / Esc</dt><dd>도움말 열기 / 모두 닫기</dd>
+    </dl>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total = slides.length;
+  var i = 0;
+  var bar = document.getElementById('bar');
+  var counter = document.getElementById('counter');
+  var notes = document.getElementById('notes');
+  var notesBody = document.getElementById('notesBody');
+  var overview = document.getElementById('overview');
+  var help = document.getElementById('help');
+
+  function render(){
+    slides.forEach(function(s,idx){
+      s.classList.remove('active','prev');
+      if(idx===i) s.classList.add('active');
+      else if(idx<i) s.classList.add('prev');
+    });
+    counter.textContent = (i+1)+' / '+total;
+    bar.style.width = (total>1 ? (i/(total-1))*100 : 100)+'%';
+    notesBody.textContent = slides[i].getAttribute('data-notes') || '(노트 없음)';
+    var cur = document.querySelector('.ov-item.current');
+    if(cur) cur.classList.remove('current');
+    var next = document.querySelector('.ov-item[data-idx="'+i+'"]');
+    if(next) next.classList.add('current');
+    slides[i].focus && slides[i].setAttribute('tabindex','-1');
+  }
+  function go(n){ i = Math.max(0, Math.min(total-1, n)); render(); }
+  function next(){ go(i+1); }
+  function prev(){ go(i-1); }
+
+  // 버튼
+  document.getElementById('btnNext').onclick = next;
+  document.getElementById('btnPrev').onclick = prev;
+  document.getElementById('btnOverview').onclick = toggleOverview;
+
+  // 테마
+  var btnTheme = document.getElementById('btnTheme');
+  function currentTheme(){
+    var t = document.documentElement.getAttribute('data-theme');
+    if(t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function toggleTheme(){
+    var t = currentTheme()==='dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  }
+  btnTheme.onclick = toggleTheme;
+
+  // 강사 노트
+  function toggleNotes(){ notes.classList.toggle('show'); }
+
+  // 전체화면
+  function toggleFull(){
+    if(!document.fullscreenElement){ (document.documentElement.requestFullscreen||function(){}).call(document.documentElement); }
+    else { document.exitFullscreen && document.exitFullscreen(); }
+  }
+
+  // 전체보기
+  var ovGrid = document.getElementById('ovGrid');
+  slides.forEach(function(s,idx){
+    var b = document.createElement('button');
+    b.className = 'ov-item';
+    b.setAttribute('data-idx', idx);
+    b.innerHTML = '<span class="n">'+String(idx+1).padStart(2,'0')+'</span><span class="ti"></span>';
+    b.querySelector('.ti').textContent = s.getAttribute('data-title') || ('슬라이드 '+(idx+1));
+    b.onclick = function(){ go(idx); closeOverlays(); };
+    ovGrid.appendChild(b);
+  });
+  function toggleOverview(){ overview.classList.toggle('show'); }
+  function closeOverlays(){ overview.classList.remove('show'); help.classList.remove('show'); }
+
+  // 타이머 (경과 / 120분)
+  var timerEl = document.getElementById('timer');
+  var tClock = document.getElementById('tClock');
+  var tPlay = document.getElementById('tPlay');
+  var tReset = document.getElementById('tReset');
+  var TOTAL = 120*60, elapsed = 0, ticking = false, handle = null;
+  function fmt(s){ var m=Math.floor(s/60), ss=s%60; return m+':' + (ss<10?'0':'') + ss; }
+  function paint(){
+    tClock.textContent = fmt(elapsed)+' / 120:00';
+    tClock.classList.toggle('warn', elapsed >= TOTAL);
+  }
+  function tick(){ elapsed++; paint(); }
+  function playPause(){
+    ticking = !ticking;
+    tPlay.textContent = ticking ? '⏸' : '▶';
+    if(ticking){ handle = setInterval(tick, 1000); } else { clearInterval(handle); }
+  }
+  function resetTimer(){ elapsed=0; paint(); }
+  tPlay.onclick = playPause; tReset.onclick = resetTimer;
+  document.getElementById('btnTimer').onclick = function(){
+    timerEl.hidden = !timerEl.hidden;
+  };
+  paint();
+
+  // 키보드
+  document.addEventListener('keydown', function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    var k = e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='Spacebar'){ e.preventDefault(); next(); }
+    else if(k==='ArrowLeft'||k==='PageUp'){ e.preventDefault(); prev(); }
+    else if(k==='Home'){ e.preventDefault(); go(0); }
+    else if(k==='End'){ e.preventDefault(); go(total-1); }
+    else if(k==='f'||k==='F'){ toggleFull(); }
+    else if(k==='n'||k==='N'){ toggleNotes(); }
+    else if(k==='o'||k==='O'){ toggleOverview(); }
+    else if(k==='d'||k==='D'){ toggleTheme(); }
+    else if(k==='t'||k==='T'){ timerEl.hidden = !timerEl.hidden; if(!timerEl.hidden && !ticking) playPause(); }
+    else if(k==='?'){ help.classList.toggle('show'); }
+    else if(k==='Escape'){ closeOverlays(); notes.classList.remove('show'); }
+  });
+
+  // 터치 스와이프
+  var x0=null;
+  document.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if(x0===null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if(Math.abs(dx) > 55){ dx<0 ? next() : prev(); }
+    x0=null;
+  }, {passive:true});
+
+  // 해시 딥링크 (#5 등)
+  function fromHash(){
+    var n = parseInt((location.hash||'').replace('#',''),10);
+    if(!isNaN(n) && n>=1 && n<=total) i = n-1;
+  }
+  fromHash();
+  window.addEventListener('hashchange', function(){ fromHash(); render(); });
+
+  render();
+})();
+</script>
+</body>
+</html>
