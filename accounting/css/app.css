@@ -399,9 +399,9 @@ select.input{max-width:280px}
 .viztoggle button.is-on{background:var(--cat-1);color:#fff}
 
 .vizbody{position:relative;min-height:480px;display:flex}
-.vizbody .city{flex:1;height:480px;border-radius:14px;border:1px solid var(--line-2);box-shadow:none;
-  background-color:var(--canvas-bg);
-  background-image:radial-gradient(130% 100% at 50% 10%, rgba(57,135,229,.12), transparent 60%)}
+.vizbody .city{flex:1;height:480px;border-radius:14px;border:1px solid var(--line-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
+  background-color:#eef2f8;
+  background-image:linear-gradient(180deg,#f4f7fb,#e3e9f2)}
 
 /* 상시 라벨 오버레이 */
 .city__labels{position:absolute;inset:0;pointer-events:none;z-index:6;overflow:hidden}
