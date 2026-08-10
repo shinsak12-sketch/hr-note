@@ -302,8 +302,8 @@ function render(){
   clearOverlays();
   const content=el("content");
   const meta=NAV.find(n=>n.id===ctx.route)||NAV[0];
-  el("viewTitle").textContent=meta.title;
-  el("viewSub").textContent=meta.sub||"";
+  el("viewTitle").textContent="사업비 관리 프로그램";
+  el("viewSub").textContent = meta.title + (meta.sub? " · "+meta.sub : "");
   paintNav(); updateChrome();
 
   const hasData = ctx.data.sample || (ctx.data.leaves && ctx.data.leaves.length);
@@ -409,7 +409,7 @@ function renderHome(root){
     renderViz($("#vizbody",vizCard), nodes, state);
     renderMonthly($("#monthbd",monthCard), nodes, pace, curMonth);
     $("#monthScope",monthCard).textContent = state.path.length? "· "+state.path[state.path.length-1] : "· 전체";
-    el("viewSub").textContent = state.path.length? "현재 보기: "+state.path.join(" › ") : "사업비 구성 · 월별 추이";
+    el("viewSub").textContent = state.path.length? "대시보드 · 현재 보기: "+state.path.join(" › ") : "대시보드 · 사업비 구성";
   };
   $("#vizToggle",vizCard).querySelectorAll("button").forEach(b=>b.onclick=()=>{
     state.viz=b.dataset.v;
