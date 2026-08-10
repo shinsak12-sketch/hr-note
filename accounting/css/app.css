@@ -43,7 +43,8 @@
   --line: rgba(255,255,255,.08);
   --line-2: rgba(255,255,255,.14);
   --glow: rgba(57,135,229,.20);
-  --board-a:#171c26; --board-b:#0e131b;   /* 3D 바닥 */
+  --board-a:#2c3547; --board-b:#161d29;   /* 3D 바닥 (밝게) */
+  --grid-line: rgba(255,255,255,.18);
 }
 /* ---- 라이트 ---- */
 :root[data-theme="light"] {
@@ -59,7 +60,8 @@
   --line: rgba(16,19,26,.10);
   --line-2: rgba(16,19,26,.16);
   --glow: rgba(42,120,214,.16);
-  --board-a:#e7ecf4; --board-b:#d7dee9;
+  --board-a:#eef2f8; --board-b:#d7dee9;
+  --grid-line: rgba(16,19,26,.18);
   --cat-1:#2a78d6; --cat-2:#eb6834; --cat-3:#1baf7a; --cat-4:#eda100;
   --cat-5:#e87ba4; --cat-6:#008300; --cat-7:#4a3aa7; --cat-8:#e34948;
   --div-mid:#f0efec;
@@ -242,13 +244,13 @@ button { font-family:inherit; }
 .board{
   position:absolute;transform-style:preserve-3d;
   border-radius:12px;
-  background:linear-gradient(var(--board-a),var(--board-b));
-  box-shadow:0 40px 80px rgba(0,0,0,.45), inset 0 0 0 1px var(--line-2);
+  background:linear-gradient(160deg,var(--board-a),var(--board-b));
+  box-shadow:0 50px 90px rgba(0,0,0,.5), inset 0 0 0 2px var(--grid-line);
   backface-visibility:hidden;
 }
 .board::after{ /* 격자 라인 (선명하게) */
-  content:"";position:absolute;inset:0;border-radius:12px;opacity:.9;
-  background-image:linear-gradient(var(--line-2) 1px,transparent 1px),linear-gradient(90deg,var(--line-2) 1px,transparent 1px);
+  content:"";position:absolute;inset:0;border-radius:12px;opacity:1;
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
   background-size:var(--cell,64px) var(--cell,64px);
 }
 .bldg{position:absolute;transform-style:preserve-3d;cursor:pointer;will-change:transform}
@@ -396,7 +398,8 @@ select.input{max-width:280px}
 
 .vizbody{position:relative;min-height:480px;display:flex}
 .vizbody .city{flex:1;height:480px;border-radius:0;border:0;box-shadow:none;background:
-  radial-gradient(120% 90% at 50% 6%, rgba(57,135,229,.08), transparent 55%), var(--surface-1)}
+  radial-gradient(130% 100% at 50% 12%, rgba(57,135,229,.14), transparent 60%),
+  linear-gradient(180deg, #0e1420, #080b11)}
 
 /* 상시 라벨 오버레이 */
 .city__labels{position:absolute;inset:0;pointer-events:none;z-index:6;overflow:hidden}
