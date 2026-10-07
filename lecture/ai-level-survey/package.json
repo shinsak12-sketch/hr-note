@@ -1,0 +1,20 @@
+{
+  "name": "ai-level-survey",
+  "version": "1.0.0",
+  "description": "AI 활용 등급 진단 — 참가자 설문 + 강사 실시간 화면",
+  "scripts": {
+    "dev": "node dev-server.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0"
+  },
+  "devDependencies": {
+    "pg": "^8.23.1"
+  },
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  }
+}

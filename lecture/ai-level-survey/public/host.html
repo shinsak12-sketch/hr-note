@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 활용 등급 진단 · 강사 화면</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%235b3fd1'/%3E%3Ctext x='32' y='43' font-size='28' font-family='sans-serif' font-weight='800' fill='white' text-anchor='middle'%3EAI%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script src="/vendor/qrcode.js"></script>
+<style>
+:root{
+  --bg:#0b0c16; --panel:#141626; --panel2:#1b1e33; --line:#272a44;
+  --ink:#f4f2ff; --ink2:#b6b2d6; --muted:#7d79a0;
+  --accent:#8f7ff0; --goal:#b9adff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:var(--bg);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+/* 화면 크기에 맞춰 1920x1080 기준으로 비율 유지 */
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;padding:56px 72px;display:flex;flex-direction:column;
+  background:radial-gradient(1200px 700px at 85% -10%,rgba(143,127,240,.18),transparent 60%),radial-gradient(900px 600px at -10% 110%,rgba(91,63,209,.16),transparent 60%)}
+header{display:flex;align-items:center;justify-content:space-between}
+.title{display:flex;align-items:center;gap:18px}
+.logo{width:52px;height:52px;border-radius:15px;background:#5b3fd1;display:grid;place-items:center;font-weight:900;font-size:20px}
+.title h1{font-size:36px;font-weight:800;letter-spacing:-.02em}
+.title p{font-size:18px;color:var(--muted);margin-top:4px}
+.tools{display:flex;align-items:center;gap:10px}
+.pill{height:44px;padding:0 18px;border-radius:99px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;gap:8px;font-size:17px;font-weight:600;color:var(--ink2)}
+.pill.btn:hover{border-color:var(--accent);color:var(--ink)}
+.pill.primary{background:#5b3fd1;border-color:#5b3fd1;color:#fff}
+.live{width:10px;height:10px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 0 rgba(74,222,128,.6);animation:pulse 1.8s infinite}
+.live.off{background:#f87171;animation:none}
+@keyframes pulse{70%{box-shadow:0 0 0 10px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+main{flex:1;min-height:0;margin-top:40px}
+.view{display:none;height:100%}
+.view.on{display:grid}
+
+/* ---------- 모집 화면 */
+#gather{grid-template-columns:600px 1fr;gap:64px}
+.qrcard{background:#fff;border-radius:36px;padding:44px;display:flex;flex-direction:column;align-items:center;color:#17142b;align-self:start}
+.qrcard canvas,.qrcard img{width:512px;height:512px;image-rendering:pixelated}
+.qrcard .url{margin-top:26px;font-size:26px;font-weight:800;letter-spacing:-.01em;text-align:center;word-break:break-all}
+.qrcard .room{margin-top:8px;font-size:18px;color:#6b6788;font-weight:600}
+.gright{display:flex;flex-direction:column;min-width:0}
+.big-k{font-size:26px;color:var(--ink2);font-weight:700}
+.big-n{font-size:240px;font-weight:900;line-height:1;letter-spacing:-.04em;margin-top:6px;font-variant-numeric:tabular-nums}
+.big-n small{font-size:64px;font-weight:800;color:var(--ink2);margin-left:12px;letter-spacing:0}
+.big-sub{font-size:24px;color:var(--muted);margin-top:10px}
+.joined{margin-top:44px;display:flex;flex-wrap:wrap;gap:12px;align-content:flex-start;overflow:hidden;flex:1}
+.chip{height:52px;padding:0 20px 0 8px;border-radius:99px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;gap:12px;font-size:21px;font-weight:600;animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
+.chip .g{width:38px;height:38px;border-radius:50%;background:var(--panel2);display:grid;place-items:center;font-size:15px;font-weight:800;color:var(--ink2)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.hint{font-size:20px;color:var(--muted);display:flex;align-items:center;gap:10px}
+kbd{font-family:inherit;font-size:16px;font-weight:700;padding:3px 9px;border-radius:7px;background:var(--panel2);border:1px solid var(--line);color:var(--ink2)}
+
+/* ---------- 결과 화면 */
+#board{grid-template-columns:1fr 600px;grid-template-rows:auto 1fr 196px;gap:24px}
+.kpis{grid-column:1 / -1;display:grid;grid-template-columns:repeat(4,1fr) 200px;gap:20px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:18px 26px}
+.kpi span{font-size:19px;color:var(--ink2);font-weight:600}
+.kpi b{display:block;font-size:50px;font-weight:900;letter-spacing:-.03em;margin-top:6px;font-variant-numeric:tabular-nums}
+.kpi b small{font-size:24px;font-weight:700;color:var(--muted);margin-left:6px;letter-spacing:0}
+.miniqr{background:#fff;border-radius:24px;display:grid;place-items:center;padding:14px}
+.miniqr canvas{width:120px;height:120px;image-rendering:pixelated}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:28px;padding:24px 32px;min-height:0;display:flex;flex-direction:column}
+.panel h3{font-size:24px;font-weight:800;display:flex;align-items:baseline;justify-content:space-between}
+.panel h3 small{font-size:17px;font-weight:600;color:var(--muted)}
+/* 등급 분포: 가로 막대, 이름·인원·비율 직접 표기 */
+.levels{flex:1;display:flex;flex-direction:column;justify-content:space-around;margin-top:8px}
+.lvrow{display:grid;grid-template-columns:210px 1fr 150px;align-items:center;gap:22px;position:relative}
+.lvname b{display:block;font-size:20px;color:var(--muted);font-weight:800}
+.lvname span{font-size:30px;font-weight:800}
+.track{height:52px;border-radius:0 12px 12px 0;position:relative}
+.track:before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--line)}
+.fill{height:100%;border-radius:0 12px 12px 0;width:0;transition:width .8s cubic-bezier(.2,.8,.2,1);min-width:0}
+.lvval{text-align:right;font-variant-numeric:tabular-nums}
+.lvval b{font-size:44px;font-weight:900}
+.lvval span{font-size:20px;color:var(--muted);font-weight:700;margin-left:6px}
+.lvrow.goal .lvname span:after{content:"오늘의 목표";font-size:14px;font-weight:800;color:#17142b;background:var(--goal);padding:4px 9px;border-radius:99px;margin-left:10px;vertical-align:6px}
+.hbars{margin-top:10px;display:flex;flex-direction:column;flex:1;justify-content:space-around}
+.hb{display:grid;grid-template-columns:230px 1fr 44px;align-items:center;gap:14px;font-size:20px;white-space:nowrap}
+.hb .t{height:22px}
+.hb .t i{display:block;height:100%;background:var(--accent);border-radius:0 6px 6px 0;width:0;transition:width .8s}
+.hb b{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.gpanel{grid-column:1 / -1;flex-direction:row;align-items:center;gap:40px}
+.gpanel h3{flex-direction:column;align-items:flex-start;gap:6px;width:200px;flex:none}
+.groups{display:grid;grid-template-columns:repeat(8,1fr);gap:24px;flex:1;height:100%}
+.gcol{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto 92px auto;column-gap:12px;align-items:end;height:100%;align-content:center}
+.gcol .v{grid-column:1 / -1;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;text-align:center;margin-bottom:6px}
+.gcol .trk{grid-column:1 / -1;height:92px;display:flex;align-items:flex-end;justify-content:center;border-bottom:2px solid var(--line)}
+.gcol .col{width:48px;border-radius:8px 8px 0 0;background:var(--accent);transition:height .8s;height:0}
+.gcol .col.empty{background:var(--line)}
+.gcol .lab{font-size:19px;color:var(--ink2);font-weight:800;padding-top:8px;text-align:right}
+.gcol .n{font-size:16px;color:var(--muted);padding-top:8px}
+/* 떠넘기고 싶은 일: 아래로 흐르는 띠 */
+.ticker{position:absolute;left:0;right:0;bottom:0;height:84px;background:linear-gradient(90deg,var(--bg),transparent 6%,transparent 94%,var(--bg)),#10111e;border-top:1px solid var(--line);overflow:hidden;display:flex;align-items:center}
+.ticker .lab{position:absolute;left:0;top:0;bottom:0;z-index:2;display:flex;align-items:center;padding:0 26px 0 72px;background:#10111e;font-size:19px;font-weight:800;color:var(--goal);box-shadow:20px 0 20px #10111e}
+.ticker .run{display:flex;gap:16px;white-space:nowrap;padding-left:100%;animation:run linear infinite}
+.ticker .w{font-size:22px;font-weight:600;padding:10px 20px;border-radius:99px;background:var(--panel2);border:1px solid var(--line)}
+@keyframes run{to{transform:translateX(-100%)}}
+#stage.has-ticker{padding-bottom:120px}
+.err{position:absolute;right:72px;bottom:24px;z-index:3;font-size:16px;color:#fca5a5;background:#2a1215;border:1px solid #7f1d1d;padding:10px 16px;border-radius:12px;display:none;max-width:900px}
+.err.on{display:block}
+.empty-note{font-size:22px;color:var(--muted);margin:auto}
+dialog{margin:auto;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:22px;padding:28px;width:460px}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+dialog h4{font-size:22px;margin-bottom:6px}
+dialog p{font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:16px}
+dialog input{width:100%;height:52px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:20px;padding:0 14px}
+dialog .row{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <header>
+    <div class="title">
+      <div class="logo">AI</div>
+      <div><h1>AI 활용 등급 진단</h1><p>생성형 AI 활용 업무 보조 바이브코딩</p></div>
+    </div>
+    <div class="tools">
+      <span class="pill"><i class="live" id="live"></i><span id="liveTxt">실시간</span></span>
+      <button class="pill btn" id="roomBtn" title="방 코드 바꾸기">방 <b id="roomTxt"></b></button>
+      <button class="pill btn" id="wishBtn" title="W">한 줄 의견 <b id="wishState">켜짐</b></button>
+      <button class="pill btn primary" id="toggle" title="Space">결과 공개 ▶</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="view on" id="gather">
+      <div class="qrcard"><div id="qr"></div><div class="url" id="url"></div><div class="room" id="roomLine"></div></div>
+      <div class="gright">
+        <div class="big-k">지금까지 참여</div>
+        <div class="big-n"><span id="gCount">0</span><small>명</small></div>
+        <div class="big-sub">휴대폰 카메라로 QR을 찍으면 바로 시작해요 · 8문항 1분</div>
+        <div class="joined" id="joined"></div>
+        <div class="hint"><kbd>Space</kbd> 결과 공개 <kbd>F</kbd> 전체 화면 <kbd>W</kbd> 한 줄 의견 숨기기</div>
+      </div>
+    </section>
+
+    <section class="view" id="board">
+      <div class="kpis">
+        <div class="kpi"><span>참여</span><b id="kCount">0<small>명</small></b></div>
+        <div class="kpi"><span>평균 등급</span><b id="kAvg">-</b></div>
+        <div class="kpi"><span>유료 AI 사용</span><b id="kPaid">0<small>명</small></b></div>
+        <div class="kpi"><span>제작형 이상 (Lv.2+)</span><b id="kMaker">0<small>명</small></b></div>
+        <div class="miniqr"><div id="qr2"></div></div>
+      </div>
+      <div class="panel">
+        <h3>등급 분포 <small id="lvNote"></small></h3>
+        <div class="levels" id="levels"></div>
+      </div>
+      <div class="panel"><h3>주로 쓰는 곳 <small>복수 응답 · 명</small></h3><div class="hbars" id="uses"></div></div>
+      <div class="panel gpanel"><h3>조별 평균 등급 <small>막대 높이 = Lv.0~3</small></h3><div class="groups" id="groups"></div></div>
+    </section>
+  </main>
+
+  <div class="ticker" id="ticker" style="display:none"><div class="lab">AI한테 떠넘기고 싶은 일</div><div class="run" id="run"></div></div>
+  <div class="err" id="err"></div>
+</div>
+
+<dialog id="roomDlg">
+  <h4>방 코드</h4>
+  <p>같은 코드로 들어온 응답만 모여요. 리허설은 다른 코드(예: test)로 해 보고, 본 강의 때 날짜 코드로 돌아오면 깨끗한 화면으로 시작해요.</p>
+  <input id="roomInput" maxlength="32">
+  <div class="row"><button class="pill btn" id="roomCancel">취소</button><button class="pill btn primary" id="roomOk">바꾸기</button></div>
+</dialog>
+
+<script type="module">
+import { QUESTIONS, LEVELS, GROUPS, MAX_SCORE, defaultRoom } from './survey.js';
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const params = new URLSearchParams(location.search);
+let room = (params.get('room') || defaultRoom()).replace(/[^0-9A-Za-z가-힣_-]/g, '').slice(0, 32) || 'main';
+let mode = 'gather';
+let showWish = true;
+let last = null;
+let seen = new Set();
+
+// ---------- 화면 맞춤 (1920x1080 기준 확대·축소)
+function fit() {
+  const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+  $('stage').style.transform = `translate(-50%,-50%) scale(${s})`;
+}
+addEventListener('resize', fit); fit();
+
+// ---------- QR
+function joinUrl() {
+  const u = new URL('/', location.href);
+  u.searchParams.set('room', room);
+  return u.href;
+}
+function drawQR(el, size) {
+  const qr = qrcode(0, 'M');
+  qr.addData(joinUrl());
+  qr.make();
+  const n = qr.getModuleCount();
+  const q = 2; // quiet zone (흰 카드가 나머지 여백 역할)
+  const cell = Math.max(1, Math.floor(size / (n + q * 2)));
+  const c = document.createElement('canvas');
+  c.width = c.height = cell * (n + q * 2);
+  const g = c.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+  g.fillStyle = '#17142b';
+  for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (qr.isDark(r, k)) g.fillRect((k + q) * cell, (r + q) * cell, cell, cell);
+  el.replaceChildren(c);
+}
+function paintRoom() {
+  $('roomTxt').textContent = room;
+  const u = new URL(joinUrl());
+  $('url').textContent = u.host + u.pathname.replace(/\/$/, '');
+  $('roomLine').textContent = `방 코드 ${room}`;
+  drawQR($('qr'), 512);
+  drawQR($('qr2'), 150);
+  const p = new URLSearchParams(location.search); p.set('room', room);
+  history.replaceState(null, '', `?${p}`);
+}
+
+// ---------- 모드 전환
+function setMode(m) {
+  mode = m;
+  $('gather').classList.toggle('on', m === 'gather');
+  $('board').classList.toggle('on', m === 'board');
+  $('toggle').textContent = m === 'gather' ? '결과 공개 ▶' : '◀ QR 화면';
+  if (last) render(last, true);
+}
+$('toggle').addEventListener('click', () => setMode(mode === 'gather' ? 'board' : 'gather'));
+$('wishBtn').addEventListener('click', toggleWish);
+function toggleWish() {
+  showWish = !showWish;
+  $('wishState').textContent = showWish ? '켜짐' : '꺼짐';
+  if (last) renderTicker(last);
+}
+addEventListener('keydown', (e) => {
+  if ($('roomDlg').open) return;
+  if (e.code === 'Space' || e.key === 'r' || e.key === 'R') { e.preventDefault(); $('toggle').click(); }
+  else if (e.key === 'f' || e.key === 'F') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+  else if (e.key === 'w' || e.key === 'W') toggleWish();
+});
+
+// ---------- 방 코드
+$('roomBtn').addEventListener('click', () => { $('roomInput').value = room; $('roomDlg').showModal(); $('roomInput').select(); });
+$('roomCancel').addEventListener('click', () => $('roomDlg').close());
+$('roomOk').addEventListener('click', applyRoom);
+$('roomInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') applyRoom(); });
+function applyRoom() {
+  const v = $('roomInput').value.replace(/[^0-9A-Za-z가-힣_-]/g, '').slice(0, 32);
+  $('roomDlg').close();
+  if (!v || v === room) return;
+  room = v; last = null; seen = new Set(); $('joined').replaceChildren();
+  paintRoom(); poll();
+}
+
+// ---------- 그리기
+const USES = QUESTIONS.find((q) => q.id === 'uses').options.filter((o) => o.key !== 'none');
+
+function render(d, force) {
+  $('gCount').textContent = d.count;
+  // 모집 화면: 새로 들어온 사람 칩 (최근 순, 최대 30)
+  const box = $('joined');
+  const fresh = d.recent.filter((r) => !seen.has(`${r.at}|${r.name}|${r.grp}`)).reverse();
+  for (const r of fresh) {
+    seen.add(`${r.at}|${r.name}|${r.grp}`);
+    const el = document.createElement('div');
+    el.className = 'chip';
+    el.innerHTML = `<span class="g">${r.grp ? `${r.grp}조` : '-'}</span>${esc(r.name || '익명')}`;
+    box.prepend(el);
+  }
+  while (box.children.length > 30) box.lastChild.remove();
+
+  if (mode !== 'board' && !force) { renderTicker(d); return; }
+
+  // KPI
+  const avgLv = d.count ? d.levels.reduce((s, n, i) => s + n * i, 0) / d.count : null;
+  $('kCount').innerHTML = `${d.count}<small>명</small>`;
+  $('kAvg').innerHTML = avgLv == null ? '-' : `Lv.${avgLv.toFixed(1)}`;
+  $('kPaid').innerHTML = `${d.paid}<small>명${d.count ? ` · ${Math.round((d.paid / d.count) * 100)}%` : ''}</small>`;
+  const maker = d.levels[2] + d.levels[3];
+  $('kMaker').innerHTML = `${maker}<small>명${d.count ? ` · ${Math.round((maker / d.count) * 100)}%` : ''}</small>`;
+  $('lvNote').textContent = d.count ? `평균 ${d.avgScore.toFixed(1)}점 / ${MAX_SCORE}점` : '';
+
+  // 등급 분포 (막대 길이 = 인원, 최대값 기준)
+  const maxLv = Math.max(1, ...d.levels);
+  $('levels').innerHTML = LEVELS.map((L) => {
+    const n = d.levels[L.lv];
+    const pct = d.count ? Math.round((n / d.count) * 100) : 0;
+    return `<div class="lvrow${L.lv === 2 ? ' goal' : ''}">
+      <div class="lvname"><b>Lv.${L.lv}</b><span>${L.name}</span></div>
+      <div class="track"><div class="fill" data-w="${(n / maxLv) * 100}" style="background:${L.dark}"></div></div>
+      <div class="lvval"><b>${n}</b><span>명 · ${pct}%</span></div></div>`;
+  }).join('');
+
+  // 주로 쓰는 곳 (많은 순)
+  const uses = USES.map((o) => ({ label: o.label, n: d.uses[o.key] || 0 })).sort((a, b) => b.n - a.n);
+  const maxU = Math.max(1, ...uses.map((u) => u.n));
+  $('uses').innerHTML = uses.map((u) => `<div class="hb"><span>${esc(u.label)}</span><div class="t"><i data-w="${(u.n / maxU) * 100}"></i></div><b>${u.n}</b></div>`).join('');
+
+  // 조별 평균 등급 (0~3 고정 축)
+  $('groups').innerHTML = d.groups.map((g) => `<div class="gcol">
+      <span class="v">${g.avg == null ? '-' : g.avg.toFixed(1)}</span>
+      <div class="trk"><div class="col" data-h="${g.avg == null ? 0 : (g.avg / 3) * 100}"></div></div>
+      <span class="lab">${g.g}조</span><span class="n">${g.n}명</span></div>`).join('');
+
+  // 다음 프레임에 폭을 넣어야 애니메이션이 걸린다
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.querySelectorAll('.fill,.hb i').forEach((el) => { el.style.width = `${el.dataset.w}%`; });
+    document.querySelectorAll('.gcol .col').forEach((el) => { el.style.height = `${el.dataset.h}%`; });
+  }));
+  renderTicker(d);
+}
+
+let tickerKey = '';
+function renderTicker(d) {
+  const on = showWish && d.wishes.length > 0;
+  $('ticker').style.display = on ? 'flex' : 'none';
+  $('stage').classList.toggle('has-ticker', on);
+  if (!on) return;
+  const key = d.wishes.map((w) => w.text).join('|');
+  if (key === tickerKey) return;
+  tickerKey = key;
+  const run = $('run');
+  run.innerHTML = d.wishes.map((w) => `<span class="w">${esc(w.text)}</span>`).join('');
+  run.style.animationDuration = `${Math.max(20, d.wishes.length * 5)}s`;
+}
+
+// ---------- 2초마다 가져오기
+async function poll() {
+  const myRoom = room;
+  try {
+    const res = await fetch(`/api/stats?room=${encodeURIComponent(room)}`, { cache: 'no-store' });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || res.status);
+    if (myRoom !== room) return;
+    const changed = !last || JSON.stringify(d) !== JSON.stringify(last);
+    last = d;
+    if (changed) render(d);
+    $('live').classList.remove('off'); $('liveTxt').textContent = '실시간';
+    $('err').classList.remove('on');
+  } catch (e) {
+    $('live').classList.add('off'); $('liveTxt').textContent = '연결 끊김';
+    $('err').textContent = `집계를 못 가져왔어요: ${e.message}`;
+    $('err').classList.add('on');
+  }
+}
+
+paintRoom();
+poll();
+setInterval(poll, 2000);
+</script>
+</body>
+</html>
