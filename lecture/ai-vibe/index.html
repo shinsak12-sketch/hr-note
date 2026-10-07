@@ -241,50 +241,137 @@ strong{font-weight:800;color:var(--ink)}
   border:1px solid var(--line);border-radius:9px;padding:5px 14px;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .browser-body{padding:0;max-height:min(66vh,680px);overflow:auto}
 
-/* ===== 여행 앱 ===== */
-.trip{--t1:#0E9F8E;--t2:#F28C28;font-size:clamp(14px,1.55vw,19px);color:var(--ink)}
-.trip-hero{background:linear-gradient(135deg,#0E9F8E,#127A9E);color:#fff;padding:clamp(18px,2.4vw,30px) clamp(18px,2.6vw,34px)}
-.trip-hero .t{font-weight:800;font-size:clamp(22px,2.8vw,36px);letter-spacing:-.02em}
-.trip-hero .s{opacity:.85;font-weight:600;margin-top:.3em}
-.trip-hero .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:.8em}
-.trip-hero .chips span{background:rgba(255,255,255,.18);border-radius:999px;padding:.25em .8em;font-weight:700;font-size:.85em}
-.trip-tabs{display:flex;gap:6px;padding:12px clamp(14px,2vw,24px) 0;flex-wrap:wrap;background:var(--surface)}
-.trip-tabs button{border:none;background:var(--bg-2);color:var(--ink-soft);font-family:inherit;font-weight:800;font-size:.95em;padding:.55em 1.05em;border-radius:12px;cursor:pointer}
-.trip-tabs button.on{background:#0E9F8E;color:#fff}
-.trip-sub{display:flex;gap:6px;padding:10px clamp(14px,2vw,24px) 0;flex-wrap:wrap}
-.trip-sub button{border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);font-family:inherit;font-weight:700;font-size:.9em;padding:.35em .85em;border-radius:999px;cursor:pointer}
-.trip-sub button.on{border-color:#F28C28;color:#B85A00;background:color-mix(in srgb,#F28C28 14%,var(--surface))}
-.trip-body{padding:clamp(14px,2vw,24px)}
-.day-head{display:flex;align-items:baseline;gap:.6em;margin-bottom:.6em}
-.day-head b{font-size:1.25em}
-.day-head span{color:var(--ink-faint);font-weight:700}
-.tline{display:grid;gap:8px}
-.tline .it{display:grid;grid-template-columns:4.4em 1fr;gap:.8em;align-items:start;padding:.6em .8em;border-radius:12px;background:var(--bg-2)}
-.tline .it .h{font-family:var(--font-mono);font-weight:800;color:#0E9F8E}
-.tline .it .p{font-weight:800}
-.tline .it .n{color:var(--ink-faint);font-weight:600;font-size:.88em;margin-top:.15em}
-.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
-.pcard{border:1px solid var(--line);border-radius:14px;padding:.8em .9em;background:var(--surface);display:flex;flex-direction:column;gap:.3em}
-.pcard .tag{align-self:flex-start;font-size:.75em;font-weight:800;border-radius:999px;padding:.15em .65em;color:#fff}
-.pcard .tag.sight{background:#127A9E}.pcard .tag.food{background:#E5484D}.pcard .tag.shop{background:#F28C28}
-.pcard .nm{font-weight:800;font-size:1.05em}
-.pcard .ds{color:var(--ink-soft);font-weight:500;font-size:.88em;line-height:1.45}
-.ck-prog{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:800}
-.ck-prog .barbox{flex:1;height:12px;border-radius:999px;background:var(--bg-2);overflow:hidden}
-.ck-prog .barbox i{display:block;height:100%;background:#0E9F8E;width:0;transition:width .3s}
-.ck-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.ck-list label{display:flex;gap:.6em;align-items:center;padding:.6em .8em;border-radius:12px;background:var(--bg-2);font-weight:700;cursor:pointer}
-.ck-list label.done{color:var(--ink-faint);text-decoration:line-through}
-.ck-list input{width:1.15em;height:1.15em;accent-color:#0E9F8E}
-.ck-list .cat{grid-column:1/-1;font-weight:800;color:#B85A00;margin-top:.4em;font-size:.9em}
-.phr{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.phr .ph{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:.7em .9em;border-radius:12px;background:var(--bg-2)}
-.phr .ko{font-weight:800}
-.phr .th{grid-column:1;font-size:1.05em;color:#0E9F8E;font-weight:700}
-.phr .rd{grid-column:1;color:var(--ink-faint);font-weight:700;font-size:.88em}
-.phr button{grid-column:2;grid-row:1/4;border:none;background:#0E9F8E;color:#fff;font-family:inherit;font-weight:800;border-radius:10px;padding:.5em .8em;cursor:pointer}
-.phr .sit{grid-column:1/-1;font-weight:800;color:#B85A00;margin-top:.3em;font-size:.9em}
-.trip-toast{min-height:1.4em;color:#0E9F8E;font-weight:800;margin-top:8px}
+/* ===== 여행 앱 (폰 화면) ===== */
+.app-stage{display:grid;grid-template-columns:auto auto;gap:clamp(36px,5vw,96px);align-items:center;justify-content:center}
+.app-side{display:flex;flex-direction:column;gap:clamp(12px,2vh,20px);max-width:560px}
+.app-side .badge{align-self:flex-start}
+.app-side .quote{font-size:clamp(16px,1.9vw,24px);line-height:1.5;color:var(--ink-soft);border-left:4px solid var(--accent,var(--coral));padding:.2em 0 .2em .9em;font-weight:600}
+.added{list-style:none;margin:0;padding:0;display:grid;gap:clamp(8px,1.4vh,14px)}
+.added li{display:flex;gap:.7em;align-items:center;font-size:clamp(17px,2.1vw,27px);font-weight:700;color:var(--ink)}
+.added li i{flex:0 0 auto;width:1.4em;height:1.4em;border-radius:50%;background:var(--accent,var(--coral));display:grid;place-items:center}
+.added li i svg{width:.8em;height:.8em;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.added li.old{color:var(--ink-faint);font-weight:600}
+.added li.old i{background:var(--line-strong)}
+
+.phone-frame{--ph:min(82vh,860px);height:var(--ph);width:calc(var(--ph) * .47);border-radius:calc(var(--ph) * .065);padding:calc(var(--ph) * .014);
+  background:linear-gradient(145deg,#2a2b33,#0c0d12);box-shadow:0 40px 80px -30px rgba(10,10,30,.55),0 0 0 2px #3a3b44 inset;position:relative}
+.phone-frame::before{content:"";position:absolute;top:calc(var(--ph) * .028);left:50%;transform:translateX(-50%);width:28%;height:calc(var(--ph) * .032);border-radius:999px;background:#05060a;z-index:5}
+.phone-screen{width:100%;height:100%;border-radius:calc(var(--ph) * .054);overflow:hidden;background:#F5F3EE;position:relative}
+
+.tp{--bg:#F5F3EE;--card:#FFFFFF;--ink:#16182B;--sub:#6B6F80;--faint:#A3A6B3;--line:#ECE9E2;--teal:#0F9F8F;--deep:#0B5C78;--orange:#FF7A45;--pink:#E5484D;--gold:#F2B33D;--violet:#7B5CF0;
+  height:100%;display:flex;flex-direction:column;color:var(--ink);font-size:calc(var(--ph,780px) * .0192);letter-spacing:-.01em;background:var(--bg)}
+.tp svg{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.tp-status{display:flex;justify-content:space-between;align-items:center;padding:1.05em 1.8em .4em;font-weight:700;font-size:.9em;color:#fff;position:absolute;left:0;right:0;top:0;z-index:4}
+.tp-status.dark{color:var(--ink);background:rgba(245,243,238,.96)}
+.tp-status .ic{display:flex;gap:.35em;align-items:center}
+.tp-status .bat{width:1.7em;height:.85em;border:1.5px solid currentColor;border-radius:.25em;position:relative}
+.tp-status .bat::after{content:"";position:absolute;inset:1.5px;right:30%;background:currentColor;border-radius:1px}
+.tp-scroll{flex:1;overflow:auto;scrollbar-width:none;position:relative}
+.tp-scroll::-webkit-scrollbar{display:none}
+
+.tp-hero{position:relative;padding:3.4em 1.4em 1.4em;color:#fff;overflow:hidden;
+  background:radial-gradient(120% 90% at 85% 0%,#FFB067 0%,rgba(255,176,103,0) 45%),linear-gradient(160deg,#0F9F8F 0%,#0B5C78 70%,#123E66 100%)}
+.tp-hero::after{content:"";position:absolute;right:-2.5em;top:2.2em;width:7em;height:7em;border-radius:50%;background:rgba(255,214,140,.35);filter:blur(2px)}
+.tp-hero .row1{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+.tp-hero .mine{font-weight:700;opacity:.85;font-size:.92em}
+.tp-hero .dd{background:#fff;color:var(--deep);font-weight:900;border-radius:999px;padding:.3em .8em;font-size:.92em}
+.tp-hero h1{font-size:2.05em;font-weight:900;letter-spacing:-.03em;margin:.45em 0 .15em;position:relative;z-index:1;line-height:1.1}
+.tp-hero .dates{font-weight:700;opacity:.9;position:relative;z-index:1}
+.tp-route{display:flex;align-items:center;margin-top:1.1em;position:relative;z-index:1}
+.tp-route .st{display:flex;flex-direction:column;align-items:center;gap:.25em;font-weight:800;font-size:.78em}
+.tp-route .st b{width:.75em;height:.75em;border-radius:50%;background:#fff;box-shadow:0 0 0 .22em rgba(255,255,255,.3)}
+.tp-route .st.home b{background:var(--gold)}
+.tp-route .ln{flex:1;height:2px;margin:0 .2em 1.25em;background:repeating-linear-gradient(90deg,rgba(255,255,255,.85) 0 .35em,transparent .35em .7em)}
+
+.tp-sec{padding:1.1em 1.2em .2em}
+.tp-sec h4{margin:0 0 .7em;font-size:1.12em;font-weight:900;display:flex;align-items:baseline;gap:.5em}
+.tp-sec h4 small{font-size:.75em;color:var(--sub);font-weight:700}
+.tp-days{display:flex;gap:.55em;overflow-x:auto;padding:1em 1.2em .2em;scrollbar-width:none}
+.tp-days::-webkit-scrollbar{display:none}
+.tp-day{flex:0 0 auto;border:none;background:var(--card);border-radius:1.1em;padding:.75em .95em;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer;
+  box-shadow:0 .3em .8em -.4em rgba(20,20,40,.25);min-width:5.6em}
+.tp-day .n{font-size:.72em;font-weight:900;color:var(--teal);letter-spacing:.06em}
+.tp-day .d{font-weight:900;font-size:1.05em;margin-top:.15em}
+.tp-day .c{font-size:.78em;color:var(--sub);font-weight:700}
+.tp-day.on{background:var(--ink);color:#fff}
+.tp-day.on .n{color:var(--gold)}
+.tp-day.on .c{color:rgba(255,255,255,.7)}
+.tp-dayhead{display:flex;justify-content:space-between;align-items:flex-end;padding:1em 1.2em .2em}
+.tp-dayhead .city{font-size:1.45em;font-weight:900;letter-spacing:-.02em}
+.tp-dayhead .meta{font-size:.82em;color:var(--sub);font-weight:700}
+
+.tp-tl{padding:.6em 1.2em .4em;position:relative}
+.tp-ev{display:grid;grid-template-columns:3.1em 2.1em 1fr;gap:.55em;align-items:start;position:relative;padding-bottom:.85em}
+.tp-ev .t{font-weight:800;font-size:.86em;color:var(--sub);padding-top:.55em;font-variant-numeric:tabular-nums}
+.tp-ev .dot{width:2.1em;height:2.1em;border-radius:.75em;display:grid;place-items:center;color:#fff;position:relative;z-index:1;font-size:1em}
+.tp-ev .dot svg{width:1.05em;height:1.05em}
+.tp-ev::before{content:"";position:absolute;left:4.7em;top:2.3em;bottom:0;width:2px;background:var(--line)}
+.tp-ev:last-child::before{display:none}
+.tp-ev .body{background:var(--card);border-radius:.95em;padding:.65em .8em;box-shadow:0 .25em .7em -.45em rgba(20,20,40,.3)}
+.tp-ev .ttl{font-weight:800;font-size:1em}
+.tp-ev .ds{color:var(--sub);font-size:.82em;font-weight:600;margin-top:.15em;line-height:1.4}
+.tp-ev .tips{display:flex;gap:.35em;flex-wrap:wrap;margin-top:.4em}
+.tp-ev .tips span{font-size:.72em;font-weight:800;border-radius:.6em;padding:.2em .55em;background:var(--bg);color:var(--sub)}
+.tp-ev .tips span.warn{background:#FFF1E8;color:#C2410C}
+
+.tp-filter{display:flex;gap:.4em;flex-wrap:wrap;margin-bottom:.7em}
+.tp-filter button{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:.3em .8em;font-family:inherit;font-weight:800;font-size:.82em;color:var(--sub);cursor:pointer}
+.tp-filter button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.tp-places{display:grid;gap:.6em;padding-bottom:.6em}
+.tp-place{display:grid;grid-template-columns:4.2em 1fr;gap:.75em;background:var(--card);border-radius:1em;padding:.6em;box-shadow:0 .25em .7em -.45em rgba(20,20,40,.3)}
+.tp-place .th{border-radius:.75em;display:grid;place-items:center;color:#fff;aspect-ratio:1}
+.tp-place .th svg{width:1.7em;height:1.7em;stroke-width:1.8}
+.tp-place .cat{font-size:.68em;font-weight:900;letter-spacing:.05em}
+.tp-place .nm{font-weight:900;font-size:1em;margin-top:.05em}
+.tp-place .ds{color:var(--sub);font-size:.8em;font-weight:600;line-height:1.4;margin-top:.1em}
+.tp-place .pick{margin-top:.35em;font-size:.76em;font-weight:800;color:var(--ink);background:#FFF6E0;border-radius:.5em;padding:.2em .5em;display:inline-block}
+
+.tp-ckhead{display:flex;align-items:center;gap:1em;background:var(--card);margin:1em 1.2em .4em;border-radius:1.2em;padding:1em 1.1em;box-shadow:0 .25em .7em -.45em rgba(20,20,40,.3)}
+.tp-ring{width:4.4em;height:4.4em;position:relative;flex:0 0 auto}
+.tp-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.tp-ring circle{fill:none;stroke-width:3.5}
+.tp-ring .bg{stroke:var(--line)}
+.tp-ring .fg{stroke:var(--teal);stroke-linecap:round;transition:stroke-dashoffset .4s}
+.tp-ring b{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;font-size:1.05em}
+.tp-ckhead .tt{font-weight:900;font-size:1.15em}
+.tp-ckhead .ss{color:var(--sub);font-weight:700;font-size:.85em;margin-top:.15em}
+.tp-group{margin:.8em 1.2em 0}
+.tp-group .gh{display:flex;align-items:center;gap:.45em;font-weight:900;font-size:.85em;color:var(--sub);margin-bottom:.45em}
+.tp-group .gh svg{color:var(--teal)}
+.tp-ck{display:flex;align-items:center;gap:.7em;background:var(--card);border-radius:.85em;padding:.65em .8em;margin-bottom:.4em;cursor:pointer;font-weight:700;font-size:.95em;user-select:none}
+.tp-ck .box{width:1.35em;height:1.35em;border-radius:.45em;border:2px solid var(--line);display:grid;place-items:center;flex:0 0 auto;color:#fff}
+.tp-ck .box svg{width:.85em;height:.85em;stroke-width:3.2;opacity:0}
+.tp-ck.done{color:var(--faint);text-decoration:line-through}
+.tp-ck.done .box{background:var(--teal);border-color:var(--teal)}
+.tp-ck.done .box svg{opacity:1}
+
+.tp-sits{display:flex;gap:.4em;overflow-x:auto;padding:1em 1.2em .3em;scrollbar-width:none}
+.tp-sits::-webkit-scrollbar{display:none}
+.tp-sits button{flex:0 0 auto;border:none;background:var(--card);border-radius:999px;padding:.45em .95em;font-family:inherit;font-weight:800;font-size:.88em;color:var(--sub);cursor:pointer;box-shadow:0 .2em .5em -.3em rgba(20,20,40,.3)}
+.tp-sits button.on{background:var(--teal);color:#fff}
+.tp-phrases{display:grid;gap:.6em;padding:.6em 1.2em 1em}
+.tp-ph{background:var(--card);border-radius:1.05em;padding:.85em .9em;display:grid;grid-template-columns:1fr auto;gap:.15em .7em;align-items:center;box-shadow:0 .25em .7em -.45em rgba(20,20,40,.3)}
+.tp-ph .ko{font-size:.82em;font-weight:800;color:var(--sub)}
+.tp-ph .th{font-size:1.35em;font-weight:800;color:var(--ink);line-height:1.3}
+.tp-ph .rd{font-size:.9em;font-weight:800;color:var(--teal)}
+.tp-ph button{grid-column:2;grid-row:1/4;width:2.6em;height:2.6em;border-radius:50%;border:none;background:var(--teal);color:#fff;display:grid;place-items:center;cursor:pointer}
+.tp-ph button svg{fill:#fff;stroke:none;width:1em;height:1em;margin-left:.12em}
+.tp-ph.playing button{background:var(--orange)}
+.tp-note{margin:.2em 1.2em 1em;font-size:.78em;color:var(--sub);font-weight:700;min-height:1.2em}
+
+.tp-tabbar{display:flex;justify-content:space-around;background:rgba(255,255,255,.96);border-top:1px solid var(--line);padding:.55em .4em 1.35em}
+.tp-tabbar button{border:none;background:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:.2em;font-weight:800;font-size:.72em;color:var(--faint);cursor:pointer;min-width:4.5em}
+.tp-tabbar button svg{width:1.7em;height:1.7em}
+.tp-tabbar button.on{color:var(--ink)}
+.tp-tabbar button.on svg{color:var(--teal)}
+.tp-pad{height:1em}
+.tp-title{padding:3.3em 1.2em .2em}
+.tp-title h2{margin:0;font-size:1.75em;font-weight:900;letter-spacing:-.03em}
+.tp-title p{margin:.2em 0 0;color:var(--sub);font-weight:700;font-size:.88em}
+.tp-tipcard{margin:.2em 1.2em 1em;border-radius:1.05em;padding:.9em 1em;background:linear-gradient(140deg,#FFF6E0,#FFE9C7);display:flex;gap:.7em;align-items:flex-start}
+.tp-tipcard b{flex:0 0 auto;width:1.8em;height:1.8em;border-radius:50%;background:var(--gold);color:#fff;display:grid;place-items:center;font-weight:900}
+.tp-tipcard div{font-size:.86em;font-weight:700;line-height:1.5;color:#5A4210}
+.tp-tipcard em{font-style:normal;color:var(--ink);font-weight:900}
 
 /* 타이머 슬라이드 */
 .cd{display:flex;flex-direction:column;align-items:center;gap:clamp(14px,2.4vh,26px)}
@@ -553,7 +640,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
 </section>
 
 <section class="slide" data-accent="indigo" data-title="대화형 AI, 무엇을 쓸까"
-  data-notes="[도구] 특정 도구 홍보 아님. 대표 3종을 무료로라도 2개 이상 가입해 두기. 하나가 막히면 다른 걸로. 무료 한도와 기능은 자주 바뀌니 직접 써 보고 손에 맞는 걸로.">
+  data-notes="[도구] 특정 도구 홍보 아님. 대표 3종 소개. 하나를 주력으로 정하고, 결과가 마음에 안 들면 다른 걸로 같은 요청을 해 보면 비교가 된다. 오늘 실습은 조별로 준비된 도구로.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 대화형 AI</span>
     <h2 class="subhead">하나만 쓰지 말고 <span class="accent">2개 이상</span></h2>
@@ -562,7 +649,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
       <div class="card"><span class="k">chatgpt.com</span><h3>ChatGPT</h3><p>가장 많이 쓰는 도구, 대화 · 이미지 · 음성까지 고루</p></div>
       <div class="card"><span class="k">gemini.google.com</span><h3>Gemini</h3><p>구글 계정으로 바로 시작, 구글 서비스와 잘 맞음</p></div>
     </div>
-    <div class="callout"><span class="bang">!</span><p>무료 한도와 기능은 자주 바뀝니다. <b>둘 이상 가입</b>해 두고, 하나가 막히면 다른 걸로 넘어가세요.</p></div>
+    <div class="callout"><span class="bang">!</span><p><b>주력 하나</b>를 정하고, 결과가 아쉬우면 <b>같은 요청을 다른 AI에</b> 넣어 비교해 보세요.</p></div>
   </div>
 </section>
 
@@ -572,26 +659,12 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
     <span class="eyebrow"><span class="dot"></span> 오늘 바로 · 환경 구축</span>
     <h2 class="subhead">내 AI 생태계, <span class="accent">이렇게 세팅</span></h2>
     <div class="checks">
-      <label><input type="checkbox"><span><b>무료 계정 2~3개</b> 가입 (같은 이메일 OK)</span></label>
+      <label><input type="checkbox"><span><b>주력 AI 하나</b> 정하고 로그인해 두기</span></label>
       <label><input type="checkbox"><span><b>폰에 앱 설치</b> · 음성 입력으로 말하듯 시키기</span></label>
       <label><input type="checkbox"><span><b>브라우저 즐겨찾기</b> 맨 앞에 고정</span></label>
       <label><input type="checkbox"><span><b>잘 먹힌 요청문</b> 메모장에 모으기</span></label>
       <label><input type="checkbox"><span><b>결과는 파일로 저장</b> (내 AI 폴더 하나)</span></label>
       <label><input type="checkbox"><span><b>보안 수칙</b> · 고객정보 · 개인정보는 넣지 않기</span></label>
-    </div>
-  </div>
-</section>
-
-<section class="slide" data-accent="coral" data-title="무료로 끝까지 가는 법"
-  data-notes="[무료 운영] 2부 실습에서 그대로 씀. 핵심 원리: 결과물이 HTML 파일 하나라서 어느 계정·어느 AI에서든 이어서 만들 수 있다. 조 안에서 계정 릴레이.">
-  <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 무료 버전으로도 충분합니다</span>
-    <h2 class="subhead">한도에 걸려도 <span class="accent">이어서</span> 만들 수 있어요</h2>
-    <div class="grid cols-2">
-      <div class="card"><span class="k">원리</span><h3>모든 건 파일 하나에</h3><p>바이브코딩 결과물은 HTML 파일 하나. 대화가 아니라 파일에 다 들어 있습니다.</p></div>
-      <div class="card hot"><span class="k">릴레이</span><h3>한도에 걸리면 다음 사람</h3><p>최신 파일을 복사해 다른 계정 · 다른 AI의 새 대화에 붙여넣고 "이어서 ○○ 추가해줘".</p></div>
-      <div class="card"><span class="k">습관</span><h3>단계마다 저장</h3><p>결과가 나올 때마다 메모장에 붙여 .html로 저장. 언제든 그 지점부터 다시.</p></div>
-      <div class="card"><span class="k">요령</span><h3>짧게, 하나씩</h3><p>한 번에 하나만 요청. 대화가 길어지면 새 대화 + 최신 파일로 다시 시작.</p></div>
     </div>
   </div>
 </section>
@@ -692,18 +765,25 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 대화 ② · 2단계의 시작</span>
     <div class="chat">
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>좋아. 이걸 <b>HTML 웹페이지</b>로 만들어줘. 폰에서 보기 좋게, <b>날짜별 탭</b>으로 나눠서 시간 순서대로 보이게.</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>여행 일정 웹페이지를 만들었어요. 위쪽 탭에서 1일차~5일차를 고르면 그날 일정이 시간 순서로 나와요. 파일을 저장해서 폰 브라우저로 열면 바로 쓸 수 있어요.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>좋아. 이걸 <b>폰에서 보는 여행 앱</b>처럼 HTML로 만들어줘. 출발까지 며칠 남았는지 보이고, <b>날짜별로 넘겨 보면서</b> 시간 순서로.</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>여행 앱 화면을 만들었어요. 맨 위에 출발 D-day와 여행 경로, 그 아래 DAY 카드를 누르면 그날 일정이 시간 순서 타임라인으로 나와요. 현지 팁도 같이 붙였어요.</div></div>
     </div>
   </div>
 </section>
 
 <section class="slide wide" data-accent="coral" data-title="결과 ② 일정 앱"
-  data-notes="[시연] 탭을 눌러 날짜별 일정 보여주기. '글 한 편이 프로그램이 됐다.'">
+  data-notes="[시연] 폰 화면의 DAY 카드를 눌러 날짜 넘기기. 맨 위 D-day와 경로. 글 한 편이 앱이 됐다.">
   <div class="slide-inner">
-    <div class="result-head"><span class="badge">결과 ② · 실제 작동</span><span class="tap-hint">날짜 탭을 눌러 보세요</span></div>
-    <div class="browser"><div class="browser-bar"><div class="dots"><i></i><i></i><i></i></div><div class="url">태국-여행.html</div></div>
-      <div class="browser-body"><div class="trip" data-trip="2"></div></div></div>
+    <div class="app-stage">
+      <div class="phone-frame"><div class="phone-screen"><div class="tp" data-trip="2"></div></div></div>
+      <div class="app-side">
+        <span class="badge">결과 ② · 실제 작동</span>
+        <h2 class="subhead">글 한 편이 <span class="accent">앱</span>이 됐습니다</h2>
+        <div class="quote">"폰에서 보는 여행 앱처럼, 날짜별로 넘겨 보게"</div>
+        <ul class="added"><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>출발까지 D-day · 여행 경로</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>DAY 카드로 날짜 넘기기</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>시간 순서 타임라인 · 현지 팁</li></ul>
+        <p class="tap-hint">폰 화면의 DAY 카드를 눌러 보세요</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -712,18 +792,25 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 대화 ③ · 기능 추가</span>
     <div class="chat">
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>날마다 <b>관광지 · 맛집 · 쇼핑</b> 정보를 카드로 넣어줘. 한 줄 설명이랑, 종류별로 골라 볼 수 있게.</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>일정 아래에 관광지 · 맛집 · 쇼핑 카드를 넣었어요. 위의 [전체 · 관광지 · 맛집 · 쇼핑] 버튼으로 골라 볼 수 있어요.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>날마다 <b>관광지 · 맛집 · 쇼핑</b> 추천을 카드로 넣어줘. 추천 메뉴랑 팁도, 종류별로 골라 볼 수 있게.</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>일정 아래에 "오늘의 추천"을 넣었어요. [전체 · 관광 · 맛집 · 쇼핑]으로 골라 보고, 카드마다 추천 메뉴나 팁이 붙어 있어요.</div></div>
     </div>
   </div>
 </section>
 
 <section class="slide wide" data-accent="teal" data-title="결과 ③ 정보 카드"
-  data-notes="[시연] 종류 버튼(관광지/맛집/쇼핑)으로 거르기. 날짜도 바꿔 보기.">
+  data-notes="[시연] 일정 아래로 내려 오늘의 추천. 관광 · 맛집 · 쇼핑 필터. 날짜를 바꾸면 추천도 바뀜.">
   <div class="slide-inner">
-    <div class="result-head"><span class="badge">결과 ③ · 실제 작동</span><span class="tap-hint">관광지 · 맛집 · 쇼핑을 골라 보세요</span></div>
-    <div class="browser"><div class="browser-bar"><div class="dots"><i></i><i></i><i></i></div><div class="url">태국-여행.html</div></div>
-      <div class="browser-body"><div class="trip" data-trip="3"></div></div></div>
+    <div class="app-stage">
+      <div class="phone-frame"><div class="phone-screen"><div class="tp" data-trip="3" data-focus="spots"></div></div></div>
+      <div class="app-side">
+        <span class="badge">결과 ③ · 실제 작동</span>
+        <h2 class="subhead">날마다 <span class="accent">갈 곳</span>이 한눈에</h2>
+        <div class="quote">"관광지 · 맛집 · 쇼핑 추천, 추천 메뉴랑 팁도"</div>
+        <ul class="added"><li class="old"><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>일정 · D-day · 타임라인</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>오늘의 추천 카드</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>관광 · 맛집 · 쇼핑 골라 보기</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>추천 메뉴 · 현지 팁</li></ul>
+        <p class="tap-hint">아래로 내려 추천 카드를 골라 보세요</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -733,17 +820,24 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
     <span class="eyebrow"><span class="dot"></span> 대화 ④ · 써 보다가 생긴 요청</span>
     <div class="chat">
       <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>여행 준비할 때 쓰게 <b>준비물 체크리스트</b> 탭 추가해줘. 체크한 건 <b>다시 열어도 저장</b>되게, 몇 개 남았는지도 보여줘.</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>[준비물] 탭을 추가했어요. 서류 · 돈 · 전자기기 · 옷 · 약으로 나눴고, 체크하면 저장되고 위에 진행 막대가 나와요.</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>앱 아래에 탭바를 만들고 [준비물]을 추가했어요. 서류 · 돈 · 전자기기 · 옷 · 약으로 나눴고, 체크하면 저장되고 준비 진행률이 원으로 차올라요.</div></div>
     </div>
   </div>
 </section>
 
 <section class="slide wide" data-accent="amber" data-title="결과 ④ 체크리스트"
-  data-notes="[시연] 준비물 탭에서 몇 개 체크 → 진행 막대. 다른 장 갔다 와도 체크 유지.">
+  data-notes="[시연] 아래 탭바에서 준비물. 몇 개 체크 → 진행률 원이 차오름. 다른 장 갔다 와도 체크 유지.">
   <div class="slide-inner">
-    <div class="result-head"><span class="badge">결과 ④ · 실제 작동</span><span class="tap-hint">[준비물] 탭에서 체크해 보세요</span></div>
-    <div class="browser"><div class="browser-bar"><div class="dots"><i></i><i></i><i></i></div><div class="url">태국-여행.html</div></div>
-      <div class="browser-body"><div class="trip" data-trip="4" data-tab="check"></div></div></div>
+    <div class="app-stage">
+      <div class="phone-frame"><div class="phone-screen"><div class="tp" data-trip="4" data-tab="check"></div></div></div>
+      <div class="app-side">
+        <span class="badge">결과 ④ · 실제 작동</span>
+        <h2 class="subhead"><span class="accent">준비물 탭</span>이 생겼습니다</h2>
+        <div class="quote">"준비물 체크리스트, 체크한 건 저장되게"</div>
+        <ul class="added"><li class="old"><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>일정 · 추천</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>아래 탭바 (일정 · 준비물)</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>체크하면 저장</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>준비 진행률</li></ul>
+        <p class="tap-hint">준비물을 눌러 체크해 보세요</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -753,17 +847,24 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
     <span class="eyebrow"><span class="dot"></span> 대화 ⑤ · 마무리</span>
     <div class="chat">
       <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>마지막으로 <b>여행 회화</b> 탭. 식당 · 쇼핑 · 택시 상황별로 태국어랑 한글 발음, <b>버튼 누르면 읽어주기</b>까지.</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>[회화] 탭을 추가했어요. 상황별 표현에 [듣기] 버튼이 있고, 태국어 음성이 없는 기기에서는 한글 발음을 보고 말하면 돼요.</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>[회화] 탭을 추가했어요. 식당 · 쇼핑 · 택시 · 기본으로 나눴고, 재생 버튼을 누르면 읽어 줘요. 태국어 음성이 없는 기기에서는 한글 발음을 보고 말하면 돼요.</div></div>
     </div>
   </div>
 </section>
 
 <section class="slide wide" data-accent="indigo" data-title="결과 ⑤ 완성"
-  data-notes="[시연] 일정 · 준비물 · 회화 탭 오가기. [듣기] 눌러 보기(PC에 태국어 음성이 없으면 안내 문구가 뜸).">
+  data-notes="[시연] 회화 탭에서 상황 칩(식당 · 쇼핑 · 택시 · 기본) 바꾸기, 재생 버튼. 일정 · 준비물 탭도 다시 오가며 완성 앱 보여주기.">
   <div class="slide-inner">
-    <div class="result-head"><span class="badge">완성 · 실제 작동</span><span class="tap-hint">일정 · 준비물 · 회화를 오가 보세요</span></div>
-    <div class="browser"><div class="browser-bar"><div class="dots"><i></i><i></i><i></i></div><div class="url">태국-여행.html</div></div>
-      <div class="browser-body"><div class="trip" data-trip="5" data-tab="talk"></div></div></div>
+    <div class="app-stage">
+      <div class="phone-frame"><div class="phone-screen"><div class="tp" data-trip="5" data-tab="talk"></div></div></div>
+      <div class="app-side">
+        <span class="badge">완성 · 실제 작동</span>
+        <h2 class="subhead">현지에서 바로 쓰는 <span class="accent">여행 앱</span></h2>
+        <div class="quote">"상황별 태국어 · 한글 발음, 누르면 읽어주기"</div>
+        <ul class="added"><li class="old"><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>일정 · 추천 · 준비물</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>회화 탭</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>상황별 태국어 · 한글 발음</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>재생 버튼으로 듣기</li></ul>
+        <p class="tap-hint">아래 탭바로 일정 · 준비물 · 회화를 오가 보세요</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -849,7 +950,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
 </section>
 
 <section class="slide" data-accent="amber" data-title="조 역할 나누기"
-  data-notes="[역할] 7명이 노트북 한 대만 보지 않게. 프롬프터 2명이 각자 시도하고 더 잘 된 쪽으로 합치기. 한도에 걸리면 다음 주자가 이어받기(릴레이 순서 미리 정하기).">
+  data-notes="[역할] 7명이 노트북 한 대만 보지 않게. 프롬프터 2명이 각자 시도하고 더 잘 된 쪽으로 합치기.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 조 역할 · 7명</span>
     <h2 class="subhead">먼저 <span class="accent">역할</span>부터</h2>
@@ -860,7 +961,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
       <div class="card"><span class="k">1명</span><h3>기록</h3><p>쓴 요청문과 바뀐 점 정리</p></div>
       <div class="card"><span class="k">1명</span><h3>데이터</h3><p>시연용 가상 데이터 준비</p></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p><b>릴레이 순서</b>도 정해 두세요. 한 사람 무료 한도가 끝나면 다음 사람 계정으로 이어서 만듭니다.</p></div>
+    <div class="callout tip"><span class="bang">!</span><p>프롬프터 둘은 <b>같은 기능을 각자</b> 시도하고, 더 잘 나온 쪽으로 합칩니다.</p></div>
   </div>
 </section>
 
@@ -988,7 +1089,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
       <div class="card"><span class="k">엉켰을 때</span><h3>"처음부터 더 간단하게 다시 만들어줘"</h3></div>
       <div class="card"><span class="k">일부만 고칠 때</span><h3>"○○만 고쳐줘. 나머지는 그대로 둬"</h3></div>
       <div class="card"><span class="k">모를 때</span><h3>"어디를 어떻게 바꿨는지 쉽게 설명해줘"</h3></div>
-      <div class="card"><span class="k">한도에 걸렸을 때</span><h3>최신 파일 → 다음 주자 계정 → "이어서 만들어줘"</h3></div>
+      <div class="card"><span class="k">대화가 길어졌을 때</span><h3>새 대화에 최신 파일을 붙여 넣고 "이어서 만들어줘"</h3></div>
     </div>
   </div>
 </section>
@@ -1238,101 +1339,199 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
     show();
   });
 
-  /* ===== 태국 여행 프로그램 (제작 예시) ===== */
+  /* ===== 태국 여행 앱 (제작 예시) ===== */
+  var IC={
+    fly:'<path d="M2 16l20-6-20-6 3 6-3 6z"/><path d="M5 10h8"/>',
+    hotel:'<path d="M3 19V6"/><path d="M3 14h18v5"/><path d="M21 19v-3a3 3 0 0 0-3-3h-7v1"/><circle cx="7" cy="11" r="2"/>',
+    sight:'<path d="M12 3l2.2 3.2H9.8L12 3z"/><path d="M8.5 9.5h7l-1.3-3.3H9.8z"/><path d="M6 13h12l-2.5-3.5h-7z"/><path d="M6.5 13v7M17.5 13v7M3.5 20h17M10.5 20v-4h3v4"/>',
+    food:'<path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10"/><path d="M17 21V3c-2.2 1.2-3.5 4-3.5 7.5H17"/>',
+    shop:'<path d="M5.5 8h13l-1 12.5h-11z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>',
+    boat:'<path d="M3 16l2.2 4h13.6L21 16z"/><path d="M12 3v11"/><path d="M12 4.5l6.5 9.5H12"/>',
+    spa:'<path d="M12 20c-4.2 0-7-2.8-7-6.5 3 0 5.2 1.1 7 3 1.8-1.9 4-3 7-3 0 3.7-2.8 6.5-7 6.5z"/><path d="M12 16.5c-2.2-2.3-2.2-6.6 0-9.5 2.2 2.9 2.2 7.2 0 9.5z"/>',
+    night:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+    move:'<path d="M5 16.5h14"/><path d="M4 16.5V12l2.2-5h11.6L20 12v4.5"/><path d="M4 12h16"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/>',
+    cal:'<rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+    list:'<path d="M9 6.5h11M9 12h11M9 17.5h11"/><path d="M4 6.5l1 1 2-2M4 12l1 1 2-2M4 17.5l1 1 2-2"/>',
+    chat:'<path d="M4 5.5h16v10.5H9l-5 4z"/><path d="M8.5 10.5h7"/>',
+    check:'<path d="M5 12.5l4.5 4.5L19.5 7"/>',
+    doc:'<rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 8.5h6M9 12.5h6M9 16.5h3"/>',
+    won:'<circle cx="12" cy="12" r="8.5"/><path d="M8 9l1.6 6 2.4-5 2.4 5L16 9M7.5 12h9"/>',
+    plug:'<path d="M9 3v5M15 3v5M6.5 8h11v3.5a5.5 5.5 0 0 1-11 0z"/><path d="M12 17v4"/>',
+    shirt:'<path d="M8 4l-4 3 2.2 3.2L8 9v11h8V9l1.8 1.2L20 7l-4-3a4 4 0 0 1-8 0z"/>',
+    pill:'<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.6 8.6l4.8 6.8"/>'
+  };
+  function svg(k){ return '<svg viewBox="0 0 24 24">'+(IC[k]||'')+'</svg>'; }
+  var PLAY='<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></svg>';
+  var TYPE={fly:'#5C6BF2',hotel:'#7B5CF0',sight:'#0B5C78',food:'#E5484D',shop:'#FF7A45',boat:'#0F9F8F',spa:'#12A594',night:'#2B2D5A',move:'#8A8FA3'};
+  var CATC={sight:['관광','#0B5C78','linear-gradient(140deg,#2C9AB7,#0B5C78)'],food:['맛집','#E5484D','linear-gradient(140deg,#FF8A7A,#E5484D)'],shop:['쇼핑','#FF7A45','linear-gradient(140deg,#FFB067,#FF7A45)']};
+
   var DAYS=[
-    {d:'1일차',sub:'방콕 도착',plan:[['13:00','수완나품 공항 도착','유심 · 환전 먼저'],['15:00','숙소 체크인 (수쿰윗)','BTS 역 가까운 곳'],['18:30','아시아티크 야시장','강변 야경 · 대관람차']],
-      spots:[['sight','아시아티크','강변 야시장, 저녁 산책 코스'],['food','쏨분 씨푸드','푸팟퐁커리로 유명한 해산물 식당'],['shop','터미널21','층마다 나라 테마인 쇼핑몰']]},
-    {d:'2일차',sub:'방콕 시내',plan:[['09:00','왕궁 · 에메랄드 사원','긴바지 · 어깨 가리는 옷 필수'],['11:30','왓포','누워 있는 큰 불상'],['14:00','짜오프라야강 보트','수상버스로 이동'],['16:00','왓아룬','강 건너 새벽 사원'],['19:00','카오산로드','길거리 음식 · 분위기']],
-      spots:[['sight','왕궁','방콕 대표 명소, 복장 규정 있음'],['food','팁싸마이','팟타이 맛집, 저녁 줄이 김'],['shop','카오산로드','기념품 · 길거리 쇼핑']]},
-    {d:'3일차',sub:'파타야',plan:[['08:00','파타야로 이동','차로 약 2시간'],['10:30','산호섬 투어','스노클링 · 해변'],['18:00','해변 저녁','해산물'],['20:00','워킹스트리트','밤거리 구경']],
-      spots:[['sight','산호섬','맑은 바다, 반나절 투어'],['food','해변 해산물 식당','그날 잡은 해산물'],['shop','터미널21 파타야','시원하게 쉬어 가기 좋은 쇼핑몰']]},
-    {d:'4일차',sub:'방콕 쇼핑',plan:[['10:00','방콕 복귀',''],['14:00','아이콘시암','강변 대형 쇼핑몰 · 실내 수상시장'],['17:00','타이 마사지','2시간 코스 추천'],['20:00','루프탑 바','방콕 야경']],
-      spots:[['sight','루프탑 바','방콕 야경 명소'],['food','아이콘시암 쑥시암','실내 수상시장 푸드코트'],['shop','아이콘시암','브랜드 · 기념품 한 번에']]},
-    {d:'5일차',sub:'귀국',plan:[['10:00','체크아웃',''],['11:00','빅C 마트','과자 · 말린 망고 기념품'],['15:00','공항 이동','출발 3시간 전 도착']],
-      spots:[['shop','빅C','기념품 대량 구매는 마트가 저렴'],['food','공항 푸드코트','마지막 태국 음식'],['sight','공항 면세점','남은 바트 쓰기']]}
+    {city:'방콕',sum:'도착 · 야시장',plan:[
+      ['10:30','fly','인천 출발','방콕 수완나품까지 약 6시간',['기내 반입 액체 확인']],
+      ['14:30','fly','수완나품 공항 도착','유심 개통 · 환전은 공항에서 조금만',['그랩 앱 미리 설치']],
+      ['16:30','hotel','호텔 체크인','수쿰윗 아속역 근처 · BTS · MRT 환승 편리',[]],
+      ['18:30','night','쩟페어 야시장','먹거리 노점 · 랭쌥(등뼈찜) 유명',['현금 준비']],
+      ['21:00','spa','발 마사지 1시간','첫날 피로 풀기',[]]],
+     spots:[['sight','쩟페어 야시장','방콕 대표 야시장, 먹거리와 소품 구경','추천: 랭쌥 · 망고 찹쌀밥'],
+      ['food','쏨분 씨푸드','해산물 식당, 저녁 시간에 붐빔','추천: 푸팟퐁커리'],
+      ['shop','터미널21','층마다 세계 도시 테마인 쇼핑몰','추천: 푸드코트 가성비']]},
+    {city:'방콕',sum:'왕궁 · 사원 · 강',plan:[
+      ['08:30','sight','왕궁 · 에메랄드 사원','오전 일찍 가야 덜 붐벼요',['긴바지 · 어깨 가리기','warn']],
+      ['11:30','sight','왓포','누워 있는 거대한 황금 불상',[]],
+      ['13:00','food','점심 · 타띠엔 선착장 근처','강변 로컬 식당',[]],
+      ['14:30','boat','수상버스로 왓아룬','강 건너 새벽 사원, 사진 명소',['수상버스 이용']],
+      ['17:30','shop','아이콘시암','강변 대형 쇼핑몰 · 실내 수상시장',[]],
+      ['19:30','food','저녁 · 강변 레스토랑','짜오프라야강 야경',[]]],
+     spots:[['sight','왕궁','방콕 대표 명소, 복장 규정이 엄격','팁: 긴바지 · 어깨 가리는 옷'],
+      ['sight','왓아룬','해 질 녘 강 건너편에서 보는 모습이 예쁨','팁: 노을 시간 맞추기'],
+      ['food','팁싸마이','오래된 팟타이 맛집, 저녁 줄이 김','추천: 팟타이 · 오렌지 주스'],
+      ['shop','아이콘시암 쑥시암','실내 수상시장 콘셉트 푸드 · 기념품 거리','추천: 지역 간식 맛보기']]},
+    {city:'파타야',sum:'바다 · 섬 투어',plan:[
+      ['08:00','move','파타야로 이동','차로 약 2시간',['기사 포함 차량 예약']],
+      ['10:30','boat','산호섬(꼬란) 투어','스피드보트 · 해변 · 스노클링',['선크림 · 여벌 옷','warn']],
+      ['14:00','food','해변 점심','그날 잡은 해산물',[]],
+      ['16:00','hotel','리조트 체크인','수영장에서 쉬기',[]],
+      ['19:00','food','비치로드 저녁','해변 따라 산책',[]],
+      ['21:00','night','워킹스트리트','밤거리 구경',[]]],
+     spots:[['sight','산호섬(꼬란)','맑은 바다, 반나절 투어로 충분','팁: 오전 배가 바다가 잔잔'],
+      ['food','해변 해산물 식당','골라서 무게로 주문하는 방식','추천: 새우 · 오징어 구이'],
+      ['shop','터미널21 파타야','더위 피하기 좋은 쇼핑몰','추천: 시원하게 쉬어 가기']]},
+    {city:'방콕',sum:'쇼핑 · 마사지 · 야경',plan:[
+      ['10:00','move','방콕 복귀','점심 전 도착',[]],
+      ['13:00','shop','짜뚜짝 주말시장','주말에만 열려요 · 평일엔 시암 쇼핑',['주말 확인','warn']],
+      ['16:00','spa','타이 마사지 2시간','쇼핑 후 회복',[]],
+      ['18:30','night','루프탑 바','방콕 노을과 야경',['드레스코드 확인']],
+      ['20:30','food','저녁 · 똠얌꿍','현지식 마무리',[]]],
+     spots:[['shop','짜뚜짝 주말시장','구역이 넓어 지도 필수','팁: 오전에 가야 덜 더움'],
+      ['shop','시암 파라곤 · 센트럴월드','시암역 대형 쇼핑몰 모음','추천: 평일 쇼핑 코스'],
+      ['sight','루프탑 바','방콕 야경 명소','팁: 슬리퍼 · 반바지 안 되는 곳 많음'],
+      ['food','똠얌꿍 맛집','새콤 매콤한 태국 대표 국물','추천: 똠얌꿍 · 쏨땀']]},
+    {city:'방콕',sum:'기념품 · 귀국',plan:[
+      ['10:00','hotel','체크아웃','짐은 호텔에 맡기기',[]],
+      ['11:00','shop','빅C 마트','과자 · 말린 망고 · 소스 기념품',[]],
+      ['13:00','food','망고 찹쌀밥','마지막 디저트',[]],
+      ['15:00','move','공항 이동','출발 3시간 전 도착',['택스 리펀 서류','warn']],
+      ['18:00','fly','방콕 출발','인천 도착 다음 날 새벽',[]]],
+     spots:[['shop','빅C','기념품은 마트가 저렴','추천: 말린 망고 · 김과자'],
+      ['food','망고 찹쌀밥','코코넛 밀크를 뿌린 태국 대표 디저트','추천: 망고 1개 통째로'],
+      ['sight','공항 면세점','남은 바트 정리','팁: 동전은 기부함에']]}
   ];
-  var CHECK=[['서류',['여권 (유효기간 6개월 이상)','항공권 · 숙소 예약 확인','여행자 보험']],
-    ['돈',['바트 환전','해외 결제 카드','소액 현금 (팁 · 노점)']],
-    ['전자기기',['유심 · eSIM','보조배터리','멀티 어댑터']],
-    ['옷',['사원용 긴바지 · 어깨 가리는 옷','우산 · 우비 (스콜)','샌들']],
-    ['약 · 기타',['상비약','선크림','모기 기피제']]];
-  var TALK=[['식당',[['맵지 않게 해 주세요','ไม่เผ็ด','마이 펫'],['계산서 주세요','เช็คบิลด้วย','첵빈 두어이'],['맛있어요','อร่อย','아로이']]],
-    ['쇼핑',[['얼마예요?','เท่าไหร่ครับ','타오라이 캅'],['조금 깎아 주세요','ลดหน่อยได้ไหม','롯 너이 다이 마이'],['이거 주세요','เอาอันนี้','아오 안니']]],
-    ['택시 · 길',[['미터기 켜 주세요','เปิดมิเตอร์ด้วย','뻗 미떠 두어이'],['화장실 어디예요?','ห้องน้ำอยู่ที่ไหน','헝남 유 티나이']]],
-    ['기본',[['안녕하세요','สวัสดีครับ','사왓디 캅'],['감사합니다','ขอบคุณครับ','컵쿤 캅']]]];
-  var KEY='vibe-trip-check';
+  var CHECK=[['doc','서류',['여권 (유효기간 6개월 이상)','항공권 · 호텔 예약 확인','여행자 보험']],
+    ['won','돈',['바트 환전','해외 결제 카드','소액 현금 (노점 · 팁)']],
+    ['plug','전자기기',['유심 · eSIM','보조배터리','멀티 어댑터']],
+    ['shirt','옷',['사원용 긴바지 · 어깨 가리는 옷','우산 · 우비 (소나기)','샌들 · 수영복']],
+    ['pill','약 · 기타',['상비약 · 지사제','선크림','모기 기피제']]];
+  var TALK=[['식당',[['맵지 않게 해 주세요','ไม่เผ็ด','마이 펫'],['계산서 주세요','เช็คบิลด้วย','첵 빈 두어이'],['정말 맛있어요','อร่อยมาก','아로이 막']]],
+    ['쇼핑',[['얼마예요?','เท่าไหร่ครับ','타오라이 캅'],['조금 깎아 주세요','ลดหน่อยได้ไหม','롯 너이 다이 마이'],['이걸로 주세요','เอาอันนี้','아오 안 니']]],
+    ['택시',[['여기로 가 주세요','ไปที่นี่','빠이 티 니'],['미터기 켜 주세요','เปิดมิเตอร์ด้วย','쁫 미떠 두어이'],['여기서 세워 주세요','จอดตรงนี้','쩟 뜨롱 니']]],
+    ['기본',[['안녕하세요','สวัสดีครับ','사왓디 캅'],['감사합니다','ขอบคุณครับ','컵쿤 캅'],['화장실 어디예요?','ห้องน้ำอยู่ที่ไหน','헝남 유 티나이']]]];
+  var KEY='vibe-trip-check-v2';
   function loadCk(){ try{ return JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ return {}; } }
   function saveCk(o){ try{ localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){} }
-  function el(tag,cls,txt){ var e=document.createElement(tag); if(cls)e.className=cls; if(txt!=null)e.textContent=txt; return e; }
-  var TAGNAME={sight:'관광지',food:'맛집',shop:'쇼핑'};
+  function el(tag,cls,html){ var e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+  function esc(t){ return String(t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  // 다음 달 첫 목요일 출발
+  var start=(function(){ var n=new Date(); var d=new Date(n.getFullYear(), n.getMonth()+1, 1); while(d.getDay()!==4) d.setDate(d.getDate()+1); return d; })();
+  var WK='일월화수목금토';
+  function dayDate(ix){ var d=new Date(start); d.setDate(d.getDate()+ix); return (d.getMonth()+1)+'.'+d.getDate()+' ('+WK[d.getDay()]+')'; }
+  var dday=Math.ceil((start-new Date().setHours(0,0,0,0))/86400000);
 
   function buildTrip(host){
-    var level=+host.getAttribute('data-trip'); var tab=host.getAttribute('data-tab')||'plan';
-    var day=0, kind='all';
+    var level=+host.getAttribute('data-trip');
+    var tab=host.getAttribute('data-tab')||'plan', day=0, kind='all', sit=0;
     host.innerHTML='';
-    var hero=el('div','trip-hero'); hero.appendChild(el('div','t','태국 4박 5일'));
-    hero.appendChild(el('div','s','다음 달 · 방콕 3박 + 파타야 1박'));
-    var chips=el('div','chips'); ['방콕','파타야','5일 일정'].forEach(function(c){ chips.appendChild(el('span',null,c)); }); hero.appendChild(chips);
-    host.appendChild(hero);
-    var main=null;
+    var status=el('div','tp-status','<span>9:41</span><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 18h2M8 15h2v3M13 11h2v7M18 7h2v11"/></svg><span class="bat"></span></span>');
+    var scroll=el('div','tp-scroll');
+    host.appendChild(status); host.appendChild(scroll);
+    // 내리면 상태 표시줄 뒤를 가려서 글자가 겹치지 않게
+    scroll.addEventListener('scroll',function(){ status.classList.toggle('dark', tab!=='plan' || scroll.scrollTop>40); });
+    var bar=null;
     if(level>=4){
-      main=el('div','trip-tabs');
-      var tabs=[['plan','일정'],['check','준비물']]; if(level>=5) tabs.push(['talk','회화']);
-      tabs.forEach(function(t){ var b=el('button',tab===t[0]?'on':null,t[1]); b.onclick=function(){ tab=t[0]; draw(); }; main.appendChild(b); });
-      host.appendChild(main);
+      bar=el('div','tp-tabbar');
+      var tabs=[['plan','cal','일정'],['check','list','준비물']]; if(level>=5) tabs.push(['talk','chat','회화']);
+      tabs.forEach(function(t){ var b=el('button',null,svg(t[1])+'<span>'+t[2]+'</span>'); b.setAttribute('data-t',t[0]); b.onclick=function(){ tab=t[0]; scroll.scrollTop=0; draw(); }; bar.appendChild(b); });
+      host.appendChild(bar);
     }
-    var dayTabs=el('div','trip-tabs'); host.appendChild(dayTabs);
-    var sub=el('div','trip-sub'); host.appendChild(sub);
-    var body=el('div','trip-body'); host.appendChild(body);
-    var toast=null;
+
+    function hero(){
+      var h=el('div','tp-hero');
+      h.innerHTML='<div class="row1"><span class="mine">나의 여행</span><span class="dd">D-'+dday+'</span></div>'+
+        '<h1>방콕 · 파타야</h1><div class="dates">'+dayDate(0)+' – '+dayDate(4)+' · 4박 5일</div>'+
+        '<div class="tp-route"><span class="st home"><b></b>인천</span><span class="ln"></span><span class="st"><b></b>방콕</span><span class="ln"></span><span class="st"><b></b>파타야</span><span class="ln"></span><span class="st"><b></b>방콕</span><span class="ln"></span><span class="st home"><b></b>인천</span></div>';
+      return h;
+    }
 
     function draw(){
-      if(main) Array.prototype.forEach.call(main.children,function(b,ix){ b.classList.toggle('on', ['plan','check','talk'][ix]===tab); });
-      dayTabs.innerHTML=''; sub.innerHTML=''; body.innerHTML='';
-      dayTabs.style.display=(tab==='plan')?'flex':'none';
-      sub.style.display=(tab==='plan'&&level>=3)?'flex':'none';
+      if(bar) Array.prototype.forEach.call(bar.children,function(b){ b.classList.toggle('on', b.getAttribute('data-t')===tab); });
+      scroll.innerHTML='';
+      status.classList.toggle('dark', tab!=='plan');
       if(tab==='plan'){
-        DAYS.forEach(function(D,ix){ var b=el('button',ix===day?'on':null,D.d); b.onclick=function(){ day=ix; draw(); }; dayTabs.appendChild(b); });
-        if(level>=3){ [['all','전체'],['sight','관광지'],['food','맛집'],['shop','쇼핑']].forEach(function(k){
-          var b=el('button',kind===k[0]?'on':null,k[1]); b.onclick=function(){ kind=k[0]; draw(); }; sub.appendChild(b); }); }
-        var D=DAYS[day]; var hd=el('div','day-head'); hd.appendChild(el('b',null,D.d)); hd.appendChild(el('span',null,D.sub)); body.appendChild(hd);
-        var tl=el('div','tline');
-        D.plan.forEach(function(p){ var it=el('div','it'); it.appendChild(el('div','h',p[0])); var c=el('div'); c.appendChild(el('div','p',p[1])); if(p[2]) c.appendChild(el('div','n',p[2])); it.appendChild(c); tl.appendChild(it); });
-        body.appendChild(tl);
+        scroll.appendChild(hero());
+        var days=el('div','tp-days');
+        DAYS.forEach(function(D,ix){ var b=el('button','tp-day'+(ix===day?' on':''),'<div class="n">DAY '+(ix+1)+'</div><div class="d">'+dayDate(ix)+'</div><div class="c">'+D.city+'</div>');
+          b.onclick=function(){ day=ix; draw(); }; days.appendChild(b); });
+        scroll.appendChild(days);
+        var D=DAYS[day];
+        scroll.appendChild(el('div','tp-dayhead','<span class="city">'+D.city+' · '+D.sum+'</span><span class="meta">일정 '+D.plan.length+'개</span>'));
+        var tl=el('div','tp-tl');
+        D.plan.forEach(function(p){
+          var tips=(p[4]||[]); var warn=tips[1]==='warn';
+          var tipHtml=tips.length?'<div class="tips"><span class="'+(warn?'warn':'')+'">'+esc(tips[0])+'</span></div>':'';
+          tl.appendChild(el('div','tp-ev','<span class="t">'+p[0]+'</span><span class="dot" style="background:'+TYPE[p[1]]+'">'+svg(p[1])+'</span>'+
+            '<div class="body"><div class="ttl">'+esc(p[2])+'</div><div class="ds">'+esc(p[3])+'</div>'+tipHtml+'</div>'));
+        });
+        scroll.appendChild(tl);
         if(level>=3){
-          var cs=el('div','cards3');
-          D.spots.filter(function(s){ return kind==='all'||s[0]===kind; }).forEach(function(s){
-            var c=el('div','pcard'); c.appendChild(el('span','tag '+s[0],TAGNAME[s[0]])); c.appendChild(el('div','nm',s[1])); c.appendChild(el('div','ds',s[2])); cs.appendChild(c); });
-          body.appendChild(cs);
+          var sec=el('div','tp-sec'); sec.appendChild(el('h4',null,'오늘의 추천 <small>'+D.city+'</small>'));
+          var fl=el('div','tp-filter');
+          [['all','전체'],['sight','관광'],['food','맛집'],['shop','쇼핑']].forEach(function(k){ var b=el('button',kind===k[0]?'on':null,k[1]); b.onclick=function(){ kind=k[0]; draw(); }; fl.appendChild(b); });
+          sec.appendChild(fl);
+          var pl=el('div','tp-places');
+          var list=D.spots.filter(function(s){ return kind==='all'||s[0]===kind; });
+          list.forEach(function(s){ var c=CATC[s[0]];
+            pl.appendChild(el('div','tp-place','<div class="th" style="background:'+c[2]+'">'+svg(s[0])+'</div>'+
+              '<div><div class="cat" style="color:'+c[1]+'">'+c[0]+'</div><div class="nm">'+esc(s[1])+'</div><div class="ds">'+esc(s[2])+'</div><span class="pick">'+esc(s[3])+'</span></div>')); });
+          if(!list.length) pl.appendChild(el('div','ds','이 날은 해당 추천이 없어요'));
+          sec.appendChild(pl); scroll.appendChild(sec);
         }
       } else if(tab==='check'){
-        var st=loadCk(); var all=0, done=0;
-        CHECK.forEach(function(g){ all+=g[1].length; g[1].forEach(function(x){ if(st[x]) done++; }); });
-        var pr=el('div','ck-prog'); pr.appendChild(el('span',null,'준비 '+done+' / '+all));
-        var bb=el('div','barbox'); var fill=el('i'); fill.style.width=(all?done/all*100:0)+'%'; bb.appendChild(fill); pr.appendChild(bb);
-        pr.appendChild(el('span',null,(all-done)?(all-done)+'개 남음':'준비 끝'));
-        body.appendChild(pr);
-        var list=el('div','ck-list');
-        CHECK.forEach(function(g){ list.appendChild(el('div','cat',g[0]));
-          g[1].forEach(function(x){ var lb=el('label',st[x]?'done':null); var cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!st[x];
-            cb.onchange=function(){ var s2=loadCk(); s2[x]=cb.checked; saveCk(s2); draw(); }; lb.appendChild(cb); lb.appendChild(el('span',null,x)); list.appendChild(lb); }); });
-        body.appendChild(list);
+        scroll.appendChild(el('div','tp-title','<h2>여행 준비물</h2><p>출발까지 D-'+dday+' · 체크하면 저장돼요</p>'));
+        var st=loadCk(), all=0, done=0;
+        CHECK.forEach(function(g){ all+=g[2].length; g[2].forEach(function(x){ if(st[x]) done++; }); });
+        var C=2*Math.PI*16, pct=all?done/all:0;
+        scroll.appendChild(el('div','tp-ckhead','<div class="tp-ring"><svg viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="16"/><circle class="fg" cx="20" cy="20" r="16" stroke-dasharray="'+C+'" stroke-dashoffset="'+(C*(1-pct))+'"/></svg><b>'+Math.round(pct*100)+'%</b></div>'+
+          '<div><div class="tt">여행 준비</div><div class="ss">'+done+' / '+all+' 완료 · '+(all-done?(all-done)+'개 남음':'준비 끝')+'</div></div>'));
+        CHECK.forEach(function(g){
+          var gr=el('div','tp-group'); gr.appendChild(el('div','gh',svg(g[0])+'<span>'+g[1]+'</span>'));
+          g[2].forEach(function(x){ var row=el('div','tp-ck'+(st[x]?' done':''),'<span class="box">'+svg('check')+'</span><span>'+esc(x)+'</span>');
+            row.onclick=function(){ var s2=loadCk(); s2[x]=!s2[x]; saveCk(s2); var y=scroll.scrollTop; draw(); scroll.scrollTop=y; }; gr.appendChild(row); });
+          scroll.appendChild(gr);
+        });
+        scroll.appendChild(el('div','tp-pad'));
       } else {
-        var ph=el('div','phr');
-        TALK.forEach(function(g){ ph.appendChild(el('div','sit',g[0]));
-          g[1].forEach(function(p){ var c=el('div','ph'); c.appendChild(el('div','ko',p[0])); c.appendChild(el('div','th',p[1])); c.appendChild(el('div','rd','[ '+p[2]+' ]'));
-            var b=el('button',null,'듣기'); b.onclick=function(){ speak(p[1]); }; c.appendChild(b); ph.appendChild(c); }); });
-        body.appendChild(ph);
-        toast=el('div','trip-toast'); body.appendChild(toast);
+        scroll.appendChild(el('div','tp-title','<h2>여행 회화</h2><p>누르면 태국어로 읽어 줘요</p>'));
+        var sits=el('div','tp-sits');
+        TALK.forEach(function(g,ix){ var b=el('button',ix===sit?'on':null,g[0]); b.onclick=function(){ sit=ix; draw(); }; sits.appendChild(b); });
+        scroll.appendChild(sits);
+        var ph=el('div','tp-phrases'); var note=el('div','tp-note');
+        TALK[sit][1].forEach(function(p){
+          var c=el('div','tp-ph','<div class="ko">'+esc(p[0])+'</div><div class="th">'+p[1]+'</div><div class="rd">'+esc(p[2])+'</div>');
+          var b=el('button',null,PLAY); b.setAttribute('aria-label','듣기'); b.onclick=function(){ speak(p[1],c,note); }; c.appendChild(b); ph.appendChild(c); });
+        scroll.appendChild(ph); scroll.appendChild(note);
+        scroll.appendChild(el('div','tp-tipcard','<b>!</b><div>문장 끝에 남자는 <em>캅</em>, 여자는 <em>카</em>를 붙이면 공손한 말이 돼요.<br>예) 컵쿤 <em>캅</em> / 컵쿤 <em>카</em></div>'));
       }
     }
-    function speak(t){
-      var ok=false;
-      try{ if(window.speechSynthesis){ var vs=speechSynthesis.getVoices(); var v=vs.filter(function(x){ return /^th/i.test(x.lang); })[0];
-        if(v){ var u=new SpeechSynthesisUtterance(t); u.voice=v; u.lang=v.lang; u.rate=.9; speechSynthesis.cancel(); speechSynthesis.speak(u); ok=true; } } }catch(e){}
-      if(toast) toast.textContent=ok?'읽어 주는 중':'이 기기에는 태국어 음성이 없어요 — 한글 발음을 보고 말해 보세요';
-    }
     draw();
+    // 추천 카드가 새로 생긴 단계는 그 부분부터 보이게
+    if(host.getAttribute('data-focus')==='spots'){ var sec=scroll.querySelector('.tp-sec'); if(sec) scroll.scrollTop=Math.max(0,sec.offsetTop-scroll.clientHeight*.35); status.classList.toggle('dark', scroll.scrollTop>40); }
+  }
+  function speak(t,card,note){
+    var ok=false;
+    try{ if(window.speechSynthesis){ var v=speechSynthesis.getVoices().filter(function(x){ return /^th/i.test(x.lang); })[0];
+      if(v){ var u=new SpeechSynthesisUtterance(t); u.voice=v; u.lang=v.lang; u.rate=.85; card.classList.add('playing');
+        u.onend=function(){ card.classList.remove('playing'); }; speechSynthesis.cancel(); speechSynthesis.speak(u); ok=true; } } }catch(e){}
+    note.textContent=ok?'':'이 기기에는 태국어 음성이 없어요. 한글 발음을 보고 말해 보세요';
   }
   document.querySelectorAll('[data-trip]').forEach(buildTrip);
   try{ if(window.speechSynthesis) speechSynthesis.getVoices(); }catch(e){}
