@@ -834,6 +834,37 @@ body[data-tool="spot"] .spot{display:block}
 /* Why not? 표지 */
 .title-slide .headline.why{font-size:clamp(80px,15vw,210px);letter-spacing:-.045em;line-height:.95}
 .title-slide .tagline b{color:var(--ink)}
+/* 마지막 메시지: 무게감 있게 어둡고 조용한 톤 */
+.slide.sober{--bg:#100F1A;--bg-2:#191826;--surface:#1A1928;--ink:#EEEDF5;--ink-soft:#B9B6CC;--ink-faint:#7D7A93;--line:#2B2A3D;--line-strong:#3A3850;
+  background:var(--bg);color:var(--ink)}
+.slide.sober::before{display:none}
+.slide.sober .eyebrow{color:var(--ink-faint)}
+.slide.sober .eyebrow .dot{background:var(--coral)}
+.slide.sober .mark{background:none;color:var(--coral)}
+.chain4{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:stretch;gap:clamp(8px,1vw,14px);margin-top:clamp(18px,3vh,30px)}
+.c4{border:1px solid var(--line-strong);border-radius:14px;padding:clamp(14px,1.6vw,22px);display:flex;flex-direction:column;gap:.3em;background:var(--surface)}
+.c4 .n{font-family:var(--font-mono);font-size:clamp(12px,1.3vw,15px);color:var(--ink-faint);font-weight:700}
+.c4 b{font-size:clamp(20px,2.3vw,30px);font-weight:900;letter-spacing:-.02em}
+.c4 p{margin:0;color:var(--ink-soft);font-size:clamp(14px,1.6vw,20px);font-weight:600}
+.c4a{align-self:center;width:clamp(16px,1.8vw,26px);height:2px;background:var(--ink-faint);position:relative}
+.c4a::after{content:"";position:absolute;right:-1px;top:-4px;border-left:8px solid var(--ink-faint);border-top:5px solid transparent;border-bottom:5px solid transparent}
+.gone{margin-top:clamp(14px,2.2vh,22px);border:1px dashed var(--line-strong);border-radius:14px;padding:clamp(12px,1.6vh,18px) clamp(16px,2vw,26px);display:flex;justify-content:space-between;align-items:center;gap:1em;flex-wrap:wrap}
+.gone span{font-size:clamp(16px,2vw,24px);font-weight:700;color:var(--ink-faint);text-decoration:line-through;text-decoration-thickness:2px}
+.gone em{font-style:normal;font-size:clamp(13px,1.4vw,17px);font-weight:800;color:var(--coral);letter-spacing:.04em}
+.verdict{margin-top:clamp(18px,3vh,32px);padding-top:clamp(14px,2.2vh,22px);border-top:1px solid var(--line);font-size:clamp(19px,2.3vw,30px);font-weight:600;color:var(--ink-soft);line-height:1.45}
+.verdict b{color:var(--ink);font-weight:900}
+.two-sides{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,26px);margin-top:clamp(16px,2.6vh,28px)}
+.side{border:1px solid var(--line-strong);border-radius:16px;padding:clamp(16px,2vw,28px);background:var(--surface)}
+.side .k{font-size:clamp(13px,1.4vw,17px);font-weight:800;letter-spacing:.06em;color:var(--ink-faint)}
+.side h3{font-size:clamp(22px,2.6vw,34px);font-weight:900;margin:.2em 0 .5em;letter-spacing:-.02em}
+.side ul{margin:0;padding:0;list-style:none;display:grid;gap:.5em}
+.side li{font-size:clamp(15px,1.8vw,22px);font-weight:600;color:var(--ink-soft);padding-left:1em;position:relative;line-height:1.4}
+.side li::before{content:"";position:absolute;left:0;top:.6em;width:.4em;height:2px;background:currentColor}
+.side.ai{opacity:.7}
+.side.human{border-color:var(--coral);box-shadow:0 0 0 1px var(--coral) inset}
+.side.human .k{color:var(--coral)}
+.side.human li{color:var(--ink)}
+@media (max-width:900px){.chain4{grid-template-columns:1fr}.c4a{display:none}.two-sides{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -2402,7 +2433,7 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
 
 <!-- 마무리 -->
 <section class="slide center divider" data-accent="indigo" data-title="마무리"
-  data-notes="[1:52 · 8분] 강의 마무리. 오늘의 여정 → 한 문장 → 내일부터 할 세 가지 → 질문.">
+  data-notes="[1:50 · 10분] 강의 마무리. 오늘의 여정 → 한 문장 → 내일부터 할 세 가지 → 마지막 메시지(지식은 AI, 사람은 우리) → Why not? · 질문.">
   <div class="slide-inner">
     <span class="part-tag">마무리</span>
     <h2 class="headline">오늘, <span class="accent">한 칸</span> 올라갔습니다</h2>
@@ -2445,6 +2476,55 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
       <div class="card hot"><span class="k">이번 달</span><h3>도구 하나 만들기</h3><p>제일 귀찮은 일 하나를 골라, 첫 요청 템플릿으로 말해 보기.</p><div class="ex">"[누가] [언제] 쓰는 [무엇]을 HTML로"</div></div>
     </div>
     <div class="callout tip"><span class="bang">!</span><p>어디서 막히든 방법은 같습니다. <b>"이거 하려면 어떻게 해? 나한테 필요한 걸 물어봐 줘."</b></p></div>
+  </div>
+</section>
+
+<section class="slide wide sober" data-accent="coral" data-title="마지막으로 · 사라질 영역"
+  data-notes="[마지막 메시지 ① · 2분 · 톤을 낮추고 천천히] '마지막으로 조금 무거운 이야기를 하겠습니다.'
+지금 보상 업무에서 AI를 쓰는 양은 아직 적다. 하지만 공업사가 수리하고, AI가 견적을 내고, 그 견적을 또 다른 AI가 측정해서 오류를 찾고, AI끼리 협의하는 날이 오면? 지금 우리가 거래처와 하는 손해사정 협의 같은 영역은 사라질 가능성이 굉장히 높다. 범용 AI(AGI)가 나오는 순간 그 영역은 끝났다고 봐야 한다.
+핵심: AI의 영역이 넓어질수록 지식과 기술의 중요도는 떨어진다. 이건 지금으로선 필연이다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 마지막으로</span>
+    <h2 class="subhead">지식과 기술의 일은, <span class="accent">AI끼리 하게 됩니다</span></h2>
+    <p class="desc">지금 보상 업무에서 AI를 쓰는 양은 아직 많지 않습니다. 하지만 이런 날을 생각해 보세요. 견적을 AI가 내고, 그 견적을 또 다른 AI가 검토해 오류를 찾고, 둘이 협의합니다. 그때 거래처와의 손해사정 협의 같은 영역은 사라질 가능성이 매우 큽니다.</p>
+    <div class="chain4">
+      <div class="c4"><span class="n">01</span><b>공업사</b><p>차량 수리</p></div>
+      <i class="c4a"></i>
+      <div class="c4"><span class="n">02</span><b>AI</b><p>견적 작성</p></div>
+      <i class="c4a"></i>
+      <div class="c4"><span class="n">03</span><b>AI</b><p>견적 검토 · 오류 탐지</p></div>
+      <i class="c4a"></i>
+      <div class="c4"><span class="n">04</span><b>AI ↔ AI</b><p>협의 · 합의</p></div>
+    </div>
+    <div class="gone"><span>사람이 하던 거래처 손해사정 협의</span><em>사라질 가능성이 큰 영역</em></div>
+    <p class="verdict">AI의 영역이 넓어질수록, <b>지식과 기술의 값은 떨어집니다.</b> 지금으로서는 피할 수 없는 흐름입니다.</p>
+  </div>
+</section>
+
+<section class="slide wide sober" data-accent="coral" data-title="마지막으로 · 정답이 없는 일"
+  data-notes="[마지막 메시지 ② · 2분] 그럼 AI든 AGI든 할 수 없는 영역은 뭔가? 고객과의 과실 협의.
+과실은 7대 3이라는 정답이 있는 게 아니다. 기준표가 7:3을 말해도, 고객이 원하는 영역이 따로 있다. 이유를 납득하고 싶은 사람, 빨리 끝내고 싶은 사람, 억울함을 먼저 들어 주길 바라는 사람.
+서비스는 일반적인 게 아니라 사람마다 다르기 때문에 가치가 있다. AI는 평균적인 답을 내는 기계라 '이 사람'에게 맞추는 일은 사람의 몫으로 남는다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 마지막으로</span>
+    <h2 class="subhead">과실 7:3은 <span class="accent">정답이 아닙니다</span></h2>
+    <p class="desc">기준표는 7:3이라고 말할 수 있습니다. 하지만 고객이 원하는 건 숫자만이 아닙니다. 왜 그렇게 됐는지 납득하고 싶은 사람, 빨리 끝내고 싶은 사람, 억울함을 먼저 들어 주길 바라는 사람. 원하는 영역이 사람마다 다릅니다.</p>
+    <div class="two-sides">
+      <div class="side ai"><span class="k">정답이 있는 일</span><h3>AI가 합니다</h3>
+        <ul><li>기준표대로 과실 비율 계산</li><li>견적 검토 · 오류 찾기</li><li>근거 · 서류 · 문서 정리</li></ul></div>
+      <div class="side human"><span class="k">정답이 없는 일</span><h3>사람이 합니다</h3>
+        <ul><li>이 고객이 무엇을 원하는지 듣기</li><li>납득할 때까지 설명하고 협의하기</li><li>사람마다 다른 해법을 찾고, 끝까지 책임지기</li></ul></div>
+    </div>
+    <p class="verdict">서비스는 일반적이지 않기 때문에, <b>가치가 있습니다.</b></p>
+  </div>
+</section>
+
+<section class="slide center mid sober" data-accent="coral" data-title="마지막으로 · 서비스"
+  data-notes="[마지막 메시지 ③ · 1분 · 천천히] 회사가 계속 서비스를 강조하는 이유가 여기 있다. AI가 할 수 없는 영역에서 우리의 전문 역량을 키워 두는 것, 그게 미래 AI 사회를 대비하는 방법이다. 오늘 배운 AI는 그 일을 위한 시간을 벌어 주는 도구. 지식과 반복은 AI에게 맡기고, 아낀 시간은 고객에게. → 잠깐 멈췄다가 다음 장(Why not?)으로.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 그래서 우리는</span>
+    <p class="big-quote">지식은 AI에게 맡기고,<br><span class="mark">사람은 우리가</span> 맡습니다</p>
+    <p class="lead wide">회사가 서비스를 강조하는 이유가 여기에 있습니다. AI가 할 수 없는 영역에서 전문가가 되는 것, 그것이 AI 시대를 준비하는 우리의 방법입니다. 오늘 배운 AI는 <b>그 시간을 벌어 주는 도구</b>입니다.</p>
   </div>
 </section>
 
