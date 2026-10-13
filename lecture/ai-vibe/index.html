@@ -676,19 +676,13 @@ mark.ca-hl{background:#FFE58A;color:inherit;border-radius:.2em;padding:0}
 .progress{position:fixed;left:0;right:0;bottom:0;height:4px;z-index:40}
 .progress .bar{height:100%;width:0;background:linear-gradient(90deg,var(--coral),var(--indigo-soft));transition:width .4s ease}
 .hud{position:fixed;z-index:41;display:flex;gap:8px;align-items:center}
-.hud.br{right:16px;top:64px}
+.hud.br{right:16px;top:16px}
 .hud.tr{right:16px;top:16px}
 .btn{appearance:none;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 82%, transparent);color:var(--ink);font-family:var(--font-sans);
   font-weight:700;font-size:15px;height:40px;min-width:40px;padding:0 13px;border-radius:11px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;
   backdrop-filter:blur(8px);transition:transform .12s, border-color .12s}
 .btn:hover{border-color:var(--line-strong);transform:translateY(-1px)}
 .counter{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink-soft);font-size:15px;padding:0 6px;user-select:none}
-.timer{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:700;background:color-mix(in srgb,var(--surface) 85%, transparent);border:1px solid var(--line);
-  border-radius:11px;height:40px;display:flex;align-items:center;gap:10px;padding:0 12px;backdrop-filter:blur(8px)}
-.timer .clock{font-size:16px}
-.timer .clock.warn{color:var(--coral)}
-.timer .mini{border:none;background:transparent;cursor:pointer;color:var(--ink-soft);font-size:14px;font-weight:800;padding:2px;font-family:var(--font-sans)}
-.timer[hidden]{display:none}
 .notes{position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--code-bg);color:var(--code-ink);padding:18px clamp(20px,4vw,60px);border-top:2px solid var(--coral);
   transform:translateY(101%);transition:transform .3s ease;max-height:42vh;overflow:auto}
 .notes.show{transform:none}
@@ -722,7 +716,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
   html,body{height:auto;overflow:visible}
   .deck{position:static}
   .slide{position:relative;opacity:1!important;visibility:visible!important;transform:none!important;page-break-after:always;min-height:100vh}
-  .hud,.progress,.hint,.notes,.overview,.help{display:none!important}
+  .hud,.progress,.hint,.notes,.overview,.help,.tools,.ink,.laser,.spot,.blank,.jump{display:none!important}
 }
 
 /* 상단 정렬: 장마다 내용 위치가 흔들리지 않게 (표지 · 구분 장만 가운데) */
@@ -776,6 +770,32 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
 .tpl2{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,28px);margin-top:clamp(14px,2.4vh,26px)}
 .tpl2 .prompt{margin-top:.5em;font-size:clamp(14px,1.6vw,20px);line-height:1.6}
 @media (max-width:900px){.how,.beats,.tpl2{grid-template-columns:1fr 1fr}}
+
+/* 위쪽 여백: 내용 장은 위에서부터, 너무 붙지 않게 */
+.slide:not(.divider):not(.title-slide):not(.mid){padding-top:calc(var(--pad) + clamp(20px,6vh,64px))}
+.slide:has(.app-stage){padding-top:var(--pad)}
+/* 발표 도구 */
+.tools{position:fixed;right:16px;bottom:14px;z-index:41;display:flex;gap:6px;align-items:center;opacity:.32;transition:opacity .2s}
+.tools:hover,body[data-tool]:not([data-tool=""]) .tools{opacity:1}
+.tools .btn{height:36px;min-width:36px;padding:0 8px}
+.tools svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tools .btn.on{background:var(--coral);border-color:var(--coral);color:#fff}
+.tools .tsep{width:1px;height:22px;background:var(--line-strong);margin:0 2px}
+.ink{position:fixed;inset:0;width:100vw;height:100vh;z-index:30;pointer-events:none;touch-action:none}
+body[data-tool="pen"] .ink,body[data-tool="hl"] .ink{cursor:crosshair}
+.deck{transition:transform .08s linear}
+body[data-tool="zoom"]{cursor:zoom-in}
+.laser{position:fixed;left:-9px;top:-9px;width:18px;height:18px;border-radius:50%;background:#FF2D2D;z-index:49;pointer-events:none;display:none;
+  box-shadow:0 0 0 4px rgba(255,45,45,.28),0 0 18px 6px rgba(255,45,45,.55)}
+body[data-tool="laser"] .laser{display:block}
+body[data-tool="laser"],body[data-tool="laser"] *{cursor:none!important}
+.spot{position:fixed;inset:0;z-index:48;pointer-events:none;display:none}
+body[data-tool="spot"] .spot{display:block}
+.blank{position:fixed;inset:0;z-index:90;display:none;cursor:pointer}
+.blank.show{display:block}
+.jump{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:60;background:var(--code-bg);color:#fff;font-family:var(--font-mono);font-weight:800;
+  font-size:20px;padding:10px 18px;border-radius:12px;display:none;box-shadow:var(--shadow)}
+.jump.show{display:block}
 </style>
 </head>
 <body>
@@ -2403,29 +2423,41 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
 
 <!-- 컨트롤 -->
 <div class="progress"><div class="bar" id="bar"></div></div>
-<div class="hud tr">
-  <div class="timer" id="timer" hidden>
-    <button class="mini" id="tPlay" title="시작/일시정지" aria-label="타이머 시작/일시정지">시작</button>
-    <span class="clock" id="tClock">0:00 / 120:00</span>
-    <button class="mini" id="tReset" title="리셋" aria-label="타이머 리셋">리셋</button>
-  </div>
-  <button class="btn" id="btnTimer" title="강의 타이머 (T)" aria-label="강의 타이머">T</button>
-  <button class="btn" id="btnTheme" title="라이트/다크 (D)" aria-label="테마 전환">D</button>
-</div>
 <div class="hud br">
   <button class="btn" id="btnPrev" title="이전" aria-label="이전">&lsaquo;</button>
   <span class="counter" id="counter">1 / 1</span>
   <button class="btn" id="btnNext" title="다음" aria-label="다음">&rsaquo;</button>
   <button class="btn" id="btnOverview" title="전체 보기 (O)" aria-label="전체 보기">O</button>
+  <button class="btn" id="btnTheme" title="라이트/다크 (D)" aria-label="테마 전환">D</button>
 </div>
-<div class="hint">화살표 이동 · <kbd>F</kbd> 전체화면 · <kbd>N</kbd> 강사 노트 · <kbd>?</kbd> 도움말</div>
+<div class="hint">화살표 이동 · <kbd>F</kbd> 전체화면 · <kbd>N</kbd> 강사 노트 · <kbd>P</kbd> 펜 · <kbd>L</kbd> 레이저 · <kbd>Z</kbd> 확대 · <kbd>?</kbd> 도움말</div>
+<div class="tools" id="tools" aria-label="발표 도구">
+  <button class="btn tl" data-tool="pen" title="펜 (P)" aria-label="펜"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg></button>
+  <button class="btn tl" data-tool="hl" title="형광펜 (H)" aria-label="형광펜"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15l-4 4h5l2-2"/><path d="M8 14l8-8 3 3-8 8z"/><path d="M4 21h16" opacity=".5"/></svg></button>
+  <button class="btn tl" data-act="clear" title="이 장 필기 지우기 (E)" aria-label="필기 지우기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 20h10"/><path d="M5 14l7-9 7 6-6 8H9z"/></svg></button>
+  <span class="tsep"></span>
+  <button class="btn tl" data-tool="laser" title="레이저 포인터 (L)" aria-label="레이저 포인터"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="currentColor"/><circle cx="12" cy="12" r="7.5" opacity=".45"/></svg></button>
+  <button class="btn tl" data-tool="zoom" title="확대 (Z)" aria-label="확대"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/><path d="M8 10.5h5M10.5 8v5"/></svg></button>
+  <button class="btn tl" data-tool="spot" title="스포트라이트 (S)" aria-label="스포트라이트"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+  <button class="btn tl" data-act="black" title="검은 화면 (B)" aria-label="검은 화면"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="13" rx="2" fill="currentColor"/><path d="M8 21h8"/></svg></button>
+</div>
+<canvas class="ink" id="ink"></canvas>
+<div class="laser" id="laser"></div>
+<div class="spot" id="spot"></div>
+<div class="blank" id="blank"></div>
+<div class="jump" id="jump"></div>
 <div class="notes" id="notes" aria-live="polite"><div class="lab">강사 노트</div><div class="body" id="notesBody"></div></div>
 <div class="overview" id="overview" role="dialog" aria-label="전체 슬라이드"><h2>전체 슬라이드 — 눌러서 이동</h2><div class="ov-grid" id="ovGrid"></div></div>
 <div class="help" id="help" role="dialog" aria-label="단축키">
   <div class="box"><h2>단축키</h2>
     <dl><dt>← → / Space</dt><dd>이전 · 다음</dd><dt>Home / End</dt><dd>처음 · 마지막</dd>
-    <dt>F</dt><dd>전체화면</dd><dt>N</dt><dd>강사 노트</dd><dt>T</dt><dd>강의 타이머 (2시간)</dd>
-    <dt>O</dt><dd>전체 슬라이드</dd><dt>D</dt><dd>라이트 / 다크</dd><dt>? / Esc</dt><dd>도움말 / 닫기</dd></dl>
+    <dt>F</dt><dd>전체화면</dd><dt>N</dt><dd>강사 노트</dd>
+    <dt>O</dt><dd>전체 슬라이드</dd><dt>D</dt><dd>라이트 / 다크</dd>
+    <dt>숫자 + Enter</dt><dd>그 장으로 바로 이동 (예: 37 Enter)</dd></dl>
+    <h2 style="margin-top:22px">발표 도구</h2>
+    <dl><dt>P</dt><dd>펜 (장마다 따로 남음)</dd><dt>H</dt><dd>형광펜</dd><dt>E</dt><dd>이 장 필기 지우기</dd>
+    <dt>L</dt><dd>레이저 포인터</dd><dt>Z</dt><dd>확대 (마우스로 이동, 휠로 배율)</dd><dt>S</dt><dd>스포트라이트 (휠로 크기)</dd>
+    <dt>B / W</dt><dd>검은 화면 / 흰 화면</dd><dt>? / Esc</dt><dd>도움말 / 도구 끄기 · 닫기</dd></dl>
   </div>
 </div>
 
@@ -2449,6 +2481,7 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
     if(history.replaceState) history.replaceState(null,'','#'+(i+1));
     var v=document.getElementById('opening'); if(v && !slides[i].contains(v) && !v.paused) v.pause();
     fitSlide(slides[i]);
+    if(typeof redrawInk==='function'&&ctx) redrawInk();
   }
   // 화면이 작아 내용이 넘치면 그 장만 살짝 줄여서 맞춘다
   function fitSlide(sl){ var inner=sl&&sl.querySelector('.slide-inner'); if(!inner) return;
@@ -2480,21 +2513,11 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
   function toggleOverview(){ overview.classList.toggle('show'); }
   function closeOverlays(){ overview.classList.remove('show'); help.classList.remove('show'); }
 
-  // 강의 타이머 (2시간)
-  var timerEl=document.getElementById('timer'), tClock=document.getElementById('tClock'), tPlay=document.getElementById('tPlay');
-  var TOTAL=120*60, elapsed=0, ticking=false, handle=null;
-  function fmt(s){ var m=Math.floor(s/60), ss=s%60; return m+':'+(ss<10?'0':'')+ss; }
-  function paint(){ tClock.textContent=fmt(elapsed)+' / 120:00'; tClock.classList.toggle('warn', elapsed>=TOTAL); }
-  function playPause(){ ticking=!ticking; tPlay.textContent=ticking?'멈춤':'시작';
-    if(ticking){ handle=setInterval(function(){ elapsed++; paint(); },1000); } else { clearInterval(handle); } }
-  tPlay.onclick=playPause; document.getElementById('tReset').onclick=function(){ elapsed=0; paint(); };
-  document.getElementById('btnTimer').onclick=function(){ timerEl.hidden=!timerEl.hidden; };
-  paint();
-
   document.addEventListener('keydown', function(e){
     if(e.metaKey||e.ctrlKey||e.altKey) return;
     var tag=e.target.tagName;
     if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'||e.target.isContentEditable) return;
+    if(toolKey(e)) return;
     var k=e.key;
     if(k===' '||k==='Spacebar'){ if(tag==='BUTTON'||tag==='VIDEO') return; e.preventDefault(); next(); return; }
     if(k==='ArrowRight'||k==='PageDown'){ e.preventDefault(); next(); }
@@ -2505,15 +2528,71 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
     else if(k==='n'||k==='N'){ toggleNotes(); }
     else if(k==='o'||k==='O'){ toggleOverview(); }
     else if(k==='d'||k==='D'){ toggleTheme(); }
-    else if(k==='t'||k==='T'){ timerEl.hidden=!timerEl.hidden; if(!timerEl.hidden&&!ticking) playPause(); }
     else if(k==='?'){ help.classList.toggle('show'); }
     else if(k==='Escape'){ closeOverlays(); notes.classList.remove('show'); }
   });
   var x0=null;
   document.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; },{passive:true});
-  document.addEventListener('touchend',function(e){ if(x0===null) return;
+  document.addEventListener('touchend',function(e){ if(x0===null||tool) return;
     var dx=e.changedTouches[0].clientX-x0; if(Math.abs(dx)>70){ dx<0?next():prev(); } x0=null; },{passive:true});
   function fromHash(){ var n=parseInt((location.hash||'').replace('#',''),10); if(!isNaN(n)&&n>=1&&n<=total) i=n-1; }
+
+  // ===== 발표 도구: 펜 · 형광펜 · 레이저 · 확대 · 스포트라이트 · 검은/흰 화면 · 번호 이동 =====
+  var deck=document.querySelector('.deck'), cv=document.getElementById('ink'), ctx=cv.getContext('2d');
+  var laser=document.getElementById('laser'), spot=document.getElementById('spot'), blank=document.getElementById('blank'), jumpEl=document.getElementById('jump');
+  var toolsEl=document.getElementById('tools'), tool=null, ink={}, cur=null, zoomK=2, spotR=170, mx=innerWidth/2, my=innerHeight/2;
+  function sizeInk(){ var r=window.devicePixelRatio||1; cv.width=innerWidth*r; cv.height=innerHeight*r; ctx.setTransform(r,0,0,r,0,0); redrawInk(); }
+  function styleFor(t){ ctx.lineCap='round'; ctx.lineJoin='round';
+    if(t==='hl'){ ctx.strokeStyle='rgba(255,212,59,.5)'; ctx.lineWidth=Math.max(16,innerWidth*.013); }
+    else { ctx.strokeStyle='#FF3B30'; ctx.lineWidth=Math.max(3.5,innerWidth*.0026); } }
+  function drawStroke(st){ styleFor(st.t); ctx.beginPath();
+    st.p.forEach(function(q,k){ var x=q[0]*innerWidth, y=q[1]*innerHeight; if(k) ctx.lineTo(x,y); else { ctx.moveTo(x,y); ctx.lineTo(x+.01,y); } }); ctx.stroke(); }
+  function redrawInk(){ ctx.clearRect(0,0,innerWidth,innerHeight); (ink[i]||[]).forEach(drawStroke); }
+  function pt(e){ return [e.clientX/innerWidth, e.clientY/innerHeight]; }
+  cv.addEventListener('pointerdown',function(e){ if(tool!=='pen'&&tool!=='hl') return; e.preventDefault(); cv.setPointerCapture(e.pointerId);
+    cur={t:tool,p:[pt(e)]}; (ink[i]=ink[i]||[]).push(cur); redrawInk(); });
+  cv.addEventListener('pointermove',function(e){ if(!cur) return; cur.p.push(pt(e)); redrawInk(); });
+  function endStroke(){ cur=null; }
+  cv.addEventListener('pointerup',endStroke); cv.addEventListener('pointercancel',endStroke);
+  function clearInk(){ ink[i]=[]; redrawInk(); }
+
+  function applyZoom(){ var o=(mx/innerWidth*100)+'% '+(my/innerHeight*100)+'%';
+    [deck,cv].forEach(function(el){ el.style.transformOrigin=o; el.style.transform=tool==='zoom'?'scale('+zoomK+')':''; }); }
+  function paintSpot(){ spot.style.background='radial-gradient(circle at '+mx+'px '+my+'px, transparent 0 '+spotR+'px, rgba(8,6,20,.74) '+(spotR+24)+'px)'; }
+  function setTool(t){ tool=(tool===t)?null:t;
+    document.body.setAttribute('data-tool',tool||'');
+    cv.style.pointerEvents=(tool==='pen'||tool==='hl')?'auto':'none';
+    toolsEl.querySelectorAll('[data-tool]').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-tool')===tool); });
+    applyZoom(); if(tool==='spot') paintSpot(); }
+  function setBlank(c){ if(blank.classList.contains('show')&&blank.getAttribute('data-c')===c){ blank.classList.remove('show'); return; }
+    blank.setAttribute('data-c',c); blank.style.background=c==='w'?'#fff':'#000'; blank.classList.add('show'); }
+  toolsEl.addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; b.blur();
+    if(b.hasAttribute('data-tool')) setTool(b.getAttribute('data-tool'));
+    else if(b.getAttribute('data-act')==='clear') clearInk();
+    else if(b.getAttribute('data-act')==='black') setBlank('b'); });
+  document.addEventListener('mousemove',function(e){ mx=e.clientX; my=e.clientY;
+    if(tool==='laser'){ laser.style.transform='translate('+mx+'px,'+my+'px)'; }
+    else if(tool==='zoom') applyZoom(); else if(tool==='spot') paintSpot(); });
+  document.addEventListener('wheel',function(e){
+    if(tool==='zoom'){ e.preventDefault(); zoomK=Math.min(4,Math.max(1.4,zoomK+(e.deltaY<0?.25:-.25))); applyZoom(); }
+    else if(tool==='spot'){ e.preventDefault(); spotR=Math.min(420,Math.max(70,spotR+(e.deltaY<0?20:-20))); paintSpot(); } },{passive:false});
+  blank.addEventListener('click',function(){ blank.classList.remove('show'); });
+  window.addEventListener('resize',sizeInk); sizeInk();
+
+  var jumpBuf='', jumpT=null;
+  function showJump(){ jumpEl.textContent=jumpBuf?jumpBuf+' 장으로 → Enter':''; jumpEl.classList.toggle('show',!!jumpBuf);
+    clearTimeout(jumpT); jumpT=setTimeout(function(){ jumpBuf=''; showJump(); },2500); }
+  function toolKey(e){ var k=e.key;
+    if(/^[0-9]$/.test(k)){ if(jumpBuf.length<3){ jumpBuf+=k; showJump(); } return true; }
+    if(k==='Enter'&&jumpBuf){ var n=parseInt(jumpBuf,10); jumpBuf=''; showJump(); if(n>=1&&n<=total) go(n-1); return true; }
+    if(k==='Backspace'&&jumpBuf){ jumpBuf=jumpBuf.slice(0,-1); showJump(); return true; }
+    var m={p:'pen',h:'hl',l:'laser',z:'zoom',s:'spot'}[k.toLowerCase()];
+    if(m){ setTool(m); return true; }
+    if(k==='e'||k==='E'){ clearInk(); return true; }
+    if(k==='b'||k==='B'){ setBlank('b'); return true; }
+    if(k==='w'||k==='W'){ setBlank('w'); return true; }
+    if(k==='Escape'){ if(tool) setTool(tool); blank.classList.remove('show'); jumpBuf=''; showJump(); }
+    return false; }
   fromHash(); render();
 
   // 오프닝 영상: 파일이 없으면 안내
