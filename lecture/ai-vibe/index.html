@@ -260,7 +260,7 @@ strong{font-weight:800;color:var(--ink)}
 
 /* 센터원 업무 공유 — 화면 스타일 (사이트와 강의안이 같이 씀). 크기는 .ca 글자 크기에 비례 */
 .ca{--bg:#F4F3F8;--card:#fff;--ink:#17162B;--sub:#686780;--faint:#A4A3B5;--line:#E8E6F0;
-  --brand:#4338CA;--brand2:#6D5EF0;--soft:#EEECFF;--teal:#0F9F8F;--amber:#E59A12;--coral:#E5484D;--sky:#2F80ED;--violet:#8B5CF6;--gray:#8C8BA0;
+  --brand:#4338CA;--soft:#EEECFF;--teal:#0F9F8F;--amber:#E59A12;--coral:#E5484D;--sky:#2F80ED;--violet:#8B5CF6;
   height:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);letter-spacing:-.01em;word-break:keep-all;
   font-family:"PretendardLocal","Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;position:relative;overflow:hidden}
 .ca *{box-sizing:border-box}
@@ -271,17 +271,17 @@ strong{font-weight:800;color:var(--ink)}
 .ca-scroll::-webkit-scrollbar{display:none}
 
 /* 머리 */
-.ca-head{background:linear-gradient(150deg,#4338CA 0%,#5B4BE0 55%,#7C6CF5 100%);color:#fff;padding:1.1em 1.2em 1.25em;position:relative;overflow:hidden;flex:0 0 auto}
+.ca-head{background:linear-gradient(150deg,#4338CA 0%,#5B4BE0 55%,#7C6CF5 100%);color:#fff;padding:1.1em 1.2em 1.15em;position:relative;overflow:hidden;flex:0 0 auto}
 .ca-head.pad-top{padding-top:3em}
 .ca-head::after{content:"";position:absolute;right:-2.2em;top:-2.4em;width:8em;height:8em;border-radius:50%;background:rgba(255,255,255,.12)}
 .ca-top{display:flex;align-items:center;justify-content:space-between;gap:.6em;position:relative;z-index:1}
 .ca-logo{display:flex;align-items:center;gap:.5em;font-weight:900;font-size:1.15em}
 .ca-logo i{width:1.75em;height:1.75em;border-radius:.55em;background:#fff;color:var(--brand);display:grid;place-items:center;font-style:normal;font-size:.8em;font-weight:900}
 .ca-me{background:rgba(255,255,255,.18);border-radius:999px;padding:.35em .8em;font-weight:800;font-size:.82em;color:#fff;display:flex;align-items:center;gap:.35em}
-.ca-date{position:relative;z-index:1;margin-top:.9em;font-weight:700;opacity:.85;font-size:.86em}
-.ca-title{position:relative;z-index:1;font-size:1.55em;font-weight:900;letter-spacing:-.03em;margin-top:.1em}
-.ca-sum{position:relative;z-index:1;display:flex;gap:.4em;margin-top:.8em;flex-wrap:wrap}
-.ca-sum span{background:rgba(255,255,255,.16);border-radius:.7em;padding:.35em .65em;font-weight:800;font-size:.8em}
+.ca-date{position:relative;z-index:1;margin-top:.8em;font-weight:700;opacity:.85;font-size:.86em}
+.ca-title{position:relative;z-index:1;font-size:1.5em;font-weight:900;letter-spacing:-.03em;margin-top:.1em}
+.ca-sum{position:relative;z-index:1;display:flex;gap:.4em;margin-top:.7em;flex-wrap:wrap}
+.ca-sum span{background:rgba(255,255,255,.16);border-radius:.7em;padding:.3em .6em;font-weight:800;font-size:.78em}
 .ca-sum b{font-size:1.15em;margin-left:.25em}
 
 .ca-warn{margin:.8em 1em 0;background:#FFF6E5;color:#8A5A00;border-radius:.8em;padding:.6em .8em;font-size:.76em;font-weight:700;line-height:1.45;display:flex;gap:.5em}
@@ -293,64 +293,82 @@ strong{font-weight:800;color:var(--ink)}
 .ca-card{background:var(--card);border-radius:1em;padding:.8em .9em;box-shadow:0 .25em .8em -.5em rgba(25,20,60,.3)}
 .ca-list{display:grid;gap:.55em}
 .ca-empty{color:var(--faint);font-weight:700;font-size:.85em;text-align:center;padding:1.2em .5em;background:var(--card);border-radius:1em;border:1.5px dashed var(--line)}
+.ca-meta{font-size:.72em;color:var(--faint);font-weight:700;margin-top:.25em;display:flex;gap:.5em;align-items:center;flex-wrap:wrap}
+.ca-del{color:var(--faint);font-weight:800;font-size:1em;padding:0 .2em}
+.ca-av{width:2.3em;height:2.3em;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:900;font-size:.9em;flex:0 0 auto}
+.ca-filter{display:flex;gap:.35em;flex-wrap:wrap;margin-bottom:.7em}
+.ca-filter button{border-radius:999px;padding:.3em .75em;font-weight:800;font-size:.78em;background:var(--card);color:var(--sub);border:1.5px solid var(--line)}
+.ca-filter button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.ca-search{display:flex;align-items:center;gap:.5em;background:var(--card);border-radius:.9em;padding:.6em .8em;box-shadow:0 .2em .6em -.4em rgba(25,20,60,.3);margin-bottom:.6em}
+.ca-search input{border:none;outline:none;background:none;flex:1;font-size:.95em;min-width:0}
+mark.ca-hl{background:#FFE58A;color:inherit;border-radius:.2em;padding:0}
+.ca-call{display:inline-flex;align-items:center;gap:.3em;font-weight:800;font-size:.8em;color:var(--brand);text-decoration:none;background:var(--soft);border-radius:999px;padding:.3em .7em}
 
 /* 공지 */
 .ca-notice{display:flex;gap:.65em;align-items:flex-start}
 .ca-notice .pin{flex:0 0 auto;width:2em;height:2em;border-radius:.7em;display:grid;place-items:center;background:var(--soft);color:var(--brand)}
 .ca-notice.pinned .pin{background:var(--brand);color:#fff}
 .ca-notice .tx{font-weight:700;font-size:.92em;line-height:1.45;white-space:pre-wrap}
-.ca-meta{font-size:.72em;color:var(--faint);font-weight:700;margin-top:.25em;display:flex;gap:.5em;align-items:center}
-.ca-del{color:var(--faint);font-weight:800;font-size:1em;padding:0 .2em}
 
-/* 근무 현황 */
-.ca-mystat{display:flex;gap:.35em;flex-wrap:wrap}
-.ca-chip{border-radius:999px;padding:.4em .8em;font-weight:800;font-size:.8em;background:var(--card);color:var(--sub);box-shadow:0 .15em .4em -.25em rgba(25,20,60,.35)}
-.ca-chip.on{color:#fff}
-.ca-people{display:grid;gap:.45em;margin-top:.7em}
-.ca-person{display:grid;grid-template-columns:2.3em 1fr auto;gap:.65em;align-items:center}
-.ca-av{width:2.3em;height:2.3em;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:900;font-size:.9em}
-.ca-person .nm{font-weight:800;font-size:.92em}
-.ca-person .nt{font-size:.75em;color:var(--sub);font-weight:600;margin-top:.1em}
-.ca-badge{font-size:.72em;font-weight:900;border-radius:.6em;padding:.25em .6em;color:#fff}
+/* 할 일 */
+.ca-day{font-size:.78em;font-weight:900;color:var(--sub);margin:.9em 0 .45em;display:flex;align-items:center;gap:.4em}
+.ca-day:first-child{margin-top:0}
+.ca-day.today{color:var(--brand)}
+.ca-day.late{color:var(--coral)}
+.ca-todo{display:grid;grid-template-columns:auto 1fr auto;gap:.7em;align-items:center}
+.ca-todo .ck{width:1.6em;height:1.6em;border-radius:50%;border:2px solid #CFCBE0;display:grid;place-items:center;color:#fff}
+.ca-todo .ck svg{width:.9em;height:.9em;stroke-width:3.2;opacity:0}
+.ca-todo.done .ck{background:var(--teal);border-color:var(--teal)}
+.ca-todo.done .ck svg{opacity:1}
+.ca-todo .tt{font-weight:800;font-size:.95em;line-height:1.35}
+.ca-todo.done .tt{color:var(--faint);text-decoration:line-through}
+.ca-who{display:flex;align-items:center;gap:.35em;font-weight:800;font-size:.75em;color:var(--sub)}
+.ca-who .ca-av{width:1.9em;height:1.9em;font-size:.8em}
 
-/* 인수인계 */
-.ca-filter{display:flex;gap:.35em;flex-wrap:wrap;margin-bottom:.7em}
-.ca-filter button{border-radius:999px;padding:.3em .75em;font-weight:800;font-size:.78em;background:var(--card);color:var(--sub);border:1.5px solid var(--line)}
-.ca-filter button.on{background:var(--ink);border-color:var(--ink);color:#fff}
-.ca-ho{display:grid;gap:.4em}
-.ca-ho .row1{display:flex;align-items:center;justify-content:space-between;gap:.5em}
-.ca-ho .no{font-weight:900;font-size:.74em;color:var(--brand);background:var(--soft);border-radius:.5em;padding:.2em .5em}
-.ca-ho .due{font-weight:900;font-size:.74em;border-radius:.5em;padding:.2em .5em;background:#FFF1E8;color:#C2410C}
-.ca-ho .due.ok{background:#E9F8F4;color:#0B7A6C}
-.ca-ho .tt{font-weight:900;font-size:1em}
-.ca-ho .flow{display:flex;align-items:center;gap:.4em;font-size:.8em;font-weight:800;color:var(--sub)}
-.ca-ho .flow b{color:var(--ink)}
-.ca-ho .box{background:var(--bg);border-radius:.7em;padding:.5em .65em;font-size:.82em;line-height:1.45;font-weight:600;color:var(--ink)}
-.ca-ho .box em{font-style:normal;font-weight:900;color:var(--sub);font-size:.85em;display:block;margin-bottom:.1em}
-.ca-ho .acts{display:flex;justify-content:space-between;align-items:center}
-.ca-done-btn{font-weight:900;font-size:.8em;border-radius:999px;padding:.35em .85em;background:var(--teal);color:#fff;display:flex;align-items:center;gap:.3em}
-.ca-ho.done{opacity:.55}
-.ca-ho.done .ca-done-btn{background:var(--line);color:var(--sub)}
+/* 주소록 */
+.ca-team{font-size:.78em;font-weight:900;color:var(--sub);margin:.9em 0 .45em}
+.ca-team:first-child{margin-top:0}
+.ca-contact{display:grid;grid-template-columns:auto 1fr;gap:.7em;align-items:center}
+.ca-contact .nm{font-weight:900;font-size:.95em}
+.ca-contact .nm small{font-weight:700;color:var(--sub);font-size:.8em;margin-left:.3em}
+.ca-contact .ln{display:flex;gap:.35em;flex-wrap:wrap;margin-top:.35em}
 
-/* 노하우 */
-.ca-search{display:flex;align-items:center;gap:.5em;background:var(--card);border-radius:.9em;padding:.6em .8em;box-shadow:0 .2em .6em -.4em rgba(25,20,60,.3);margin-bottom:.6em}
-.ca-search input{border:none;outline:none;background:none;flex:1;font-size:.95em;min-width:0}
-.ca-tip{display:grid;grid-template-columns:2.4em 1fr;gap:.7em;align-items:start}
-.ca-tip .ic{width:2.4em;height:2.4em;border-radius:.8em;display:grid;place-items:center;color:#fff}
-.ca-tip .ic svg{width:1.2em;height:1.2em}
-.ca-tip .nm{font-weight:900;font-size:.95em;display:flex;align-items:center;gap:.4em;flex-wrap:wrap}
-.ca-tip .cat{font-size:.68em;font-weight:900;border-radius:.5em;padding:.15em .45em;background:var(--bg);color:var(--sub)}
-.ca-tip .tx{font-size:.82em;color:var(--sub);font-weight:600;line-height:1.45;margin-top:.2em;white-space:pre-wrap}
-.ca-tip .ph{display:inline-flex;align-items:center;gap:.3em;margin-top:.35em;font-weight:800;font-size:.8em;color:var(--brand);text-decoration:none}
-mark.ca-hl{background:#FFE58A;color:inherit;border-radius:.2em;padding:0}
+/* 비상연락망 */
+.ca-chain{position:relative;display:grid;gap:.7em}
+.ca-step{display:grid;grid-template-columns:2.4em 1fr;gap:.7em;position:relative}
+.ca-step::before{content:"";position:absolute;left:1.15em;top:2.4em;bottom:-.7em;width:2px;background:var(--line)}
+.ca-step:last-child::before{display:none}
+.ca-step .no{width:2.4em;height:2.4em;border-radius:50%;background:var(--coral);color:#fff;display:grid;place-items:center;font-weight:900;font-size:.85em;position:relative;z-index:1}
+.ca-step .lab{font-size:.74em;font-weight:900;color:var(--coral);margin-bottom:.3em}
+.ca-step .ppl{display:grid;gap:.4em}
+.ca-step .ca-card{display:flex;align-items:center;justify-content:space-between;gap:.5em;padding:.65em .8em}
+.ca-step .nm{font-weight:900;font-size:.92em}
+.ca-step .nm small{display:block;font-weight:700;color:var(--sub);font-size:.8em;margin-top:.1em}
+.ca-ext .ca-card{display:flex;align-items:center;justify-content:space-between;gap:.5em}
+
+/* 메신저 */
+.ca-chat{padding:1em 1em .4em;display:grid;gap:.6em}
+.ca-msg{display:grid;grid-template-columns:auto 1fr;gap:.5em;align-items:end;max-width:86%}
+.ca-msg .ca-av{width:2em;height:2em;font-size:.78em}
+.ca-msg .nm{font-size:.72em;font-weight:800;color:var(--sub);margin:0 0 .2em .2em}
+.ca-msg .bb{background:var(--card);border-radius:1.1em 1.1em 1.1em .3em;padding:.6em .8em;font-size:.9em;font-weight:600;line-height:1.45;box-shadow:0 .2em .6em -.4em rgba(25,20,60,.3);white-space:pre-wrap;word-break:break-word}
+.ca-msg .tm{font-size:.66em;color:var(--faint);font-weight:700;margin:.2em 0 0 .3em}
+.ca-msg.me{margin-left:auto;grid-template-columns:1fr}
+.ca-msg.me .bb{background:var(--brand);color:#fff;border-radius:1.1em 1.1em .3em 1.1em}
+.ca-msg.me .tm{text-align:right}
+.ca-compose{display:flex;gap:.5em;padding:.55em .8em;background:#fff;border-top:1px solid var(--line);flex:0 0 auto}
+.ca-compose input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:999px;padding:.55em .9em;font-size:.95em;outline:none;background:var(--bg)}
+.ca-compose input:focus{border-color:var(--brand)}
+.ca-compose button{width:2.5em;height:2.5em;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center}
+.ca-compose button svg{width:1.1em;height:1.1em}
 
 /* 탭바 */
-.ca-tabbar{display:flex;justify-content:space-around;background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:.5em .3em 1.1em;flex:0 0 auto}
-.ca-tabbar button{display:flex;flex-direction:column;align-items:center;gap:.2em;font-weight:800;font-size:.7em;color:var(--faint);min-width:4.6em;position:relative}
-.ca-tabbar button svg{width:1.65em;height:1.65em}
+.ca-tabbar{display:flex;justify-content:space-around;background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:.5em .2em 1.05em;flex:0 0 auto}
+.ca-tabbar button{display:flex;flex-direction:column;align-items:center;gap:.2em;font-weight:800;font-size:.66em;color:var(--faint);min-width:3.8em;position:relative}
+.ca-tabbar button svg{width:1.7em;height:1.7em}
 .ca-tabbar button.on{color:var(--ink)}
 .ca-tabbar button.on svg{color:var(--brand)}
-.ca-tabbar .dot{position:absolute;top:-.1em;right:1.1em;min-width:1.4em;height:1.4em;border-radius:999px;background:var(--coral);color:#fff;font-size:.85em;display:grid;place-items:center;padding:0 .3em}
+.ca-tabbar .dot{position:absolute;top:-.2em;right:.6em;min-width:1.5em;height:1.5em;border-radius:999px;background:var(--coral);color:#fff;font-size:.85em;display:grid;place-items:center;padding:0 .3em}
 
 /* 입력 시트 */
 .ca-sheet-bg{position:absolute;inset:0;background:rgba(15,12,40,.45);display:flex;align-items:flex-end;z-index:20;animation:caFade .2s}
@@ -367,7 +385,6 @@ mark.ca-hl{background:#FFE58A;color:inherit;border-radius:.2em;padding:0}
 .ca-f .chk{display:flex;align-items:center;gap:.45em;font-size:.85em;color:var(--ink)}
 .ca-f .chk input{width:1.1em;height:1.1em;accent-color:var(--brand)}
 .ca-go{background:var(--brand);color:#fff;font-weight:900;border-radius:.9em;padding:.8em;font-size:1em;margin-top:.3em;width:100%}
-.ca-go:disabled{opacity:.4}
 .ca-x{width:1.9em;height:1.9em;border-radius:50%;background:var(--card);display:grid;place-items:center;color:var(--sub)}
 
 .ca-toast{position:absolute;left:50%;bottom:5.5em;transform:translateX(-50%);background:var(--ink);color:#fff;font-weight:800;font-size:.8em;border-radius:999px;padding:.55em 1em;z-index:30;white-space:nowrap;animation:caFade .2s}
@@ -620,7 +637,7 @@ mark.ca-hl{background:#FFE58A;color:inherit;border-radius:.2em;padding:0}
 
 /* ===== 만화 장면 (오픈북 시험 이야기) ===== */
 .comic{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(18px,2.8vw,44px);align-items:center;margin-top:clamp(12px,2vh,22px)}
-.panel{position:relative;background:#FFFDF8;border:3px solid #1E1B33;border-radius:20px;box-shadow:7px 7px 0 #1E1B33;overflow:hidden;aspect-ratio:4/3;max-height:58vh;justify-self:center;width:100%}
+.panel{position:relative;background:#FFFDF8;border:3px solid #1E1B33;border-radius:20px;box-shadow:7px 7px 0 #1E1B33;overflow:hidden;aspect-ratio:4/3;justify-self:center;width:min(100%,calc(58vh * 4 / 3))}
 .panel svg{display:block;width:100%;height:100%}
 .ptag{position:absolute;top:10px;left:12px;z-index:2;background:#1E1B33;color:#fff;font-weight:900;font-size:clamp(12px,1.35vw,16px);border-radius:999px;padding:.25em .85em;letter-spacing:.02em}
 .ct{font-family:var(--font-sans);font-weight:800;font-size:17px;fill:#1E1B33}
@@ -647,6 +664,14 @@ mark.ca-hl{background:#FFE58A;color:inherit;border-radius:.2em;padding:0}
 .map .row.head{border-top:none;background:var(--bg-2);font-size:clamp(13px,1.5vw,18px);font-weight:900;color:var(--ink-faint)}
 @media (max-width:900px){ .comic{grid-template-columns:1fr} .map .row{grid-template-columns:1fr 2em 1.3fr} }
 
+
+.chat.mini{gap:clamp(6px,1vh,10px);margin-top:clamp(10px,1.6vh,16px)}
+.chat.mini .bubble{font-size:clamp(14px,1.55vw,19px);padding:clamp(8px,1.1vw,14px) clamp(12px,1.5vw,20px);line-height:1.45}
+.chat.mini .avatar{width:2.2em;height:2.2em;font-size:clamp(12px,1.3vw,16px)}
+.chat.mini .turn{max-width:min(80%,980px)}
+.comic2{display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,2.4vw,36px);margin-top:clamp(12px,2vh,22px)}
+.comic2 .panel{width:min(100%,calc(46vh * 4 / 3))}
+@media (max-width:900px){ .comic2{grid-template-columns:1fr} }
 /* 컨트롤 UI */
 .progress{position:fixed;left:0;right:0;bottom:0;height:4px;z-index:40}
 .progress .bar{height:100%;width:0;background:linear-gradient(90deg,var(--coral),var(--indigo-soft));transition:width .4s ease}
@@ -699,6 +724,25 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
   .slide{position:relative;opacity:1!important;visibility:visible!important;transform:none!important;page-break-after:always;min-height:100vh}
   .hud,.progress,.hint,.notes,.overview,.help{display:none!important}
 }
+
+/* 상단 정렬: 장마다 내용 위치가 흔들리지 않게 (표지 · 구분 장만 가운데) */
+.slide{justify-content:flex-start}
+.slide.title-slide,.slide.divider,.slide.mid{justify-content:center}
+/* 자유도 게이지 */
+.gauge{position:relative;height:clamp(16px,2.2vh,22px);border-radius:999px;background:var(--line,#E8E6F0);margin:clamp(52px,7.5vh,76px) 2% clamp(16px,2.6vh,26px)}
+.gauge .gfill{position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,#B9B4D6,var(--indigo,#5D57E8) 60%,var(--coral,#FF5A4D))}
+.gauge .gm{position:absolute;bottom:100%;transform:translateX(-50%);font-family:var(--font-mono);font-weight:800;font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft);padding-bottom:.35em;display:flex;flex-direction:column;align-items:center}
+.gauge .gm i{order:2;width:3px;height:.7em;background:currentColor;margin-top:.15em}
+.gauge .gm.hot{color:var(--coral)}
+/* 오늘의 여정 */
+.journey{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:clamp(8px,1.2vw,18px);margin-top:clamp(18px,3vh,32px)}
+.jstop{background:var(--surface);border:2px solid var(--line,#E8E6F0);border-radius:22px;padding:clamp(16px,2vw,28px);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.45em}
+.jstop.hot{border-color:var(--accent,var(--coral))}
+.jstop .jlv{font-family:var(--font-mono);font-weight:800;font-size:clamp(13px,1.4vw,17px);color:var(--accent,var(--coral));letter-spacing:.04em}
+.jstop h3{font-size:clamp(24px,2.8vw,38px);font-weight:900;letter-spacing:-.02em}
+.jstop p{font-size:clamp(15px,1.6vw,20px);color:var(--ink-soft);line-height:1.5}
+.jarrow{align-self:center;width:0;height:0;border-left:clamp(14px,1.6vw,22px) solid var(--accent,var(--coral));border-top:clamp(10px,1.2vw,16px) solid transparent;border-bottom:clamp(10px,1.2vw,16px) solid transparent}
+@media (max-width:760px){.journey{grid-template-columns:1fr}.jarrow{justify-self:center;transform:rotate(90deg)}}
 </style>
 </head>
 <body>
@@ -713,6 +757,13 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
       <circle cx="93" cy="64" r="7" fill="#FFDDBF" stroke="#1E1B33" stroke-width="3"/>
       <circle cx="60" cy="62" r="34" fill="#FFDDBF" stroke="#1E1B33" stroke-width="3"/>
       <path d="M26 60 Q22 22 60 22 Q99 22 94 60 Q88 40 72 43 Q62 33 50 43 Q34 39 26 60 Z" fill="#2B2440" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="me" viewBox="0 0 120 150">
+      <path d="M18 150 Q18 100 60 97 Q102 100 102 150 Z" fill="#0FB6A4" stroke="#1E1B33" stroke-width="3"/>
+      <path d="M50 99 L60 120 L70 99" fill="#fff" stroke="#1E1B33" stroke-width="2.5" stroke-linejoin="round"/><path d="M57 104 L60 126 L63 104 Z" fill="#FF5A4D"/>
+      <circle cx="27" cy="64" r="7" fill="#F6CBA8" stroke="#1E1B33" stroke-width="3"/><circle cx="93" cy="64" r="7" fill="#F6CBA8" stroke="#1E1B33" stroke-width="3"/>
+      <circle cx="60" cy="62" r="34" fill="#F6CBA8" stroke="#1E1B33" stroke-width="3"/>
+      <path d="M25 58 Q24 24 60 24 Q96 24 95 58 Q94 44 82 40 Q60 48 36 40 Q26 44 25 58 Z" fill="#6B4226" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
     </symbol>
     <!-- 표정들 (학생과 같은 크기로 겹쳐 씀) -->
     <symbol id="f-worry" viewBox="0 0 120 150">
@@ -789,8 +840,8 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
     <h2 class="subhead">AI로 <span class="accent">일하는 환경</span>을 만들고, <span class="accent">도구</span>를 만듭니다</h2>
     <div class="grid cols-3 agenda">
       <div class="card"><span class="k">시작 · 8분</span><h3>AI 활용 등급 진단</h3><ul><li>QR로 1분 설문</li><li>우리 수준 확인</li></ul></div>
-      <div class="card hot"><span class="k">1부 · 55분</span><h3>업무 자동화하기</h3><ul><li>AI는 왜 마법 같은가</li><li>지금 AI는 어디로 가나</li><li>알려 주고 잘 시키기</li><li>파일 · 스킬 · 예약으로 맡기기</li></ul></div>
-      <div class="card hot"><span class="k">2부 · 45분</span><h3>바이브코딩</h3><ul><li>시연 두 가지</li><li>바이브코딩이란</li><li>제작 예시 · 센터원 업무 공유</li><li>진짜 사이트 같이 써 보기</li></ul></div>
+      <div class="card hot"><span class="k">1부 · 55분</span><h3>업무 자동화하기</h3><ul><li>AI는 왜 마법 같은가</li><li>지금 AI는 어디로 가나</li><li>알려 주고 잘 시키기</li><li>파일 · 스킬로 맡기기</li></ul></div>
+      <div class="card hot"><span class="k">2부 · 45분 · 상급자</span><h3>바이브코딩</h3><ul><li>왜 도구를 만들어야 하나</li><li>시연 두 가지</li><li>제작 예시 · 센터원 업무 공유</li><li>진짜 사이트 같이 써 보기</li></ul></div>
     </div>
     <p class="src">쉬는 시간 5분 · 마무리 5분</p>
   </div>
@@ -815,7 +866,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
       <div style="text-align:left;max-width:560px">
         <h2 class="subhead">휴대폰 카메라로<br><span class="accent">QR</span>을 찍어 주세요</h2>
         <p class="lead">8문항 · 1분 · 닉네임만</p>
-        <p class="src" data-qr-url="/"></p>
+        <p class="src" data-qr-url="/" style="text-align:left"></p>
       </div>
     </div>
   </div>
@@ -861,7 +912,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
      1부
      ====================================================== -->
 <section class="slide center divider" data-accent="coral" data-title="1부 · 업무 자동화하기" data-part="1"
-  data-notes="[0:10] 1부 시작. 코딩 없이, AI에 이미 있는 기능만으로 내 일을 알아서 해 주는 AI를 만드는 시간. 순서: 원리 → 알려 주기 → 잘 시키기 → 파일로 받기 → 스킬로 심어 두기 → 예약으로 맡기기.">
+  data-notes="[0:10] 1부 시작. 코딩 없이, AI에 이미 있는 기능만으로 내 일을 알아서 해 주는 AI를 만드는 시간. 순서: 원리 → 트렌드 → 알려 주기 → 잘 시키기 → 파일로 받기 → 스킬로 심어 두기.">
   <div class="slide-inner">
     <span class="part-tag">1부 · 55분</span>
     <h2 class="headline">업무 <span class="accent">자동화</span>하기</h2>
@@ -1213,6 +1264,21 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
   </div>
 </section>
 
+<section class="slide wide" data-accent="coral" data-title="만화의 결론 · 묻지 말고 시켜라"
+  data-notes="[만화의 결론 · 1분] 이야기의 결론을 한 문장으로. 학생은 답을 '아는' 게 아니라 그럴듯하게 '뽑는다' → 정답을 물어보는 용도는 AI의 약점을 쓰는 것, 재료를 주고 결과물을 만들게 하는 용도는 강점을 쓰는 것. 오늘 나머지 시간은 전부 '시키는 법'.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 만화의 결론</span>
+    <h2 class="subhead">AI는 '물어보는' 도구가 아니라 <span class="accent">'시켜서 만드는'</span> 도구입니다</h2>
+    <p class="desc">학생은 답을 '아는' 게 아니라 그럴듯하게 '뽑는다'고 했죠. 그래서 정답을 물어보는 건 AI의 약점을 쓰는 것이고, 재료를 주고 글 · 표 · 문서 · 프로그램을 만들게 하는 건 AI의 강점을 쓰는 겁니다.</p>
+    <div class="grid cols-2 five">
+      <div class="card dim"><span class="k">물어보기 · 검색처럼</span><h3>"정답 알려 줘"</h3><p>정답을 기대합니다. 그럴듯하게 틀릴 위험이 있고, 결국 출처를 다시 찾아봐야 합니다.</p><div class="ex">"과실비율 기준이 뭐야?" → 확인이 또 필요</div></div>
+      <div class="card hot"><span class="k">시켜서 만들기</span><h3>"이걸로 만들어 줘"</h3><p>재료는 내가 주고, 결과물을 받습니다. 그럴듯한 문장을 만드는 건 AI가 가장 잘하는 일입니다.</p><div class="ex">"이 메모로 고객 안내문 써줘" → 바로 쓸 초안</div></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>검색은 검색창에서, AI에게는 <b>일을 시키세요.</b> 오늘 남은 시간은 전부 '잘 시키는 법'입니다.</p></div>
+  </div>
+</section>
+
+
 
 <section class="slide center" data-accent="coral" data-title="정리 · 초안은 AI, 판단은 나"
   data-notes="[원리 정리 → 활용 연결] 세 질문의 답을 한 번에 정리. 마지막 줄이 다음 파트로 넘어가는 다리: 'AI는 우리 회사, 우리 업무를 모릅니다. 그래서 지금부터는 AI에게 우리 일을 알려 주는 방법입니다.'">
@@ -1242,7 +1308,7 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
 · 1단계 묻고 답하기: 2022년 11월 ChatGPT 공개 이후. 결과를 옮기고 정리하는 건 사람.
 · 2단계 만들어 주기: 2024년 무렵부터 Claude 아티팩트 · ChatGPT 캔버스처럼 문서 · 코드 · 화면을 직접 만들어 주는 기능이 일반화.
 · 3단계 알아서 일하기(에이전트): 2025년부터 여러 단계를 스스로 계획 · 실행 · 확인하는 에이전트가 본격화. 다른 프로그램과 연결(커넥터, MCP), 정해진 시간에 실행(예약), 브라우저 조작까지.
-오늘 진단 등급과 그대로 겹친다는 점을 짚어 주기. 오늘 1부 뒤쪽(스킬 · 예약)이 3단계, 2부(바이브코딩)가 2단계의 끝판.">
+오늘 진단 등급과 그대로 겹친다는 점을 짚어 주기. 오늘 1부 뒤쪽(스킬)이 3단계로 가는 첫걸음, 2부(바이브코딩)가 2단계의 끝판.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 트렌드 ① · 큰 흐름</span>
     <h2 class="subhead">AI는 '대답하는 AI'에서 <span class="accent">'일하는 AI'</span>로 가고 있습니다</h2>
@@ -1297,7 +1363,7 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
 · 일을 시작하기 전에 AI가 할 일과 내가 할 일을 먼저 나눈다: 53% vs 33%
 · 실력 유지를 위해 일부러 일부는 AI 없이 한다: 43% vs 30%
 · 팀에서 AI 팁 · 만든 에이전트 · 실수를 공유한다: 61% vs 36%
-연결: 일을 나누고(→ 초안은 AI, 판단은 나), 정리해서 반복 가능하게 만들고(→ 스킬 · 예약), 공유한다(→ 2부 센터원).">
+연결: 일을 나누고(→ 초안은 AI, 판단은 나), 정리해서 반복 가능하게 만들고(→ 스킬), 공유한다(→ 2부 센터원).">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 트렌드 ④ · 사람은 지금</span>
     <h2 class="subhead">앞서가는 16%는 <span class="accent">더 많이가 아니라, 다르게</span> 씁니다</h2>
@@ -1313,7 +1379,7 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
 </section>
 
 <section class="slide wide" data-accent="teal" data-title="그래서 오늘은"
-  data-notes="[트렌드 → 활용 연결] 오늘 1부 남은 시간이 '3단계로 가는 사다리'라는 걸 보여 준다. 알려 주고 · 잘 시키고(2단계의 기본) → 파일로 받고(만들어 주기) → 스킬로 심고 · 예약으로 맡기기(알아서 일하기). 2부는 아예 도구를 만들어 공유하기.">
+  data-notes="[트렌드 → 활용 연결] 오늘 1부 남은 시간이 '3단계로 가는 사다리'라는 걸 보여 준다. 알려 주고 · 잘 시키고(2단계의 기본) → 파일로 받고(만들어 주기) → 스킬로 심어 두기(알아서 일하기). 2부는 아예 도구를 만들어 공유하기.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 그래서 오늘은</span>
     <h2 class="subhead">오늘 남은 시간은 <span class="accent">'일하는 AI'로 가는 사다리</span>입니다</h2>
@@ -1321,7 +1387,7 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
     <div class="flow" style="--n:4">
       <div class="step"><span class="n">03 · 알려 주고 잘 시키기</span><h3>지침 · 프롬프트</h3><p>AI가 우리 일을 알게</p></div>
       <div class="step"><span class="n">04 · 만들어 받기</span><h3>파일 생성</h3><p>답 대신 결과물을</p></div>
-      <div class="step hot"><span class="n">05 · 06 · 맡기기</span><h3>스킬 · 예약</h3><p>매뉴얼대로, 정해진 시간에 알아서</p></div>
+      <div class="step hot"><span class="n">05 · 심어 두기</span><h3>스킬</h3><p>한마디면 매뉴얼대로 알아서</p></div>
       <div class="step"><span class="n">2부 · 만들어 나누기</span><h3>바이브코딩</h3><p>업무 도구를 만들어 공유</p></div>
     </div>
   </div>
@@ -1350,6 +1416,44 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
     </div>
   </div>
 </section>
+
+<section class="slide wide" data-accent="indigo" data-title="학습이 아니라 메모라이징"
+  data-notes="[메모라이징 · 2분] 많이 오해하는 부분. 맞춤 지침 · 프로젝트 · 메모리를 쓰면 AI가 '학습'한다고 생각하는데 아니다.
+학습 = 만화 속 오픈북 자체를 수조 번 고쳐 쓰는 일(AI 회사가 반도체 수만 장으로 몇 달). 우리가 하는 건 오픈북 맨 앞에 포스트잇을 붙여 두는 것 = 메모라이징. AI 머릿속(숫자)은 그대로이고, 대화를 시작할 때마다 포스트잇을 먼저 읽을 뿐.
+그래서 손이 간다: 무엇을 기억시킬지 내가 정해서 쓰고, 바뀌면 내가 고친다. 메모리 기능이 일부를 자동으로 적어 주기도 하지만, 틀린 메모는 내가 지워야 한다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 꼭 알아 둘 것</span>
+    <h2 class="subhead">이건 '학습'이 아니라 <span class="accent">'메모라이징'</span>입니다</h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">포스트잇</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#F3F1FF"/>
+          <use href="#stu" x="20" y="88" width="110" height="138"/><use href="#f-happy" x="20" y="88" width="110" height="138"/>
+          <rect x="10" y="222" width="380" height="18" rx="4" fill="#E9C89C" stroke="#1E1B33" stroke-width="3"/>
+          <rect x="150" y="70" width="200" height="150" rx="8" fill="#5D57E8" stroke="#1E1B33" stroke-width="3"/>
+          <rect x="160" y="80" width="180" height="130" rx="4" fill="#7C77EE"/>
+          <text x="250" y="200" class="ct white sm" text-anchor="middle">AI의 오픈북 (그대로)</text>
+          <g transform="rotate(-5 250 128)"><rect x="186" y="88" width="132" height="92" fill="#FFE27A" stroke="#1E1B33" stroke-width="3"/>
+            <text x="252" y="112" class="ct sm" text-anchor="middle">나는 보상 담당자</text>
+            <text x="252" y="134" class="ct sm" text-anchor="middle">존댓말 · 결론부터</text>
+            <text x="252" y="156" class="ct sm coral" text-anchor="middle">모르면 [확인 필요]</text></g>
+          <path d="M372 30 Q340 40 330 80" fill="none" stroke="#1E1B33" stroke-width="3" stroke-dasharray="6 6"/>
+          <rect x="300" y="12" width="92" height="32" rx="16" fill="#1E1B33"/><text x="346" y="33" class="ct sm white" text-anchor="middle">내가 붙임</text>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">만화에서 '학습'은 오픈북 자체를 수조 번 고쳐 쓰는 일이었죠. 맞춤 지침 · 프로젝트 · 메모리는 그게 아닙니다. 오픈북 맨 앞에 <b>포스트잇을 붙여 두는 것</b>, 메모라이징입니다. AI 머릿속은 그대로이고, 대화할 때마다 포스트잇을 먼저 읽고 시작할 뿐입니다.</p>
+        <div class="map" style="margin-top:0">
+          <div class="row head"><span>무엇 · 누가</span><span></span><span>어떻게</span></div>
+          <div class="row"><span><b>학습</b> · AI 회사</span><i>→</i><span>오픈북 자체를 고쳐 씀. 반도체 수만 장으로 몇 달</span></div>
+          <div class="row"><span><b>메모라이징</b> · 나</span><i>→</i><span>포스트잇을 붙임. <b>내가 직접 쓰고 관리</b></span></div>
+        </div>
+        <div class="callout warn"><span class="bang">!</span><p>그래서 <b>손이 갑니다.</b> 무엇을 기억시킬지 내가 정해서 쓰고, 바뀌면 내가 고쳐야 합니다. AI가 알아서 배워 주지 않습니다.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
 <section class="slide" data-accent="indigo" data-title="맞춤 지침 예시"
   data-notes="[복사해 가기] 화면을 폰으로 찍어 가도 되고, 오른쪽 위 복사 버튼. 맨 아래 줄이 핵심 — 역질문을 매번 안 써도 AI가 알아서 먼저 물어본다. [확인 필요] 표시는 앞의 가짜 판례 사례와 연결.
@@ -1427,18 +1531,22 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
   </div>
 </section>
 
-<section class="slide wide compact" data-accent="teal" data-title="방식 ② 대화로 풀어 가기"
-  data-notes="[방식 ② · 2분] 동료와 일하듯 대화로. 처음부터 완벽하게 말하려고 애쓰지 말 것. 결과를 보고 하나씩 고쳐 가면 된다. 마지막 줄이 핵심 연결: 대화로 잘 풀린 결과는 '요청문으로 정리해줘' 하면 방식 ①의 프롬프트가 된다 → 뒤의 스킬로 저장.">
+<section class="slide wide compact" data-accent="teal" data-title="방식 ② 친구처럼 대화하기"
+  data-notes="[방식 ② · 3분] 업무 지시만 하다 보면 대화가 한 방향이 된다. 정답이 없는 질문을 친구에게 묻듯 던져 보는 경험을 한 번 해 보라고 권하기. AI가 되묻고, 내가 답하고, 대화가 양방향이 된다. 대화 내용은 예시(실제로는 매번 다르게 나온다). 강의장에서 실제로 쳐 보면 반응이 좋다.
+업무 연결: 이렇게 시작한 대화가 기획 · 고민 정리 · 아이디어 회의가 된다. 마음에 드는 결과가 나오면 '지금까지 대화를 요청문으로 정리해줘' → 방식 ①의 프롬프트.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 방식 ② · 대화하면서 풀어 가기</span>
-    <h2 class="subhead">처음부터 완벽할 필요 없습니다. <span class="accent">보면서 고치세요</span></h2>
-    <p class="desc">동료에게 일을 부탁할 때처럼, 일단 말하고 결과를 보면서 고쳐 가는 방식입니다. 한 번에 하나씩 바꿔 달라고 하면 됩니다. 실력은 첫 요청이 아니라 "여긴 이렇게 바꿔줘"에서 납니다.</p>
-    <div class="chat">
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>수리비 늦어진 고객한테 보낼 답장 써줘.</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span><span class="muted">(무난하지만 딱딱한 답장)</span></div></div>
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>좀 더 부드럽게. 그리고 <b>3일 안에 지급</b>된다는 말 넣어줘.</div></div>
+    <h2 class="subhead">가끔은 시키지 말고, <span class="accent">친구처럼 대화</span>해 보세요</h2>
+    <p class="desc">업무 지시만 하다 보면 대화가 한 방향이 됩니다. 정답이 없는 질문을 친구에게 묻듯 던져 보세요. AI가 되묻고, 내가 답하면서 생각이 넓어지는 경험을 꼭 한 번 해 보시길 권합니다.</p>
+    <div class="chat mini">
+      <div class="turn me"><div class="avatar">나</div><div class="bubble">신은 존재한다고 생각해?</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble">저는 믿음을 가진 존재가 아니라 단정하긴 어려워요. 철학에서는 '있다 · 없다 · 알 수 없다'는 입장이 오래 부딪혀 왔어요. 혹시 어느 쪽에 마음이 가세요?</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble">잘 모르겠어. 근데 사람들은 왜 신을 믿을까?</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble">불안할 때 기댈 곳, 함께하는 공동체, 삶의 의미를 찾는 마음… 여러 설명이 있어요. 요즘 이런 질문이 떠오른 계기가 있으셨어요?</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble">요즘 일이 많아서 그런가 ㅎㅎ</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble">그럴 때 큰 질문이 떠오르곤 하죠. 요즘 어떤 일이 제일 버거우세요? 같이 하나씩 정리해 볼까요?</div></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>마음에 들게 나왔다면 <b>"지금까지 대화를 요청문 하나로 정리해줘"</b> → 방식 ①의 프롬프트가 됩니다.</p></div>
+    <div class="callout tip"><span class="bang">!</span><p>정답을 받는 대화가 아니라 <b>생각이 넓어지는 대화</b>입니다. 이렇게 시작한 대화가 기획 · 고민 정리 · 아이디어로 이어집니다.</p></div>
   </div>
 </section>
 
@@ -1486,7 +1594,7 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
 <section class="slide wide" data-accent="indigo" data-title="요즘 추세 · 프롬프트도 자동화"
   data-notes="[추세 · 2분] 2023년쯤엔 '프롬프트 엔지니어링', 즉 프롬프트를 잘 쓰는 요령이 화제였다. 2025년 6월 쇼피파이 CEO 토비 뤼트케가 '컨텍스트 엔지니어링'이라는 말을 쓰고, 안드레이 카파시가 '+1'로 동의하면서 퍼졌다 — 짧은 명령문보다 AI가 일하는 데 필요한 정보를 통째로 잘 채워 주는 게 핵심이라는 뜻.
 그리고 지금은 프롬프트조차 AI가 쓰게 하고(메타 프롬프팅), AI가 스스로 해 보고 · 결과를 확인하고 · 고치는 반복(에이전트 루프)으로 간다.
-메시지: 프롬프트를 잘 외우는 사람보다, 프롬프트가 저절로 돌아가는 구조를 만드는 사람이 앞서간다. 오늘 뒤에 나올 스킬과 예약이 바로 그 구조.">
+메시지: 프롬프트를 잘 외우는 사람보다, 프롬프트가 저절로 돌아가는 구조를 만드는 사람이 앞서간다. 오늘 뒤에 나올 스킬이 바로 그 구조.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 요즘 추세</span>
     <h2 class="subhead">프롬프트를 잘 쓰는 사람에서, <span class="accent">프롬프트까지 자동화하는 사람</span>으로</h2>
@@ -1496,7 +1604,7 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
       <div class="step"><span class="n">2025년 ~</span><h3>컨텍스트 엔지니어링</h3><p>AI에게 필요한 정보(지침 · 파일 · 매뉴얼)를 미리 잘 채워 두기</p></div>
       <div class="step hot"><span class="n">지금</span><h3>메타 프롬프팅 · 에이전트 루프</h3><p>프롬프트는 AI가 쓰고, AI가 해 보고 · 확인하고 · 고치기를 반복</p></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>앞으로는 프롬프트를 잘 외우는 사람보다, <b>프롬프트가 저절로 돌아가는 구조를 만드는 사람</b>이 앞서갑니다. 뒤에 나올 <b>스킬과 예약</b>이 바로 그 구조입니다.</p></div>
+    <div class="callout tip"><span class="bang">!</span><p>앞으로는 프롬프트를 잘 외우는 사람보다, <b>프롬프트가 저절로 돌아가는 구조를 만드는 사람</b>이 앞서갑니다. 뒤에 나올 <b>스킬</b>이 바로 그 구조입니다.</p></div>
     <p class="src">'컨텍스트 엔지니어링': 토비 뤼트케(쇼피파이 CEO) 제안, 안드레이 카파시 동의 (2025.6)</p>
   </div>
 </section>
@@ -1563,6 +1671,48 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
     <div class="idx">05</div>
     <h2 class="headline"><span class="accent">스킬</span>: 내 업무 매뉴얼을 AI에 심기</h2>
     <p class="lead wide">매번 같은 걸 시킨다면, 아예 매뉴얼로 심어 둡니다</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="스킬을 만화로"
+  data-notes="[스킬 만화 · 2분] 왼쪽: 스킬이 없으면 매번 처음부터 길게 설명해야 한다(나도 지치고, 빠뜨리기도 한다). 오른쪽: 스킬이 있으면 '민원 답변!' 한마디에 AI가 책장에서 해당 매뉴얼을 꺼내 그대로 따라 한다. 책장에는 매뉴얼 여러 권이 꽂혀 있고, AI가 필요한 걸 골라 꺼낸다 — 이게 스킬의 핵심.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 스킬을 만화로</span>
+    <h2 class="subhead">매번 설명하던 걸, <span class="accent">책장에 매뉴얼로</span> 꽂아 둡니다</h2>
+    <div class="comic2">
+      <div class="panel"><span class="ptag">스킬이 없으면</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#FFF0EE"/>
+          <use href="#me" x="10" y="118" width="110" height="138"/><use href="#f-worry" x="10" y="118" width="110" height="138"/>
+          <use href="#stu" x="270" y="118" width="110" height="138"/><use href="#f-think" x="270" y="118" width="110" height="138"/>
+          <rect x="12" y="32" width="300" height="94" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M60 126 L64 140 L80 126" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+          <text x="24" y="54" class="ct sm">민원 답변 써줘. 아 그리고 사과는 하되</text>
+          <text x="24" y="74" class="ct sm">책임 인정은 빼고, 처리 예정일 넣고,</text>
+          <text x="24" y="94" class="ct sm">4줄로, 존댓말로, 이모티콘 없이, 또…</text>
+          <text x="24" y="116" class="ct sm coral">(어제도 한 말 · 내일도 할 말)</text>
+          <text x="325" y="290" class="ct xs" text-anchor="middle">AI</text><text x="65" y="290" class="ct xs" text-anchor="middle">나</text>
+        </svg>
+      </div>
+      <div class="panel"><span class="ptag">스킬이 있으면</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#EAFBF7"/>
+          <use href="#me" x="10" y="118" width="110" height="138"/><use href="#f-happy" x="10" y="118" width="110" height="138"/>
+          <rect x="16" y="40" width="112" height="44" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M56 84 L62 102 L76 84" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+          <text x="72" y="68" class="ct" text-anchor="middle">민원 답변!</text>
+          <rect x="176" y="20" width="210" height="150" rx="6" fill="#C8A27A" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M176 95 H386" stroke="#1E1B33" stroke-width="3"/>
+          <rect x="188" y="30" width="26" height="62" fill="#5D57E8" stroke="#1E1B33" stroke-width="2.5"/><rect x="218" y="30" width="26" height="62" fill="#FFD43B" stroke="#1E1B33" stroke-width="2.5"/><rect x="248" y="30" width="26" height="62" fill="#80CBC4" stroke="#1E1B33" stroke-width="2.5"/>
+          <rect x="188" y="104" width="26" height="62" fill="#FFB74D" stroke="#1E1B33" stroke-width="2.5"/><rect x="218" y="104" width="26" height="62" fill="#B7A6FF" stroke="#1E1B33" stroke-width="2.5"/>
+          <text x="330" y="52" class="ct xs" text-anchor="middle">분쟁심의 자료</text><text x="330" y="70" class="ct xs" text-anchor="middle">회사 PPT 양식</text><text x="330" y="88" class="ct xs" text-anchor="middle">안내 문자</text>
+          <use href="#stu" x="262" y="130" width="110" height="138"/><use href="#f-cool" x="262" y="130" width="110" height="138"/>
+          <g transform="rotate(-12 262 150)"><rect x="236" y="120" width="40" height="70" fill="#FF5A4D" stroke="#1E1B33" stroke-width="3"/><text x="256" y="150" class="ct xs white" text-anchor="middle">민원</text><text x="256" y="166" class="ct xs white" text-anchor="middle">답변</text></g>
+          <text x="317" y="290" class="ct xs" text-anchor="middle">AI</text><text x="65" y="290" class="ct xs" text-anchor="middle">나</text>
+        </svg>
+      </div>
+    </div>
+    <p class="desc">스킬이 없으면 매번 처음부터 길게 설명해야 하고, 가끔 빠뜨립니다. 스킬로 등록해 두면 AI의 책장에 매뉴얼이 꽂혀 있다가, <b>"민원 답변!" 한마디에 AI가 맞는 매뉴얼을 골라 꺼내</b> 그대로 따라 합니다.</p>
   </div>
 </section>
 
@@ -1667,52 +1817,25 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
   </div>
 </section>
 
-<!-- 05 예약 -->
-<section class="slide center divider" data-accent="indigo" data-title="06 반복 업무 예약"
-  data-notes="[0:58 · 4분] 예약 작업.">
-  <div class="slide-inner">
-    <div class="idx">06</div>
-    <h2 class="headline">반복 업무 <span class="accent">예약</span></h2>
-    <p class="lead wide">매주 같은 때 하는 일이라면, 시간까지 맡깁니다</p>
-  </div>
-</section>
 
-<section class="slide wide" data-accent="indigo" data-title="예약 작업"
-  data-notes="[예약 · 3분] ChatGPT 예약 작업: 2026년 8월부터 무료 계정도 사용(활성 3개, 하루 1번, 아침 · 오후 · 밤 같은 시간대). 유료는 정확한 시간과 더 잦은 반복. Claude: 데스크톱 앱 Cowork의 예약 작업(2026년 2월 발표) — 매시간 · 매일 · 평일 · 매주, 컴퓨터와 앱이 켜져 있을 때 실행. 요금제별 범위와 메뉴는 강의 직전 실제 화면 확인. 회사 메일 · 자료 연결 시 보안 정책 먼저.">
-  <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 예약 작업</span>
-    <h2 class="subhead">한 번 말해 두면 <span class="accent">그 시간에 알아서</span></h2>
-    <p class="desc">예약 작업은 "매주 월요일 아침에 이거 해줘"처럼 시간을 정해 두면, 그 시간에 AI가 알아서 작업하고 결과를 알려 주는 기능입니다. 내가 대화를 시작하지 않아도 됩니다.</p>
-    <div class="grid cols-2">
-      <div class="card tight"><span class="k">ChatGPT · 예약 작업</span><p>대화창에 "매주 월요일 아침에 ~ 해줘"라고 말하면 등록됩니다. 무료 계정도 3개까지.</p></div>
-      <div class="card tight"><span class="k">Claude · Cowork 예약 작업</span><p>데스크톱 앱에서 매일 · 평일 · 매주 반복. 컴퓨터와 앱이 켜져 있을 때 실행됩니다.</p></div>
-    </div>
-    <div class="steps3">
-      <div><span class="badge">매주 월요일 아침</span><div class="prompt">이번 주 할 일 체크리스트 틀 만들어줘. 미결 건 점검 · 기한 확인 · 주간 보고 순서로.</div></div>
-      <div><span class="badge">매일 아침</span><div class="prompt">자동차보험 · 손해사정 관련 새 소식을 5줄로 요약해줘. 출처 링크 포함.</div></div>
-      <div><span class="badge">매주 금요일 오후</span><div class="prompt">주간 업무 보고 초안 틀 만들어줘. 이번 주 한 일 · 다음 주 할 일 · 이슈.</div></div>
-    </div>
-  </div>
-</section>
 
 <section class="slide wide" data-accent="teal" data-title="1부 정리 · 내 AI 업무 환경"
-  data-notes="[1:02 · 정리] 1부 흐름을 한 장으로: 알려 주기 → 잘 시키기 → 파일로 받기 → 심어 두기 → 맡기기. 마지막 문장 두 개만 기억하면 된다. 다음은 쉬는 시간.">
+  data-notes="[1:02 · 정리] 1부 흐름을 한 장으로: 알려 주기 → 잘 시키기 → 파일로 받기 → 심어 두기. 마지막 문장 두 개만 기억하면 된다. 다음은 쉬는 시간.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 1부 정리</span>
     <h2 class="subhead">내 AI 업무 환경은 <span class="accent">이렇게 쌓입니다</span></h2>
-    <div class="flow" style="--n:5">
-      <div class="step"><span class="n">01 · 알려 주기</span><h3>맞춤 지침 · 프로젝트</h3><p>내가 누구고 어떻게 일하는지</p></div>
-      <div class="step"><span class="n">02 · 잘 시키기</span><h3>5요소 · 역질문</h3><p>모르면 AI가 묻게</p></div>
+    <div class="flow" style="--n:4">
+      <div class="step"><span class="n">01 · 알려 주기</span><h3>맞춤 지침 · 프로젝트</h3><p>내가 누구고 어떻게 일하는지 (메모라이징)</p></div>
+      <div class="step"><span class="n">02 · 잘 시키기</span><h3>두 가지 방식</h3><p>체계적 프롬프트 · 친구처럼 대화</p></div>
       <div class="step"><span class="n">03 · 받기</span><h3>파일 생성</h3><p>결과는 엑셀 · 워드 · PPT로</p></div>
       <div class="step hot"><span class="n">04 · 심어 두기</span><h3>스킬</h3><p>자주 쓰는 프롬프트 · 업무 매뉴얼</p></div>
-      <div class="step"><span class="n">05 · 맡기기</span><h3>예약</h3><p>반복은 시간 맞춰 알아서</p></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>같은 말을 두 번 하면 → <b>지침 · 스킬</b>로. 같은 일을 매주 하면 → <b>예약</b>으로.</p></div>
+    <div class="callout tip"><span class="bang">!</span><p>같은 말을 두 번 하면 → <b>지침</b>으로. 같은 일을 세 번 시키면 → <b>스킬</b>로.</p></div>
   </div>
 </section>
 
 
-<section class="slide center" data-accent="teal" data-title="쉬는 시간"
+<section class="slide center mid" data-accent="teal" data-title="쉬는 시간"
   data-notes="[휴식 5분] 시작 버튼. 끝나면 2부.">
   <div class="slide-inner cd" data-cd data-cd-sec="300">
     <span class="label" data-cd-label>쉬는 시간</span>
@@ -1727,12 +1850,145 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
 <!-- ======================================================
      2부
      ====================================================== -->
+<!-- ======================================================
+     2부
+     ====================================================== -->
 <section class="slide center divider" data-accent="teal" data-title="2부 · 바이브코딩" data-part="2"
-  data-notes="[1:05] 2부 시작. 이번엔 AI 기능을 쓰는 걸 넘어, AI에게 말로 업무 도구를 만들게 한다.">
+  data-notes="[1:05] 2부 시작. '1부가 AI 안에 있는 도구를 잘 쓰는 법이었다면, 2부는 상급자 영역입니다. 도구 자체를 만듭니다.' 진단 등급으로 치면 Lv.2에서 Lv.3으로.">
   <div class="slide-inner">
-    <span class="part-tag">2부 · 45분</span>
+    <span class="part-tag">2부 · 상급자 영역 · 45분</span>
     <h2 class="headline"><span class="accent">바이브코딩</span></h2>
-    <p class="lead">말로 업무 도구 만들기</p>
+    <p class="lead wide">있는 도구를 쓰는 사람에서,<br><b>도구를 만드는 사람</b>으로</p>
+    <div class="meta-row"><span class="chip">1부 · 있는 기능 잘 쓰기</span><span class="chip" style="border-color:var(--teal);color:var(--teal)"><b style="color:var(--teal)">2부 · 내 도구 만들기</b></span></div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="1부의 한계 · 도구 상자"
+  data-notes="[이론 ① · 2분] 1부에서 배운 건 AI 회사가 만들어 둔 도구 상자(문서 · 엑셀 · 요약 · 스킬)를 잘 쓰는 법. 그런데 우리 업무에 딱 맞는 도구는 그 상자 안에 없다. 예: 현장 사진을 찍으면 파손 부위를 표시하고 사진대지까지 한 번에 되는 도구. '그럼 누가 만들어 주길 기다려야 할까요?'">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 2부 이론 · 1부의 한계</span>
+    <h2 class="subhead">1부의 AI는 <span class="accent">도구 상자 안의 도구만</span> 씁니다</h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">도구 상자</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#FFF0EE"/>
+          <use href="#me" x="8" y="130" width="104" height="130"/><use href="#f-think" x="8" y="130" width="104" height="130"/>
+          <rect x="10" y="34" width="206" height="84" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M52 118 L58 134 L72 118" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+          <text x="113" y="58" class="ct sm" text-anchor="middle">현장 사진 찍으면</text>
+          <text x="113" y="80" class="ct sm" text-anchor="middle">파손 표시하고 사진대지까지</text>
+          <text x="113" y="102" class="ct sm" text-anchor="middle">한 번에 되는 거 없어?</text>
+          <use href="#stu" x="282" y="118" width="110" height="138"/><use href="#f-worry" x="282" y="118" width="110" height="138"/>
+          <rect x="170" y="176" width="130" height="74" rx="8" fill="#E5484D" stroke="#1E1B33" stroke-width="3"/>
+          <rect x="210" y="164" width="50" height="16" rx="6" fill="none" stroke="#1E1B33" stroke-width="3"/>
+          <text x="235" y="200" class="ct sm white" text-anchor="middle">AI 도구 상자</text>
+          <g class="ct xs"><rect x="178" y="208" width="54" height="16" rx="4" fill="#fff"/><text x="205" y="220" class="ct xs" text-anchor="middle">문서</text>
+          <rect x="238" y="208" width="54" height="16" rx="4" fill="#fff"/><text x="265" y="220" class="ct xs" text-anchor="middle">엑셀</text>
+          <rect x="178" y="228" width="54" height="16" rx="4" fill="#fff"/><text x="205" y="240" class="ct xs" text-anchor="middle">요약</text>
+          <rect x="238" y="228" width="54" height="16" rx="4" fill="#fff"/><text x="265" y="240" class="ct xs" text-anchor="middle">스킬</text></g>
+          <rect x="236" y="20" width="156" height="66" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M330 86 L336 104 L348 86" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+          <text x="314" y="46" class="ct sm" text-anchor="middle">제 상자엔</text>
+          <text x="314" y="70" class="ct sm coral" text-anchor="middle">그런 도구가 없어요…</text>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">1부에서 배운 건 AI 회사가 만들어 둔 <b>도구 상자</b>를 잘 쓰는 법이었습니다. 문서 만들기, 엑셀, 요약, 스킬. 그런데 우리 업무에 딱 맞는 도구는 그 상자 안에 없습니다.</p>
+        <div class="aibox"><span class="k">1부의 자동화</span><p>AI 안에서 작업한다는 건 결국 <b>남이 만든 도구를 빌려 쓰는 것</b>입니다. 상자 밖의 일은 못 합니다.</p></div>
+        <p class="desc">그럼 누가 만들어 주길 기다려야 할까요?</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="없으면 만든다"
+  data-notes="[이론 ② · 2분] 바이브코딩 = 필요한 도구가 없으면 AI에게 말로 설명해서 직접 만드는 것. 코드는 AI가 쓰고, 나는 '이렇게 생겼으면 좋겠다'만 말한다. 2025년 2월 안드레이 카파시(OpenAI 창립 멤버)가 처음 쓴 말이 그해 콜린스 사전 올해의 단어가 됐다. 결과물은 보통 인터넷 창에서 열리는 파일 하나(HTML) — 설치 없이 폰 · PC에서 바로.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 2부 이론 · 바이브코딩</span>
+    <h2 class="subhead">도구가 없으면? <span class="accent">말로 만들게 합니다</span></h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">바이브코딩</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#EAFBF7"/>
+          <use href="#me" x="8" y="130" width="104" height="130"/><use href="#f-happy" x="8" y="130" width="104" height="130"/>
+          <use href="#stu" x="120" y="118" width="110" height="138"/><use href="#f-cool" x="120" y="118" width="110" height="138"/>
+          <rect x="40" y="36" width="210" height="58" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M170 94 L176 112 L188 94" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+          <text x="145" y="60" class="ct sm" text-anchor="middle">없으면 만들어 드릴게요!</text>
+          <text x="145" y="84" class="ct sm teal" text-anchor="middle">말만 해 주세요</text>
+          <rect x="272" y="40" width="98" height="186" rx="18" fill="#1E1B33"/>
+          <rect x="280" y="54" width="82" height="158" rx="10" fill="#fff"/>
+          <rect x="288" y="64" width="66" height="22" rx="5" fill="#0FB6A4"/><text x="321" y="80" class="ct xs white" text-anchor="middle">내 업무 앱</text>
+          <rect x="288" y="94" width="66" height="44" rx="5" fill="#E8E6F0"/>
+          <path d="M296 128 L310 108 L320 120 L328 112 L346 130" fill="none" stroke="#5D57E8" stroke-width="3" stroke-linejoin="round"/>
+          <rect x="288" y="146" width="30" height="20" rx="4" fill="#FFD43B"/><rect x="324" y="146" width="30" height="20" rx="4" fill="#FF8A65"/>
+          <rect x="288" y="174" width="66" height="24" rx="12" fill="#5D57E8"/><text x="321" y="191" class="ct xs white" text-anchor="middle">사진대지</text>
+          <path d="M240 150 L262 140 M240 170 L264 170 M240 190 L262 200" stroke="#0FB6A4" stroke-width="4" stroke-linecap="round"/>
+          <text x="380" y="34" class="ct big" text-anchor="end">✨</text>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">바이브코딩은 필요한 도구가 없을 때 <b>AI에게 말로 설명해서 직접 만드는 것</b>입니다. 코드는 AI가 쓰고, 나는 "이렇게 생겼으면 좋겠다", "여기는 이렇게 바꿔 줘"만 말합니다.</p>
+        <div class="aibox"><span class="k">바이브코딩</span><p>원하는 느낌(바이브)을 말로 전하고, 결과를 보며 고쳐 가는 방식. 2025년 2월 처음 나온 말이 그해 사전의 <b>'올해의 단어'</b>가 됐습니다.</p></div>
+        <p class="src">콜린스 사전 올해의 단어 발표(2025.11)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="indigo" data-title="어떻게 가능하지? · 오픈북 속 코드"
+  data-notes="[이론 ③ · 2분] 1부 만화와 연결. 그 학생이 베낀 오픈북에는 글만 있었던 게 아니라 프로그램 코드도 잔뜩 들어 있었다. Meta 논문(2024)에 따르면 Llama 3 학습 데이터의 약 17%가 코드. 15조 토큰의 17%면 약 2.6조 토큰(강사 환산). 그래서 '이런 화면 만들어줘'라고 하면 코드를 써 낸다. 단, 주사위(장면 5)는 여기서도 굴러가니 써 보고 고치는 과정이 꼭 필요하다 → 3박자로 연결.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 2부 이론 · 어떻게 가능하지?</span>
+    <h2 class="subhead">그 학생의 오픈북엔 <span class="accent">코드도</span> 잔뜩 있었습니다</h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">다시, 그 오픈북</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#F3F1FF"/>
+          <rect x="24" y="40" width="190" height="168" rx="10" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <line x1="119" y1="46" x2="119" y2="202" stroke="#1E1B33" stroke-width="2"/>
+          <g class="ct xs"><text x="34" y="66" class="ct xs">보상 기준…</text><text x="34" y="86" class="ct xs">약관 해설…</text><text x="34" y="106" class="ct xs">뉴스 기사…</text><text x="34" y="126" class="ct xs">소설…</text><text x="34" y="146" class="ct xs">백과사전…</text></g>
+          <rect x="124" y="54" width="84" height="140" rx="6" fill="#1E1B33"/>
+          <text x="130" y="74" class="ct xs" fill="#7CF5E2" style="fill:#7CF5E2">&lt;html&gt;</text>
+          <text x="136" y="94" class="ct xs" style="fill:#FFD43B">&lt;button&gt;</text>
+          <text x="130" y="114" class="ct xs" style="fill:#FF8A65">function()</text>
+          <text x="136" y="134" class="ct xs" style="fill:#7CF5E2">if (날짜)</text>
+          <text x="136" y="154" class="ct xs" style="fill:#fff">save()</text>
+          <text x="130" y="174" class="ct xs" style="fill:#FFD43B">&lt;/html&gt;</text>
+          <text x="166" y="226" class="ct coral" text-anchor="middle">코드 약 17%</text>
+          <use href="#stu" x="252" y="100" width="120" height="150"/><use href="#f-cool" x="252" y="100" width="120" height="150"/>
+          <rect x="232" y="20" width="160" height="70" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M300 90 L306 108 L318 90" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+          <text x="312" y="48" class="ct sm" text-anchor="middle">화면 만드는 법도</text>
+          <text x="312" y="72" class="ct sm teal" text-anchor="middle">다 베껴 놨죠!</text>
+          <rect x="20" y="248" width="360" height="18" rx="4" fill="#E9C89C" stroke="#1E1B33" stroke-width="3"/>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">1부 만화의 그 학생, 기억나시죠? 인터넷의 글을 베껴 오픈북을 두껍게 만들 때 <b>프로그램 코드</b>도 함께 베꼈습니다. 그래서 "이런 화면 만들어줘"라고 하면 코드를 써 냅니다.</p>
+        <div class="aibox"><span class="k">실제 숫자</span><p>Llama 3가 읽은 글의 <b>약 17%가 코드</b>였습니다. 15조 개 토큰의 17%면 약 <b>2.6조 개</b>. 사람이 평생 읽을 수 없는 양의 코드를 본 셈입니다.</p></div>
+        <div class="callout warn" style="margin:0"><span class="bang">!</span><p>단, 주사위(장면 5)는 여기서도 굴러갑니다. 그래서 <b>써 보고 고치는</b> 과정이 꼭 필요합니다.</p></div>
+        <p class="src">Meta, The Llama 3 Herd of Models (2024) · 2.6조는 강사 환산</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="indigo" data-title="자유도 게이지"
+  data-notes="[이론 ③ · 2분] 같은 AI를 써도 자유도가 다르다. 묻기(10) → 1부의 AI 기능 활용(60) → 바이브코딩(100). 1부가 자동화를 '빌려 쓰는' 단계였다면, 2부는 자동화를 '직접 만드는' 단계. 회사가 만들어 주길 기다리지 않아도 내 업무에 맞춘 도구를 내가 만든다. 숫자는 비유.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 2부 이론 · 자유도</span>
+    <h2 class="subhead">같은 AI, <span class="accent">자유도가 다릅니다</span></h2>
+    <p class="desc">1부가 자동화를 <b>빌려 쓰는</b> 단계였다면, 2부는 자동화를 <b>직접 만드는</b> 단계입니다. 회사가 만들어 주길 기다리지 않아도, 내 업무에 맞춘 도구를 내가 만듭니다.</p>
+    <div class="gauge"><div class="gfill"></div>
+      <span class="gm" style="left:10%"><i></i>10</span><span class="gm" style="left:60%"><i></i>60</span><span class="gm hot" style="left:100%"><i></i>100</span>
+    </div>
+    <div class="grid cols-3 five">
+      <div class="card dim"><span class="k">자유도 10 · 묻기</span><h3>검색창처럼</h3><p>답을 받고 끝. 옮기고 정리하는 건 내 몫.</p><div class="ex">"과실비율 기준 알려 줘"</div></div>
+      <div class="card"><span class="k">자유도 60 · 1부</span><h3>AI 기능 활용</h3><p>지침 · 파일 · 스킬. 상자 안 도구를 잘 쓰기.</p><div class="ex">"이 메모로 주간 보고서 만들어 줘"</div></div>
+      <div class="card hot"><span class="k">자유도 100 · 2부</span><h3>바이브코딩</h3><p>상자에 없는 도구를 만든다. 내 업무 전용.</p><div class="ex">"사진 찍으면 파손 표시 · 사진대지 되는 앱"</div></div>
+    </div>
+    <p class="src">숫자는 비유</p>
   </div>
 </section>
 
@@ -1753,63 +2009,18 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
     <h2 class="subhead">AI <span class="accent">차량손해사정</span> 프로그램</h2>
   </div>
 </section>
-<section class="slide center divider" data-accent="indigo" data-title="01 바이브코딩이란"
-  data-notes="[1:11 · 12분] 바이브코딩 개념. 핵심은 '뭘 만들 수 있고 뭘 못 만드는지' 감 잡기.">
+<section class="slide" data-accent="coral" data-title="바이브코딩 3박자"
+  data-notes="[핵심] 요청 → 써 보기 → 바꿔줘. 실력은 첫 요청이 아니라 '고쳐 달라는 말'에서 난다. 한 번에 하나씩 고치고, 잘 될 때마다 파일 저장.">
   <div class="slide-inner">
-    <div class="idx">01</div>
-    <h2 class="headline"><span class="accent">바이브코딩</span>이란</h2>
-  </div>
-</section>
-<section class="slide" data-accent="indigo" data-title="말의 유래"
-  data-notes="[유래] 2025년 2월 안드레이 카파시(OpenAI 창립 멤버)가 처음 씀. '코드가 존재한다는 것조차 잊는다'. 같은 해 11월 콜린스 사전 올해의 단어. 오늘 쓰는 발표 자료, 진단 사이트, 센터원 앱도 모두 이 방식으로 만들었다.
-멘트: '개발자만의 얘기가 아닙니다. 말로 설명할 수 있으면 만들 수 있어요.'">
-  <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 말의 유래</span>
-    <h2 class="subhead">1년 만에 <span class="accent">올해의 단어</span>가 됐습니다</h2>
-    <p class="desc">코드를 한 줄씩 짜는 대신, 원하는 느낌(바이브)을 말로 설명하고 AI가 만든 결과를 보면서 고쳐 가는 방식입니다. 2025년 2월에 처음 나온 말이 그해 사전의 '올해의 단어'가 됐습니다.</p>
-    <div class="grid cols-3">
-      <div class="card"><span class="k">2025.2</span><h3>안드레이 카파시</h3><p>OpenAI 창립 멤버가 처음 쓴 말. "코드가 존재한다는 것조차 잊는다"</p></div>
-      <div class="card hot"><span class="k">2025.11</span><h3>콜린스 사전 올해의 단어</h3><p>AI에게 말로 시켜 프로그램을 만드는 것</p></div>
-      <div class="card"><span class="k">오늘</span><h3>이 강의 자료도</h3><p>발표 자료 · 진단 사이트 · 센터원 앱 모두 말로 만들었습니다</p></div>
+    <span class="eyebrow"><span class="dot"></span> 바이브코딩 3박자</span>
+    <h2 class="subhead">한 번에 완성되지 않아도 <span class="accent">정상</span></h2>
+    <p class="desc">한 번에 완벽한 프로그램은 안 나옵니다. 그게 정상입니다. 써 보고, 이상한 곳을 말로 고쳐 달라고 하는 걸 반복하면 됩니다. 1부의 '친구처럼 대화하기'와 똑같습니다.</p>
+    <div class="flow" style="--n:3">
+      <div class="step"><span class="n">01</span><h3>말로 요청</h3><p>템플릿으로 첫 요청</p></div>
+      <div class="step"><span class="n">02</span><h3>직접 써 보기</h3><p>눌러 보고 틀린 곳 찾기</p></div>
+      <div class="step hot"><span class="n">03</span><h3>"이렇게 바꿔줘"</h3><p>한 번에 하나씩, 될 때마다 저장</p></div>
     </div>
-    <p class="src">출처: 콜린스 사전 올해의 단어 발표 보도(코리아타임스 · AFP, 2025.11.6)</p>
-  </div>
-</section>
-<section class="slide center" data-accent="indigo" data-title="바이브코딩의 정의"
-  data-notes="[정의] 코드를 쓰는 게 아니라 원하는 걸 말로 설명. 나는 코드를 읽지 않고, 써 보고 고칠 점만 말한다. '이 발표 자료도 그렇게 만들었습니다.'">
-  <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 정의</span>
-    <p class="big-quote">만들고 싶은 걸 <span class="mark">우리말로 설명</span>하면<br>AI가 프로그램으로 만들어 줍니다</p>
-    <div class="meta-row">
-      <span class="chip">코드는 안 읽어도 됨</span>
-      <span class="chip">써 보고 고칠 점만 말하기</span>
-      <span class="chip">이 발표 자료도 그렇게 만들었습니다</span>
-    </div>
-    <p class="desc">코드를 몰라도 됩니다. 내가 하는 일은 원하는 걸 설명하고, 만들어진 걸 써 보고, 고칠 점을 말하는 것뿐입니다. 1부에서 배운 '대화로 풀어 가기'를 프로그램 만들기에 그대로 쓰는 겁니다.</p>
-  </div>
-</section>
-<section class="slide" data-accent="indigo" data-title="1단계 vs 2단계"
-  data-notes="[비교] 같은 질문이라도 1단계는 '답'을 받고 끝, 2단계는 '도구'를 받아서 계속 쓴다. 제작 예시에서 실제로 보여줌.">
-  <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 같은 AI, 다른 결과</span>
-    <h2 class="subhead">답을 받느냐, <span class="accent">도구를 받느냐</span></h2>
-    <div class="grid cols-2">
-      <div class="card dim"><span class="k">1단계 · 검색형</span><h3>"태국 여행 계획 짜줘"</h3><p>긴 글 한 편을 받습니다.<br>읽고 나면 끝. 다음에 또 물어봐야 합니다.</p></div>
-      <div class="card hot"><span class="k">2단계 · 제작형</span><h3>"그걸 앱으로 만들어줘"</h3><p>눌러 보고, 체크하고, 저장하는 <b>내 프로그램</b>이 생깁니다.<br>계속 고쳐 가며 씁니다.</p></div>
-    </div>
-  </div>
-</section>
-<section class="slide" data-accent="teal" data-title="왜 HTML 파일 하나인가"
-  data-notes="[HTML] HTML = 인터넷 창(브라우저)만 있으면 돌아가는 프로그램 파일. 설치 없음, 폰 · PC 다 됨, 카톡으로 파일 하나 보내면 공유 끝. 오늘 2부 결과물도 HTML.">
-  <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 왜 HTML 파일 하나인가</span>
-    <h2 class="subhead">인터넷 창만 있으면 <span class="accent">어디서나 돌아갑니다</span></h2>
-    <p class="desc">HTML은 인터넷 창(브라우저)이 읽는 파일 형식입니다. 파일 하나에 화면과 기능을 다 담을 수 있어서, 따로 설치하지 않아도 폰이나 PC에서 열기만 하면 프로그램처럼 돌아갑니다.</p>
-    <div class="grid cols-3">
-      <div class="card"><span class="k">설치</span><h3>필요 없음</h3><p>파일을 열면 바로 실행</p></div>
-      <div class="card"><span class="k">어디서나</span><h3>폰 · PC 다 됨</h3><p>브라우저만 있으면 OK</p></div>
-      <div class="card hot"><span class="k">공유</span><h3>파일 하나 보내면 끝</h3><p>카톡 · 메일로 전달</p></div>
-    </div>
+    <div class="callout tip"><span class="bang">!</span><p>실력은 첫 요청이 아니라 <b>"이렇게 바꿔줘"</b>에서 납니다.</p></div>
   </div>
 </section>
 <section class="slide wide" data-accent="teal" data-title="되는 것 / 안 되는 것"
@@ -1835,35 +2046,6 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
     </div>
   </div>
 </section>
-<section class="slide wide" data-accent="indigo" data-title="업무 도구의 5가지 형태"
-  data-notes="[형태] 주제를 정해 주는 게 아니라 '형태'만. 내 귀찮은 일이 어느 형태에 해당하는지만 찾으면 시작할 수 있다.">
-  <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 업무 도구의 형태</span>
-    <h2 class="subhead">내 귀찮은 일은 <span class="accent">어느 형태?</span></h2>
-    <p class="desc">뭘 만들지 막막하면, 내가 귀찮아하는 일이 아래 다섯 가지 중 어디에 해당하는지부터 찾으면 됩니다. 대부분의 업무 도구는 이 중 하나이거나 둘을 섞은 모양입니다.</p>
-    <div class="grid cols-5 five">
-      <div class="card"><span class="k">01</span><h3>계산형</h3><p>숫자를 넣으면 결과가 나온다</p><div class="ex">예: 경과일 · 기한 계산기</div></div>
-      <div class="card"><span class="k">02</span><h3>체크리스트형</h3><p>빠뜨리지 않게 순서대로</p><div class="ex">예: 사고 접수 서류 체크</div></div>
-      <div class="card"><span class="k">03</span><h3>문서 생성형</h3><p>칸을 채우면 글이 완성된다</p><div class="ex">예: 고객 안내 문자 생성기</div></div>
-      <div class="card"><span class="k">04</span><h3>기록 · 관리형</h3><p>쌓고, 찾고, 정리한다</p><div class="ex">예: 공업사 · 병원 연락처 모음</div></div>
-      <div class="card"><span class="k">05</span><h3>안내 · 조회형</h3><p>필요할 때 꺼내 본다</p><div class="ex">예: 업무 기준 빠른 찾기</div></div>
-    </div>
-  </div>
-</section>
-<section class="slide" data-accent="coral" data-title="바이브코딩 3박자"
-  data-notes="[핵심] 요청 → 써 보기 → 바꿔줘. 실력은 첫 요청이 아니라 '고쳐 달라는 말'에서 난다. 한 번에 하나씩 고치고, 잘 될 때마다 파일 저장.">
-  <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 바이브코딩 3박자</span>
-    <h2 class="subhead">한 번에 완성되지 않아도 <span class="accent">정상</span></h2>
-    <p class="desc">한 번에 완벽한 프로그램은 안 나옵니다. 그게 정상입니다. 써 보고, 이상한 곳을 말로 고쳐 달라고 하는 걸 반복하면 됩니다. 1부의 '대화로 풀어 가기'와 똑같습니다.</p>
-    <div class="flow" style="--n:3">
-      <div class="step"><span class="n">01</span><h3>말로 요청</h3><p>템플릿으로 첫 요청</p></div>
-      <div class="step"><span class="n">02</span><h3>직접 써 보기</h3><p>눌러 보고 틀린 곳 찾기</p></div>
-      <div class="step hot"><span class="n">03</span><h3>"이렇게 바꿔줘"</h3><p>한 번에 하나씩, 될 때마다 저장</p></div>
-    </div>
-    <div class="callout tip"><span class="bang">!</span><p>실력은 첫 요청이 아니라 <b>"이렇게 바꿔줘"</b>에서 납니다.</p></div>
-  </div>
-</section>
 <section class="slide" data-accent="coral" data-title="첫 요청 템플릿"
   data-notes="[템플릿] 내일 그대로 쓰는 양식. 노란 부분만 채우면 된다. 채우기 어려우면? 팁 ① — '이 템플릿 채우게 나한테 질문해줘'.">
   <div class="slide-inner">
@@ -1877,120 +2059,117 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
     <div class="callout tip"><span class="bang">!</span><p>채우기 어려우면? <b>"이 템플릿을 채울 수 있게 나한테 질문해줘."</b></p></div>
   </div>
 </section>
-<section class="slide" data-accent="amber" data-title="막혔을 때"
-  data-notes="[막혔을 때] 직접 만들 때 제일 많이 쓰게 될 장. 특히 '처음부터 다시' 하지 말 것 — 잘 되던 것까지 바뀐다.">
+
+<!-- 제작 예시 -->
+<section class="slide center divider" data-accent="coral" data-title="제작 예시 · 센터원"
+  data-notes="[1:27 · 15분 · 제작 예시] 센터원 업무 공유 프로그램을 대화 5번으로 키운다: 공지 · 할 일 → 주소록 · 비상연락망 → 메신저 → 다 같이 쓰기. 결과 장의 폰 화면은 실제로 눌러진다(가짜 예시 데이터). 마지막에 진짜 사이트 QR로 다 같이 써 본다.
+※ 강의 전에: QR 장의 주소로 한 번 들어가 '예시 데이터로 채워 보기'를 눌러 두면 빈 화면이 아닌 상태로 시작한다.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 막혔을 때</span>
-    <h2 class="subhead">이 네 가지면 <span class="accent">다 풀립니다</span></h2>
-    <div class="grid cols-2">
-      <div class="card"><span class="k">01 · 오류가 나면</span><h3>캡처해서 그대로 붙여 넣기</h3><p>"이 화면처럼 나와. 고쳐줘."</p></div>
-      <div class="card"><span class="k">02 · 고칠 때</span><h3>"처음부터 다시" 말고 "이 부분만"</h3><p>잘 되던 부분까지 바뀌지 않게</p></div>
-      <div class="card"><span class="k">03 · 망가지면</span><h3>잘 되던 파일로 돌아가기</h3><p>그래서 될 때마다 저장 (버전 1, 2, 3…)</p></div>
-      <div class="card"><span class="k">04 · 헷갈려하면</span><h3>새 대화로</h3><p>대화가 길어지면 최신 파일을 붙여 넣고 새로 시작</p></div>
-    </div>
+    <span class="part-tag">제작 예시</span>
+    <h2 class="headline">센터원 <span class="accent">업무 공유</span> 프로그램</h2>
+    <p class="lead">공지 · 할 일 · 주소록 · 비상연락망 · 메신저를 대화 5번으로</p>
   </div>
 </section>
-<section class="slide center divider" data-accent="coral" data-title="02 바이브코딩 제작 예시"
-  data-notes="[1:23 · 22분 · 제작 예시] 센터원 업무 공유 프로그램을 대화 5번으로 키운다. 결과 장의 폰 화면은 실제로 눌러진다(가짜 예시 데이터). 마지막에 진짜 사이트 QR로 다 같이 써 본다.
-※ 강의 전에: QR 장의 주소로 한 번 들어가서 '예시 데이터로 채워 보기'를 눌러 두면 빈 화면이 아닌 상태로 시작한다.">
-  <div class="slide-inner">
-    <div class="idx">02</div>
-    <h2 class="headline">바이브코딩 <span class="accent">제작 예시</span></h2>
-    <p class="lead">센터원 업무 공유 프로그램</p>
-  </div>
-</section>
+
 <section class="slide wide compact" data-accent="coral" data-title="대화 ① 업무 공유 정리해줘"
-  data-notes="[대화 ①] 1단계 방식. 정리된 글을 받음. 맞는 말인데 읽고 끝. '그래서 이걸 어디서 쓰지?' 질문 던지며 다음으로.">
+  data-notes="[대화 ①] 1단계 방식. 정리된 글을 받음. 맞는 말인데 읽고 끝. '그래서 이걸 어디서 쓰지?'">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 대화 ① · 1단계 방식</span>
+    <span class="eyebrow"><span class="dot"></span> 대화 ① · 묻기만 하면</span>
     <div class="chat">
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>우리 보상센터 <b>업무 공유</b>를 어떻게 하면 좋을지 정리해줘. 공지가 단톡방에 묻히고, 휴가 때 인수인계가 자꾸 빠져.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>우리 보상센터 <b>업무 공유</b>를 어떻게 하면 좋을지 정리해줘. 공지가 단톡방에 묻히고, 누가 뭘 하는지 모르겠고, 연락처도 여기저기 흩어져 있어.</div></div>
       <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>
         <div class="plan"><b>1. 공지</b> 중요한 공지는 따로 모아 맨 위에 고정하세요.<br>
-        <b>2. 근무 현황</b> 매일 아침 출근 · 외근 · 휴가와 대직자를 한곳에 표시하세요.<br>
-        <b>3. 인수인계</b> 사고번호 · 진행 상황 · 다음 할 일 · 기한을 같은 양식으로 남기세요.<br>
-        <b>4. 노하우</b> 공업사 · 병원 연락처와 업무 요령을 검색되게 모아 두세요.<br>
-        <span class="muted">… (긴 글이 이어짐)</span></div>
+        <b>2. 할 일</b> 날짜와 담당자를 정해서 한곳에 적으세요.<br>
+        <b>3. 주소록</b> 팀 · 내선 · 휴대폰을 한곳에 모으세요.<br>
+        <b>4. 비상연락망</b> 누가 누구에게 연락할지 순서를 정하세요.<br>
+        <b>5. 메신저</b> 업무 대화는 한 방에서 하세요.</div>
       </div></div>
     </div>
     <div class="callout warn"><span class="bang">?</span><p>맞는 말인데… <b>읽고 끝</b>입니다. 이걸 내일부터 센터에서 진짜로 쓰려면?</p></div>
   </div>
 </section>
-<section class="slide wide" data-accent="coral" data-title="대화 ② 앱으로 만들어줘"
+
+<section class="slide wide" data-accent="coral" data-title="대화 ② 공지 · 할 일 앱"
   data-notes="[대화 ②] 2단계의 시작. '어떻게 보이게'를 말하는 한마디로 글이 도구가 된다.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 대화 ② · 2단계의 시작</span>
+    <span class="eyebrow"><span class="dot"></span> 대화 ② · 만들어 달라고 하면</span>
     <div class="chat">
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>좋아. 이걸 <b>폰으로 보는 앱</b>처럼 HTML로 만들어줘. 맨 위에 <b>공지</b>, 그 아래 <b>오늘 누가 출근 · 외근 · 휴가인지</b>랑 대직자. 내 상태는 버튼으로 고르게.</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>센터 홈 화면을 만들었어요. 맨 위에 오늘 인원 요약, 공지는 고정할 수 있고, 아래에서 내 상태를 누르면 근무 현황에 바로 표시돼요.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>좋아. 이걸 <b>폰으로 보는 앱</b>처럼 HTML로 만들어줘. 먼저 <b>공지</b>랑 <b>할 일</b>. 할 일은 <b>날짜와 담당자를 골라서</b> 등록하고, 밀린 일은 빨갛게.</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>공지와 할 일 화면을 만들었어요. 할 일은 밀린 일 · 오늘 · 내일 순으로 묶이고, 동그라미를 누르면 완료돼요. 위쪽에 오늘 할 일과 밀린 일 개수도 보여요.</div></div>
     </div>
   </div>
 </section>
-<section class="slide wide" data-accent="coral" data-title="결과 ② 센터 홈"
-  data-notes="[시연] 폰 화면에서 '+ 공지'로 공지 올리기, '내 상태'에서 외근 눌러 메모 넣기. 위쪽 인원 요약이 바뀌는 것 보여 주기. 글 한 편이 앱이 됐다.">
+
+<section class="slide wide" data-accent="coral" data-title="결과 ② 공지 · 할 일"
+  data-notes="[시연] 폰 화면에서 '+ 할 일'로 날짜 · 담당자 골라 등록, 동그라미 눌러 완료. 아래 탭으로 공지도 보여 주기. 글 한 편이 앱이 됐다.">
   <div class="slide-inner">
     <div class="app-stage">
-      <div class="phone-frame"><div class="phone-screen"><div data-center="2"></div></div></div>
+      <div class="phone-frame"><div class="phone-screen"><div data-center="2" data-tab="todo"></div></div></div>
       <div class="app-side">
         <span class="badge">결과 ② · 실제 작동</span>
         <h2 class="subhead">글 한 편이 <span class="accent">앱</span>이 됐습니다</h2>
-        <div class="quote">"폰으로 보는 앱처럼, 공지랑 오늘 근무 현황"</div>
-        <ul class="added"><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>오늘 인원 요약</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>공지 올리기 · 고정</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>내 상태 · 대직자</li></ul>
-        <p class="tap-hint">폰 화면에서 내 상태를 눌러 보세요</p>
+        <div class="quote">"공지랑 할 일, 날짜와 담당자를 골라서"</div>
+        <ul class="added"><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>공지 올리기 · 고정</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>할 일 · 날짜와 담당자 선택</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>밀린 일 · 오늘 · 내일 묶어 보기</li></ul>
+        <p class="tap-hint">동그라미를 눌러 완료해 보세요</p>
       </div>
     </div>
   </div>
 </section>
-<section class="slide wide" data-accent="teal" data-title="대화 ③ 인수인계 추가"
-  data-notes="[대화 ③] 기능 추가는 한 번에 하나. 처음 요청 때 안 한 기능도 대화로 붙인다.">
+
+<section class="slide wide" data-accent="teal" data-title="대화 ③ 주소록 · 비상연락망"
+  data-notes="[대화 ③] 기능은 한 번에 하나(또는 비슷한 것 둘)씩. 처음 요청에 없던 것도 대화로 붙인다.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 대화 ③ · 기능 추가</span>
     <div class="chat">
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>휴가 가는 사람이 담당 건을 <b>대직자에게 넘기는 인수인계</b> 탭 추가해줘. 사고번호, 진행 상황, 다음 할 일, 기한. 받은 사람이 <b>처리 완료</b> 누를 수 있게.</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>아래에 탭바를 만들고 [인수인계]를 넣었어요. 기한이 가까운 순으로 보이고, [나에게 온 것]만 골라 볼 수 있어요. 나에게 온 건 탭에 빨간 숫자로 떠요.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span><b>센터 주소록</b>이랑 <b>비상연락망</b> 탭 추가해줘. 주소록은 팀별로, 검색되게. 비상연락망은 1차 → 2차 → 3차 연락 순서로. 번호 누르면 <b>바로 전화</b>.</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>아래 탭바에 [주소록]과 [비상연락]을 넣었어요. 주소록은 팀별로 묶이고 이름 · 팀 · 번호 어디든 검색돼요. 비상연락망은 연락 순서가 화살표처럼 이어지고, 외부 긴급 연락처도 따로 모았어요.</div></div>
     </div>
   </div>
 </section>
-<section class="slide wide" data-accent="teal" data-title="결과 ③ 인수인계"
-  data-notes="[시연] '나에게 온 것' 필터, '처리 완료' 누르기, '+ 인수인계'로 하나 남기기. 탭의 빨간 숫자가 줄어드는 것 보여 주기.">
+
+<section class="slide wide" data-accent="teal" data-title="결과 ③ 주소록 · 비상연락망"
+  data-notes="[시연] 비상연락 탭의 1차 → 2차 → 3차 순서, 번호 버튼. 주소록 탭에서 '대물' 검색.">
   <div class="slide-inner">
     <div class="app-stage">
-      <div class="phone-frame"><div class="phone-screen"><div data-center="3" data-tab="handover"></div></div></div>
+      <div class="phone-frame"><div class="phone-screen"><div data-center="3" data-tab="emergency"></div></div></div>
       <div class="app-side">
         <span class="badge">결과 ③ · 실제 작동</span>
-        <h2 class="subhead">휴가 가도 <span class="accent">건이 안 빠집니다</span></h2>
-        <div class="quote">"대직자에게 넘기는 인수인계, 처리 완료까지"</div>
-        <ul class="added"><li class="old"><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>공지 · 근무 현황</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>인수인계 카드 · 기한 D-day</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>나에게 온 것 · 처리 완료</li></ul>
-        <p class="tap-hint">처리 완료를 눌러 보세요</p>
+        <h2 class="subhead">흩어진 연락처가 <span class="accent">한곳에</span></h2>
+        <div class="quote">"주소록은 검색되게, 비상연락망은 순서대로"</div>
+        <ul class="added"><li class="old"><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>공지 · 할 일</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>주소록 · 팀별 · 검색</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>비상연락망 · 연락 순서 · 누르면 전화</li></ul>
+        <p class="tap-hint">주소록 탭에서 "대물"을 검색해 보세요</p>
       </div>
     </div>
   </div>
 </section>
-<section class="slide wide" data-accent="amber" data-title="대화 ④ 노하우 · 연락처"
-  data-notes="[대화 ④] 써 보다가 생긴 불편이 최고의 요청. '그 공업사 번호 뭐였지?'">
+
+<section class="slide wide" data-accent="amber" data-title="대화 ④ 메신저"
+  data-notes="[대화 ④] 써 보다가 생긴 요청. '할 일 넘겼으면 바로 말도 해야 하는데 단톡방으로 다시 가야 하네?'">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 대화 ④ · 써 보다 생긴 요청</span>
     <div class="chat">
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>쓰다 보니 "그 공업사 번호 뭐였지?"가 제일 많네. <b>공업사 · 병원 · 렌트 연락처랑 업무 요령</b>을 모아서 <b>검색</b>되게 해줘. 번호 누르면 바로 전화.</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>[노하우] 탭을 추가했어요. 종류별로 고르고, 이름 · 지역 · 메모 어디든 검색되며 찾은 글자는 노랗게 표시돼요. 번호를 누르면 전화가 걸려요.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>쓰다 보니 할 일 넘기고 나서 말하러 단톡방에 또 가게 되네. 여기에 <b>센터 메신저</b>도 넣어줘. 단톡방처럼, 안 읽은 건 숫자로.</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>[메신저] 탭을 추가했어요. 내 메시지는 오른쪽, 다른 사람은 이름과 함께 왼쪽에 보여요. 다른 탭에 있을 때 새 메시지가 오면 탭에 빨간 숫자가 떠요.</div></div>
     </div>
   </div>
 </section>
-<section class="slide wide" data-accent="amber" data-title="결과 ④ 노하우"
-  data-notes="[시연] 검색창에 '공업' 또는 '렌트' 입력. 종류 필터. '+ 등록'으로 하나 추가.">
+
+<section class="slide wide" data-accent="amber" data-title="결과 ④ 메신저"
+  data-notes="[시연] 메신저 탭에서 메시지 보내기 → 잠시 후 '이대물'의 답장이 온다(강의안용 가짜 답장). 탭 다섯 개가 다 갖춰진 완성 앱.">
   <div class="slide-inner">
     <div class="app-stage">
-      <div class="phone-frame"><div class="phone-screen"><div data-center="4" data-tab="tips"></div></div></div>
+      <div class="phone-frame"><div class="phone-screen"><div data-center="4" data-tab="chat"></div></div></div>
       <div class="app-side">
         <span class="badge">결과 ④ · 실제 작동</span>
-        <h2 class="subhead">센터 노하우가 <span class="accent">검색</span>됩니다</h2>
-        <div class="quote">"연락처랑 업무 요령, 검색되게"</div>
-        <ul class="added"><li class="old"><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>공지 · 근무 현황 · 인수인계</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>공업사 · 병원 · 렌트 · 견인 · 노하우</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>검색 · 누르면 전화</li></ul>
-        <p class="tap-hint">검색창에 "렌트"를 쳐 보세요</p>
+        <h2 class="subhead">센터가 <span class="accent">한 앱 안에</span></h2>
+        <div class="quote">"센터 메신저도, 단톡방처럼"</div>
+        <ul class="added"><li class="old"><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>공지 · 할 일 · 주소록 · 비상연락망</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>센터 메신저</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>안 읽은 메시지 숫자</li></ul>
+        <p class="tap-hint">메시지를 보내 보세요</p>
       </div>
     </div>
   </div>
 </section>
+
 <section class="slide wide compact" data-accent="indigo" data-title="대화 ⑤ 다 같이 쓰려면?"
   data-notes="[대화 ⑤ · 반전] 지금까지 만든 건 파일 하나라 내 폰에만 저장된다(되는 것 / 안 되는 것 장과 연결). 그런데 막히면 AI에게 물으면 된다. AI가 서버 붙이는 길을 알려 준다.
 멘트: '그래서 진짜로 붙여 봤습니다. 오늘 아침 진단 설문도 이렇게 만든 사이트입니다.'">
@@ -2010,8 +2189,8 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
   </div>
 </section>
 <section class="slide center" data-accent="indigo" data-title="직접 써 보세요 · QR"
-  data-notes="[같이 써 보기 · 5분] 진짜 사이트. 이름 입력 → 내 상태 체크 → 인수인계 하나(받는 사람은 옆 사람 이름) → 노하우 하나. 화면을 미러링해서 강사 폰에서도 같이 보여 주면, 글이 5초 안에 서로의 폰에 뜨는 걸 볼 수 있다.
-QR 주소는 오늘 날짜 방으로 만들어진다(같은 날 들어온 사람끼리 공유). 실제 고객 정보는 넣지 않게 다시 한 번 안내.">
+  data-notes="[같이 써 보기 · 5분] 진짜 사이트. 이름 입력 → 옆 사람에게 할 일 하나(날짜 · 담당자 선택) → 메신저로 한마디 → 주소록에 가짜 번호. 강사 폰 화면을 미러링하면 글이 몇 초 안에 서로의 폰에 뜨는 걸 볼 수 있다.
+QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제 고객 정보 · 실제 전화번호는 넣지 않게 다시 안내.">
   <div class="slide-inner">
     <span class="live"><i></i> 진짜 사이트</span>
     <div style="display:flex;gap:clamp(24px,4vw,64px);align-items:center;justify-content:center;flex-wrap:wrap;margin-top:clamp(12px,2vh,22px)">
@@ -2020,9 +2199,9 @@ QR 주소는 오늘 날짜 방으로 만들어진다(같은 날 들어온 사람
         <h2 class="subhead">직접 <span class="accent">써 보세요</span></h2>
         <ul class="list num-list">
           <li><span class="mk"></span><span><b>이름</b> 입력</span></li>
-          <li><span class="mk"></span><span>오늘 <b>내 상태</b> 체크</span></li>
-          <li><span class="mk"></span><span>옆 사람에게 <b>인수인계</b> 하나</span></li>
-          <li><span class="mk"></span><span><b>노하우</b> 하나 등록</span></li>
+          <li><span class="mk"></span><span>옆 사람에게 <b>할 일</b> 하나 (날짜 · 담당자)</span></li>
+          <li><span class="mk"></span><span><b>메신저</b>로 "넘겼어요" 한마디</span></li>
+          <li><span class="mk"></span><span><b>주소록</b>에 내 번호 (가짜로)</span></li>
         </ul>
         <p class="src" data-qr-url="/center"></p>
       </div>
@@ -2030,40 +2209,80 @@ QR 주소는 오늘 날짜 방으로 만들어진다(같은 날 들어온 사람
     <div class="callout warn" style="max-width:820px"><span class="bang">!</span><p>교육용 공간이에요. <b>실제 고객 이름 · 연락처 · 주민번호는 넣지 마세요.</b></p></div>
   </div>
 </section>
-<section class="slide" data-accent="coral" data-title="방금 무슨 일이"
-  data-notes="[정리] 대화 5번, 코드 0줄. 단계마다 배운 점을 짚기. 내일부터 이 흐름 그대로 여러분 업무로.">
+
+<!-- 마무리 -->
+<section class="slide center divider" data-accent="indigo" data-title="마무리"
+  data-notes="[1:52 · 8분] 강의 마무리. 오늘의 여정 → 한 문장 → 내일부터 할 세 가지 → 다시 진단 → 질문.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 방금 무슨 일이</span>
-    <h2 class="subhead">대화 <span class="accent">5번</span>, 코드 <span class="accent">0줄</span></h2>
-    <div class="flow" style="--n:5">
-      <div class="step"><span class="n">①</span><h3>정리 받기</h3><p>묻기만 하면 글이 온다</p></div>
-      <div class="step hot"><span class="n">②</span><h3>앱으로</h3><p>"어떻게 보이게"를 말하면 도구가 온다</p></div>
-      <div class="step"><span class="n">③</span><h3>인수인계</h3><p>기능은 한 번에 하나씩</p></div>
-      <div class="step"><span class="n">④</span><h3>노하우</h3><p>써 보다 생긴 불편이 최고의 요청</p></div>
-      <div class="step hot"><span class="n">⑤</span><h3>같이 쓰기</h3><p>한계도 AI에게 물으면 길이 나온다</p></div>
-    </div>
-    <div class="callout tip"><span class="bang">!</span><p>이 흐름 그대로, 이제 <b>여러분 업무</b>로 만듭니다.</p></div>
+    <span class="part-tag">마무리</span>
+    <h2 class="headline">오늘, <span class="accent">한 칸</span> 올라갔습니다</h2>
   </div>
 </section>
 
-<section class="slide wide" data-accent="coral" data-title="오늘 가져갈 세 가지"
-  data-notes="[1:55 · 마무리] 오늘 내용을 세 줄로. 내일 하나만 해 보기.">
+<section class="slide wide" data-accent="indigo" data-title="오늘의 여정"
+  data-notes="[여정 · 2분] 오늘 2시간을 한 장으로. 아침 진단에서 대부분 Lv.1(묻는 사람)이었다. 1부에서 AI가 어떻게 생각하는지 알고, 알려 주고 · 잘 시키고 · 파일로 받고 · 스킬로 심는 법(Lv.2 시키는 사람)을 봤다. 2부에서는 상자에 없는 도구를 말로 만드는 법(Lv.3 만드는 사람)을 봤다.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 오늘 가져갈 세 가지</span>
-    <div class="grid cols-3">
-      <div class="card"><span class="k">01</span><h3>같은 말 두 번이면</h3><p>맞춤 지침 · 스킬로 심어 두기</p></div>
-      <div class="card"><span class="k">02</span><h3>같은 일 매주라면</h3><p>예약 작업에 맡기기</p></div>
-      <div class="card hot"><span class="k">03</span><h3>필요한 도구가 있다면</h3><p>말로 만들기 · 막히면 AI에게 묻기</p></div>
+    <span class="eyebrow"><span class="dot"></span> 오늘의 여정</span>
+    <h2 class="subhead">묻는 사람에서 <span class="accent">시키는 사람</span>, 그리고 <span class="accent">만드는 사람</span>으로</h2>
+    <div class="journey">
+      <div class="jstop"><span class="jlv">아침 · Lv.1</span><h3>묻는 사람</h3><p>AI를 검색창처럼. 답을 받고 끝.</p></div>
+      <div class="jarrow"></div>
+      <div class="jstop"><span class="jlv">1부 · Lv.2</span><h3>시키는 사람</h3><p>AI가 어떻게 생각하는지 알고, 알려 주고 · 잘 시키고 · 파일로 받고 · 스킬로 심기.</p></div>
+      <div class="jarrow"></div>
+      <div class="jstop hot"><span class="jlv">2부 · Lv.3</span><h3>만드는 사람</h3><p>상자에 없는 도구를 말로 만들고, 동료와 나눠 쓰기.</p></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>오늘 다 기억하지 않아도 됩니다. <b>내일 한 칸만</b> 올라가면 됩니다.</p></div>
+  </div>
+</section>
+
+<section class="slide center mid" data-accent="coral" data-title="오늘의 한 문장"
+  data-notes="[한 문장] 잠깐 멈추고 천천히. 1부의 결론(시키기)과 2부의 결론(만들기)을 한 문장으로.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 오늘의 한 문장</span>
+    <p class="big-quote">묻지 말고, <span class="mark">시키세요.</span><br>시킬 도구가 없으면, <span class="mark">만드세요.</span></p>
+    <p class="lead wide">AI는 정답을 아는 학생이 아니라, <b>시키면 만들어 내는 학생</b>입니다.</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="내일부터 딱 세 가지"
+  data-notes="[실천 · 2분] 거창하게 말고 딱 세 가지. 시간 단위로 쪼개서: 내일 아침 5분 / 이번 주 / 이번 달. 맞춤 지침 예시와 첫 요청 템플릿은 강의안에 그대로 있으니 사진 찍어 가라고 안내.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 내일부터</span>
+    <h2 class="subhead">거창하게 말고, <span class="accent">딱 세 가지</span>만</h2>
+    <div class="grid cols-3 five">
+      <div class="card"><span class="k">내일 아침 · 5분</span><h3>맞춤 지침 붙여 넣기</h3><p>오늘 본 예시를 내 AI 설정에 붙여 넣기. 다음 대화부터 바로 달라집니다.</p><div class="ex">"나는 자동차보험 보상 담당자다…"</div></div>
+      <div class="card"><span class="k">이번 주</span><h3>프롬프트 하나를 스킬로</h3><p>제일 자주 쓰는 요청 하나를 골라 "스킬로 만들어줘".</p><div class="ex">세 번 복사했다면 스킬로</div></div>
+      <div class="card hot"><span class="k">이번 달</span><h3>도구 하나 만들기</h3><p>제일 귀찮은 일 하나를 골라, 첫 요청 템플릿으로 말해 보기.</p><div class="ex">"[누가] [언제] 쓰는 [무엇]을 HTML로"</div></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>어디서 막히든 방법은 같습니다. <b>"이거 하려면 어떻게 해? 나한테 필요한 걸 물어봐 줘."</b></p></div>
+  </div>
+</section>
+
+<section class="slide center" data-accent="amber" data-title="다시 진단해 보세요"
+  data-notes="[다시 진단 · 2분] 같은 QR, 같은 폰으로 다시 하면 응답이 새로 바뀐다(사람당 1건). 강의 시작 때 결과 화면을 캡처해 두었다가, 강사 화면(/host)에서 다시 결과를 공개해 비교하면 마무리 분위기가 좋다. 오늘 배운 걸 기준으로 '앞으로 할 수 있다'고 생각하는 쪽으로 답해 보라고 안내.">
+  <div class="slide-inner">
+    <span class="live"><i></i> 강의 전과 비교</span>
+    <div class="qr-row">
+      <div class="qr-card"><div data-qr="/"></div></div>
+      <div style="text-align:left;max-width:600px">
+        <h2 class="subhead">처음 그 진단, <span class="accent">다시</span> 해 보세요</h2>
+        <p class="desc" style="margin-top:.6em">같은 폰으로 다시 하면 응답이 새로 바뀝니다. 아침의 나와 지금의 나, 등급이 얼마나 달라졌을까요?</p>
+        <p class="src" data-qr-url="/" style="text-align:left"></p>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="slide center" data-accent="coral" data-title="정리 · Q&A"
-  data-notes="[마무리] 오늘 한 문장 각인 → 내일 할 일 하나 → 질문.">
+<section class="slide center title-slide" data-accent="indigo" data-title="감사합니다 · Q&A"
+  data-notes="[마무리] 감사 인사 → 질문 받기. 진단 사이트와 센터원은 오늘 이후에도 열려 있다고 안내(교육용, 실제 고객 정보 금지).">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 오늘의 정리</span>
-    <p class="big-quote">일하기 싫은 마음이<br><span class="mark">최고의 개발 기획서</span>입니다</p>
-    <p class="lead wide">내일, 제일 귀찮은 일 하나만 <strong>말로 시켜 보세요.</strong><br>질문 받겠습니다.</p>
+    <span class="kicker">생성형 AI 활용 업무 보조 바이브코딩</span>
+    <h1 class="headline">감사합니다</h1>
+    <p class="tagline">질문 받겠습니다</p>
+    <div class="meta-row">
+      <span class="chip"><b>1부</b> 시키는 사람</span>
+      <span class="chip"><b>2부</b> 만드는 사람</span>
+    </div>
   </div>
 </section>
 
@@ -4539,270 +4758,290 @@ var qrcode = function() {
 </script>
 <script>
 /* 센터원 업무 공유 — 화면 (사이트: 실제 저장 / 강의안: 가짜 예시 데이터)
-   CenterApp.mount(el, { mode:'live'|'demo', room, api, step, tab, notch }) */
+   CenterApp.mount(el, { mode:'live'|'demo', room, api, step, tab, notch })
+   step 2: 공지 · 할 일 / step 3: + 주소록 · 비상연락망 / step 4 이상: + 메신저 */
 (function () {
   'use strict';
 
-  var STATES = [
-    ['출근', '#0F9F8F'], ['외근', '#2F80ED'], ['휴가', '#E5484D'],
-    ['반차', '#E59A12'], ['교육', '#8B5CF6'], ['재택', '#8C8BA0'],
-  ];
-  var CATS = [
-    ['공업사', '#2F80ED', 'wrench'], ['병원', '#E5484D', 'cross'], ['렌트', '#0F9F8F', 'car'],
-    ['견인', '#E59A12', 'truck'], ['노하우', '#8B5CF6', 'bulb'], ['기타', '#8C8BA0', 'dot'],
-  ];
   var ICON = {
-    home: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
-    swap: '<path d="M7 7h12l-3-3"/><path d="M17 17H5l3 3"/>',
-    book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
-    pin: '<path d="M12 17v4"/><path d="M8 3h8l-1 6 3 4H6l3-4z"/>',
     bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+    pin: '<path d="M12 17v4"/><path d="M8 3h8l-1 6 3 4H6l3-4z"/>',
+    todo: '<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/><path d="M8 15l2.5 2.5L16 13"/>',
+    users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16 14.5a5 5 0 0 1 6 5"/>',
+    siren: '<path d="M6 18v-6a6 6 0 0 1 12 0v6"/><path d="M4 18h16v3H4z"/><path d="M12 3V1M4.5 5.5 3 4M19.5 5.5 21 4"/>',
+    chat: '<path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
     x: '<path d="M6 6l12 12M18 6L6 18"/>',
     check: '<path d="M5 12l5 5 9-10"/>',
-    arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
     phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
     user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
     warn: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>',
-    wrench: '<path d="M14 6a4 4 0 0 0 5 5l-9 9-3-3 9-9a4 4 0 0 0-2-2z"/>',
-    cross: '<path d="M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z"/>',
-    car: '<path d="M5 16l1.5-5h11L19 16"/><rect x="3" y="16" width="18" height="4" rx="1"/><circle cx="7" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/>',
-    truck: '<path d="M2 6h11v10H2z"/><path d="M13 10h4l4 4v2h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
-    bulb: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/>',
-    dot: '<circle cx="12" cy="12" r="4"/>',
+    send: '<path d="M4 12l16-8-6 17-3-7z"/><path d="M11 14l9-10"/>',
   };
   function svg(n) { return '<svg viewBox="0 0 24 24">' + ICON[n] + '</svg>'; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  function kst(d) { return new Date((d || Date.now()) + 9 * 3600e3); }
+  function kst(t) { return new Date((t || Date.now()) + 9 * 3600e3); }
   function today() { return kst().toISOString().slice(0, 10); }
   function addDays(n) { return kst(Date.now() + n * 864e5).toISOString().slice(0, 10); }
-  function prettyDate() {
-    var d = kst(); var w = '일월화수목금토'[d.getUTCDay()];
-    return (d.getUTCMonth() + 1) + '월 ' + d.getUTCDate() + '일 (' + w + ')';
-  }
+  var WK = '일월화수목금토';
+  function dayLabel(d) { var x = new Date(d + 'T00:00:00Z'); return (x.getUTCMonth() + 1) + '월 ' + x.getUTCDate() + '일 (' + WK[x.getUTCDay()] + ')'; }
+  function prettyToday() { return dayLabel(today()); }
+  function hhmm(ms) { var d = kst(ms); return String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0'); }
   function ago(ms) {
     var s = (Date.now() - ms) / 1000;
     if (s < 60) return '방금'; if (s < 3600) return Math.floor(s / 60) + '분 전';
     if (s < 86400) return Math.floor(s / 3600) + '시간 전'; return Math.floor(s / 86400) + '일 전';
   }
-  function dday(due) {
-    if (!due) return null;
-    var diff = Math.round((Date.parse(due) - Date.parse(today())) / 864e5);
-    if (diff === 0) return ['오늘까지', ''];
-    if (diff < 0) return [(-diff) + '일 지남', ''];
-    return ['D-' + diff, diff > 2 ? 'ok' : ''];
-  }
-  function stateColor(s) { for (var i = 0; i < STATES.length; i++) if (STATES[i][0] === s) return STATES[i][1]; return '#8C8BA0'; }
-  function cat(c) { for (var i = 0; i < CATS.length; i++) if (CATS[i][0] === c) return CATS[i]; return CATS[5]; }
   var AV = ['#4338CA', '#0F9F8F', '#E5484D', '#E59A12', '#2F80ED', '#8B5CF6', '#C2410C', '#0B7A6C'];
   function avColor(name) { var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0; return AV[h % AV.length]; }
+  function av(name) { return '<span class="ca-av" style="background:' + avColor(name || '?') + '">' + esc((name || '?').slice(0, 1)) + '</span>'; }
+  function tel(p) { return 'tel:' + String(p || '').replace(/[^0-9+]/g, ''); }
 
   // ---------- 예시 데이터 (모두 가짜)
   function sample() {
     var t = today();
     return [
       { kind: 'notice', author: '윤센터', data: { text: '이번 주 금요일 오후 4시 센터 회의 (3층 회의실)\n미결 건 현황 챙겨 와 주세요.', pin: true } },
-      { kind: 'notice', author: '이대물', data: { text: '렌트 협력업체 단가표가 바뀌었어요. 노하우 탭에 올려 뒀습니다.' } },
       { kind: 'notice', author: '박총무', data: { text: '연말 휴가 신청은 이번 달 말까지 부탁드립니다.' } },
-      { kind: 'status', author: '이대물', data: { date: t, state: '외근', note: '가나공업사 현장 확인, 15시 복귀' } },
-      { kind: 'status', author: '박대인', data: { date: t, state: '휴가', sub: '최렌트' } },
-      { kind: 'status', author: '최렌트', data: { date: t, state: '출근' } },
-      { kind: 'status', author: '정사정', data: { date: t, state: '교육', note: '오전 교육, 오후 복귀' } },
-      { kind: 'status', author: '한과실', data: { date: t, state: '반차', note: '오후 반차', sub: '김보상' } },
-      { kind: 'status', author: '윤센터', data: { date: t, state: '출근' } },
-      { kind: 'handover', author: '박대인', data: { caseNo: '2026-000123', title: '후미 추돌 · 수리 진행', to: '최렌트', progress: '공업사 입고, 견적 확인 완료. 렌트 사용 중', next: '출고 예정일 확인 후 렌트 종료 안내', due: addDays(1) } },
-      { kind: 'handover', author: '박대인', data: { caseNo: '2026-000187', title: '주차장 접촉 · 과실 협의', to: '최렌트', progress: '상대 보험사와 과실 협의 중', next: '상대사 회신 오면 고객에게 통화', due: addDays(3) } },
-      { kind: 'handover', author: '한과실', data: { caseNo: '2026-000201', title: '통원 치료 · 서류 대기', to: '김보상', progress: '진단서 접수, 통원 확인서 미제출', next: '고객에게 서류 재요청 문자', due: t } },
-      { kind: 'handover', author: '정사정', data: { caseNo: '2026-000099', title: '단독 사고 · 지급 완료', to: '이대물', progress: '지급 완료', next: '종결 처리' }, done: true },
-      { kind: 'tip', author: '이대물', data: { cat: '공업사', name: '가나공업사 (예시)', area: '○○구', phone: '02-000-1234', text: '수입차 판금 잘함. 견적 사진을 바로 보내 줌' } },
-      { kind: 'tip', author: '최렌트', data: { cat: '병원', name: '다라정형외과 (예시)', area: '△△동', phone: '02-000-5678', text: '서류 발급이 빠름. 오전 방문 추천' } },
-      { kind: 'tip', author: '이대물', data: { cat: '렌트', name: '마바렌트 (예시)', phone: '1588-0000', text: '야간 · 주말 배차 가능. 협력 단가는 공지 참고' } },
-      { kind: 'tip', author: '정사정', data: { cat: '견인', name: '사아견인 (예시)', phone: '010-0000-0000', text: '고속도로 출동이 빠름' } },
-      { kind: 'tip', author: '윤센터', data: { cat: '노하우', name: '과실 협의 전 체크', text: '블랙박스 원본부터 확보 → 과실비율 기준에서 사고 유형 먼저 찾아 두기' } },
-      { kind: 'tip', author: '최렌트', data: { cat: '노하우', name: '렌트 종료 안내 요령', text: '출고 확정 연락 받은 날 바로 렌트 종료 안내. 반납 시간까지 같이 안내' } },
+      { kind: 'notice', author: '이대물', data: { text: '렌트 협력업체 연락처가 바뀌었어요. 주소록 확인해 주세요.' } },
+      { kind: 'todo', author: '윤센터', data: { title: '주간 미결 건 점검', date: t, who: '김보상' } },
+      { kind: 'todo', author: '이대물', data: { title: '가나공업사 현장 확인', date: t, who: '이대물' } },
+      { kind: 'todo', author: '윤센터', data: { title: '분쟁심의 자료 준비', date: addDays(1), who: '박대인' } },
+      { kind: 'todo', author: '최렌트', data: { title: '렌트 종료 안내 문자 발송', date: addDays(2), who: '최렌트' } },
+      { kind: 'todo', author: '정사정', data: { title: '서류 미제출 건 재요청', date: addDays(-1), who: '김보상' } },
+      { kind: 'todo', author: '정사정', data: { title: '법정 교육 이수 확인', date: addDays(-1), who: '정사정' }, done: true },
+      { kind: 'contact', author: '박총무', data: { team: '센터', name: '윤센터', role: '센터장', ext: '1000', phone: '010-0000-0001' } },
+      { kind: 'contact', author: '박총무', data: { team: '센터', name: '박총무', role: '총무', ext: '1001', phone: '010-0000-0009' } },
+      { kind: 'contact', author: '박총무', data: { team: '대물1팀', name: '김보상', role: '과장', ext: '1101', phone: '010-0000-0002' } },
+      { kind: 'contact', author: '박총무', data: { team: '대물1팀', name: '이대물', role: '대리', ext: '1102', phone: '010-0000-0003' } },
+      { kind: 'contact', author: '박총무', data: { team: '대물2팀', name: '최렌트', role: '주임', ext: '1201', phone: '010-0000-0004' } },
+      { kind: 'contact', author: '박총무', data: { team: '대물2팀', name: '정사정', role: '사원', ext: '1202', phone: '010-0000-0005' } },
+      { kind: 'contact', author: '박총무', data: { team: '대인팀', name: '박대인', role: '과장', ext: '1301', phone: '010-0000-0006' } },
+      { kind: 'contact', author: '박총무', data: { team: '대인팀', name: '한과실', role: '대리', ext: '1302', phone: '010-0000-0007' } },
+      { kind: 'emergency', author: '박총무', data: { group: 'chain', step: 1, name: '윤센터', role: '센터장 · 최초 보고', phone: '010-0000-0001' } },
+      { kind: 'emergency', author: '박총무', data: { group: 'chain', step: 2, name: '김보상', role: '대물1팀 대표', phone: '010-0000-0002' } },
+      { kind: 'emergency', author: '박총무', data: { group: 'chain', step: 2, name: '박대인', role: '대인팀 대표', phone: '010-0000-0006' } },
+      { kind: 'emergency', author: '박총무', data: { group: 'chain', step: 3, name: '각 팀원', role: '팀 대표가 순서대로 연락', phone: '' } },
+      { kind: 'emergency', author: '박총무', data: { group: 'ext', name: '건물 관리실 (예시)', role: '정전 · 누수 · 출입', phone: '02-000-0000' } },
+      { kind: 'emergency', author: '박총무', data: { group: 'ext', name: '긴급출동 접수 (예시)', role: '현장 출동 요청', phone: '1588-0000' } },
+      { kind: 'message', author: '윤센터', data: { text: '오늘 오후 회의는 4시입니다. 늦지 않게 와 주세요.' } },
+      { kind: 'message', author: '이대물', data: { text: '넵! 공업사 들렀다가 바로 가겠습니다.' } },
+      { kind: 'message', author: '최렌트', data: { text: '회의 자료는 공지에 올려 두었어요.' } },
     ];
   }
+  var REPLIES = ['확인했습니다!', '넵, 알겠습니다.', '오후에 다시 말씀드릴게요.', '좋습니다 👍', '제가 챙겨 볼게요.'];
 
   // ---------- 저장소: 강의안용 (메모리)
   var demoItems = null;
-  function demoStore() {
+  function demoStore(me) {
     if (!demoItems) {
-      var base = Date.now();
+      var base = Date.now(), n = 0;
       demoItems = sample().map(function (x, i) {
-        return { id: 'd' + i, kind: x.kind, author: x.author, data: x.data, done: !!x.done, at: base - (i + 1) * 47 * 60e3, mine: x.author === '김보상' };
+        var at = x.kind === 'message' ? base - (12 - (n++) * 4) * 60e3 : base - (i + 1) * 37 * 60e3;
+        return { id: 'd' + i, kind: x.kind, author: x.author, data: x.data, done: !!x.done, at: at };
       });
     }
+    function mark() { return demoItems.map(function (x) { var y = Object.assign({}, x); y.mine = x.author === me; return y; }); }
     return {
-      load: function () { return Promise.resolve({ today: today(), items: demoItems.slice() }); },
+      load: function () { return Promise.resolve({ today: today(), items: mark() }); },
       send: function (a) {
         if (a.op === 'delete') demoItems = demoItems.filter(function (x) { return x.id !== a.id; });
         else if (a.op === 'done') demoItems.forEach(function (x) { if (x.id === a.id) x.done = !x.done; });
-        else if (a.op === 'add') {
-          if (a.kind === 'status') demoItems = demoItems.filter(function (x) { return !(x.kind === 'status' && x.mine); });
-          demoItems.unshift({ id: 'n' + Date.now(), kind: a.kind, author: a.author, data: a.data, done: false, at: Date.now(), mine: true });
-        }
+        else if (a.op === 'add') demoItems.push({ id: 'n' + Date.now() + Math.random(), kind: a.kind, author: a.author, data: a.data, done: false, at: Date.now() });
         return Promise.resolve({ ok: true });
+      },
+      fakeReply: function () {
+        demoItems.push({ id: 'r' + Date.now(), kind: 'message', author: '이대물', data: { text: REPLIES[Math.floor(Math.random() * REPLIES.length)] }, done: false, at: Date.now() });
       },
     };
   }
 
   // ---------- 저장소: 사이트용 (서버)
   function liveStore(api, room, cid) {
+    function j(r) { return r.json().then(function (x) { if (!r.ok) throw new Error(x.error || r.status); return x; }); }
     return {
-      load: function () {
-        return fetch(api + '?room=' + encodeURIComponent(room), { headers: { 'x-cid': cid }, cache: 'no-store' })
-          .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || r.status); return j; }); });
-      },
+      load: function () { return fetch(api + '?room=' + encodeURIComponent(room), { headers: { 'x-cid': cid }, cache: 'no-store' }).then(j); },
       send: function (a) {
         a.room = room; a.cid = cid;
-        return fetch(api, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) })
-          .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || r.status); return j; }); });
+        return fetch(api, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).then(j);
       },
     };
   }
-
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  var TABS = [['notice', '공지', 'bell', '센터 공지'], ['todo', '할 일', 'todo', '할 일'], ['contact', '주소록', 'users', '센터 주소록'], ['emergency', '비상연락', 'siren', '비상연락망'], ['chat', '메신저', 'chat', '센터 메신저']];
 
   function mount(root, opts) {
     opts = opts || {};
     var live = opts.mode === 'live';
     var step = live ? 5 : (opts.step || 4);
-    var tabs = [['home', '홈', 'home']];
-    if (step >= 3) tabs.push(['handover', '인수인계', 'swap']);
-    if (step >= 4) tabs.push(['tips', '노하우', 'book']);
-    var tab = opts.tab || 'home';
+    var allow = step >= 4 ? 5 : step >= 3 ? 4 : 2;
+    var tabs = TABS.slice(0, allow);
+    var tab = opts.tab || 'notice';
     var me = live ? (lsGet('ca:name') || '') : '김보상';
     var cid = lsGet('ca:cid');
     if (!cid) { cid = 'c' + Math.random().toString(36).slice(2) + Date.now().toString(36); lsSet('ca:cid', cid); }
-    var store = live ? liveStore(opts.api || '/api/center', opts.room || 'main', cid) : demoStore();
-    var data = { today: today(), items: [] };
-    var hoFilter = 'all', tipCat = '전체', query = '';
-    var online = true, lastJson = '';
+    var store = live ? liveStore(opts.api || '/api/center', opts.room || 'main', cid) : demoStore(me);
+    var data = { items: [] };
+    var todoFilter = 'open', query = '', online = true, lastJson = '', chatSeen = Number(lsGet('ca:chatSeen') || 0), stickBottom = true;
 
     root.classList.add('ca');
     root.innerHTML = '';
     var head = el('div', 'ca-head' + (opts.notch ? ' pad-top' : ''));
     var scroll = el('div', 'ca-scroll');
+    var compose = el('form', 'ca-compose', '<input placeholder="메시지 입력" maxlength="300" autocomplete="off"><button type="submit" aria-label="보내기">' + svg('send') + '</button>');
     var bar = el('div', 'ca-tabbar');
-    root.appendChild(head); root.appendChild(scroll);
-    if (tabs.length > 1) root.appendChild(bar);
+    root.appendChild(head); root.appendChild(scroll); root.appendChild(compose); root.appendChild(bar);
 
     function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
     function toast(msg) { var t = el('div', 'ca-toast', esc(msg)); root.appendChild(t); setTimeout(function () { t.remove(); }, 1800); }
     function of(kind) { return data.items.filter(function (x) { return x.kind === kind; }); }
+    function people() {
+      var n = of('contact').map(function (c) { return c.data.name; });
+      if (me) n.unshift(me);
+      return n.filter(function (x, i, a) { return x && a.indexOf(x) === i; });
+    }
 
     function refresh() {
       return store.load().then(function (d) {
         online = true;
         var j = JSON.stringify(d);
         if (j !== lastJson) { lastJson = j; data = d; draw(); } else drawHead();
-      }, function (e) { online = false; drawHead(); if (live && !data.items.length) scroll.innerHTML = '<div class="ca-sec"><div class="ca-empty">불러오지 못했어요. 잠시 후 다시 시도해 주세요.<br>' + esc(e.message) + '</div></div>'; });
+      }, function (e) {
+        online = false; drawHead();
+        if (live && !data.items.length) scroll.innerHTML = '<div class="ca-sec"><div class="ca-empty">불러오지 못했어요. 잠시 후 다시 시도해 주세요.<br>' + esc(e.message) + '</div></div>';
+      });
     }
     function act(a) {
-      if (live && !me) { askName(function () { act(a); }); return; }
+      if (live && !me) { askName(function () { act(a); }); return Promise.resolve(); }
       a.author = me;
       return store.send(a).then(refresh, function (e) { toast('저장하지 못했어요: ' + e.message); });
     }
 
     // ---------- 머리
     function drawHead() {
-      var st = of('status'); var cnt = {};
-      st.forEach(function (s) { cnt[s.data.state] = (cnt[s.data.state] || 0) + 1; });
-      var sum = ['출근', '외근', '휴가', '반차', '교육', '재택'].filter(function (k) { return cnt[k]; })
-        .map(function (k) { return '<span>' + k + '<b>' + cnt[k] + '</b></span>'; }).join('');
+      var t = TABS.filter(function (x) { return x[0] === tab; })[0];
+      var sum = '';
+      if (tab === 'todo' || tab === 'notice') {
+        var td = of('todo'), d0 = today();
+        var c = { today: 0, late: 0, mine: 0 };
+        td.forEach(function (x) { if (x.done) return; if (x.data.date === d0) c.today++; if (x.data.date < d0) c.late++; if (x.data.who === me) c.mine++; });
+        if (allow >= 2) sum = '<div class="ca-sum"><span>오늘 할 일<b>' + c.today + '</b></span><span>밀린 일<b>' + c.late + '</b></span>' + (me ? '<span>내 할 일<b>' + c.mine + '</b></span>' : '') + '</div>';
+      }
       head.innerHTML =
         '<div class="ca-top"><div class="ca-logo"><i>C1</i>센터원</div>' +
         '<button class="ca-me" data-a="name">' + svg('user') + esc(me || '이름 설정') + '</button></div>' +
-        '<div class="ca-date">' + prettyDate() + (live ? ' · <span class="ca-live' + (online ? '' : ' off') + '"><i></i>' + (online ? '실시간' : '연결 끊김') + '</span>' : '') + '</div>' +
-        '<div class="ca-title">' + (tab === 'home' ? '오늘 우리 센터' : tab === 'handover' ? '인수인계' : '센터 노하우') + '</div>' +
-        (tab === 'home' && sum ? '<div class="ca-sum">' + sum + '</div>' : '');
+        '<div class="ca-date">' + prettyToday() + (live ? ' · <span class="ca-live' + (online ? '' : ' off') + '"><i></i>' + (online ? '실시간' : '연결 끊김') + '</span>' : '') + '</div>' +
+        '<div class="ca-title">' + t[3] + '</div>' + sum;
     }
 
-    // ---------- 홈: 공지 + 근무 현황
-    function drawHome() {
-      var notices = of('notice').sort(function (a, b) { return (b.data.pin ? 1 : 0) - (a.data.pin ? 1 : 0) || b.at - a.at; });
-      var st = of('status');
-      var mine = st.filter(function (s) { return s.mine; })[0];
-      var h = (live ? '<div class="ca-warn">' + svg('warn') + '<span>교육용 공유 공간이에요. 실제 고객 이름 · 연락처 · 주민번호는 넣지 마세요.</span></div>' : '');
-      h += '<div class="ca-sec"><div class="ca-sec-h"><h3>' + svg('bell') + '공지</h3><button class="ca-add" data-a="notice">' + svg('plus') + '공지</button></div><div class="ca-list">';
-      h += notices.length ? notices.map(function (n) {
+    // ---------- 공지
+    function drawNotice() {
+      var list = of('notice').sort(function (a, b) { return (b.data.pin ? 1 : 0) - (a.data.pin ? 1 : 0) || b.at - a.at; });
+      var h = live ? '<div class="ca-warn">' + svg('warn') + '<span>교육용 공유 공간이에요. 실제 고객 이름 · 연락처 · 주민번호는 넣지 마세요.</span></div>' : '';
+      h += '<div class="ca-sec"><div class="ca-sec-h"><h3>' + svg('bell') + '공지 <small>' + list.length + '개</small></h3><button class="ca-add" data-a="notice">' + svg('plus') + '공지</button></div><div class="ca-list">';
+      h += list.length ? list.map(function (n) {
         return '<div class="ca-card ca-notice' + (n.data.pin ? ' pinned' : '') + '"><span class="pin">' + svg(n.data.pin ? 'pin' : 'bell') + '</span><div style="flex:1;min-width:0"><div class="tx">' + esc(n.data.text) + '</div>' +
           '<div class="ca-meta">' + esc(n.author) + ' · ' + ago(n.at) + (n.mine ? ' <button class="ca-del" data-del="' + n.id + '">삭제</button>' : '') + '</div></div></div>';
       }).join('') : '<div class="ca-empty">아직 공지가 없어요</div>';
-      h += '</div></div>';
-
-      h += '<div class="ca-sec"><div class="ca-sec-h"><h3>' + svg('user') + '오늘 근무 <small>' + st.length + '명</small></h3></div>';
-      h += '<div class="ca-card"><div style="font-weight:800;font-size:.8em;color:var(--sub);margin-bottom:.5em">내 상태 ' + (mine ? '· <b style="color:var(--ink)">' + esc(mine.data.state) + '</b>' : '선택') + '</div><div class="ca-mystat">' +
-        STATES.map(function (s) { var on = mine && mine.data.state === s[0]; return '<button class="ca-chip' + (on ? ' on' : '') + '" style="' + (on ? 'background:' + s[1] : '') + '" data-st="' + s[0] + '">' + s[0] + '</button>'; }).join('') +
-        '</div></div>';
-      var order = {}; STATES.forEach(function (s, i) { order[s[0]] = i; });
-      st.sort(function (a, b) { return (order[a.data.state] - order[b.data.state]) || a.author.localeCompare(b.author); });
-      h += '<div class="ca-people">' + (st.length ? st.map(function (s) {
-        var c = stateColor(s.data.state);
-        var note = [s.data.note, s.data.sub ? '대직 ' + s.data.sub : ''].filter(Boolean).join(' · ');
-        return '<div class="ca-card ca-person"><span class="ca-av" style="background:' + avColor(s.author) + '">' + esc(s.author.slice(0, 1)) + '</span>' +
-          '<div><div class="nm">' + esc(s.author) + (s.mine ? ' <small style="color:var(--faint)">(나)</small>' : '') + '</div>' + (note ? '<div class="nt">' + esc(note) + '</div>' : '') + '</div>' +
-          '<span class="ca-badge" style="background:' + c + '">' + esc(s.data.state) + '</span></div>';
-      }).join('') : '<div class="ca-empty">아직 아무도 체크하지 않았어요</div>') + '</div></div>';
-      return h;
-    }
-
-    // ---------- 인수인계
-    function drawHandover() {
-      var all = of('handover').sort(function (a, b) { return (a.done - b.done) || String(a.data.due || '9').localeCompare(String(b.data.due || '9')) || b.at - a.at; });
-      var list = all.filter(function (x) {
-        if (hoFilter === 'tome') return !x.done && x.data.to === me;
-        if (hoFilter === 'byme') return !x.done && x.author === me;
-        if (hoFilter === 'done') return x.done;
-        return !x.done;
-      });
-      var tome = all.filter(function (x) { return !x.done && x.data.to === me; }).length;
-      var h = '<div class="ca-sec"><div class="ca-sec-h"><h3>' + svg('swap') + '진행 중 <small>' + all.filter(function (x) { return !x.done; }).length + '건</small></h3><button class="ca-add" data-a="handover">' + svg('plus') + '인수인계</button></div>';
-      h += '<div class="ca-filter">' + [['all', '전체'], ['tome', '나에게 온 것' + (tome ? ' ' + tome : '')], ['byme', '내가 넘긴 것'], ['done', '완료']].map(function (f) {
-        return '<button class="' + (hoFilter === f[0] ? 'on' : '') + '" data-hf="' + f[0] + '">' + f[1] + '</button>';
-      }).join('') + '</div><div class="ca-list">';
-      h += list.length ? list.map(function (x) {
-        var d = x.done ? null : dday(x.data.due);
-        return '<div class="ca-card ca-ho' + (x.done ? ' done' : '') + '"><div class="row1"><span class="no">' + esc(x.data.caseNo || '번호 없음') + '</span>' + (d ? '<span class="due ' + d[1] + '">' + d[0] + '</span>' : '') + '</div>' +
-          '<div class="tt">' + esc(x.data.title) + '</div>' +
-          '<div class="flow"><b>' + esc(x.author) + '</b>' + svg('arrow') + '<b>' + esc(x.data.to || '누구나') + '</b></div>' +
-          (x.data.progress ? '<div class="box"><em>진행 상황</em>' + esc(x.data.progress) + '</div>' : '') +
-          (x.data.next ? '<div class="box"><em>다음 할 일</em>' + esc(x.data.next) + '</div>' : '') +
-          '<div class="acts"><span class="ca-meta">' + ago(x.at) + (x.mine ? ' <button class="ca-del" data-del="' + x.id + '">삭제</button>' : '') + '</span>' +
-          '<button class="ca-done-btn" data-done="' + x.id + '">' + svg('check') + (x.done ? '되돌리기' : '처리 완료') + '</button></div></div>';
-      }).join('') : '<div class="ca-empty">' + (hoFilter === 'tome' ? '나에게 온 인수인계가 없어요' : '해당하는 인수인계가 없어요') + '</div>';
       return h + '</div></div>';
     }
 
-    // ---------- 노하우
+    // ---------- 할 일
+    function drawTodo() {
+      var d0 = today(), d1 = addDays(1);
+      var all = of('todo');
+      var list = all.filter(function (x) {
+        if (todoFilter === 'mine') return !x.done && x.data.who === me;
+        if (todoFilter === 'done') return x.done;
+        return !x.done;
+      }).sort(function (a, b) { return (a.data.date || '').localeCompare(b.data.date || '') || a.at - b.at; });
+      var h = '<div class="ca-sec"><div class="ca-sec-h"><h3>' + svg('todo') + '할 일</h3><button class="ca-add" data-a="todo">' + svg('plus') + '할 일</button></div>';
+      h += '<div class="ca-filter">' + [['open', '진행 중'], ['mine', '내 할 일'], ['done', '완료']].map(function (f) {
+        return '<button class="' + (todoFilter === f[0] ? 'on' : '') + '" data-tf="' + f[0] + '">' + f[1] + '</button>';
+      }).join('') + '</div>';
+      if (!list.length) return h + '<div class="ca-empty">' + (todoFilter === 'mine' ? '나에게 배정된 할 일이 없어요' : '할 일이 없어요') + '</div></div>';
+      var last = null;
+      list.forEach(function (x) {
+        var d = x.data.date || '';
+        var key = !x.done && d < d0 ? 'late' : d;
+        if (key !== last) {
+          last = key;
+          var lab = key === 'late' ? '밀린 일' : d === d0 ? '오늘 · ' + dayLabel(d) : d === d1 ? '내일 · ' + dayLabel(d) : dayLabel(d);
+          h += '<div class="ca-day' + (key === 'late' ? ' late' : d === d0 ? ' today' : '') + '">' + lab + '</div>';
+        }
+        h += '<div class="ca-card ca-todo' + (x.done ? ' done' : '') + '" style="margin-bottom:.45em"><button class="ck" data-done="' + x.id + '" aria-label="완료 표시">' + svg('check') + '</button>' +
+          '<div><div class="tt">' + esc(x.data.title) + '</div><div class="ca-meta">' + (key === 'late' ? dayLabel(d) + ' · ' : '') + esc(x.author) + '님이 등록' + (x.mine ? ' <button class="ca-del" data-del="' + x.id + '">삭제</button>' : '') + '</div></div>' +
+          '<span class="ca-who">' + av(x.data.who) + esc(x.data.who) + '</span></div>';
+      });
+      return h + '</div>';
+    }
+
+    // ---------- 주소록
     function hl(s) {
       var t = esc(s); if (!query) return t;
       var q = esc(query).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       return t.replace(new RegExp(q, 'gi'), function (m) { return '<mark class="ca-hl">' + m + '</mark>'; });
     }
-    function drawTips() {
+    function drawContact() {
       var q = query.toLowerCase();
-      var list = of('tip').filter(function (x) {
-        if (tipCat !== '전체' && x.data.cat !== tipCat) return false;
-        if (!q) return true;
-        return [x.data.name, x.data.area, x.data.phone, x.data.text, x.data.cat, x.author].join(' ').toLowerCase().indexOf(q) >= 0;
-      }).sort(function (a, b) { return b.at - a.at; });
-      var h = '<div class="ca-sec"><div class="ca-search">' + svg('search') + '<input id="caQ" placeholder="공업사, 병원, 지역, 노하우 검색" value="' + esc(query) + '"></div>';
-      h += '<div class="ca-filter">' + ['전체'].concat(CATS.map(function (c) { return c[0]; })).map(function (c) {
-        return '<button class="' + (tipCat === c ? 'on' : '') + '" data-tc="' + c + '">' + c + '</button>';
-      }).join('') + '</div>';
-      h += '<div class="ca-sec-h"><h3>' + svg('book') + '목록 <small>' + list.length + '개</small></h3><button class="ca-add" data-a="tip">' + svg('plus') + '등록</button></div><div class="ca-list">';
-      h += list.length ? list.map(function (x) {
-        var c = cat(x.data.cat);
-        return '<div class="ca-card ca-tip"><span class="ic" style="background:' + c[1] + '">' + svg(c[2]) + '</span><div style="min-width:0">' +
-          '<div class="nm">' + hl(x.data.name) + '<span class="cat">' + esc(x.data.cat) + (x.data.area ? ' · ' + hl(x.data.area) : '') + '</span></div>' +
-          (x.data.text ? '<div class="tx">' + hl(x.data.text) + '</div>' : '') +
-          (x.data.phone ? '<a class="ph" href="tel:' + esc(x.data.phone.replace(/[^0-9+]/g, '')) + '">' + svg('phone') + hl(x.data.phone) + '</a>' : '') +
-          '<div class="ca-meta">' + esc(x.author) + ' · ' + ago(x.at) + (x.mine ? ' <button class="ca-del" data-del="' + x.id + '">삭제</button>' : '') + '</div></div></div>';
-      }).join('') : '<div class="ca-empty">' + (q ? '"' + esc(query) + '" 검색 결과가 없어요' : '아직 등록된 게 없어요') + '</div>';
+      var list = of('contact').filter(function (x) {
+        return !q || [x.data.team, x.data.name, x.data.role, x.data.ext, x.data.phone].join(' ').toLowerCase().indexOf(q) >= 0;
+      }).sort(function (a, b) { return (a.data.team || '').localeCompare(b.data.team || '') || (a.data.name || '').localeCompare(b.data.name || ''); });
+      var h = '<div class="ca-sec"><div class="ca-search">' + svg('search') + '<input id="caQ" placeholder="이름 · 팀 · 번호 검색" value="' + esc(query) + '"></div>';
+      h += '<div class="ca-sec-h"><h3>' + svg('users') + '주소록 <small>' + list.length + '명</small></h3><button class="ca-add" data-a="contact">' + svg('plus') + '추가</button></div>';
+      if (!list.length) return h + '<div class="ca-empty">' + (q ? '"' + esc(query) + '" 검색 결과가 없어요' : '아직 등록된 사람이 없어요') + '</div></div>';
+      var last = null;
+      list.forEach(function (x) {
+        if (x.data.team !== last) { last = x.data.team; h += '<div class="ca-team">' + esc(last || '팀 없음') + '</div>'; }
+        h += '<div class="ca-card ca-contact" style="margin-bottom:.45em">' + av(x.data.name) + '<div><div class="nm">' + hl(x.data.name) + '<small>' + hl(x.data.role) + '</small></div>' +
+          '<div class="ln">' + (x.data.ext ? '<a class="ca-call" href="' + tel(x.data.ext) + '">내선 ' + hl(x.data.ext) + '</a>' : '') +
+          (x.data.phone ? '<a class="ca-call" href="' + tel(x.data.phone) + '">' + svg('phone') + hl(x.data.phone) + '</a>' : '') +
+          (x.mine ? '<button class="ca-del" data-del="' + x.id + '">삭제</button>' : '') + '</div></div></div>';
+      });
+      return h + '</div>';
+    }
+
+    // ---------- 비상연락망
+    function drawEmergency() {
+      var all = of('emergency');
+      var chain = all.filter(function (x) { return x.data.group !== 'ext'; }).sort(function (a, b) { return (a.data.step || 9) - (b.data.step || 9) || a.at - b.at; });
+      var ext = all.filter(function (x) { return x.data.group === 'ext'; });
+      var h = '<div class="ca-sec"><div class="ca-sec-h"><h3>' + svg('siren') + '연락 순서</h3><button class="ca-add" data-a="emergency">' + svg('plus') + '추가</button></div>';
+      if (!chain.length) h += '<div class="ca-empty">연락 순서가 없어요</div>';
+      else {
+        var steps = {}; chain.forEach(function (x) { (steps[x.data.step] = steps[x.data.step] || []).push(x); });
+        h += '<div class="ca-chain">' + Object.keys(steps).sort(function (a, b) { return a - b; }).map(function (s) {
+          return '<div class="ca-step"><span class="no">' + s + '차</span><div><div class="lab">' + (s === '1' ? '가장 먼저' : (s - 1) + '차가 연락') + '</div><div class="ppl">' +
+            steps[s].map(function (x) {
+              return '<div class="ca-card"><div class="nm">' + esc(x.data.name) + '<small>' + esc(x.data.role) + '</small></div>' +
+                (x.data.phone ? '<a class="ca-call" href="' + tel(x.data.phone) + '">' + svg('phone') + esc(x.data.phone) + '</a>' : '') + '</div>';
+            }).join('') + '</div></div></div>';
+        }).join('') + '</div>';
+      }
+      h += '</div><div class="ca-sec ca-ext"><div class="ca-sec-h"><h3>' + svg('warn') + '외부 긴급 연락처</h3></div><div class="ca-list">';
+      h += ext.length ? ext.map(function (x) {
+        return '<div class="ca-card"><div><div style="font-weight:900;font-size:.92em">' + esc(x.data.name) + '</div><div class="ca-meta" style="margin-top:.1em">' + esc(x.data.role) + '</div></div>' +
+          (x.data.phone ? '<a class="ca-call" href="' + tel(x.data.phone) + '">' + svg('phone') + esc(x.data.phone) + '</a>' : '') + '</div>';
+      }).join('') : '<div class="ca-empty">등록된 외부 연락처가 없어요</div>';
       return h + '</div></div>';
+    }
+
+    // ---------- 메신저
+    function drawChat() {
+      var list = of('message').sort(function (a, b) { return a.at - b.at; }).slice(-200);
+      if (!list.length) return '<div class="ca-chat"><div class="ca-empty">첫 메시지를 보내 보세요</div></div>';
+      return '<div class="ca-chat">' + list.map(function (x) {
+        if (x.mine) return '<div class="ca-msg me"><div><div class="bb">' + esc(x.data.text) + '</div><div class="tm">' + hhmm(x.at) + '</div></div></div>';
+        return '<div class="ca-msg">' + av(x.author) + '<div><div class="nm">' + esc(x.author) + '</div><div class="bb">' + esc(x.data.text) + '</div><div class="tm">' + hhmm(x.at) + '</div></div></div>';
+      }).join('') + '</div>';
+    }
+
+    function unread() {
+      if (allow < 5 || tab === 'chat') return 0;
+      return of('message').filter(function (x) { return !x.mine && x.at > chatSeen; }).length;
     }
 
     function draw() {
@@ -4810,21 +5049,30 @@ var qrcode = function() {
       var keepFocus = document.activeElement && document.activeElement.id === 'caQ' && root.contains(document.activeElement);
       var pos = keepFocus ? document.activeElement.selectionStart : 0;
       var y = scroll.scrollTop;
-      var h = tab === 'home' ? drawHome() : tab === 'handover' ? drawHandover() : drawTips();
+      var nearBottom = scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight < 60;
+      var h = tab === 'notice' ? drawNotice() : tab === 'todo' ? drawTodo() : tab === 'contact' ? drawContact() : tab === 'emergency' ? drawEmergency() : drawChat();
       if (live && !data.items.length && online) h += '<div class="ca-seed"><button data-a="seed">예시 데이터로 채워 보기</button></div>';
       scroll.innerHTML = h;
-      scroll.scrollTop = y;
+      if (tab === 'chat') {
+        if (stickBottom || nearBottom) scroll.scrollTop = scroll.scrollHeight; else scroll.scrollTop = y;
+        stickBottom = false;
+        var last = of('message').reduce(function (m, x) { return Math.max(m, x.at); }, 0);
+        if (last > chatSeen) { chatSeen = last; lsSet('ca:chatSeen', String(last)); }
+      } else scroll.scrollTop = y;
+      compose.style.display = tab === 'chat' ? '' : 'none';
       if (keepFocus) { var q = root.querySelector('#caQ'); q.focus(); q.setSelectionRange(pos, pos); }
-      var tome = of('handover').filter(function (x) { return !x.done && x.data.to === me; }).length;
+      var mineTodo = of('todo').filter(function (x) { return !x.done && x.data.who === me && x.data.date <= today(); }).length;
+      var un = unread();
       bar.innerHTML = tabs.map(function (t) {
-        return '<button class="' + (tab === t[0] ? 'on' : '') + '" data-tab="' + t[0] + '">' + svg(t[2]) + '<span>' + t[1] + '</span>' + (t[0] === 'handover' && tome ? '<span class="dot">' + tome + '</span>' : '') + '</button>';
+        var dot = t[0] === 'todo' && mineTodo ? mineTodo : t[0] === 'chat' && un ? un : 0;
+        return '<button class="' + (tab === t[0] ? 'on' : '') + '" data-tab="' + t[0] + '">' + svg(t[2]) + '<span>' + t[1] + '</span>' + (dot ? '<span class="dot">' + dot + '</span>' : '') + '</button>';
       }).join('');
     }
 
     // ---------- 입력 시트
     function sheet(title, body, onSubmit) {
       var bg = el('div', 'ca-sheet-bg');
-      bg.innerHTML = '<div class="ca-sheet"><h4>' + esc(title) + '<button class="ca-x" data-x>' + svg('x') + '</button></h4><form class="ca-f">' + body + '<button class="ca-go" type="submit">저장</button></form></div>';
+      bg.innerHTML = '<div class="ca-sheet"><h4>' + esc(title) + '<button class="ca-x" data-x type="button">' + svg('x') + '</button></h4><form class="ca-f">' + body + '<button class="ca-go" type="submit">저장</button></form></div>';
       root.appendChild(bg);
       var form = bg.querySelector('form');
       function close() { bg.remove(); }
@@ -4841,46 +5089,50 @@ var qrcode = function() {
         if (!v.n) return false; me = v.n; lsSet('ca:name', me); draw(); if (then) then();
       });
     }
+    function opts2(list, sel) { return list.map(function (n) { return '<option' + (n === sel ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join(''); }
     var forms = {
       notice: function () {
         sheet('공지 올리기', '<label>내용<textarea name="text" maxlength="200" required placeholder="예: 금요일 16시 센터 회의"></textarea></label><label class="chk"><input type="checkbox" name="pin">맨 위에 고정</label>',
           function (v) { if (!v.text) return false; act({ op: 'add', kind: 'notice', data: { text: v.text, pin: v.pin } }); toast('공지를 올렸어요'); });
       },
-      handover: function () {
-        var people = of('status').map(function (s) { return s.author; }).filter(function (n, i, a) { return n !== me && a.indexOf(n) === i; });
-        sheet('인수인계 남기기',
-          '<div class="two"><label>사고번호<input name="caseNo" maxlength="20" placeholder="2026-000000"></label><label>받는 사람<input name="to" maxlength="12" list="caPeople" required placeholder="이름"></label></div>' +
-          '<datalist id="caPeople">' + people.map(function (p) { return '<option value="' + esc(p) + '">'; }).join('') + '</datalist>' +
-          '<label>건 요약<input name="title" maxlength="40" required placeholder="예: 후미 추돌 · 수리 진행"></label>' +
-          '<label>진행 상황<textarea name="progress" maxlength="200" placeholder="어디까지 했나요?"></textarea></label>' +
-          '<label>다음 할 일<input name="next" maxlength="120" placeholder="받는 사람이 할 일"></label>' +
-          '<label>기한<input type="date" name="due" value="' + addDays(1) + '"></label>',
-          function (v) { if (!v.title || !v.to) return false; act({ op: 'add', kind: 'handover', data: v }); toast(v.to + '님에게 넘겼어요'); });
+      todo: function () {
+        sheet('할 일 등록',
+          '<label>할 일<input name="title" maxlength="60" required placeholder="예: 미결 건 점검"></label>' +
+          '<div class="two"><label>날짜<input type="date" name="date" value="' + today() + '" required></label>' +
+          '<label>담당자<select name="who">' + opts2(people(), me) + '</select></label></div>',
+          function (v) { if (!v.title || !v.date) return false; act({ op: 'add', kind: 'todo', data: v }); toast(v.who + '님에게 할 일을 배정했어요'); });
       },
-      tip: function () {
-        sheet('노하우 · 연락처 등록',
-          '<div class="two"><label>종류<select name="cat">' + CATS.map(function (c) { return '<option>' + c[0] + '</option>'; }).join('') + '</select></label><label>지역<input name="area" maxlength="20" placeholder="예: ○○구"></label></div>' +
-          '<label>이름 · 제목<input name="name" maxlength="40" required placeholder="예: 가나공업사 / 과실 협의 요령"></label>' +
-          '<label>연락처<input name="phone" maxlength="20" inputmode="tel" placeholder="선택"></label>' +
-          '<label>메모<textarea name="text" maxlength="300" placeholder="잘하는 것, 주의할 점, 요령"></textarea></label>',
-          function (v) { if (!v.name) return false; act({ op: 'add', kind: 'tip', data: v }); toast('등록했어요'); });
+      contact: function () {
+        sheet('주소록 추가',
+          '<div class="two"><label>이름<input name="name" maxlength="12" required></label><label>직급<input name="role" maxlength="12" placeholder="예: 대리"></label></div>' +
+          '<label>팀<input name="team" maxlength="20" placeholder="예: 대물1팀"></label>' +
+          '<div class="two"><label>내선<input name="ext" maxlength="10" inputmode="tel"></label><label>휴대폰<input name="phone" maxlength="20" inputmode="tel"></label></div>',
+          function (v) { if (!v.name) return false; act({ op: 'add', kind: 'contact', data: v }); toast('주소록에 추가했어요'); });
       },
-      status: function (state) {
-        var mine = of('status').filter(function (s) { return s.mine; })[0];
-        var needSub = state === '휴가' || state === '반차';
-        sheet('오늘 ' + state,
-          '<label>메모 (선택)<input name="note" maxlength="30" placeholder="' + (state === '외근' ? '예: 현장 확인, 15시 복귀' : '예: 오후 복귀') + '" value="' + esc(mine && mine.data.state === state ? mine.data.note || '' : '') + '"></label>' +
-          (needSub ? '<label>대직자<input name="sub" maxlength="12" placeholder="이름" value="' + esc(mine && mine.data.sub || '') + '"></label>' : ''),
-          function (v) { act({ op: 'add', kind: 'status', data: { date: today(), state: state, note: v.note || '', sub: v.sub || '' } }); toast('오늘 ' + state + '(으)로 표시했어요'); });
+      emergency: function () {
+        sheet('비상연락망 추가',
+          '<div class="two"><label>구분<select name="group"><option value="chain">연락 순서</option><option value="ext">외부 긴급 연락처</option></select></label>' +
+          '<label>순서 (연락 순서일 때)<select name="step"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label></div>' +
+          '<label>이름 · 기관<input name="name" maxlength="20" required></label>' +
+          '<label>역할<input name="role" maxlength="30" placeholder="예: 대물1팀 대표"></label>' +
+          '<label>연락처<input name="phone" maxlength="20" inputmode="tel"></label>',
+          function (v) { if (!v.name) return false; v.step = Number(v.step); act({ op: 'add', kind: 'emergency', data: v }); toast('비상연락망에 추가했어요'); });
       },
     };
 
-    // ---------- 클릭
+    compose.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var inp = compose.querySelector('input'); var t = inp.value.trim(); if (!t) return;
+      if (live && !me) { askName(); return; }
+      inp.value = ''; stickBottom = true;
+      act({ op: 'add', kind: 'message', data: { text: t } });
+      if (!live && store.fakeReply) setTimeout(function () { store.fakeReply(); stickBottom = true; refresh(); }, 1400);
+    });
+
     root.addEventListener('click', function (e) {
-      var b = e.target.closest('button'); if (!b || !root.contains(b)) return;
-      if (b.closest('.ca-sheet-bg')) return;
+      var b = e.target.closest('button'); if (!b || !root.contains(b) || b.closest('.ca-sheet-bg') || b.closest('.ca-compose')) return;
       var d = b.dataset;
-      if (d.tab) { tab = d.tab; scroll.scrollTop = 0; draw(); return; }
+      if (d.tab) { tab = d.tab; query = ''; stickBottom = true; scroll.scrollTop = 0; draw(); return; }
       if (d.a === 'name') { if (live) askName(); return; }
       if (d.a === 'seed') {
         if (!me) { askName(function () { b.click(); }); return; }
@@ -4888,9 +5140,7 @@ var qrcode = function() {
         return;
       }
       if (d.a && forms[d.a]) { if (live && !me) { askName(forms[d.a]); return; } forms[d.a](); return; }
-      if (d.st) { if (live && !me) { askName(function () { forms.status(d.st); }); return; } forms.status(d.st); return; }
-      if (d.hf) { hoFilter = d.hf; draw(); return; }
-      if (d.tc) { tipCat = d.tc; draw(); return; }
+      if (d.tf) { todoFilter = d.tf; draw(); return; }
       if (d.done) { act({ op: 'done', id: d.done }); return; }
       if (d.del) { if (window.confirm('삭제할까요?')) act({ op: 'delete', id: d.del }); return; }
     });
@@ -4899,14 +5149,13 @@ var qrcode = function() {
     refresh();
     if (live) {
       if (!me) setTimeout(function () { askName(); }, 400);
-      setInterval(function () { if (!document.hidden && !root.querySelector('.ca-sheet-bg')) refresh(); }, 5000);
+      setInterval(function () { if (!document.hidden && !root.querySelector('.ca-sheet-bg')) refresh(); }, 3000);
     }
     return { refresh: refresh };
   }
 
   window.CenterApp = { mount: mount, sample: sample };
 })();
-
 </script>
 <script>
 /* ===== 센터원 업무 공유 (제작 예시) ===== */
@@ -4915,7 +5164,7 @@ var qrcode = function() {
   var LIVE_BASE='https://ai-level-survey-weld.vercel.app';
   var apps=[];
   document.querySelectorAll('[data-center]').forEach(function(h){
-    apps.push({ host:h, app:CenterApp.mount(h,{ mode:'demo', step:+h.getAttribute('data-center'), tab:h.getAttribute('data-tab')||'home', notch:true }) });
+    apps.push({ host:h, app:CenterApp.mount(h,{ mode:'demo', step:+h.getAttribute('data-center'), tab:h.getAttribute('data-tab')||'notice', notch:true }) });
   });
   // 장을 넘겨도 앞 장에서 바꾼 내용이 이어지게
   setInterval(function(){ apps.forEach(function(a){ var s=a.host.closest('.slide'); if(s&&s.classList.contains('active')) a.app.refresh(); }); },1000);
