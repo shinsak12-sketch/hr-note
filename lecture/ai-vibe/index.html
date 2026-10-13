@@ -4403,7 +4403,7 @@ var qrcode = function() {
 /* ===== 센터원 업무 공유 (제작 예시) ===== */
 (function(){
   // 진단 · 센터원 사이트 주소. 바뀌면 여기만 고치면 된다
-  var LIVE_BASE='https://ai-level-survey.vercel.app';
+  var LIVE_BASE='https://ai-level-survey-weld.vercel.app';
   var apps=[];
   document.querySelectorAll('[data-center]').forEach(function(h){
     apps.push({ host:h, app:CenterApp.mount(h,{ mode:'demo', step:+h.getAttribute('data-center'), tab:h.getAttribute('data-tab')||'home', notch:true }) });

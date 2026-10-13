@@ -23,7 +23,7 @@
 수치 · 사례는 각 장 하단과 강사 노트(`N`)에 출처가 있습니다. 메뉴 이름 · 요금제별 제공 범위는 강의 직전 실제 화면으로 확인하세요.
 
 ## 사이트 주소
-QR이 가리키는 주소는 `index.html` 맨 아래 `LIVE_BASE` 한 줄에서 바꿉니다 (지금: `https://ai-level-survey.vercel.app`).
+QR이 가리키는 주소는 `index.html` 맨 아래 `LIVE_BASE` 한 줄에서 바꿉니다 (지금: `https://ai-level-survey-weld.vercel.app`).
 강의 전에 `/center?room=오늘날짜(예: 261013)`에 들어가 "예시 데이터로 채워 보기"를 눌러 두면 빈 화면 없이 시작합니다.
 
 ## 단축키
