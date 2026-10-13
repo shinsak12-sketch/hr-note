@@ -865,6 +865,15 @@ body[data-tool="spot"] .spot{display:block}
 .side.human .k{color:var(--coral)}
 .side.human li{color:var(--ink)}
 @media (max-width:900px){.chain4{grid-template-columns:1fr}.c4a{display:none}.two-sides{grid-template-columns:1fr}}
+
+.voices{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,1.6vw,22px);margin-top:clamp(18px,3vh,32px)}
+.vq{border:1px solid var(--line-strong);border-radius:16px;padding:clamp(18px,2vw,28px);background:var(--surface);display:flex;flex-direction:column;gap:.5em;position:relative}
+.vq::before{content:"\201D";position:absolute;bottom:-.42em;right:.25em;font-size:clamp(60px,7vw,100px);line-height:1;color:var(--line-strong);font-family:Georgia,serif}
+.vq p{margin:0 0 .4em;font-size:clamp(18px,2.1vw,27px);font-weight:700;line-height:1.45;color:var(--ink-soft);letter-spacing:-.01em}
+.vq p b{color:var(--ink);font-weight:900}
+.vq .by{font-size:clamp(14px,1.55vw,19px);font-weight:800;color:var(--ink);margin-top:auto}
+.vq .when{font-size:clamp(12px,1.3vw,15px);font-weight:600;color:var(--ink-faint)}
+@media (max-width:900px){.voices{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -2479,8 +2488,26 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
   </div>
 </section>
 
+<section class="slide wide sober" data-accent="coral" data-title="마지막으로 · 세계가 말하는 방향"
+  data-notes="[마지막 메시지 ⓪ · 2분 · 톤을 낮추고] '마지막으로 조금 무거운 이야기를 하겠습니다. AI를 만드는 회사의 대표들이 직접 하는 말입니다.'
+① 샘 올트먼(OpenAI CEO), 에세이 「The Gentle Singularity」(2025.6): 'As datacenter production gets automated, the cost of intelligence should eventually converge to near the cost of electricity.' → 지능의 비용이 결국 전기 요금 수준까지 내려간다 = 전등 켜듯 부담 없이 누구나 AI를 쓰는 사회. 같은 해 2월 「Three Observations」에서는 같은 수준의 AI를 쓰는 비용이 12개월마다 약 10분의 1로 떨어진다고 했다.
+② 다리오 아모데이(Anthropic CEO), Axios 인터뷰(2025.5): AI가 1~5년 안에 초급 사무직 일자리의 절반을 없애고, 실업률을 10~20%까지 올릴 수 있다고 경고.
+③ 무스타파 술레이만(Microsoft AI CEO), FT 인터뷰(2026.2): 변호사 · 회계사 · 프로젝트 관리자 · 마케터 같은 사무직 업무 대부분이 12~18개월 안에 자동화될 것.
+※ 모두 예측이고 반론도 있다(예: 사티아 나델라는 기존 업무가 자동화되는 대신 새 업무가 생긴다고 봄). 시기는 사람마다 달라도 방향은 같다는 점만 짚는다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 마지막으로</span>
+    <h2 class="subhead">AI를 만드는 사람들이 <span class="accent">직접 하는 말</span></h2>
+    <div class="voices">
+      <div class="vq"><p>"지능의 비용은 결국 <b>전기 요금 수준</b>까지 내려갈 것"</p><span class="by">샘 올트먼 · OpenAI CEO</span><span class="when">에세이 「The Gentle Singularity」 2025.6</span></div>
+      <div class="vq"><p>"1~5년 안에 <b>초급 사무직 일자리의 절반</b>이 사라질 수 있다"</p><span class="by">다리오 아모데이 · Anthropic CEO</span><span class="when">Axios 인터뷰 2025.5</span></div>
+      <div class="vq"><p>"사무직 업무 대부분이 <b>12~18개월 안에</b> 자동화될 것"</p><span class="by">무스타파 술레이만 · Microsoft AI CEO</span><span class="when">FT 인터뷰 2026.2</span></div>
+    </div>
+    <p class="verdict">AI는 전등 켜듯 <b>누구나 부담 없이 쓰는 값</b>이 되고, 에이전트가 사무직의 일을 맡게 됩니다. 시기는 저마다 달라도, <b>방향은 같습니다.</b></p>
+  </div>
+</section>
+
 <section class="slide wide sober" data-accent="coral" data-title="마지막으로 · 사라질 영역"
-  data-notes="[마지막 메시지 ① · 2분 · 톤을 낮추고 천천히] '마지막으로 조금 무거운 이야기를 하겠습니다.'
+  data-notes="[마지막 메시지 ① · 2분 · 천천히] '그럼 우리 일은 어떨까요?'
 지금 보상 업무에서 AI를 쓰는 양은 아직 적다. 하지만 공업사가 수리하고, AI가 견적을 내고, 그 견적을 또 다른 AI가 측정해서 오류를 찾고, AI끼리 협의하는 날이 오면? 지금 우리가 거래처와 하는 손해사정 협의 같은 영역은 사라질 가능성이 굉장히 높다. 범용 AI(AGI)가 나오는 순간 그 영역은 끝났다고 봐야 한다.
 핵심: AI의 영역이 넓어질수록 지식과 기술의 중요도는 떨어진다. 이건 지금으로선 필연이다.">
   <div class="slide-inner">
