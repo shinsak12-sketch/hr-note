@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>생성형 AI 활용 업무 보조 바이브코딩</title>
-<meta name="description" content="생성형 AI 활용 업무 보조 바이브코딩 — 2시간 강의 · 시연. 1부 업무 자동화하기, 2부 바이브코딩. 오프라인 발표용." />
+<title>Why not? · 생성형 AI 활용 업무 보조 바이브코딩</title>
+<meta name="description" content="Why not? 생성형 AI 활용 업무 보조 바이브코딩 — 2시간 강의 · 시연. 1부 업무 자동화하기, 2부 바이브코딩. 오프라인 발표용." />
 <style>
 /* ============================================================
    생성형 AI 활용 업무 보조 바이브코딩 — 발표 덱
@@ -821,10 +821,19 @@ body[data-tool="spot"] .spot{display:block}
 .mtl .hit{fill:transparent;cursor:pointer}
 .mtl .pt:hover .dot{r:12}
 .mtl .lb{fill:var(--ink-soft);font-size:15px;font-weight:700;pointer-events:none}
+.mtl .bar{fill:var(--indigo-soft,#6C63FF);opacity:.85}
+.mtl .bn{fill:var(--ink);font-size:17px;font-weight:800;font-family:var(--font-mono)}
+.mtl .bn .bs{fill:var(--ink-faint);font-size:13px;font-family:var(--font-sans);font-weight:700}
+.mtl .base{stroke:var(--line-strong);stroke-width:1.5}
+.mtl .ln.sm{font-size:15px;fill:var(--ink-faint)}
 .mtl .tip{position:absolute;z-index:3;pointer-events:none;background:var(--code-bg);color:#fff;border-radius:10px;padding:8px 12px;box-shadow:var(--shadow);white-space:nowrap;display:flex;align-items:center;gap:8px;font-size:15px}
 .mtl .tip[hidden]{display:none}
 .mtl .tip i{width:10px;height:10px;border-radius:50%;flex:none}
 .mtl .tip span{color:#C9C6DD;font-weight:600}
+
+/* Why not? 표지 */
+.title-slide .headline.why{font-size:clamp(80px,15vw,210px);letter-spacing:-.045em;line-height:.95}
+.title-slide .tagline b{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -902,11 +911,11 @@ body[data-tool="spot"] .spot{display:block}
 
 <!-- ============ 표지 ============ -->
 <section class="slide center title-slide" data-accent="indigo" data-title="표지"
-  data-notes="[시작 전] 입장하면서 이 화면. 바로 다음 장 순서 → 진단 QR.">
+  data-notes="[시작] 오프닝 영상 마지막 'Why not use AI?' 화면에서 바로 이 장으로. 멘트: '오늘 강의 제목은 이겁니다. Why not? 왜 안 돼요? AI로 안 되는 줄 알았던 일, 오늘 하나씩 되는 걸 보여 드리겠습니다.' → 순서 → 진단 QR.">
   <div class="slide-inner">
-    <span class="kicker">사내 교육 · 2시간</span>
-    <h1 class="headline">생성형 AI 활용<br>업무 보조 <span style="color:var(--coral)">바이브코딩</span></h1>
-    <p class="tagline">AI로 업무 환경을 만들고, 말로 업무 도구를 만든다</p>
+    <span class="kicker">생성형 AI 활용 업무 보조 바이브코딩 · 2시간</span>
+    <h1 class="headline why">Why <span style="color:var(--coral)">not?</span></h1>
+    <p class="tagline">왜 안 돼? AI로 <b>모든 게 가능하다</b></p>
     <div class="meta-row">
       <span class="chip"><b>1부</b> 업무 자동화하기</span>
       <span class="chip"><b>2부</b> 바이브코딩</span>
@@ -979,11 +988,12 @@ body[data-tool="spot"] .spot{display:block}
     <p class="lead wide" style="margin-top:clamp(22px,3.5vh,36px)">대부분 AI를 <strong>검색창처럼</strong> 쓰고 있었습니다.<br>오늘은 여기서 <span class="mark">딱 한 칸</span>만 올라갑니다.</p>
   </div>
 </section>
-<section class="slide center" data-accent="coral" data-title="오늘의 목표: 1단계 → 2단계"
-  data-notes="[0:10] 오늘의 한 문장. 물어보는 사람(1단계)에서 시켜서 만드는 사람(2단계)으로.">
+<section class="slide center" data-accent="coral" data-title="오늘의 목표: Why not?"
+  data-notes="[0:10] 오늘의 목표는 기술이 아니라 생각의 전환. '이게 될까?' 하고 멈추던 걸 'Why not? 일단 시켜 보자'로. 그 결과가 물어보는 사람(1단계)에서 시켜서 만드는 사람(2단계)으로 올라가는 것.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 오늘의 목표</span>
-    <p class="big-quote">물어보는 사람에서<br><span class="mark">시켜서 만드는 사람</span>으로</p>
+    <p class="big-quote">"이게 될까?"에서<br><span class="mark">"Why not?"</span>으로</p>
+    <p class="lead wide">안 될 이유보다 해 볼 방법을 먼저 찾는 것. 물어보는 사람에서 <b>시켜서 만드는 사람</b>으로 넘어가는 생각의 전환이 오늘의 목표입니다.</p>
     <div class="meta-row">
       <span class="chip">1단계 · 검색형</span>
       <span class="chip" style="border-color:var(--coral);color:var(--coral)"><b style="color:var(--coral)">2단계 · 제작형</b></span>
@@ -1387,19 +1397,19 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
 </section>
 
 <section class="slide wide" data-accent="indigo" data-title="AI 모델 출시 연표"
-  data-notes="[연표 · 2분] 점 하나 = 회사의 대표 모델 하나(각 회사 공식 발표일 기준, 대표 모델만 골라 표시). 점에 마우스를 올리면 이름과 날짜가 나온다.
-멘트: 'ChatGPT(2022년 11월) 전에는 몇 년에 하나씩 나오던 점이, 이후로는 회사마다 두세 달 간격으로 찍힙니다. 오늘 보는 메뉴와 기능도 내년이면 또 바뀝니다. 그래서 특정 버튼보다 시키는 법을 익히는 게 오래갑니다.'
-날짜: OpenAI GPT-1 2018.6 · GPT-2 2019.2 · GPT-3 2020.5 · ChatGPT 2022.11.30 · GPT-4 2023.3.14 · GPT-4o 2024.5.13 · o1 2024.9.12 · GPT-4.5 2025.2.27 · GPT-5 2025.8.7 · GPT-5.2 2025.12.11 · GPT-6 Astra 2026.9.3
-Google BERT 2018.10 · PaLM 2022.4 · Bard 2023.3.21 · Gemini 1.0 2023.12.6 · Gemini 1.5 2024.2.15 · Gemini 2.0 2024.12.11 · Gemini 2.5 Pro 2025.3.25 · Gemini 3 Pro 2025.11.18 · Gemini 3.1 Pro 2026.2.19 · Gemini 3.5 Flash 2026.5.19
-Anthropic Claude 2023.3.14 · Claude 2 2023.7.11 · Claude 3 2024.3.4 · Claude 3.5 Sonnet 2024.6.20 · Claude 3.7 Sonnet 2025.2.24 · Claude 4 2025.5.22 · Sonnet 4.5 2025.9.29 · Opus 4.5 2025.11.24 · Opus 4.6 2026.2.5 · Opus 5 2026.7.24 · Opus 5.5 2026.9.22
+  data-notes="[연표 · 2분] 보여 줄 것: AI 모델이 빠르게 진화하면서 계속 늘어나고 있다. 점 하나 = 회사의 대표 모델 하나(공식 발표 기준, 대표 모델만 골라 표시). 아래 막대는 이 표에 찍힌 연도별 수(2026년은 10월까지).
+멘트: 'ChatGPT 전 5년 동안 점이 5개였습니다. 이후 4년 사이 46개. 이름 뒤 숫자도 GPT-1에서 GPT-6까지 계속 올라갑니다. 오늘 배우는 메뉴도 내년이면 또 바뀝니다. 그래서 버튼보다 시키는 법을 익히는 게 오래갑니다.'
+날짜(공식 발표 기준): OpenAI GPT-1 2018.6.11 · GPT-2 2019.2.14 · GPT-3 2020.5.28 · ChatGPT 2022.11.30 · GPT-4 2023.3.14 · GPT-4o 2024.5.13 · o1 2024.9.12 · GPT-4.5 2025.2.27 · GPT-5 2025.8.7 · GPT-5.2 2025.12.11 · GPT-5.5 2026.4 · GPT-5.6 2026.7.9 · GPT-6 Astra 2026.9.3
+Google BERT 2018.10 · PaLM 2022.4 · Bard 2023.3.21 · Gemini 1.0 2023.12.6 · Gemini 1.5 2024.2.15 · Gemini 2.0 2024.12.11 · Gemini 2.5 Pro 2025.3.25 · Gemini 3 Pro 2025.11.18 · Gemini 3.1 Pro 2026.2.19 · Gemini 3.5 Flash 2026.5.19 · Gemini 3.6 Flash 2026.7 · Gemini 3.7 Flash 2026.8
+Anthropic Claude 2023.3.14 · Claude 2 2023.7.11 · Claude 3 2024.3.4 · Claude 3.5 Sonnet 2024.6.20 · Claude 3.7 Sonnet 2025.2.24 · Claude 4 2025.5.22 · Sonnet 4.5 2025.9.29 · Opus 4.5 2025.11.24 · Opus 4.6 2026.2.5 · Opus 4.7 2026.4.16 · Opus 4.8 2026.5.28 · Sonnet 5 2026.6.30 · Opus 5 2026.7.24 · Opus 5.5 2026.9.22
 Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024.7.23 · Llama 4 2025.4.5
-기타 DeepSeek-R1 2025.1.20">
+기타 Mistral 7B(Mistral AI) 2023.9.27 · Grok(xAI) 2023.11.4 · DeepSeek-V3 2024.12.26 · DeepSeek-R1 2025.1.20 · Grok 3 2025.2.17 · Grok 4 2025.7.9 · Kimi K2(Moonshot AI) 2025.7.11">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> AI 모델 출시 연표</span>
-    <h2 class="subhead">ChatGPT 이후, 새 모델이 <span class="accent">두세 달마다</span> 나옵니다</h2>
-    <p class="desc">점 하나가 회사의 대표 모델 하나입니다. 2022년 11월 ChatGPT 전에는 몇 년에 하나씩이던 점이, 이후로는 회사마다 두세 달 간격으로 찍힙니다. 오늘 보는 메뉴도 내년이면 또 바뀝니다. 그래서 버튼보다 <b>시키는 법</b>을 익히는 게 오래갑니다.</p>
+    <h2 class="subhead">AI 모델이 <span class="accent">빠르게 진화하며, 늘어나고</span> 있습니다</h2>
+    <p class="desc">점 하나가 회사의 대표 모델 하나입니다. ChatGPT 전 약 5년 동안 <b>5개</b>였던 점이, 이후 4년 사이 <b>46개</b>로 늘었습니다. 이름 뒤 숫자도 GPT-1에서 GPT-6까지 쉬지 않고 올라갑니다. 지금 이 순간에도 더 똑똑한 AI가 나오고 있습니다.</p>
     <div class="mtl" id="tl" role="img" aria-label="2018년부터 2026년까지 회사별 대표 AI 모델 출시 시점 점도표"></div>
-    <p class="src">각 회사 공식 발표일 기준 · 대표 모델만 표시 · 2026년 10월 기준 · 점에 마우스를 올리면 이름과 날짜</p>
+    <p class="src">각 회사 공식 발표 기준 · 대표 모델만 골라 표시(연도별 수도 이 표 기준) · 2026년 10월 기준 · 점에 마우스를 올리면 이름과 출시 월</p>
   </div>
 </section>
 
@@ -2420,7 +2430,7 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 오늘의 한 문장</span>
     <p class="big-quote">묻지 말고, <span class="mark">시키세요.</span><br>시킬 도구가 없으면, <span class="mark">만드세요.</span></p>
-    <p class="lead wide">AI는 정답을 아는 학생이 아니라, <b>시키면 만들어 내는 학생</b>입니다.</p>
+    <p class="lead wide">다음에 "이것도 될까?" 싶을 때, 이렇게 말해 보세요. <b>Why not?</b></p>
   </div>
 </section>
 
@@ -2439,11 +2449,11 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
 </section>
 
 <section class="slide center title-slide" data-accent="indigo" data-title="감사합니다 · Q&A"
-  data-notes="[마무리] 감사 인사 → 질문 받기. 진단 사이트와 센터원은 오늘 이후에도 열려 있다고 안내(교육용, 실제 고객 정보 금지).">
+  data-notes="[마무리] 오프닝의 'Why not?'으로 다시 닫기. 감사 인사 → 질문 받기. 진단 사이트와 센터원은 오늘 이후에도 열려 있다고 안내(교육용, 실제 고객 정보 금지).">
   <div class="slide-inner">
     <span class="kicker">생성형 AI 활용 업무 보조 바이브코딩</span>
-    <h1 class="headline">감사합니다</h1>
-    <p class="tagline">질문 받겠습니다</p>
+    <h1 class="headline why">Why <span style="color:var(--coral)">not?</span></h1>
+    <p class="tagline">감사합니다. 질문 받겠습니다</p>
     <div class="meta-row">
       <span class="chip"><b>1부</b> 시키는 사람</span>
       <span class="chip"><b>2부</b> 만드는 사람</span>
@@ -5432,35 +5442,46 @@ var qrcode = function() {
   // [회사 칸, 이름, 날짜, 라벨 위치(u 위 / d 아래 / 없으면 마우스로만)]
   var D=[
     [0,'GPT-1','2018-06-11','u'],[0,'GPT-2','2019-02-14'],[0,'GPT-3','2020-05-28','u'],[0,'ChatGPT','2022-11-30','ul'],[0,'GPT-4','2023-03-14','d'],
-    [0,'GPT-4o','2024-05-13'],[0,'o1','2024-09-12'],[0,'GPT-4.5','2025-02-27'],[0,'GPT-5','2025-08-07','u'],[0,'GPT-5.2','2025-12-11'],[0,'GPT-6 Astra','2026-09-03','ul'],
+    [0,'GPT-4o','2024-05-13'],[0,'o1','2024-09-12'],[0,'GPT-4.5','2025-02-27'],[0,'GPT-5','2025-08-07','u'],[0,'GPT-5.2','2025-12-11'],
+    [0,'GPT-5.5','2026-04-15'],[0,'GPT-5.6','2026-07-09'],[0,'GPT-6 Astra','2026-09-03','ul'],
     [1,'BERT','2018-10-11','u'],[1,'PaLM','2022-04-04','u'],[1,'Bard','2023-03-21'],[1,'Gemini 1.0','2023-12-06','u'],[1,'Gemini 1.5','2024-02-15'],
     [1,'Gemini 2.0','2024-12-11'],[1,'Gemini 2.5 Pro','2025-03-25'],[1,'Gemini 3 Pro','2025-11-18','u'],[1,'Gemini 3.1 Pro','2026-02-19'],[1,'Gemini 3.5 Flash','2026-05-19'],
+    [1,'Gemini 3.6 Flash','2026-07-15'],[1,'Gemini 3.7 Flash','2026-08-15'],
     [2,'Claude','2023-03-14','u'],[2,'Claude 2','2023-07-11'],[2,'Claude 3','2024-03-04','u'],[2,'Claude 3.5 Sonnet','2024-06-20'],[2,'Claude 3.7 Sonnet','2025-02-24'],
-    [2,'Claude 4','2025-05-22','u'],[2,'Claude Sonnet 4.5','2025-09-29'],[2,'Claude Opus 4.5','2025-11-24'],[2,'Claude Opus 4.6','2026-02-05'],[2,'Claude Opus 5','2026-07-24'],[2,'Claude Opus 5.5','2026-09-22','ul'],
+    [2,'Claude 4','2025-05-22','u'],[2,'Claude Sonnet 4.5','2025-09-29'],[2,'Claude Opus 4.5','2025-11-24'],[2,'Claude Opus 4.6','2026-02-05'],[2,'Claude Opus 4.7','2026-04-16'],
+    [2,'Claude Opus 4.8','2026-05-28'],[2,'Claude Sonnet 5','2026-06-30'],[2,'Claude Opus 5','2026-07-24'],[2,'Claude Opus 5.5','2026-09-22','ul'],
     [3,'LLaMA','2023-02-24','u'],[3,'Llama 2','2023-07-18'],[3,'Llama 3','2024-04-18'],[3,'Llama 3.1','2024-07-23'],[3,'Llama 4','2025-04-05','u'],
-    [4,'DeepSeek-R1','2025-01-20','u']
+    [4,'Mistral 7B','2023-09-27','u',' · Mistral AI'],[4,'Grok','2023-11-04',0,' · xAI'],[4,'DeepSeek-V3','2024-12-26',0,' · DeepSeek'],[4,'DeepSeek-R1','2025-01-20','u',' · DeepSeek'],
+    [4,'Grok 3','2025-02-17',0,' · xAI'],[4,'Grok 4','2025-07-09',0,' · xAI'],[4,'Kimi K2','2025-07-11',0,' · Moonshot AI']
   ];
-  var W=1400,H=388,L=120,R=1376,T=34,lane=58,x0=Date.UTC(2018,0,1),x1=Date.UTC(2027,0,1);
+  var W=1400,L=120,R=1376,T=34,lane=52,x0=Date.UTC(2018,0,1),x1=Date.UTC(2027,0,1);
+  var LB=T+lane*5, BASE=LB+78, BMAX=48, H=BASE+34;
   function X(d){ var p=d.split('-'); return L+(Date.UTC(+p[0],+p[1]-1,+p[2])-x0)/(x1-x0)*(R-L); }
   function Y(k){ return T+lane*k+lane/2; }
+  var cnt={}; D.forEach(function(d){ var y=d[2].slice(0,4); cnt[y]=(cnt[y]||0)+1; });
+  var cmax=Math.max.apply(null,Object.keys(cnt).map(function(k){ return cnt[k]; }));
   var h='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">';
   for(var yr=2018;yr<=2027;yr++){ var gx=X(yr+'-01-01');
-    h+='<line class="grid" x1="'+gx+'" y1="'+T+'" x2="'+gx+'" y2="'+(T+lane*5)+'"/>';
-    if(yr<2027) h+='<text class="yr" x="'+(gx+(X((yr+1)+'-01-01')-gx)/2)+'" y="'+(T+lane*5+30)+'" text-anchor="middle">'+yr+'</text>'; }
+    h+='<line class="grid" x1="'+gx+'" y1="'+T+'" x2="'+gx+'" y2="'+BASE+'"/>';
+    if(yr<2027){ var mid=gx+(X((yr+1)+'-01-01')-gx)/2, n=cnt[yr]||0, bh=n/cmax*BMAX;
+      if(n) h+='<rect class="bar" x="'+(mid-22)+'" y="'+(BASE-bh)+'" width="44" height="'+bh+'" rx="4"/>';
+      h+='<text class="bn" x="'+mid+'" y="'+(BASE-bh-7)+'" text-anchor="middle">'+n+(yr===2026?'<tspan class="bs">개 (1~10월)</tspan>':'')+'</text>';
+      h+='<text class="yr" x="'+mid+'" y="'+(BASE+26)+'" text-anchor="middle">'+yr+'</text>'; } }
+  h+='<line class="base" x1="'+L+'" y1="'+BASE+'" x2="'+R+'" y2="'+BASE+'"/><text class="ln sm" x="'+(L-16)+'" y="'+(BASE-14)+'" text-anchor="end">연도별 수</text>';
   LANES.forEach(function(l,k){ h+='<line class="lane" x1="'+L+'" y1="'+Y(k)+'" x2="'+R+'" y2="'+Y(k)+'"/>'+
     '<text class="ln" x="'+(L-16)+'" y="'+(Y(k)+6)+'" text-anchor="end">'+l[0]+'</text>'; });
   var cx=X('2022-11-30');
-  h+='<line class="mark" x1="'+cx+'" y1="'+(T-14)+'" x2="'+cx+'" y2="'+(T+lane*5)+'"/><text class="mk" x="'+(cx+8)+'" y="'+(T-4)+'">ChatGPT 출시 이후 →</text>';
+  h+='<line class="mark" x1="'+cx+'" y1="'+(T-14)+'" x2="'+cx+'" y2="'+BASE+'"/><text class="mk" x="'+(cx+8)+'" y="'+(T-4)+'">ChatGPT 출시 이후 →</text>';
   D.forEach(function(d,n){ var x=X(d[2]), y=Y(d[0]);
-    h+='<g class="pt" data-n="'+n+'"><circle class="hit" cx="'+x+'" cy="'+y+'" r="16"/><circle class="dot '+LANES[d[0]][1]+'" cx="'+x+'" cy="'+y+'" r="9"/>';
-    if(d[3]) h+='<text class="lb" x="'+(d[3]==='ul'?x+8:x)+'" y="'+(d[3]==='d'?y+29:y-17)+'" text-anchor="'+(d[3]==='ul'?'end':'middle')+'">'+d[1]+'</text>';
+    h+='<g class="pt" data-n="'+n+'"><circle class="hit" cx="'+x+'" cy="'+y+'" r="14"/><circle class="dot '+LANES[d[0]][1]+'" cx="'+x+'" cy="'+y+'" r="8"/>';
+    if(d[3]) h+='<text class="lb" x="'+(d[3]==='ul'?x+8:x)+'" y="'+(d[3]==='d'?y+27:y-15)+'" text-anchor="'+(d[3]==='ul'?'end':'middle')+'">'+d[1]+'</text>';
     h+='</g>'; });
   h+='</svg><div class="tip" hidden></div>';
   box.innerHTML=h;
   var tip=box.querySelector('.tip');
   box.addEventListener('mouseover',function(e){ var g=e.target.closest('.pt'); if(!g){ tip.hidden=true; return; }
     var d=D[+g.getAttribute('data-n')], p=d[2].split('-');
-    tip.innerHTML='<i class="'+LANES[d[0]][1]+'"></i><b>'+d[1]+'</b><span>'+LANES[d[0]][0]+' · '+p[0]+'년 '+(+p[1])+'월 '+(+p[2])+'일</span>';
+    tip.innerHTML='<i class="'+LANES[d[0]][1]+'"></i><b>'+d[1]+'</b><span>'+(d[4]?d[4].slice(3):LANES[d[0]][0])+' · '+p[0]+'년 '+(+p[1])+'월</span>';
     var r=box.getBoundingClientRect(), c=g.querySelector('.dot').getBoundingClientRect();
     tip.hidden=false; var tx=c.left-r.left+c.width/2, tw=tip.offsetWidth;
     tip.style.left=Math.max(0,Math.min(r.width-tw,tx-tw/2))+'px'; tip.style.top=(c.top-r.top-tip.offsetHeight-12)+'px'; });
