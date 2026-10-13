@@ -241,7 +241,7 @@ strong{font-weight:800;color:var(--ink)}
   border:1px solid var(--line);border-radius:9px;padding:5px 14px;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .browser-body{padding:0;max-height:min(66vh,680px);overflow:auto}
 
-/* ===== 여행 앱 (폰 화면) ===== */
+/* ===== 제작 예시 (폰 화면) ===== */
 .app-stage{display:grid;grid-template-columns:auto auto;gap:clamp(36px,5vw,96px);align-items:center;justify-content:center}
 .app-side{display:flex;flex-direction:column;gap:clamp(12px,2vh,20px);max-width:560px}
 .app-side .badge{align-self:flex-start}
@@ -258,120 +258,127 @@ strong{font-weight:800;color:var(--ink)}
 .phone-frame::before{content:"";position:absolute;top:calc(var(--ph) * .028);left:50%;transform:translateX(-50%);width:28%;height:calc(var(--ph) * .032);border-radius:999px;background:#05060a;z-index:5}
 .phone-screen{width:100%;height:100%;border-radius:calc(var(--ph) * .054);overflow:hidden;background:#F5F3EE;position:relative}
 
-.tp{--bg:#F5F3EE;--card:#FFFFFF;--ink:#16182B;--sub:#6B6F80;--faint:#A3A6B3;--line:#ECE9E2;--teal:#0F9F8F;--deep:#0B5C78;--orange:#FF7A45;--pink:#E5484D;--gold:#F2B33D;--violet:#7B5CF0;
-  height:100%;display:flex;flex-direction:column;color:var(--ink);font-size:calc(var(--ph,780px) * .0192);letter-spacing:-.01em;background:var(--bg)}
-.tp svg{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
-.tp-status{display:flex;justify-content:space-between;align-items:center;padding:1.05em 1.8em .4em;font-weight:700;font-size:.9em;color:#fff;position:absolute;left:0;right:0;top:0;z-index:4}
-.tp-status.dark{color:var(--ink);background:rgba(245,243,238,.96)}
-.tp-status .ic{display:flex;gap:.35em;align-items:center}
-.tp-status .bat{width:1.7em;height:.85em;border:1.5px solid currentColor;border-radius:.25em;position:relative}
-.tp-status .bat::after{content:"";position:absolute;inset:1.5px;right:30%;background:currentColor;border-radius:1px}
-.tp-scroll{flex:1;overflow:auto;scrollbar-width:none;position:relative}
-.tp-scroll::-webkit-scrollbar{display:none}
+/* 센터원 업무 공유 — 화면 스타일 (사이트와 강의안이 같이 씀). 크기는 .ca 글자 크기에 비례 */
+.ca{--bg:#F4F3F8;--card:#fff;--ink:#17162B;--sub:#686780;--faint:#A4A3B5;--line:#E8E6F0;
+  --brand:#4338CA;--brand2:#6D5EF0;--soft:#EEECFF;--teal:#0F9F8F;--amber:#E59A12;--coral:#E5484D;--sky:#2F80ED;--violet:#8B5CF6;--gray:#8C8BA0;
+  height:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);letter-spacing:-.01em;word-break:keep-all;
+  font-family:"PretendardLocal","Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;position:relative;overflow:hidden}
+.ca *{box-sizing:border-box}
+.ca :where(button,input,textarea,select){font:inherit;color:inherit}
+.ca :where(button){cursor:pointer;border:none;background:none;padding:0}
+.ca svg{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.ca-scroll{flex:1;overflow:auto;scrollbar-width:none;padding-bottom:1.2em}
+.ca-scroll::-webkit-scrollbar{display:none}
 
-.tp-hero{position:relative;padding:3.4em 1.4em 1.4em;color:#fff;overflow:hidden;
-  background:radial-gradient(120% 90% at 85% 0%,#FFB067 0%,rgba(255,176,103,0) 45%),linear-gradient(160deg,#0F9F8F 0%,#0B5C78 70%,#123E66 100%)}
-.tp-hero::after{content:"";position:absolute;right:-2.5em;top:2.2em;width:7em;height:7em;border-radius:50%;background:rgba(255,214,140,.35);filter:blur(2px)}
-.tp-hero .row1{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
-.tp-hero .mine{font-weight:700;opacity:.85;font-size:.92em}
-.tp-hero .dd{background:#fff;color:var(--deep);font-weight:900;border-radius:999px;padding:.3em .8em;font-size:.92em}
-.tp-hero h1{font-size:2.05em;font-weight:900;letter-spacing:-.03em;margin:.45em 0 .15em;position:relative;z-index:1;line-height:1.1}
-.tp-hero .dates{font-weight:700;opacity:.9;position:relative;z-index:1}
-.tp-route{display:flex;align-items:center;margin-top:1.1em;position:relative;z-index:1}
-.tp-route .st{display:flex;flex-direction:column;align-items:center;gap:.25em;font-weight:800;font-size:.78em}
-.tp-route .st b{width:.75em;height:.75em;border-radius:50%;background:#fff;box-shadow:0 0 0 .22em rgba(255,255,255,.3)}
-.tp-route .st.home b{background:var(--gold)}
-.tp-route .ln{flex:1;height:2px;margin:0 .2em 1.25em;background:repeating-linear-gradient(90deg,rgba(255,255,255,.85) 0 .35em,transparent .35em .7em)}
+/* 머리 */
+.ca-head{background:linear-gradient(150deg,#4338CA 0%,#5B4BE0 55%,#7C6CF5 100%);color:#fff;padding:1.1em 1.2em 1.25em;position:relative;overflow:hidden;flex:0 0 auto}
+.ca-head.pad-top{padding-top:3em}
+.ca-head::after{content:"";position:absolute;right:-2.2em;top:-2.4em;width:8em;height:8em;border-radius:50%;background:rgba(255,255,255,.12)}
+.ca-top{display:flex;align-items:center;justify-content:space-between;gap:.6em;position:relative;z-index:1}
+.ca-logo{display:flex;align-items:center;gap:.5em;font-weight:900;font-size:1.15em}
+.ca-logo i{width:1.75em;height:1.75em;border-radius:.55em;background:#fff;color:var(--brand);display:grid;place-items:center;font-style:normal;font-size:.8em;font-weight:900}
+.ca-me{background:rgba(255,255,255,.18);border-radius:999px;padding:.35em .8em;font-weight:800;font-size:.82em;color:#fff;display:flex;align-items:center;gap:.35em}
+.ca-date{position:relative;z-index:1;margin-top:.9em;font-weight:700;opacity:.85;font-size:.86em}
+.ca-title{position:relative;z-index:1;font-size:1.55em;font-weight:900;letter-spacing:-.03em;margin-top:.1em}
+.ca-sum{position:relative;z-index:1;display:flex;gap:.4em;margin-top:.8em;flex-wrap:wrap}
+.ca-sum span{background:rgba(255,255,255,.16);border-radius:.7em;padding:.35em .65em;font-weight:800;font-size:.8em}
+.ca-sum b{font-size:1.15em;margin-left:.25em}
 
-.tp-sec{padding:1.1em 1.2em .2em}
-.tp-sec h4{margin:0 0 .7em;font-size:1.12em;font-weight:900;display:flex;align-items:baseline;gap:.5em}
-.tp-sec h4 small{font-size:.75em;color:var(--sub);font-weight:700}
-.tp-days{display:flex;gap:.55em;overflow-x:auto;padding:1em 1.2em .2em;scrollbar-width:none}
-.tp-days::-webkit-scrollbar{display:none}
-.tp-day{flex:0 0 auto;border:none;background:var(--card);border-radius:1.1em;padding:.75em .95em;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer;
-  box-shadow:0 .3em .8em -.4em rgba(20,20,40,.25);min-width:5.6em}
-.tp-day .n{font-size:.72em;font-weight:900;color:var(--teal);letter-spacing:.06em}
-.tp-day .d{font-weight:900;font-size:1.05em;margin-top:.15em}
-.tp-day .c{font-size:.78em;color:var(--sub);font-weight:700}
-.tp-day.on{background:var(--ink);color:#fff}
-.tp-day.on .n{color:var(--gold)}
-.tp-day.on .c{color:rgba(255,255,255,.7)}
-.tp-dayhead{display:flex;justify-content:space-between;align-items:flex-end;padding:1em 1.2em .2em}
-.tp-dayhead .city{font-size:1.45em;font-weight:900;letter-spacing:-.02em}
-.tp-dayhead .meta{font-size:.82em;color:var(--sub);font-weight:700}
+.ca-warn{margin:.8em 1em 0;background:#FFF6E5;color:#8A5A00;border-radius:.8em;padding:.6em .8em;font-size:.76em;font-weight:700;line-height:1.45;display:flex;gap:.5em}
+.ca-sec{padding:1em 1em 0}
+.ca-sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6em}
+.ca-sec-h h3{margin:0;font-size:1.05em;font-weight:900;display:flex;align-items:center;gap:.4em}
+.ca-sec-h h3 small{font-size:.75em;color:var(--sub);font-weight:700}
+.ca-add{font-weight:800;font-size:.8em;color:var(--brand);background:var(--soft);border-radius:999px;padding:.35em .8em;display:flex;align-items:center;gap:.3em}
+.ca-card{background:var(--card);border-radius:1em;padding:.8em .9em;box-shadow:0 .25em .8em -.5em rgba(25,20,60,.3)}
+.ca-list{display:grid;gap:.55em}
+.ca-empty{color:var(--faint);font-weight:700;font-size:.85em;text-align:center;padding:1.2em .5em;background:var(--card);border-radius:1em;border:1.5px dashed var(--line)}
 
-.tp-tl{padding:.6em 1.2em .4em;position:relative}
-.tp-ev{display:grid;grid-template-columns:3.1em 2.1em 1fr;gap:.55em;align-items:start;position:relative;padding-bottom:.85em}
-.tp-ev .t{font-weight:800;font-size:.86em;color:var(--sub);padding-top:.55em;font-variant-numeric:tabular-nums}
-.tp-ev .dot{width:2.1em;height:2.1em;border-radius:.75em;display:grid;place-items:center;color:#fff;position:relative;z-index:1;font-size:1em}
-.tp-ev .dot svg{width:1.05em;height:1.05em}
-.tp-ev::before{content:"";position:absolute;left:4.7em;top:2.3em;bottom:0;width:2px;background:var(--line)}
-.tp-ev:last-child::before{display:none}
-.tp-ev .body{background:var(--card);border-radius:.95em;padding:.65em .8em;box-shadow:0 .25em .7em -.45em rgba(20,20,40,.3)}
-.tp-ev .ttl{font-weight:800;font-size:1em}
-.tp-ev .ds{color:var(--sub);font-size:.82em;font-weight:600;margin-top:.15em;line-height:1.4}
-.tp-ev .tips{display:flex;gap:.35em;flex-wrap:wrap;margin-top:.4em}
-.tp-ev .tips span{font-size:.72em;font-weight:800;border-radius:.6em;padding:.2em .55em;background:var(--bg);color:var(--sub)}
-.tp-ev .tips span.warn{background:#FFF1E8;color:#C2410C}
+/* 공지 */
+.ca-notice{display:flex;gap:.65em;align-items:flex-start}
+.ca-notice .pin{flex:0 0 auto;width:2em;height:2em;border-radius:.7em;display:grid;place-items:center;background:var(--soft);color:var(--brand)}
+.ca-notice.pinned .pin{background:var(--brand);color:#fff}
+.ca-notice .tx{font-weight:700;font-size:.92em;line-height:1.45;white-space:pre-wrap}
+.ca-meta{font-size:.72em;color:var(--faint);font-weight:700;margin-top:.25em;display:flex;gap:.5em;align-items:center}
+.ca-del{color:var(--faint);font-weight:800;font-size:1em;padding:0 .2em}
 
-.tp-filter{display:flex;gap:.4em;flex-wrap:wrap;margin-bottom:.7em}
-.tp-filter button{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:.3em .8em;font-family:inherit;font-weight:800;font-size:.82em;color:var(--sub);cursor:pointer}
-.tp-filter button.on{background:var(--ink);border-color:var(--ink);color:#fff}
-.tp-places{display:grid;gap:.6em;padding-bottom:.6em}
-.tp-place{display:grid;grid-template-columns:4.2em 1fr;gap:.75em;background:var(--card);border-radius:1em;padding:.6em;box-shadow:0 .25em .7em -.45em rgba(20,20,40,.3)}
-.tp-place .th{border-radius:.75em;display:grid;place-items:center;color:#fff;aspect-ratio:1}
-.tp-place .th svg{width:1.7em;height:1.7em;stroke-width:1.8}
-.tp-place .cat{font-size:.68em;font-weight:900;letter-spacing:.05em}
-.tp-place .nm{font-weight:900;font-size:1em;margin-top:.05em}
-.tp-place .ds{color:var(--sub);font-size:.8em;font-weight:600;line-height:1.4;margin-top:.1em}
-.tp-place .pick{margin-top:.35em;font-size:.76em;font-weight:800;color:var(--ink);background:#FFF6E0;border-radius:.5em;padding:.2em .5em;display:inline-block}
+/* 근무 현황 */
+.ca-mystat{display:flex;gap:.35em;flex-wrap:wrap}
+.ca-chip{border-radius:999px;padding:.4em .8em;font-weight:800;font-size:.8em;background:var(--card);color:var(--sub);box-shadow:0 .15em .4em -.25em rgba(25,20,60,.35)}
+.ca-chip.on{color:#fff}
+.ca-people{display:grid;gap:.45em;margin-top:.7em}
+.ca-person{display:grid;grid-template-columns:2.3em 1fr auto;gap:.65em;align-items:center}
+.ca-av{width:2.3em;height:2.3em;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:900;font-size:.9em}
+.ca-person .nm{font-weight:800;font-size:.92em}
+.ca-person .nt{font-size:.75em;color:var(--sub);font-weight:600;margin-top:.1em}
+.ca-badge{font-size:.72em;font-weight:900;border-radius:.6em;padding:.25em .6em;color:#fff}
 
-.tp-ckhead{display:flex;align-items:center;gap:1em;background:var(--card);margin:1em 1.2em .4em;border-radius:1.2em;padding:1em 1.1em;box-shadow:0 .25em .7em -.45em rgba(20,20,40,.3)}
-.tp-ring{width:4.4em;height:4.4em;position:relative;flex:0 0 auto}
-.tp-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.tp-ring circle{fill:none;stroke-width:3.5}
-.tp-ring .bg{stroke:var(--line)}
-.tp-ring .fg{stroke:var(--teal);stroke-linecap:round;transition:stroke-dashoffset .4s}
-.tp-ring b{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;font-size:1.05em}
-.tp-ckhead .tt{font-weight:900;font-size:1.15em}
-.tp-ckhead .ss{color:var(--sub);font-weight:700;font-size:.85em;margin-top:.15em}
-.tp-group{margin:.8em 1.2em 0}
-.tp-group .gh{display:flex;align-items:center;gap:.45em;font-weight:900;font-size:.85em;color:var(--sub);margin-bottom:.45em}
-.tp-group .gh svg{color:var(--teal)}
-.tp-ck{display:flex;align-items:center;gap:.7em;background:var(--card);border-radius:.85em;padding:.65em .8em;margin-bottom:.4em;cursor:pointer;font-weight:700;font-size:.95em;user-select:none}
-.tp-ck .box{width:1.35em;height:1.35em;border-radius:.45em;border:2px solid var(--line);display:grid;place-items:center;flex:0 0 auto;color:#fff}
-.tp-ck .box svg{width:.85em;height:.85em;stroke-width:3.2;opacity:0}
-.tp-ck.done{color:var(--faint);text-decoration:line-through}
-.tp-ck.done .box{background:var(--teal);border-color:var(--teal)}
-.tp-ck.done .box svg{opacity:1}
+/* 인수인계 */
+.ca-filter{display:flex;gap:.35em;flex-wrap:wrap;margin-bottom:.7em}
+.ca-filter button{border-radius:999px;padding:.3em .75em;font-weight:800;font-size:.78em;background:var(--card);color:var(--sub);border:1.5px solid var(--line)}
+.ca-filter button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.ca-ho{display:grid;gap:.4em}
+.ca-ho .row1{display:flex;align-items:center;justify-content:space-between;gap:.5em}
+.ca-ho .no{font-weight:900;font-size:.74em;color:var(--brand);background:var(--soft);border-radius:.5em;padding:.2em .5em}
+.ca-ho .due{font-weight:900;font-size:.74em;border-radius:.5em;padding:.2em .5em;background:#FFF1E8;color:#C2410C}
+.ca-ho .due.ok{background:#E9F8F4;color:#0B7A6C}
+.ca-ho .tt{font-weight:900;font-size:1em}
+.ca-ho .flow{display:flex;align-items:center;gap:.4em;font-size:.8em;font-weight:800;color:var(--sub)}
+.ca-ho .flow b{color:var(--ink)}
+.ca-ho .box{background:var(--bg);border-radius:.7em;padding:.5em .65em;font-size:.82em;line-height:1.45;font-weight:600;color:var(--ink)}
+.ca-ho .box em{font-style:normal;font-weight:900;color:var(--sub);font-size:.85em;display:block;margin-bottom:.1em}
+.ca-ho .acts{display:flex;justify-content:space-between;align-items:center}
+.ca-done-btn{font-weight:900;font-size:.8em;border-radius:999px;padding:.35em .85em;background:var(--teal);color:#fff;display:flex;align-items:center;gap:.3em}
+.ca-ho.done{opacity:.55}
+.ca-ho.done .ca-done-btn{background:var(--line);color:var(--sub)}
 
-.tp-sits{display:flex;gap:.4em;overflow-x:auto;padding:1em 1.2em .3em;scrollbar-width:none}
-.tp-sits::-webkit-scrollbar{display:none}
-.tp-sits button{flex:0 0 auto;border:none;background:var(--card);border-radius:999px;padding:.45em .95em;font-family:inherit;font-weight:800;font-size:.88em;color:var(--sub);cursor:pointer;box-shadow:0 .2em .5em -.3em rgba(20,20,40,.3)}
-.tp-sits button.on{background:var(--teal);color:#fff}
-.tp-phrases{display:grid;gap:.6em;padding:.6em 1.2em 1em}
-.tp-ph{background:var(--card);border-radius:1.05em;padding:.85em .9em;display:grid;grid-template-columns:1fr auto;gap:.15em .7em;align-items:center;box-shadow:0 .25em .7em -.45em rgba(20,20,40,.3)}
-.tp-ph .ko{font-size:.82em;font-weight:800;color:var(--sub)}
-.tp-ph .th{font-size:1.35em;font-weight:800;color:var(--ink);line-height:1.3}
-.tp-ph .rd{font-size:.9em;font-weight:800;color:var(--teal)}
-.tp-ph button{grid-column:2;grid-row:1/4;width:2.6em;height:2.6em;border-radius:50%;border:none;background:var(--teal);color:#fff;display:grid;place-items:center;cursor:pointer}
-.tp-ph button svg{fill:#fff;stroke:none;width:1em;height:1em;margin-left:.12em}
-.tp-ph.playing button{background:var(--orange)}
-.tp-note{margin:.2em 1.2em 1em;font-size:.78em;color:var(--sub);font-weight:700;min-height:1.2em}
+/* 노하우 */
+.ca-search{display:flex;align-items:center;gap:.5em;background:var(--card);border-radius:.9em;padding:.6em .8em;box-shadow:0 .2em .6em -.4em rgba(25,20,60,.3);margin-bottom:.6em}
+.ca-search input{border:none;outline:none;background:none;flex:1;font-size:.95em;min-width:0}
+.ca-tip{display:grid;grid-template-columns:2.4em 1fr;gap:.7em;align-items:start}
+.ca-tip .ic{width:2.4em;height:2.4em;border-radius:.8em;display:grid;place-items:center;color:#fff}
+.ca-tip .ic svg{width:1.2em;height:1.2em}
+.ca-tip .nm{font-weight:900;font-size:.95em;display:flex;align-items:center;gap:.4em;flex-wrap:wrap}
+.ca-tip .cat{font-size:.68em;font-weight:900;border-radius:.5em;padding:.15em .45em;background:var(--bg);color:var(--sub)}
+.ca-tip .tx{font-size:.82em;color:var(--sub);font-weight:600;line-height:1.45;margin-top:.2em;white-space:pre-wrap}
+.ca-tip .ph{display:inline-flex;align-items:center;gap:.3em;margin-top:.35em;font-weight:800;font-size:.8em;color:var(--brand);text-decoration:none}
+mark.ca-hl{background:#FFE58A;color:inherit;border-radius:.2em;padding:0}
 
-.tp-tabbar{display:flex;justify-content:space-around;background:rgba(255,255,255,.96);border-top:1px solid var(--line);padding:.55em .4em 1.35em}
-.tp-tabbar button{border:none;background:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:.2em;font-weight:800;font-size:.72em;color:var(--faint);cursor:pointer;min-width:4.5em}
-.tp-tabbar button svg{width:1.7em;height:1.7em}
-.tp-tabbar button.on{color:var(--ink)}
-.tp-tabbar button.on svg{color:var(--teal)}
-.tp-pad{height:1em}
-.tp-title{padding:3.3em 1.2em .2em}
-.tp-title h2{margin:0;font-size:1.75em;font-weight:900;letter-spacing:-.03em}
-.tp-title p{margin:.2em 0 0;color:var(--sub);font-weight:700;font-size:.88em}
-.tp-tipcard{margin:.2em 1.2em 1em;border-radius:1.05em;padding:.9em 1em;background:linear-gradient(140deg,#FFF6E0,#FFE9C7);display:flex;gap:.7em;align-items:flex-start}
-.tp-tipcard b{flex:0 0 auto;width:1.8em;height:1.8em;border-radius:50%;background:var(--gold);color:#fff;display:grid;place-items:center;font-weight:900}
-.tp-tipcard div{font-size:.86em;font-weight:700;line-height:1.5;color:#5A4210}
-.tp-tipcard em{font-style:normal;color:var(--ink);font-weight:900}
+/* 탭바 */
+.ca-tabbar{display:flex;justify-content:space-around;background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:.5em .3em 1.1em;flex:0 0 auto}
+.ca-tabbar button{display:flex;flex-direction:column;align-items:center;gap:.2em;font-weight:800;font-size:.7em;color:var(--faint);min-width:4.6em;position:relative}
+.ca-tabbar button svg{width:1.65em;height:1.65em}
+.ca-tabbar button.on{color:var(--ink)}
+.ca-tabbar button.on svg{color:var(--brand)}
+.ca-tabbar .dot{position:absolute;top:-.1em;right:1.1em;min-width:1.4em;height:1.4em;border-radius:999px;background:var(--coral);color:#fff;font-size:.85em;display:grid;place-items:center;padding:0 .3em}
+
+/* 입력 시트 */
+.ca-sheet-bg{position:absolute;inset:0;background:rgba(15,12,40,.45);display:flex;align-items:flex-end;z-index:20;animation:caFade .2s}
+.ca-sheet{background:var(--bg);width:100%;border-radius:1.3em 1.3em 0 0;padding:1.1em 1em 1.4em;max-height:88%;overflow:auto;animation:caUp .25s ease}
+@keyframes caFade{from{opacity:0}}
+@keyframes caUp{from{transform:translateY(30%)}}
+.ca-sheet h4{margin:0 0 .8em;font-size:1.15em;font-weight:900;display:flex;justify-content:space-between;align-items:center}
+.ca-f{display:grid;gap:.6em}
+.ca-f label{display:grid;gap:.3em;font-size:.78em;font-weight:800;color:var(--sub)}
+.ca-f input,.ca-f textarea,.ca-f select{border:1.5px solid var(--line);background:var(--card);border-radius:.7em;padding:.6em .7em;font-size:1.15em;font-weight:600;color:var(--ink);outline:none;width:100%}
+.ca-f textarea{min-height:4.5em;resize:vertical}
+.ca-f input:focus,.ca-f textarea:focus,.ca-f select:focus{border-color:var(--brand)}
+.ca-f .two{display:grid;grid-template-columns:1fr 1fr;gap:.5em}
+.ca-f .chk{display:flex;align-items:center;gap:.45em;font-size:.85em;color:var(--ink)}
+.ca-f .chk input{width:1.1em;height:1.1em;accent-color:var(--brand)}
+.ca-go{background:var(--brand);color:#fff;font-weight:900;border-radius:.9em;padding:.8em;font-size:1em;margin-top:.3em;width:100%}
+.ca-go:disabled{opacity:.4}
+.ca-x{width:1.9em;height:1.9em;border-radius:50%;background:var(--card);display:grid;place-items:center;color:var(--sub)}
+
+.ca-toast{position:absolute;left:50%;bottom:5.5em;transform:translateX(-50%);background:var(--ink);color:#fff;font-weight:800;font-size:.8em;border-radius:999px;padding:.55em 1em;z-index:30;white-space:nowrap;animation:caFade .2s}
+.ca-live{display:inline-flex;align-items:center;gap:.3em;font-size:.72em;font-weight:800;opacity:.9}
+.ca-live i{width:.55em;height:.55em;border-radius:50%;background:#7CF0B5}
+.ca-live.off i{background:#FF8A8A}
+.ca-seed{margin:1em;text-align:center}
+.ca-seed button{font-weight:900;color:var(--brand);background:var(--soft);border-radius:999px;padding:.6em 1.1em;font-size:.85em}
+
+.phone-screen > .ca{font-size:calc(var(--ph) * .0192)}
+#centerQR canvas{display:block;width:clamp(220px,34vh,380px);height:auto;image-rendering:pixelated}
 
 /* 타이머 슬라이드 */
 .cd{display:flex;flex-direction:column;align-items:center;gap:clamp(14px,2.4vh,26px)}
@@ -1152,154 +1159,168 @@ METR(2025): 숙련 개발자 16명, 실제 과제 246개. AI 쓰니 19% 더 느�
 
 <!-- 04 제작 예시 -->
 <section class="slide center divider" data-accent="coral" data-title="04 바이브코딩 제작 예시"
-  data-notes="[0:46 · 14분] 제작 예시. 태국 4박 5일 여행 프로그램을 대화 5번으로 키운다. 각 대화 다음 장의 결과물은 실제로 눌러지니 직접 시연.">
+  data-notes="[제작 예시] 센터원 업무 공유 프로그램을 대화 5번으로 키운다. 결과 장의 폰 화면은 실제로 눌러진다(가짜 예시 데이터). 마지막에 진짜 사이트 QR로 다 같이 써 본다.
+※ 강의 전에: QR 장의 주소로 한 번 들어가서 '예시 데이터로 채워 보기'를 눌러 두면 빈 화면이 아닌 상태로 시작한다.">
   <div class="slide-inner">
     <div class="idx">04</div>
     <h2 class="headline">바이브코딩 <span class="accent">제작 예시</span></h2>
-    <p class="lead">다음 달, 태국 4박 5일 여행 프로그램</p>
+    <p class="lead">센터원 업무 공유 프로그램</p>
   </div>
 </section>
 
-<section class="slide wide" data-accent="coral" data-title="대화 ① 여행 계획 짜줘"
-  data-notes="[대화 ①] 1단계 방식. 글 계획을 받음. 내용은 좋지만 읽고 끝. '이걸 내 폰에서 계속 쓰려면?' 질문 던지며 다음으로.">
+<section class="slide wide" data-accent="coral" data-title="대화 ① 업무 공유 정리해줘"
+  data-notes="[대화 ①] 1단계 방식. 정리된 글을 받음. 맞는 말인데 읽고 끝. '그래서 이걸 어디서 쓰지?' 질문 던지며 다음으로.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 대화 ① · 1단계 방식</span>
     <div class="chat">
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>다음 달에 4박 5일로 <b>태국 여행</b>을 가는데 여행 계획을 짜줘.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>우리 보상센터 <b>업무 공유</b>를 어떻게 하면 좋을지 정리해줘. 공지가 단톡방에 묻히고, 휴가 때 인수인계가 자꾸 빠져.</div></div>
       <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>
-        <div class="plan"><b>1일차</b> 방콕 도착 · 숙소 체크인 · 아시아티크 야시장<br>
-        <b>2일차</b> 왕궁 · 왓포 · 왓아룬 · 짜오프라야강 보트<br>
-        <b>3일차</b> 파타야 이동 · 산호섬 투어 · 워킹스트리트<br>
-        <b>4일차</b> 방콕 복귀 · 아이콘시암 쇼핑 · 타이 마사지<br>
-        <b>5일차</b> 터미널21 · 공항 이동<br>
-        <span class="muted">… 준비물은 여권, 환전, 유심 … (긴 글이 이어짐)</span></div>
+        <div class="plan"><b>1. 공지</b> 중요한 공지는 따로 모아 맨 위에 고정하세요.<br>
+        <b>2. 근무 현황</b> 매일 아침 출근 · 외근 · 휴가와 대직자를 한곳에 표시하세요.<br>
+        <b>3. 인수인계</b> 사고번호 · 진행 상황 · 다음 할 일 · 기한을 같은 양식으로 남기세요.<br>
+        <b>4. 노하우</b> 공업사 · 병원 연락처와 업무 요령을 검색되게 모아 두세요.<br>
+        <span class="muted">… (긴 글이 이어짐)</span></div>
       </div></div>
     </div>
-    <div class="callout warn"><span class="bang">?</span><p>좋은데… <b>읽고 끝</b>입니다. 여행 가서 폰으로 계속 보고, 체크하고 싶다면?</p></div>
+    <div class="callout warn"><span class="bang">?</span><p>맞는 말인데… <b>읽고 끝</b>입니다. 이걸 내일부터 센터에서 진짜로 쓰려면?</p></div>
   </div>
 </section>
 
-<section class="slide wide" data-accent="coral" data-title="대화 ② HTML로 만들어줘"
-  data-notes="[대화 ②] 2단계의 시작. 같은 내용을 '웹페이지로' 바꿔 달라는 한마디.">
+<section class="slide wide" data-accent="coral" data-title="대화 ② 앱으로 만들어줘"
+  data-notes="[대화 ②] 2단계의 시작. '어떻게 보이게'를 말하는 한마디로 글이 도구가 된다.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 대화 ② · 2단계의 시작</span>
     <div class="chat">
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>좋아. 이걸 <b>폰에서 보는 여행 앱</b>처럼 HTML로 만들어줘. 출발까지 며칠 남았는지 보이고, <b>날짜별로 넘겨 보면서</b> 시간 순서로.</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>여행 앱 화면을 만들었어요. 맨 위에 출발 D-day와 여행 경로, 그 아래 DAY 카드를 누르면 그날 일정이 시간 순서 타임라인으로 나와요. 현지 팁도 같이 붙였어요.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>좋아. 이걸 <b>폰으로 보는 앱</b>처럼 HTML로 만들어줘. 맨 위에 <b>공지</b>, 그 아래 <b>오늘 누가 출근 · 외근 · 휴가인지</b>랑 대직자. 내 상태는 버튼으로 고르게.</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>센터 홈 화면을 만들었어요. 맨 위에 오늘 인원 요약, 공지는 고정할 수 있고, 아래에서 내 상태를 누르면 근무 현황에 바로 표시돼요.</div></div>
     </div>
   </div>
 </section>
 
-<section class="slide wide" data-accent="coral" data-title="결과 ② 일정 앱"
-  data-notes="[시연] 폰 화면의 DAY 카드를 눌러 날짜 넘기기. 맨 위 D-day와 경로. 글 한 편이 앱이 됐다.">
+<section class="slide wide" data-accent="coral" data-title="결과 ② 센터 홈"
+  data-notes="[시연] 폰 화면에서 '+ 공지'로 공지 올리기, '내 상태'에서 외근 눌러 메모 넣기. 위쪽 인원 요약이 바뀌는 것 보여 주기. 글 한 편이 앱이 됐다.">
   <div class="slide-inner">
     <div class="app-stage">
-      <div class="phone-frame"><div class="phone-screen"><div class="tp" data-trip="2"></div></div></div>
+      <div class="phone-frame"><div class="phone-screen"><div data-center="2"></div></div></div>
       <div class="app-side">
         <span class="badge">결과 ② · 실제 작동</span>
         <h2 class="subhead">글 한 편이 <span class="accent">앱</span>이 됐습니다</h2>
-        <div class="quote">"폰에서 보는 여행 앱처럼, 날짜별로 넘겨 보게"</div>
-        <ul class="added"><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>출발까지 D-day · 여행 경로</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>DAY 카드로 날짜 넘기기</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>시간 순서 타임라인 · 현지 팁</li></ul>
-        <p class="tap-hint">폰 화면의 DAY 카드를 눌러 보세요</p>
+        <div class="quote">"폰으로 보는 앱처럼, 공지랑 오늘 근무 현황"</div>
+        <ul class="added"><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>오늘 인원 요약</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>공지 올리기 · 고정</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>내 상태 · 대직자</li></ul>
+        <p class="tap-hint">폰 화면에서 내 상태를 눌러 보세요</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="slide wide" data-accent="teal" data-title="대화 ③ 관광지 · 맛집 · 쇼핑"
-  data-notes="[대화 ③] 기능 추가는 한 번에 하나. 정보 카드 추가.">
+<section class="slide wide" data-accent="teal" data-title="대화 ③ 인수인계 추가"
+  data-notes="[대화 ③] 기능 추가는 한 번에 하나. 처음 요청 때 안 한 기능도 대화로 붙인다.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 대화 ③ · 기능 추가</span>
     <div class="chat">
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>날마다 <b>관광지 · 맛집 · 쇼핑</b> 추천을 카드로 넣어줘. 추천 메뉴랑 팁도, 종류별로 골라 볼 수 있게.</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>일정 아래에 "오늘의 추천"을 넣었어요. [전체 · 관광 · 맛집 · 쇼핑]으로 골라 보고, 카드마다 추천 메뉴나 팁이 붙어 있어요.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>휴가 가는 사람이 담당 건을 <b>대직자에게 넘기는 인수인계</b> 탭 추가해줘. 사고번호, 진행 상황, 다음 할 일, 기한. 받은 사람이 <b>처리 완료</b> 누를 수 있게.</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>아래에 탭바를 만들고 [인수인계]를 넣었어요. 기한이 가까운 순으로 보이고, [나에게 온 것]만 골라 볼 수 있어요. 나에게 온 건 탭에 빨간 숫자로 떠요.</div></div>
     </div>
   </div>
 </section>
 
-<section class="slide wide" data-accent="teal" data-title="결과 ③ 정보 카드"
-  data-notes="[시연] 일정 아래로 내려 오늘의 추천. 관광 · 맛집 · 쇼핑 필터. 날짜를 바꾸면 추천도 바뀜.">
+<section class="slide wide" data-accent="teal" data-title="결과 ③ 인수인계"
+  data-notes="[시연] '나에게 온 것' 필터, '처리 완료' 누르기, '+ 인수인계'로 하나 남기기. 탭의 빨간 숫자가 줄어드는 것 보여 주기.">
   <div class="slide-inner">
     <div class="app-stage">
-      <div class="phone-frame"><div class="phone-screen"><div class="tp" data-trip="3" data-focus="spots"></div></div></div>
+      <div class="phone-frame"><div class="phone-screen"><div data-center="3" data-tab="handover"></div></div></div>
       <div class="app-side">
         <span class="badge">결과 ③ · 실제 작동</span>
-        <h2 class="subhead">날마다 <span class="accent">갈 곳</span>이 한눈에</h2>
-        <div class="quote">"관광지 · 맛집 · 쇼핑 추천, 추천 메뉴랑 팁도"</div>
-        <ul class="added"><li class="old"><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>일정 · D-day · 타임라인</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>오늘의 추천 카드</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>관광 · 맛집 · 쇼핑 골라 보기</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>추천 메뉴 · 현지 팁</li></ul>
-        <p class="tap-hint">아래로 내려 추천 카드를 골라 보세요</p>
+        <h2 class="subhead">휴가 가도 <span class="accent">건이 안 빠집니다</span></h2>
+        <div class="quote">"대직자에게 넘기는 인수인계, 처리 완료까지"</div>
+        <ul class="added"><li class="old"><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>공지 · 근무 현황</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>인수인계 카드 · 기한 D-day</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>나에게 온 것 · 처리 완료</li></ul>
+        <p class="tap-hint">처리 완료를 눌러 보세요</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="slide wide" data-accent="amber" data-title="대화 ④ 준비물 체크리스트"
-  data-notes="[대화 ④] 써 보다가 필요한 게 생김 → 바꿔줘. 체크한 건 저장되게.">
+<section class="slide wide" data-accent="amber" data-title="대화 ④ 노하우 · 연락처"
+  data-notes="[대화 ④] 써 보다가 생긴 불편이 최고의 요청. '그 공업사 번호 뭐였지?'">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 대화 ④ · 써 보다가 생긴 요청</span>
+    <span class="eyebrow"><span class="dot"></span> 대화 ④ · 써 보다 생긴 요청</span>
     <div class="chat">
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>여행 준비할 때 쓰게 <b>준비물 체크리스트</b> 탭 추가해줘. 체크한 건 <b>다시 열어도 저장</b>되게, 몇 개 남았는지도 보여줘.</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>앱 아래에 탭바를 만들고 [준비물]을 추가했어요. 서류 · 돈 · 전자기기 · 옷 · 약으로 나눴고, 체크하면 저장되고 준비 진행률이 원으로 차올라요.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>쓰다 보니 "그 공업사 번호 뭐였지?"가 제일 많네. <b>공업사 · 병원 · 렌트 연락처랑 업무 요령</b>을 모아서 <b>검색</b>되게 해줘. 번호 누르면 바로 전화.</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>[노하우] 탭을 추가했어요. 종류별로 고르고, 이름 · 지역 · 메모 어디든 검색되며 찾은 글자는 노랗게 표시돼요. 번호를 누르면 전화가 걸려요.</div></div>
     </div>
   </div>
 </section>
 
-<section class="slide wide" data-accent="amber" data-title="결과 ④ 체크리스트"
-  data-notes="[시연] 아래 탭바에서 준비물. 몇 개 체크 → 진행률 원이 차오름. 다른 장 갔다 와도 체크 유지.">
+<section class="slide wide" data-accent="amber" data-title="결과 ④ 노하우"
+  data-notes="[시연] 검색창에 '공업' 또는 '렌트' 입력. 종류 필터. '+ 등록'으로 하나 추가.">
   <div class="slide-inner">
     <div class="app-stage">
-      <div class="phone-frame"><div class="phone-screen"><div class="tp" data-trip="4" data-tab="check"></div></div></div>
+      <div class="phone-frame"><div class="phone-screen"><div data-center="4" data-tab="tips"></div></div></div>
       <div class="app-side">
         <span class="badge">결과 ④ · 실제 작동</span>
-        <h2 class="subhead"><span class="accent">준비물 탭</span>이 생겼습니다</h2>
-        <div class="quote">"준비물 체크리스트, 체크한 건 저장되게"</div>
-        <ul class="added"><li class="old"><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>일정 · 추천</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>아래 탭바 (일정 · 준비물)</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>체크하면 저장</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>준비 진행률</li></ul>
-        <p class="tap-hint">준비물을 눌러 체크해 보세요</p>
+        <h2 class="subhead">센터 노하우가 <span class="accent">검색</span>됩니다</h2>
+        <div class="quote">"연락처랑 업무 요령, 검색되게"</div>
+        <ul class="added"><li class="old"><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>공지 · 근무 현황 · 인수인계</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>공업사 · 병원 · 렌트 · 견인 · 노하우</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>검색 · 누르면 전화</li></ul>
+        <p class="tap-hint">검색창에 "렌트"를 쳐 보세요</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="slide wide" data-accent="indigo" data-title="대화 ⑤ 여행 회화"
-  data-notes="[대화 ⑤] 마지막. 현지에서 바로 쓰는 회화. 버튼 누르면 읽어주기.">
+<section class="slide wide" data-accent="indigo" data-title="대화 ⑤ 다 같이 쓰려면?"
+  data-notes="[대화 ⑤ · 반전] 지금까지 만든 건 파일 하나라 내 폰에만 저장된다(되는 것 / 안 되는 것 장과 연결). 그런데 막히면 AI에게 물으면 된다. AI가 서버 붙이는 길을 알려 준다.
+멘트: '그래서 진짜로 붙여 봤습니다. 오늘 아침 진단 설문도 이렇게 만든 사이트입니다.'">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 대화 ⑤ · 마무리</span>
+    <span class="eyebrow"><span class="dot"></span> 대화 ⑤ · 막히면 물어보기</span>
     <div class="chat">
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>마지막으로 <b>여행 회화</b> 탭. 식당 · 쇼핑 · 택시 상황별로 태국어랑 한글 발음, <b>버튼 누르면 읽어주기</b>까지.</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>[회화] 탭을 추가했어요. 식당 · 쇼핑 · 택시 · 기본으로 나눴고, 재생 버튼을 누르면 읽어 줘요. 태국어 음성이 없는 기기에서는 한글 발음을 보고 말하면 돼요.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>근데 이거 <b>센터원 다 같이</b> 보려면 어떻게 해?</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>
+        <div class="plan">지금은 파일 하나라 <b>각자 폰에만</b> 저장돼요. 같이 보려면 글을 모아 둘 <b>서버</b>가 필요해요. 무료로 이렇게 할 수 있어요.<br>
+        <b>① 저장소</b> 코드를 GitHub에 올리기<br>
+        <b>② 사이트 주소</b> Vercel에 연결하면 주소가 생겨요<br>
+        <b>③ 데이터베이스</b> Neon을 연결하면 모두의 글이 한곳에 모여요<br>
+        <span class="muted">하나씩 같이 해 볼까요?</span></div>
+      </div></div>
     </div>
+    <div class="callout tip"><span class="bang">!</span><p>한계도 AI에게 물으면 <b>길을 알려 줍니다.</b> 오늘 아침 진단 설문도 이렇게 만든 사이트예요.</p></div>
   </div>
 </section>
 
-<section class="slide wide" data-accent="indigo" data-title="결과 ⑤ 완성"
-  data-notes="[시연] 회화 탭에서 상황 칩(식당 · 쇼핑 · 택시 · 기본) 바꾸기, 재생 버튼. 일정 · 준비물 탭도 다시 오가며 완성 앱 보여주기.">
+<section class="slide center" data-accent="indigo" data-title="직접 써 보세요 · QR"
+  data-notes="[실습 5분] 진짜 사이트. 이름 입력 → 내 상태 체크 → 인수인계 하나(받는 사람은 옆 사람 이름) → 노하우 하나. 화면을 미러링해서 강사 폰에서도 같이 보여 주면, 글이 5초 안에 서로의 폰에 뜨는 걸 볼 수 있다.
+QR 주소는 오늘 날짜 방으로 만들어진다(같은 날 들어온 사람끼리 공유). 실제 고객 정보는 넣지 않게 다시 한 번 안내.">
   <div class="slide-inner">
-    <div class="app-stage">
-      <div class="phone-frame"><div class="phone-screen"><div class="tp" data-trip="5" data-tab="talk"></div></div></div>
-      <div class="app-side">
-        <span class="badge">완성 · 실제 작동</span>
-        <h2 class="subhead">현지에서 바로 쓰는 <span class="accent">여행 앱</span></h2>
-        <div class="quote">"상황별 태국어 · 한글 발음, 누르면 읽어주기"</div>
-        <ul class="added"><li class="old"><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>일정 · 추천 · 준비물</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>회화 탭</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>상황별 태국어 · 한글 발음</li><li class=""><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>재생 버튼으로 듣기</li></ul>
-        <p class="tap-hint">아래 탭바로 일정 · 준비물 · 회화를 오가 보세요</p>
+    <span class="live"><i></i> 진짜 사이트</span>
+    <div style="display:flex;gap:clamp(24px,4vw,64px);align-items:center;justify-content:center;flex-wrap:wrap;margin-top:clamp(12px,2vh,22px)">
+      <div style="background:#fff;border-radius:28px;padding:clamp(16px,2vw,28px);box-shadow:var(--shadow)"><div id="centerQR" data-path="/center"></div></div>
+      <div style="text-align:left;max-width:560px">
+        <h2 class="subhead">직접 <span class="accent">써 보세요</span></h2>
+        <ul class="list num-list">
+          <li><span class="mk"></span><span><b>이름</b> 입력</span></li>
+          <li><span class="mk"></span><span>오늘 <b>내 상태</b> 체크</span></li>
+          <li><span class="mk"></span><span>옆 사람에게 <b>인수인계</b> 하나</span></li>
+          <li><span class="mk"></span><span><b>노하우</b> 하나 등록</span></li>
+        </ul>
+        <p class="src" id="centerURL"></p>
       </div>
     </div>
+    <div class="callout warn" style="max-width:820px"><span class="bang">!</span><p>교육용 공간이에요. <b>실제 고객 이름 · 연락처 · 주민번호는 넣지 마세요.</b></p></div>
   </div>
 </section>
 
 <section class="slide" data-accent="coral" data-title="방금 무슨 일이"
-  data-notes="[정리] 대화 5번, 코드 0줄. 단계마다 배운 점을 짚기. 2부에서 이 흐름 그대로 각 조의 업무 도구를 만든다.">
+  data-notes="[정리] 대화 5번, 코드 0줄. 단계마다 배운 점을 짚기. 2부에서는 이 흐름 그대로 여러분 업무로.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 방금 무슨 일이</span>
     <h2 class="subhead">대화 <span class="accent">5번</span>, 코드 <span class="accent">0줄</span></h2>
     <div class="flow" style="--n:5">
-      <div class="step"><span class="n">①</span><h3>계획 받기</h3><p>묻기만 하면 글이 온다</p></div>
-      <div class="step hot"><span class="n">②</span><h3>HTML로</h3><p>"어떻게 보이게"를 말하면 도구가 온다</p></div>
-      <div class="step"><span class="n">③</span><h3>정보 카드</h3><p>기능은 한 번에 하나씩</p></div>
-      <div class="step"><span class="n">④</span><h3>체크리스트</h3><p>써 보다 생긴 불편이 최고의 요청</p></div>
-      <div class="step"><span class="n">⑤</span><h3>여행 회화</h3><p>대화로 계속 키운다</p></div>
+      <div class="step"><span class="n">①</span><h3>정리 받기</h3><p>묻기만 하면 글이 온다</p></div>
+      <div class="step hot"><span class="n">②</span><h3>앱으로</h3><p>"어떻게 보이게"를 말하면 도구가 온다</p></div>
+      <div class="step"><span class="n">③</span><h3>인수인계</h3><p>기능은 한 번에 하나씩</p></div>
+      <div class="step"><span class="n">④</span><h3>노하우</h3><p>써 보다 생긴 불편이 최고의 요청</p></div>
+      <div class="step hot"><span class="n">⑤</span><h3>같이 쓰기</h3><p>한계도 AI에게 물으면 길이 나온다</p></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>이 흐름 그대로, 2부에서는 <b>여러분 업무</b>로 만듭니다.</p></div>
+    <div class="callout tip"><span class="bang">!</span><p>이 흐름 그대로, 이제 <b>여러분 업무</b>로 만듭니다.</p></div>
   </div>
 </section>
 
@@ -1758,202 +1779,2701 @@ METR(2025): 숙련 개발자 16명, 실제 과제 246개. AI 쓰니 19% 더 느�
     show();
   });
 
-  /* ===== 태국 여행 앱 (제작 예시) ===== */
-  var IC={
-    fly:'<path d="M2 16l20-6-20-6 3 6-3 6z"/><path d="M5 10h8"/>',
-    hotel:'<path d="M3 19V6"/><path d="M3 14h18v5"/><path d="M21 19v-3a3 3 0 0 0-3-3h-7v1"/><circle cx="7" cy="11" r="2"/>',
-    sight:'<path d="M12 3l2.2 3.2H9.8L12 3z"/><path d="M8.5 9.5h7l-1.3-3.3H9.8z"/><path d="M6 13h12l-2.5-3.5h-7z"/><path d="M6.5 13v7M17.5 13v7M3.5 20h17M10.5 20v-4h3v4"/>',
-    food:'<path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10"/><path d="M17 21V3c-2.2 1.2-3.5 4-3.5 7.5H17"/>',
-    shop:'<path d="M5.5 8h13l-1 12.5h-11z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>',
-    boat:'<path d="M3 16l2.2 4h13.6L21 16z"/><path d="M12 3v11"/><path d="M12 4.5l6.5 9.5H12"/>',
-    spa:'<path d="M12 20c-4.2 0-7-2.8-7-6.5 3 0 5.2 1.1 7 3 1.8-1.9 4-3 7-3 0 3.7-2.8 6.5-7 6.5z"/><path d="M12 16.5c-2.2-2.3-2.2-6.6 0-9.5 2.2 2.9 2.2 7.2 0 9.5z"/>',
-    night:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
-    move:'<path d="M5 16.5h14"/><path d="M4 16.5V12l2.2-5h11.6L20 12v4.5"/><path d="M4 12h16"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/>',
-    cal:'<rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/>',
-    list:'<path d="M9 6.5h11M9 12h11M9 17.5h11"/><path d="M4 6.5l1 1 2-2M4 12l1 1 2-2M4 17.5l1 1 2-2"/>',
-    chat:'<path d="M4 5.5h16v10.5H9l-5 4z"/><path d="M8.5 10.5h7"/>',
-    check:'<path d="M5 12.5l4.5 4.5L19.5 7"/>',
-    doc:'<rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 8.5h6M9 12.5h6M9 16.5h3"/>',
-    won:'<circle cx="12" cy="12" r="8.5"/><path d="M8 9l1.6 6 2.4-5 2.4 5L16 9M7.5 12h9"/>',
-    plug:'<path d="M9 3v5M15 3v5M6.5 8h11v3.5a5.5 5.5 0 0 1-11 0z"/><path d="M12 17v4"/>',
-    shirt:'<path d="M8 4l-4 3 2.2 3.2L8 9v11h8V9l1.8 1.2L20 7l-4-3a4 4 0 0 1-8 0z"/>',
-    pill:'<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.6 8.6l4.8 6.8"/>'
-  };
-  function svg(k){ return '<svg viewBox="0 0 24 24">'+(IC[k]||'')+'</svg>'; }
-  var PLAY='<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></svg>';
-  var TYPE={fly:'#5C6BF2',hotel:'#7B5CF0',sight:'#0B5C78',food:'#E5484D',shop:'#FF7A45',boat:'#0F9F8F',spa:'#12A594',night:'#2B2D5A',move:'#8A8FA3'};
-  var CATC={sight:['관광','#0B5C78','linear-gradient(140deg,#2C9AB7,#0B5C78)'],food:['맛집','#E5484D','linear-gradient(140deg,#FF8A7A,#E5484D)'],shop:['쇼핑','#FF7A45','linear-gradient(140deg,#FFB067,#FF7A45)']};
+})();
+</script>
+<script>
+//---------------------------------------------------------------------
+//
+// QR Code Generator for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//  http://www.opensource.org/licenses/mit-license.php
+//
+// The word 'QR Code' is registered trademark of
+// DENSO WAVE INCORPORATED
+//  http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
 
-  var DAYS=[
-    {city:'방콕',sum:'도착 · 야시장',plan:[
-      ['10:30','fly','인천 출발','방콕 수완나품까지 약 6시간',['기내 반입 액체 확인']],
-      ['14:30','fly','수완나품 공항 도착','유심 개통 · 환전은 공항에서 조금만',['그랩 앱 미리 설치']],
-      ['16:30','hotel','호텔 체크인','수쿰윗 아속역 근처 · BTS · MRT 환승 편리',[]],
-      ['18:30','night','쩟페어 야시장','먹거리 노점 · 랭쌥(등뼈찜) 유명',['현금 준비']],
-      ['21:00','spa','발 마사지 1시간','첫날 피로 풀기',[]]],
-     spots:[['sight','쩟페어 야시장','방콕 대표 야시장, 먹거리와 소품 구경','추천: 랭쌥 · 망고 찹쌀밥'],
-      ['food','쏨분 씨푸드','해산물 식당, 저녁 시간에 붐빔','추천: 푸팟퐁커리'],
-      ['shop','터미널21','층마다 세계 도시 테마인 쇼핑몰','추천: 푸드코트 가성비']]},
-    {city:'방콕',sum:'왕궁 · 사원 · 강',plan:[
-      ['08:30','sight','왕궁 · 에메랄드 사원','오전 일찍 가야 덜 붐벼요',['긴바지 · 어깨 가리기','warn']],
-      ['11:30','sight','왓포','누워 있는 거대한 황금 불상',[]],
-      ['13:00','food','점심 · 타띠엔 선착장 근처','강변 로컬 식당',[]],
-      ['14:30','boat','수상버스로 왓아룬','강 건너 새벽 사원, 사진 명소',['수상버스 이용']],
-      ['17:30','shop','아이콘시암','강변 대형 쇼핑몰 · 실내 수상시장',[]],
-      ['19:30','food','저녁 · 강변 레스토랑','짜오프라야강 야경',[]]],
-     spots:[['sight','왕궁','방콕 대표 명소, 복장 규정이 엄격','팁: 긴바지 · 어깨 가리는 옷'],
-      ['sight','왓아룬','해 질 녘 강 건너편에서 보는 모습이 예쁨','팁: 노을 시간 맞추기'],
-      ['food','팁싸마이','오래된 팟타이 맛집, 저녁 줄이 김','추천: 팟타이 · 오렌지 주스'],
-      ['shop','아이콘시암 쑥시암','실내 수상시장 콘셉트 푸드 · 기념품 거리','추천: 지역 간식 맛보기']]},
-    {city:'파타야',sum:'바다 · 섬 투어',plan:[
-      ['08:00','move','파타야로 이동','차로 약 2시간',['기사 포함 차량 예약']],
-      ['10:30','boat','산호섬(꼬란) 투어','스피드보트 · 해변 · 스노클링',['선크림 · 여벌 옷','warn']],
-      ['14:00','food','해변 점심','그날 잡은 해산물',[]],
-      ['16:00','hotel','리조트 체크인','수영장에서 쉬기',[]],
-      ['19:00','food','비치로드 저녁','해변 따라 산책',[]],
-      ['21:00','night','워킹스트리트','밤거리 구경',[]]],
-     spots:[['sight','산호섬(꼬란)','맑은 바다, 반나절 투어로 충분','팁: 오전 배가 바다가 잔잔'],
-      ['food','해변 해산물 식당','골라서 무게로 주문하는 방식','추천: 새우 · 오징어 구이'],
-      ['shop','터미널21 파타야','더위 피하기 좋은 쇼핑몰','추천: 시원하게 쉬어 가기']]},
-    {city:'방콕',sum:'쇼핑 · 마사지 · 야경',plan:[
-      ['10:00','move','방콕 복귀','점심 전 도착',[]],
-      ['13:00','shop','짜뚜짝 주말시장','주말에만 열려요 · 평일엔 시암 쇼핑',['주말 확인','warn']],
-      ['16:00','spa','타이 마사지 2시간','쇼핑 후 회복',[]],
-      ['18:30','night','루프탑 바','방콕 노을과 야경',['드레스코드 확인']],
-      ['20:30','food','저녁 · 똠얌꿍','현지식 마무리',[]]],
-     spots:[['shop','짜뚜짝 주말시장','구역이 넓어 지도 필수','팁: 오전에 가야 덜 더움'],
-      ['shop','시암 파라곤 · 센트럴월드','시암역 대형 쇼핑몰 모음','추천: 평일 쇼핑 코스'],
-      ['sight','루프탑 바','방콕 야경 명소','팁: 슬리퍼 · 반바지 안 되는 곳 많음'],
-      ['food','똠얌꿍 맛집','새콤 매콤한 태국 대표 국물','추천: 똠얌꿍 · 쏨땀']]},
-    {city:'방콕',sum:'기념품 · 귀국',plan:[
-      ['10:00','hotel','체크아웃','짐은 호텔에 맡기기',[]],
-      ['11:00','shop','빅C 마트','과자 · 말린 망고 · 소스 기념품',[]],
-      ['13:00','food','망고 찹쌀밥','마지막 디저트',[]],
-      ['15:00','move','공항 이동','출발 3시간 전 도착',['택스 리펀 서류','warn']],
-      ['18:00','fly','방콕 출발','인천 도착 다음 날 새벽',[]]],
-     spots:[['shop','빅C','기념품은 마트가 저렴','추천: 말린 망고 · 김과자'],
-      ['food','망고 찹쌀밥','코코넛 밀크를 뿌린 태국 대표 디저트','추천: 망고 1개 통째로'],
-      ['sight','공항 면세점','남은 바트 정리','팁: 동전은 기부함에']]}
-  ];
-  var CHECK=[['doc','서류',['여권 (유효기간 6개월 이상)','항공권 · 호텔 예약 확인','여행자 보험']],
-    ['won','돈',['바트 환전','해외 결제 카드','소액 현금 (노점 · 팁)']],
-    ['plug','전자기기',['유심 · eSIM','보조배터리','멀티 어댑터']],
-    ['shirt','옷',['사원용 긴바지 · 어깨 가리는 옷','우산 · 우비 (소나기)','샌들 · 수영복']],
-    ['pill','약 · 기타',['상비약 · 지사제','선크림','모기 기피제']]];
-  var TALK=[['식당',[['맵지 않게 해 주세요','ไม่เผ็ด','마이 펫'],['계산서 주세요','เช็คบิลด้วย','첵 빈 두어이'],['정말 맛있어요','อร่อยมาก','아로이 막']]],
-    ['쇼핑',[['얼마예요?','เท่าไหร่ครับ','타오라이 캅'],['조금 깎아 주세요','ลดหน่อยได้ไหม','롯 너이 다이 마이'],['이걸로 주세요','เอาอันนี้','아오 안 니']]],
-    ['택시',[['여기로 가 주세요','ไปที่นี่','빠이 티 니'],['미터기 켜 주세요','เปิดมิเตอร์ด้วย','쁫 미떠 두어이'],['여기서 세워 주세요','จอดตรงนี้','쩟 뜨롱 니']]],
-    ['기본',[['안녕하세요','สวัสดีครับ','사왓디 캅'],['감사합니다','ขอบคุณครับ','컵쿤 캅'],['화장실 어디예요?','ห้องน้ำอยู่ที่ไหน','헝남 유 티나이']]]];
-  var KEY='vibe-trip-check-v2';
-  function loadCk(){ try{ return JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ return {}; } }
-  function saveCk(o){ try{ localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){} }
-  function el(tag,cls,html){ var e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
-  function esc(t){ return String(t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+var qrcode = function() {
 
-  // 다음 달 첫 목요일 출발
-  var start=(function(){ var n=new Date(); var d=new Date(n.getFullYear(), n.getMonth()+1, 1); while(d.getDay()!==4) d.setDate(d.getDate()+1); return d; })();
-  var WK='일월화수목금토';
-  function dayDate(ix){ var d=new Date(start); d.setDate(d.getDate()+ix); return (d.getMonth()+1)+'.'+d.getDate()+' ('+WK[d.getDay()]+')'; }
-  var dday=Math.ceil((start-new Date().setHours(0,0,0,0))/86400000);
+  //---------------------------------------------------------------------
+  // qrcode
+  //---------------------------------------------------------------------
 
-  function buildTrip(host){
-    var level=+host.getAttribute('data-trip');
-    var tab=host.getAttribute('data-tab')||'plan', day=0, kind='all', sit=0;
-    host.innerHTML='';
-    var status=el('div','tp-status','<span>9:41</span><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 18h2M8 15h2v3M13 11h2v7M18 7h2v11"/></svg><span class="bat"></span></span>');
-    var scroll=el('div','tp-scroll');
-    host.appendChild(status); host.appendChild(scroll);
-    // 내리면 상태 표시줄 뒤를 가려서 글자가 겹치지 않게
-    scroll.addEventListener('scroll',function(){ status.classList.toggle('dark', tab!=='plan' || scroll.scrollTop>40); });
-    var bar=null;
-    if(level>=4){
-      bar=el('div','tp-tabbar');
-      var tabs=[['plan','cal','일정'],['check','list','준비물']]; if(level>=5) tabs.push(['talk','chat','회화']);
-      tabs.forEach(function(t){ var b=el('button',null,svg(t[1])+'<span>'+t[2]+'</span>'); b.setAttribute('data-t',t[0]); b.onclick=function(){ tab=t[0]; scroll.scrollTop=0; draw(); }; bar.appendChild(b); });
-      host.appendChild(bar);
+  /**
+   * qrcode
+   * @param typeNumber 1 to 40
+   * @param errorCorrectionLevel 'L','M','Q','H'
+   */
+  var qrcode = function(typeNumber, errorCorrectionLevel) {
+
+    var PAD0 = 0xEC;
+    var PAD1 = 0x11;
+
+    var _typeNumber = typeNumber;
+    var _errorCorrectionLevel = QRErrorCorrectionLevel[errorCorrectionLevel];
+    var _modules = null;
+    var _moduleCount = 0;
+    var _dataCache = null;
+    var _dataList = [];
+
+    var _this = {};
+
+    var makeImpl = function(test, maskPattern) {
+
+      _moduleCount = _typeNumber * 4 + 17;
+      _modules = function(moduleCount) {
+        var modules = new Array(moduleCount);
+        for (var row = 0; row < moduleCount; row += 1) {
+          modules[row] = new Array(moduleCount);
+          for (var col = 0; col < moduleCount; col += 1) {
+            modules[row][col] = null;
+          }
+        }
+        return modules;
+      }(_moduleCount);
+
+      setupPositionProbePattern(0, 0);
+      setupPositionProbePattern(_moduleCount - 7, 0);
+      setupPositionProbePattern(0, _moduleCount - 7);
+      setupPositionAdjustPattern();
+      setupTimingPattern();
+      setupTypeInfo(test, maskPattern);
+
+      if (_typeNumber >= 7) {
+        setupTypeNumber(test);
+      }
+
+      if (_dataCache == null) {
+        _dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
+      }
+
+      mapData(_dataCache, maskPattern);
+    };
+
+    var setupPositionProbePattern = function(row, col) {
+
+      for (var r = -1; r <= 7; r += 1) {
+
+        if (row + r <= -1 || _moduleCount <= row + r) continue;
+
+        for (var c = -1; c <= 7; c += 1) {
+
+          if (col + c <= -1 || _moduleCount <= col + c) continue;
+
+          if ( (0 <= r && r <= 6 && (c == 0 || c == 6) )
+              || (0 <= c && c <= 6 && (r == 0 || r == 6) )
+              || (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+            _modules[row + r][col + c] = true;
+          } else {
+            _modules[row + r][col + c] = false;
+          }
+        }
+      }
+    };
+
+    var getBestMaskPattern = function() {
+
+      var minLostPoint = 0;
+      var pattern = 0;
+
+      for (var i = 0; i < 8; i += 1) {
+
+        makeImpl(true, i);
+
+        var lostPoint = QRUtil.getLostPoint(_this);
+
+        if (i == 0 || minLostPoint > lostPoint) {
+          minLostPoint = lostPoint;
+          pattern = i;
+        }
+      }
+
+      return pattern;
+    };
+
+    var setupTimingPattern = function() {
+
+      for (var r = 8; r < _moduleCount - 8; r += 1) {
+        if (_modules[r][6] != null) {
+          continue;
+        }
+        _modules[r][6] = (r % 2 == 0);
+      }
+
+      for (var c = 8; c < _moduleCount - 8; c += 1) {
+        if (_modules[6][c] != null) {
+          continue;
+        }
+        _modules[6][c] = (c % 2 == 0);
+      }
+    };
+
+    var setupPositionAdjustPattern = function() {
+
+      var pos = QRUtil.getPatternPosition(_typeNumber);
+
+      for (var i = 0; i < pos.length; i += 1) {
+
+        for (var j = 0; j < pos.length; j += 1) {
+
+          var row = pos[i];
+          var col = pos[j];
+
+          if (_modules[row][col] != null) {
+            continue;
+          }
+
+          for (var r = -2; r <= 2; r += 1) {
+
+            for (var c = -2; c <= 2; c += 1) {
+
+              if (r == -2 || r == 2 || c == -2 || c == 2
+                  || (r == 0 && c == 0) ) {
+                _modules[row + r][col + c] = true;
+              } else {
+                _modules[row + r][col + c] = false;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    var setupTypeNumber = function(test) {
+
+      var bits = QRUtil.getBCHTypeNumber(_typeNumber);
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
+      }
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+      }
+    };
+
+    var setupTypeInfo = function(test, maskPattern) {
+
+      var data = (_errorCorrectionLevel << 3) | maskPattern;
+      var bits = QRUtil.getBCHTypeInfo(data);
+
+      // vertical
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 6) {
+          _modules[i][8] = mod;
+        } else if (i < 8) {
+          _modules[i + 1][8] = mod;
+        } else {
+          _modules[_moduleCount - 15 + i][8] = mod;
+        }
+      }
+
+      // horizontal
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 8) {
+          _modules[8][_moduleCount - i - 1] = mod;
+        } else if (i < 9) {
+          _modules[8][15 - i - 1 + 1] = mod;
+        } else {
+          _modules[8][15 - i - 1] = mod;
+        }
+      }
+
+      // fixed module
+      _modules[_moduleCount - 8][8] = (!test);
+    };
+
+    var mapData = function(data, maskPattern) {
+
+      var inc = -1;
+      var row = _moduleCount - 1;
+      var bitIndex = 7;
+      var byteIndex = 0;
+      var maskFunc = QRUtil.getMaskFunction(maskPattern);
+
+      for (var col = _moduleCount - 1; col > 0; col -= 2) {
+
+        if (col == 6) col -= 1;
+
+        while (true) {
+
+          for (var c = 0; c < 2; c += 1) {
+
+            if (_modules[row][col - c] == null) {
+
+              var dark = false;
+
+              if (byteIndex < data.length) {
+                dark = ( ( (data[byteIndex] >>> bitIndex) & 1) == 1);
+              }
+
+              var mask = maskFunc(row, col - c);
+
+              if (mask) {
+                dark = !dark;
+              }
+
+              _modules[row][col - c] = dark;
+              bitIndex -= 1;
+
+              if (bitIndex == -1) {
+                byteIndex += 1;
+                bitIndex = 7;
+              }
+            }
+          }
+
+          row += inc;
+
+          if (row < 0 || _moduleCount <= row) {
+            row -= inc;
+            inc = -inc;
+            break;
+          }
+        }
+      }
+    };
+
+    var createBytes = function(buffer, rsBlocks) {
+
+      var offset = 0;
+
+      var maxDcCount = 0;
+      var maxEcCount = 0;
+
+      var dcdata = new Array(rsBlocks.length);
+      var ecdata = new Array(rsBlocks.length);
+
+      for (var r = 0; r < rsBlocks.length; r += 1) {
+
+        var dcCount = rsBlocks[r].dataCount;
+        var ecCount = rsBlocks[r].totalCount - dcCount;
+
+        maxDcCount = Math.max(maxDcCount, dcCount);
+        maxEcCount = Math.max(maxEcCount, ecCount);
+
+        dcdata[r] = new Array(dcCount);
+
+        for (var i = 0; i < dcdata[r].length; i += 1) {
+          dcdata[r][i] = 0xff & buffer.getBuffer()[i + offset];
+        }
+        offset += dcCount;
+
+        var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+        var rawPoly = qrPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+        var modPoly = rawPoly.mod(rsPoly);
+        ecdata[r] = new Array(rsPoly.getLength() - 1);
+        for (var i = 0; i < ecdata[r].length; i += 1) {
+          var modIndex = i + modPoly.getLength() - ecdata[r].length;
+          ecdata[r][i] = (modIndex >= 0)? modPoly.getAt(modIndex) : 0;
+        }
+      }
+
+      var totalCodeCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalCodeCount += rsBlocks[i].totalCount;
+      }
+
+      var data = new Array(totalCodeCount);
+      var index = 0;
+
+      for (var i = 0; i < maxDcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < dcdata[r].length) {
+            data[index] = dcdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      for (var i = 0; i < maxEcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < ecdata[r].length) {
+            data[index] = ecdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      return data;
+    };
+
+    var createData = function(typeNumber, errorCorrectionLevel, dataList) {
+
+      var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectionLevel);
+
+      var buffer = qrBitBuffer();
+
+      for (var i = 0; i < dataList.length; i += 1) {
+        var data = dataList[i];
+        buffer.put(data.getMode(), 4);
+        buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+        data.write(buffer);
+      }
+
+      // calc num max data.
+      var totalDataCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalDataCount += rsBlocks[i].dataCount;
+      }
+
+      if (buffer.getLengthInBits() > totalDataCount * 8) {
+        throw 'code length overflow. ('
+          + buffer.getLengthInBits()
+          + '>'
+          + totalDataCount * 8
+          + ')';
+      }
+
+      // end code
+      if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+        buffer.put(0, 4);
+      }
+
+      // padding
+      while (buffer.getLengthInBits() % 8 != 0) {
+        buffer.putBit(false);
+      }
+
+      // padding
+      while (true) {
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD0, 8);
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD1, 8);
+      }
+
+      return createBytes(buffer, rsBlocks);
+    };
+
+    _this.addData = function(data, mode) {
+
+      mode = mode || 'Byte';
+
+      var newData = null;
+
+      switch(mode) {
+      case 'Numeric' :
+        newData = qrNumber(data);
+        break;
+      case 'Alphanumeric' :
+        newData = qrAlphaNum(data);
+        break;
+      case 'Byte' :
+        newData = qr8BitByte(data);
+        break;
+      case 'Kanji' :
+        newData = qrKanji(data);
+        break;
+      default :
+        throw 'mode:' + mode;
+      }
+
+      _dataList.push(newData);
+      _dataCache = null;
+    };
+
+    _this.isDark = function(row, col) {
+      if (row < 0 || _moduleCount <= row || col < 0 || _moduleCount <= col) {
+        throw row + ',' + col;
+      }
+      return _modules[row][col];
+    };
+
+    _this.getModuleCount = function() {
+      return _moduleCount;
+    };
+
+    _this.make = function() {
+      if (_typeNumber < 1) {
+        var typeNumber = 1;
+
+        for (; typeNumber < 40; typeNumber++) {
+          var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, _errorCorrectionLevel);
+          var buffer = qrBitBuffer();
+
+          for (var i = 0; i < _dataList.length; i++) {
+            var data = _dataList[i];
+            buffer.put(data.getMode(), 4);
+            buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+            data.write(buffer);
+          }
+
+          var totalDataCount = 0;
+          for (var i = 0; i < rsBlocks.length; i++) {
+            totalDataCount += rsBlocks[i].dataCount;
+          }
+
+          if (buffer.getLengthInBits() <= totalDataCount * 8) {
+            break;
+          }
+        }
+
+        _typeNumber = typeNumber;
+      }
+
+      makeImpl(false, getBestMaskPattern() );
+    };
+
+    _this.createTableTag = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var qrHtml = '';
+
+      qrHtml += '<table style="';
+      qrHtml += ' border-width: 0px; border-style: none;';
+      qrHtml += ' border-collapse: collapse;';
+      qrHtml += ' padding: 0px; margin: ' + margin + 'px;';
+      qrHtml += '">';
+      qrHtml += '<tbody>';
+
+      for (var r = 0; r < _this.getModuleCount(); r += 1) {
+
+        qrHtml += '<tr>';
+
+        for (var c = 0; c < _this.getModuleCount(); c += 1) {
+          qrHtml += '<td style="';
+          qrHtml += ' border-width: 0px; border-style: none;';
+          qrHtml += ' border-collapse: collapse;';
+          qrHtml += ' padding: 0px; margin: 0px;';
+          qrHtml += ' width: ' + cellSize + 'px;';
+          qrHtml += ' height: ' + cellSize + 'px;';
+          qrHtml += ' background-color: ';
+          qrHtml += _this.isDark(r, c)? '#000000' : '#ffffff';
+          qrHtml += ';';
+          qrHtml += '"/>';
+        }
+
+        qrHtml += '</tr>';
+      }
+
+      qrHtml += '</tbody>';
+      qrHtml += '</table>';
+
+      return qrHtml;
+    };
+
+    _this.createSvgTag = function(cellSize, margin, alt, title) {
+
+      var opts = {};
+      if (typeof arguments[0] == 'object') {
+        // Called by options.
+        opts = arguments[0];
+        // overwrite cellSize and margin.
+        cellSize = opts.cellSize;
+        margin = opts.margin;
+        alt = opts.alt;
+        title = opts.title;
+      }
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      // Compose alt property surrogate
+      alt = (typeof alt === 'string') ? {text: alt} : alt || {};
+      alt.text = alt.text || null;
+      alt.id = (alt.text) ? alt.id || 'qrcode-description' : null;
+
+      // Compose title property surrogate
+      title = (typeof title === 'string') ? {text: title} : title || {};
+      title.text = title.text || null;
+      title.id = (title.text) ? title.id || 'qrcode-title' : null;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var c, mc, r, mr, qrSvg='', rect;
+
+      rect = 'l' + cellSize + ',0 0,' + cellSize +
+        ' -' + cellSize + ',0 0,-' + cellSize + 'z ';
+
+      qrSvg += '<svg version="1.1" xmlns="http://www.w3.org/2000/svg"';
+      qrSvg += !opts.scalable ? ' width="' + size + 'px" height="' + size + 'px"' : '';
+      qrSvg += ' viewBox="0 0 ' + size + ' ' + size + '" ';
+      qrSvg += ' preserveAspectRatio="xMinYMin meet"';
+      qrSvg += (title.text || alt.text) ? ' role="img" aria-labelledby="' +
+          escapeXml([title.id, alt.id].join(' ').trim() ) + '"' : '';
+      qrSvg += '>';
+      qrSvg += (title.text) ? '<title id="' + escapeXml(title.id) + '">' +
+          escapeXml(title.text) + '</title>' : '';
+      qrSvg += (alt.text) ? '<description id="' + escapeXml(alt.id) + '">' +
+          escapeXml(alt.text) + '</description>' : '';
+      qrSvg += '<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>';
+      qrSvg += '<path d="';
+
+      for (r = 0; r < _this.getModuleCount(); r += 1) {
+        mr = r * cellSize + margin;
+        for (c = 0; c < _this.getModuleCount(); c += 1) {
+          if (_this.isDark(r, c) ) {
+            mc = c*cellSize+margin;
+            qrSvg += 'M' + mc + ',' + mr + rect;
+          }
+        }
+      }
+
+      qrSvg += '" stroke="transparent" fill="black"/>';
+      qrSvg += '</svg>';
+
+      return qrSvg;
+    };
+
+    _this.createDataURL = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      return createDataURL(size, size, function(x, y) {
+        if (min <= x && x < max && min <= y && y < max) {
+          var c = Math.floor( (x - min) / cellSize);
+          var r = Math.floor( (y - min) / cellSize);
+          return _this.isDark(r, c)? 0 : 1;
+        } else {
+          return 1;
+        }
+      } );
+    };
+
+    _this.createImgTag = function(cellSize, margin, alt) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+
+      var img = '';
+      img += '<img';
+      img += '\u0020src="';
+      img += _this.createDataURL(cellSize, margin);
+      img += '"';
+      img += '\u0020width="';
+      img += size;
+      img += '"';
+      img += '\u0020height="';
+      img += size;
+      img += '"';
+      if (alt) {
+        img += '\u0020alt="';
+        img += escapeXml(alt);
+        img += '"';
+      }
+      img += '/>';
+
+      return img;
+    };
+
+    var escapeXml = function(s) {
+      var escaped = '';
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charAt(i);
+        switch(c) {
+        case '<': escaped += '&lt;'; break;
+        case '>': escaped += '&gt;'; break;
+        case '&': escaped += '&amp;'; break;
+        case '"': escaped += '&quot;'; break;
+        default : escaped += c; break;
+        }
+      }
+      return escaped;
+    };
+
+    var _createHalfASCII = function(margin) {
+      var cellSize = 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r1, r2, p;
+
+      var blocks = {
+        '██': '█',
+        '█ ': '▀',
+        ' █': '▄',
+        '  ': ' '
+      };
+
+      var blocksLastLineNoMargin = {
+        '██': '▀',
+        '█ ': '▀',
+        ' █': ' ',
+        '  ': ' '
+      };
+
+      var ascii = '';
+      for (y = 0; y < size; y += 2) {
+        r1 = Math.floor((y - min) / cellSize);
+        r2 = Math.floor((y + 1 - min) / cellSize);
+        for (x = 0; x < size; x += 1) {
+          p = '█';
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r1, Math.floor((x - min) / cellSize))) {
+            p = ' ';
+          }
+
+          if (min <= x && x < max && min <= y+1 && y+1 < max && _this.isDark(r2, Math.floor((x - min) / cellSize))) {
+            p += ' ';
+          }
+          else {
+            p += '█';
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          ascii += (margin < 1 && y+1 >= max) ? blocksLastLineNoMargin[p] : blocks[p];
+        }
+
+        ascii += '\n';
+      }
+
+      if (size % 2 && margin > 0) {
+        return ascii.substring(0, ascii.length - size - 1) + Array(size+1).join('▀');
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.createASCII = function(cellSize, margin) {
+      cellSize = cellSize || 1;
+
+      if (cellSize < 2) {
+        return _createHalfASCII(margin);
+      }
+
+      cellSize -= 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r, p;
+
+      var white = Array(cellSize+1).join('██');
+      var black = Array(cellSize+1).join('  ');
+
+      var ascii = '';
+      var line = '';
+      for (y = 0; y < size; y += 1) {
+        r = Math.floor( (y - min) / cellSize);
+        line = '';
+        for (x = 0; x < size; x += 1) {
+          p = 1;
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r, Math.floor((x - min) / cellSize))) {
+            p = 0;
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          line += p ? white : black;
+        }
+
+        for (r = 0; r < cellSize; r += 1) {
+          ascii += line + '\n';
+        }
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.renderTo2dContext = function(context, cellSize) {
+      cellSize = cellSize || 2;
+      var length = _this.getModuleCount();
+      for (var row = 0; row < length; row++) {
+        for (var col = 0; col < length; col++) {
+          context.fillStyle = _this.isDark(row, col) ? 'black' : 'white';
+          context.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+        }
+      }
     }
 
-    function hero(){
-      var h=el('div','tp-hero');
-      h.innerHTML='<div class="row1"><span class="mine">나의 여행</span><span class="dd">D-'+dday+'</span></div>'+
-        '<h1>방콕 · 파타야</h1><div class="dates">'+dayDate(0)+' – '+dayDate(4)+' · 4박 5일</div>'+
-        '<div class="tp-route"><span class="st home"><b></b>인천</span><span class="ln"></span><span class="st"><b></b>방콕</span><span class="ln"></span><span class="st"><b></b>파타야</span><span class="ln"></span><span class="st"><b></b>방콕</span><span class="ln"></span><span class="st home"><b></b>인천</span></div>';
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrcode.stringToBytes
+  //---------------------------------------------------------------------
+
+  qrcode.stringToBytesFuncs = {
+    'default' : function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        bytes.push(c & 0xff);
+      }
+      return bytes;
+    }
+  };
+
+  qrcode.stringToBytes = qrcode.stringToBytesFuncs['default'];
+
+  //---------------------------------------------------------------------
+  // qrcode.createStringToBytes
+  //---------------------------------------------------------------------
+
+  /**
+   * @param unicodeData base64 string of byte array.
+   * [16bit Unicode],[16bit Bytes], ...
+   * @param numChars
+   */
+  qrcode.createStringToBytes = function(unicodeData, numChars) {
+
+    // create conversion map.
+
+    var unicodeMap = function() {
+
+      var bin = base64DecodeInputStream(unicodeData);
+      var read = function() {
+        var b = bin.read();
+        if (b == -1) throw 'eof';
+        return b;
+      };
+
+      var count = 0;
+      var unicodeMap = {};
+      while (true) {
+        var b0 = bin.read();
+        if (b0 == -1) break;
+        var b1 = read();
+        var b2 = read();
+        var b3 = read();
+        var k = String.fromCharCode( (b0 << 8) | b1);
+        var v = (b2 << 8) | b3;
+        unicodeMap[k] = v;
+        count += 1;
+      }
+      if (count != numChars) {
+        throw count + ' != ' + numChars;
+      }
+
+      return unicodeMap;
+    }();
+
+    var unknownChar = '?'.charCodeAt(0);
+
+    return function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        if (c < 128) {
+          bytes.push(c);
+        } else {
+          var b = unicodeMap[s.charAt(i)];
+          if (typeof b == 'number') {
+            if ( (b & 0xff) == b) {
+              // 1byte
+              bytes.push(b);
+            } else {
+              // 2bytes
+              bytes.push(b >>> 8);
+              bytes.push(b & 0xff);
+            }
+          } else {
+            bytes.push(unknownChar);
+          }
+        }
+      }
+      return bytes;
+    };
+  };
+
+  //---------------------------------------------------------------------
+  // QRMode
+  //---------------------------------------------------------------------
+
+  var QRMode = {
+    MODE_NUMBER :    1 << 0,
+    MODE_ALPHA_NUM : 1 << 1,
+    MODE_8BIT_BYTE : 1 << 2,
+    MODE_KANJI :     1 << 3
+  };
+
+  //---------------------------------------------------------------------
+  // QRErrorCorrectionLevel
+  //---------------------------------------------------------------------
+
+  var QRErrorCorrectionLevel = {
+    L : 1,
+    M : 0,
+    Q : 3,
+    H : 2
+  };
+
+  //---------------------------------------------------------------------
+  // QRMaskPattern
+  //---------------------------------------------------------------------
+
+  var QRMaskPattern = {
+    PATTERN000 : 0,
+    PATTERN001 : 1,
+    PATTERN010 : 2,
+    PATTERN011 : 3,
+    PATTERN100 : 4,
+    PATTERN101 : 5,
+    PATTERN110 : 6,
+    PATTERN111 : 7
+  };
+
+  //---------------------------------------------------------------------
+  // QRUtil
+  //---------------------------------------------------------------------
+
+  var QRUtil = function() {
+
+    var PATTERN_POSITION_TABLE = [
+      [],
+      [6, 18],
+      [6, 22],
+      [6, 26],
+      [6, 30],
+      [6, 34],
+      [6, 22, 38],
+      [6, 24, 42],
+      [6, 26, 46],
+      [6, 28, 50],
+      [6, 30, 54],
+      [6, 32, 58],
+      [6, 34, 62],
+      [6, 26, 46, 66],
+      [6, 26, 48, 70],
+      [6, 26, 50, 74],
+      [6, 30, 54, 78],
+      [6, 30, 56, 82],
+      [6, 30, 58, 86],
+      [6, 34, 62, 90],
+      [6, 28, 50, 72, 94],
+      [6, 26, 50, 74, 98],
+      [6, 30, 54, 78, 102],
+      [6, 28, 54, 80, 106],
+      [6, 32, 58, 84, 110],
+      [6, 30, 58, 86, 114],
+      [6, 34, 62, 90, 118],
+      [6, 26, 50, 74, 98, 122],
+      [6, 30, 54, 78, 102, 126],
+      [6, 26, 52, 78, 104, 130],
+      [6, 30, 56, 82, 108, 134],
+      [6, 34, 60, 86, 112, 138],
+      [6, 30, 58, 86, 114, 142],
+      [6, 34, 62, 90, 118, 146],
+      [6, 30, 54, 78, 102, 126, 150],
+      [6, 24, 50, 76, 102, 128, 154],
+      [6, 28, 54, 80, 106, 132, 158],
+      [6, 32, 58, 84, 110, 136, 162],
+      [6, 26, 54, 82, 110, 138, 166],
+      [6, 30, 58, 86, 114, 142, 170]
+    ];
+    var G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
+    var G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
+    var G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
+
+    var _this = {};
+
+    var getBCHDigit = function(data) {
+      var digit = 0;
+      while (data != 0) {
+        digit += 1;
+        data >>>= 1;
+      }
+      return digit;
+    };
+
+    _this.getBCHTypeInfo = function(data) {
+      var d = data << 10;
+      while (getBCHDigit(d) - getBCHDigit(G15) >= 0) {
+        d ^= (G15 << (getBCHDigit(d) - getBCHDigit(G15) ) );
+      }
+      return ( (data << 10) | d) ^ G15_MASK;
+    };
+
+    _this.getBCHTypeNumber = function(data) {
+      var d = data << 12;
+      while (getBCHDigit(d) - getBCHDigit(G18) >= 0) {
+        d ^= (G18 << (getBCHDigit(d) - getBCHDigit(G18) ) );
+      }
+      return (data << 12) | d;
+    };
+
+    _this.getPatternPosition = function(typeNumber) {
+      return PATTERN_POSITION_TABLE[typeNumber - 1];
+    };
+
+    _this.getMaskFunction = function(maskPattern) {
+
+      switch (maskPattern) {
+
+      case QRMaskPattern.PATTERN000 :
+        return function(i, j) { return (i + j) % 2 == 0; };
+      case QRMaskPattern.PATTERN001 :
+        return function(i, j) { return i % 2 == 0; };
+      case QRMaskPattern.PATTERN010 :
+        return function(i, j) { return j % 3 == 0; };
+      case QRMaskPattern.PATTERN011 :
+        return function(i, j) { return (i + j) % 3 == 0; };
+      case QRMaskPattern.PATTERN100 :
+        return function(i, j) { return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 == 0; };
+      case QRMaskPattern.PATTERN101 :
+        return function(i, j) { return (i * j) % 2 + (i * j) % 3 == 0; };
+      case QRMaskPattern.PATTERN110 :
+        return function(i, j) { return ( (i * j) % 2 + (i * j) % 3) % 2 == 0; };
+      case QRMaskPattern.PATTERN111 :
+        return function(i, j) { return ( (i * j) % 3 + (i + j) % 2) % 2 == 0; };
+
+      default :
+        throw 'bad maskPattern:' + maskPattern;
+      }
+    };
+
+    _this.getErrorCorrectPolynomial = function(errorCorrectLength) {
+      var a = qrPolynomial([1], 0);
+      for (var i = 0; i < errorCorrectLength; i += 1) {
+        a = a.multiply(qrPolynomial([1, QRMath.gexp(i)], 0) );
+      }
+      return a;
+    };
+
+    _this.getLengthInBits = function(mode, type) {
+
+      if (1 <= type && type < 10) {
+
+        // 1 - 9
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 10;
+        case QRMode.MODE_ALPHA_NUM : return 9;
+        case QRMode.MODE_8BIT_BYTE : return 8;
+        case QRMode.MODE_KANJI     : return 8;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 27) {
+
+        // 10 - 26
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 12;
+        case QRMode.MODE_ALPHA_NUM : return 11;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 10;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 41) {
+
+        // 27 - 40
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 14;
+        case QRMode.MODE_ALPHA_NUM : return 13;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 12;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else {
+        throw 'type:' + type;
+      }
+    };
+
+    _this.getLostPoint = function(qrcode) {
+
+      var moduleCount = qrcode.getModuleCount();
+
+      var lostPoint = 0;
+
+      // LEVEL1
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount; col += 1) {
+
+          var sameCount = 0;
+          var dark = qrcode.isDark(row, col);
+
+          for (var r = -1; r <= 1; r += 1) {
+
+            if (row + r < 0 || moduleCount <= row + r) {
+              continue;
+            }
+
+            for (var c = -1; c <= 1; c += 1) {
+
+              if (col + c < 0 || moduleCount <= col + c) {
+                continue;
+              }
+
+              if (r == 0 && c == 0) {
+                continue;
+              }
+
+              if (dark == qrcode.isDark(row + r, col + c) ) {
+                sameCount += 1;
+              }
+            }
+          }
+
+          if (sameCount > 5) {
+            lostPoint += (3 + sameCount - 5);
+          }
+        }
+      };
+
+      // LEVEL2
+
+      for (var row = 0; row < moduleCount - 1; row += 1) {
+        for (var col = 0; col < moduleCount - 1; col += 1) {
+          var count = 0;
+          if (qrcode.isDark(row, col) ) count += 1;
+          if (qrcode.isDark(row + 1, col) ) count += 1;
+          if (qrcode.isDark(row, col + 1) ) count += 1;
+          if (qrcode.isDark(row + 1, col + 1) ) count += 1;
+          if (count == 0 || count == 4) {
+            lostPoint += 3;
+          }
+        }
+      }
+
+      // LEVEL3
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount - 6; col += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row, col + 1)
+              &&  qrcode.isDark(row, col + 2)
+              &&  qrcode.isDark(row, col + 3)
+              &&  qrcode.isDark(row, col + 4)
+              && !qrcode.isDark(row, col + 5)
+              &&  qrcode.isDark(row, col + 6) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount - 6; row += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row + 1, col)
+              &&  qrcode.isDark(row + 2, col)
+              &&  qrcode.isDark(row + 3, col)
+              &&  qrcode.isDark(row + 4, col)
+              && !qrcode.isDark(row + 5, col)
+              &&  qrcode.isDark(row + 6, col) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      // LEVEL4
+
+      var darkCount = 0;
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount; row += 1) {
+          if (qrcode.isDark(row, col) ) {
+            darkCount += 1;
+          }
+        }
+      }
+
+      var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+      lostPoint += ratio * 10;
+
+      return lostPoint;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // QRMath
+  //---------------------------------------------------------------------
+
+  var QRMath = function() {
+
+    var EXP_TABLE = new Array(256);
+    var LOG_TABLE = new Array(256);
+
+    // initialize tables
+    for (var i = 0; i < 8; i += 1) {
+      EXP_TABLE[i] = 1 << i;
+    }
+    for (var i = 8; i < 256; i += 1) {
+      EXP_TABLE[i] = EXP_TABLE[i - 4]
+        ^ EXP_TABLE[i - 5]
+        ^ EXP_TABLE[i - 6]
+        ^ EXP_TABLE[i - 8];
+    }
+    for (var i = 0; i < 255; i += 1) {
+      LOG_TABLE[EXP_TABLE[i] ] = i;
+    }
+
+    var _this = {};
+
+    _this.glog = function(n) {
+
+      if (n < 1) {
+        throw 'glog(' + n + ')';
+      }
+
+      return LOG_TABLE[n];
+    };
+
+    _this.gexp = function(n) {
+
+      while (n < 0) {
+        n += 255;
+      }
+
+      while (n >= 256) {
+        n -= 255;
+      }
+
+      return EXP_TABLE[n];
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrPolynomial
+  //---------------------------------------------------------------------
+
+  function qrPolynomial(num, shift) {
+
+    if (typeof num.length == 'undefined') {
+      throw num.length + '/' + shift;
+    }
+
+    var _num = function() {
+      var offset = 0;
+      while (offset < num.length && num[offset] == 0) {
+        offset += 1;
+      }
+      var _num = new Array(num.length - offset + shift);
+      for (var i = 0; i < num.length - offset; i += 1) {
+        _num[i] = num[i + offset];
+      }
+      return _num;
+    }();
+
+    var _this = {};
+
+    _this.getAt = function(index) {
+      return _num[index];
+    };
+
+    _this.getLength = function() {
+      return _num.length;
+    };
+
+    _this.multiply = function(e) {
+
+      var num = new Array(_this.getLength() + e.getLength() - 1);
+
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        for (var j = 0; j < e.getLength(); j += 1) {
+          num[i + j] ^= QRMath.gexp(QRMath.glog(_this.getAt(i) ) + QRMath.glog(e.getAt(j) ) );
+        }
+      }
+
+      return qrPolynomial(num, 0);
+    };
+
+    _this.mod = function(e) {
+
+      if (_this.getLength() - e.getLength() < 0) {
+        return _this;
+      }
+
+      var ratio = QRMath.glog(_this.getAt(0) ) - QRMath.glog(e.getAt(0) );
+
+      var num = new Array(_this.getLength() );
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        num[i] = _this.getAt(i);
+      }
+
+      for (var i = 0; i < e.getLength(); i += 1) {
+        num[i] ^= QRMath.gexp(QRMath.glog(e.getAt(i) ) + ratio);
+      }
+
+      // recursive call
+      return qrPolynomial(num, 0).mod(e);
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // QRRSBlock
+  //---------------------------------------------------------------------
+
+  var QRRSBlock = function() {
+
+    var RS_BLOCK_TABLE = [
+
+      // L
+      // M
+      // Q
+      // H
+
+      // 1
+      [1, 26, 19],
+      [1, 26, 16],
+      [1, 26, 13],
+      [1, 26, 9],
+
+      // 2
+      [1, 44, 34],
+      [1, 44, 28],
+      [1, 44, 22],
+      [1, 44, 16],
+
+      // 3
+      [1, 70, 55],
+      [1, 70, 44],
+      [2, 35, 17],
+      [2, 35, 13],
+
+      // 4
+      [1, 100, 80],
+      [2, 50, 32],
+      [2, 50, 24],
+      [4, 25, 9],
+
+      // 5
+      [1, 134, 108],
+      [2, 67, 43],
+      [2, 33, 15, 2, 34, 16],
+      [2, 33, 11, 2, 34, 12],
+
+      // 6
+      [2, 86, 68],
+      [4, 43, 27],
+      [4, 43, 19],
+      [4, 43, 15],
+
+      // 7
+      [2, 98, 78],
+      [4, 49, 31],
+      [2, 32, 14, 4, 33, 15],
+      [4, 39, 13, 1, 40, 14],
+
+      // 8
+      [2, 121, 97],
+      [2, 60, 38, 2, 61, 39],
+      [4, 40, 18, 2, 41, 19],
+      [4, 40, 14, 2, 41, 15],
+
+      // 9
+      [2, 146, 116],
+      [3, 58, 36, 2, 59, 37],
+      [4, 36, 16, 4, 37, 17],
+      [4, 36, 12, 4, 37, 13],
+
+      // 10
+      [2, 86, 68, 2, 87, 69],
+      [4, 69, 43, 1, 70, 44],
+      [6, 43, 19, 2, 44, 20],
+      [6, 43, 15, 2, 44, 16],
+
+      // 11
+      [4, 101, 81],
+      [1, 80, 50, 4, 81, 51],
+      [4, 50, 22, 4, 51, 23],
+      [3, 36, 12, 8, 37, 13],
+
+      // 12
+      [2, 116, 92, 2, 117, 93],
+      [6, 58, 36, 2, 59, 37],
+      [4, 46, 20, 6, 47, 21],
+      [7, 42, 14, 4, 43, 15],
+
+      // 13
+      [4, 133, 107],
+      [8, 59, 37, 1, 60, 38],
+      [8, 44, 20, 4, 45, 21],
+      [12, 33, 11, 4, 34, 12],
+
+      // 14
+      [3, 145, 115, 1, 146, 116],
+      [4, 64, 40, 5, 65, 41],
+      [11, 36, 16, 5, 37, 17],
+      [11, 36, 12, 5, 37, 13],
+
+      // 15
+      [5, 109, 87, 1, 110, 88],
+      [5, 65, 41, 5, 66, 42],
+      [5, 54, 24, 7, 55, 25],
+      [11, 36, 12, 7, 37, 13],
+
+      // 16
+      [5, 122, 98, 1, 123, 99],
+      [7, 73, 45, 3, 74, 46],
+      [15, 43, 19, 2, 44, 20],
+      [3, 45, 15, 13, 46, 16],
+
+      // 17
+      [1, 135, 107, 5, 136, 108],
+      [10, 74, 46, 1, 75, 47],
+      [1, 50, 22, 15, 51, 23],
+      [2, 42, 14, 17, 43, 15],
+
+      // 18
+      [5, 150, 120, 1, 151, 121],
+      [9, 69, 43, 4, 70, 44],
+      [17, 50, 22, 1, 51, 23],
+      [2, 42, 14, 19, 43, 15],
+
+      // 19
+      [3, 141, 113, 4, 142, 114],
+      [3, 70, 44, 11, 71, 45],
+      [17, 47, 21, 4, 48, 22],
+      [9, 39, 13, 16, 40, 14],
+
+      // 20
+      [3, 135, 107, 5, 136, 108],
+      [3, 67, 41, 13, 68, 42],
+      [15, 54, 24, 5, 55, 25],
+      [15, 43, 15, 10, 44, 16],
+
+      // 21
+      [4, 144, 116, 4, 145, 117],
+      [17, 68, 42],
+      [17, 50, 22, 6, 51, 23],
+      [19, 46, 16, 6, 47, 17],
+
+      // 22
+      [2, 139, 111, 7, 140, 112],
+      [17, 74, 46],
+      [7, 54, 24, 16, 55, 25],
+      [34, 37, 13],
+
+      // 23
+      [4, 151, 121, 5, 152, 122],
+      [4, 75, 47, 14, 76, 48],
+      [11, 54, 24, 14, 55, 25],
+      [16, 45, 15, 14, 46, 16],
+
+      // 24
+      [6, 147, 117, 4, 148, 118],
+      [6, 73, 45, 14, 74, 46],
+      [11, 54, 24, 16, 55, 25],
+      [30, 46, 16, 2, 47, 17],
+
+      // 25
+      [8, 132, 106, 4, 133, 107],
+      [8, 75, 47, 13, 76, 48],
+      [7, 54, 24, 22, 55, 25],
+      [22, 45, 15, 13, 46, 16],
+
+      // 26
+      [10, 142, 114, 2, 143, 115],
+      [19, 74, 46, 4, 75, 47],
+      [28, 50, 22, 6, 51, 23],
+      [33, 46, 16, 4, 47, 17],
+
+      // 27
+      [8, 152, 122, 4, 153, 123],
+      [22, 73, 45, 3, 74, 46],
+      [8, 53, 23, 26, 54, 24],
+      [12, 45, 15, 28, 46, 16],
+
+      // 28
+      [3, 147, 117, 10, 148, 118],
+      [3, 73, 45, 23, 74, 46],
+      [4, 54, 24, 31, 55, 25],
+      [11, 45, 15, 31, 46, 16],
+
+      // 29
+      [7, 146, 116, 7, 147, 117],
+      [21, 73, 45, 7, 74, 46],
+      [1, 53, 23, 37, 54, 24],
+      [19, 45, 15, 26, 46, 16],
+
+      // 30
+      [5, 145, 115, 10, 146, 116],
+      [19, 75, 47, 10, 76, 48],
+      [15, 54, 24, 25, 55, 25],
+      [23, 45, 15, 25, 46, 16],
+
+      // 31
+      [13, 145, 115, 3, 146, 116],
+      [2, 74, 46, 29, 75, 47],
+      [42, 54, 24, 1, 55, 25],
+      [23, 45, 15, 28, 46, 16],
+
+      // 32
+      [17, 145, 115],
+      [10, 74, 46, 23, 75, 47],
+      [10, 54, 24, 35, 55, 25],
+      [19, 45, 15, 35, 46, 16],
+
+      // 33
+      [17, 145, 115, 1, 146, 116],
+      [14, 74, 46, 21, 75, 47],
+      [29, 54, 24, 19, 55, 25],
+      [11, 45, 15, 46, 46, 16],
+
+      // 34
+      [13, 145, 115, 6, 146, 116],
+      [14, 74, 46, 23, 75, 47],
+      [44, 54, 24, 7, 55, 25],
+      [59, 46, 16, 1, 47, 17],
+
+      // 35
+      [12, 151, 121, 7, 152, 122],
+      [12, 75, 47, 26, 76, 48],
+      [39, 54, 24, 14, 55, 25],
+      [22, 45, 15, 41, 46, 16],
+
+      // 36
+      [6, 151, 121, 14, 152, 122],
+      [6, 75, 47, 34, 76, 48],
+      [46, 54, 24, 10, 55, 25],
+      [2, 45, 15, 64, 46, 16],
+
+      // 37
+      [17, 152, 122, 4, 153, 123],
+      [29, 74, 46, 14, 75, 47],
+      [49, 54, 24, 10, 55, 25],
+      [24, 45, 15, 46, 46, 16],
+
+      // 38
+      [4, 152, 122, 18, 153, 123],
+      [13, 74, 46, 32, 75, 47],
+      [48, 54, 24, 14, 55, 25],
+      [42, 45, 15, 32, 46, 16],
+
+      // 39
+      [20, 147, 117, 4, 148, 118],
+      [40, 75, 47, 7, 76, 48],
+      [43, 54, 24, 22, 55, 25],
+      [10, 45, 15, 67, 46, 16],
+
+      // 40
+      [19, 148, 118, 6, 149, 119],
+      [18, 75, 47, 31, 76, 48],
+      [34, 54, 24, 34, 55, 25],
+      [20, 45, 15, 61, 46, 16]
+    ];
+
+    var qrRSBlock = function(totalCount, dataCount) {
+      var _this = {};
+      _this.totalCount = totalCount;
+      _this.dataCount = dataCount;
+      return _this;
+    };
+
+    var _this = {};
+
+    var getRsBlockTable = function(typeNumber, errorCorrectionLevel) {
+
+      switch(errorCorrectionLevel) {
+      case QRErrorCorrectionLevel.L :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+      case QRErrorCorrectionLevel.M :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+      case QRErrorCorrectionLevel.Q :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+      case QRErrorCorrectionLevel.H :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+      default :
+        return undefined;
+      }
+    };
+
+    _this.getRSBlocks = function(typeNumber, errorCorrectionLevel) {
+
+      var rsBlock = getRsBlockTable(typeNumber, errorCorrectionLevel);
+
+      if (typeof rsBlock == 'undefined') {
+        throw 'bad rs block @ typeNumber:' + typeNumber +
+            '/errorCorrectionLevel:' + errorCorrectionLevel;
+      }
+
+      var length = rsBlock.length / 3;
+
+      var list = [];
+
+      for (var i = 0; i < length; i += 1) {
+
+        var count = rsBlock[i * 3 + 0];
+        var totalCount = rsBlock[i * 3 + 1];
+        var dataCount = rsBlock[i * 3 + 2];
+
+        for (var j = 0; j < count; j += 1) {
+          list.push(qrRSBlock(totalCount, dataCount) );
+        }
+      }
+
+      return list;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrBitBuffer
+  //---------------------------------------------------------------------
+
+  var qrBitBuffer = function() {
+
+    var _buffer = [];
+    var _length = 0;
+
+    var _this = {};
+
+    _this.getBuffer = function() {
+      return _buffer;
+    };
+
+    _this.getAt = function(index) {
+      var bufIndex = Math.floor(index / 8);
+      return ( (_buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+    };
+
+    _this.put = function(num, length) {
+      for (var i = 0; i < length; i += 1) {
+        _this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+      }
+    };
+
+    _this.getLengthInBits = function() {
+      return _length;
+    };
+
+    _this.putBit = function(bit) {
+
+      var bufIndex = Math.floor(_length / 8);
+      if (_buffer.length <= bufIndex) {
+        _buffer.push(0);
+      }
+
+      if (bit) {
+        _buffer[bufIndex] |= (0x80 >>> (_length % 8) );
+      }
+
+      _length += 1;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrNumber
+  //---------------------------------------------------------------------
+
+  var qrNumber = function(data) {
+
+    var _mode = QRMode.MODE_NUMBER;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _data;
+
+      var i = 0;
+
+      while (i + 2 < data.length) {
+        buffer.put(strToNum(data.substring(i, i + 3) ), 10);
+        i += 3;
+      }
+
+      if (i < data.length) {
+        if (data.length - i == 1) {
+          buffer.put(strToNum(data.substring(i, i + 1) ), 4);
+        } else if (data.length - i == 2) {
+          buffer.put(strToNum(data.substring(i, i + 2) ), 7);
+        }
+      }
+    };
+
+    var strToNum = function(s) {
+      var num = 0;
+      for (var i = 0; i < s.length; i += 1) {
+        num = num * 10 + chatToNum(s.charAt(i) );
+      }
+      return num;
+    };
+
+    var chatToNum = function(c) {
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      }
+      throw 'illegal char :' + c;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrAlphaNum
+  //---------------------------------------------------------------------
+
+  var qrAlphaNum = function(data) {
+
+    var _mode = QRMode.MODE_ALPHA_NUM;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var s = _data;
+
+      var i = 0;
+
+      while (i + 1 < s.length) {
+        buffer.put(
+          getCode(s.charAt(i) ) * 45 +
+          getCode(s.charAt(i + 1) ), 11);
+        i += 2;
+      }
+
+      if (i < s.length) {
+        buffer.put(getCode(s.charAt(i) ), 6);
+      }
+    };
+
+    var getCode = function(c) {
+
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      } else if ('A' <= c && c <= 'Z') {
+        return c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+      } else {
+        switch (c) {
+        case ' ' : return 36;
+        case '$' : return 37;
+        case '%' : return 38;
+        case '*' : return 39;
+        case '+' : return 40;
+        case '-' : return 41;
+        case '.' : return 42;
+        case '/' : return 43;
+        case ':' : return 44;
+        default :
+          throw 'illegal char :' + c;
+        }
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qr8BitByte
+  //---------------------------------------------------------------------
+
+  var qr8BitByte = function(data) {
+
+    var _mode = QRMode.MODE_8BIT_BYTE;
+    var _data = data;
+    var _bytes = qrcode.stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _bytes.length;
+    };
+
+    _this.write = function(buffer) {
+      for (var i = 0; i < _bytes.length; i += 1) {
+        buffer.put(_bytes[i], 8);
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrKanji
+  //---------------------------------------------------------------------
+
+  var qrKanji = function(data) {
+
+    var _mode = QRMode.MODE_KANJI;
+    var _data = data;
+
+    var stringToBytes = qrcode.stringToBytesFuncs['SJIS'];
+    if (!stringToBytes) {
+      throw 'sjis not supported.';
+    }
+    !function(c, code) {
+      // self test for sjis support.
+      var test = stringToBytes(c);
+      if (test.length != 2 || ( (test[0] << 8) | test[1]) != code) {
+        throw 'sjis not supported.';
+      }
+    }('\u53cb', 0x9746);
+
+    var _bytes = stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return ~~(_bytes.length / 2);
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _bytes;
+
+      var i = 0;
+
+      while (i + 1 < data.length) {
+
+        var c = ( (0xff & data[i]) << 8) | (0xff & data[i + 1]);
+
+        if (0x8140 <= c && c <= 0x9FFC) {
+          c -= 0x8140;
+        } else if (0xE040 <= c && c <= 0xEBBF) {
+          c -= 0xC140;
+        } else {
+          throw 'illegal char at ' + (i + 1) + '/' + c;
+        }
+
+        c = ( (c >>> 8) & 0xff) * 0xC0 + (c & 0xff);
+
+        buffer.put(c, 13);
+
+        i += 2;
+      }
+
+      if (i < data.length) {
+        throw 'illegal char at ' + (i + 1);
+      }
+    };
+
+    return _this;
+  };
+
+  //=====================================================================
+  // GIF Support etc.
+  //
+
+  //---------------------------------------------------------------------
+  // byteArrayOutputStream
+  //---------------------------------------------------------------------
+
+  var byteArrayOutputStream = function() {
+
+    var _bytes = [];
+
+    var _this = {};
+
+    _this.writeByte = function(b) {
+      _bytes.push(b & 0xff);
+    };
+
+    _this.writeShort = function(i) {
+      _this.writeByte(i);
+      _this.writeByte(i >>> 8);
+    };
+
+    _this.writeBytes = function(b, off, len) {
+      off = off || 0;
+      len = len || b.length;
+      for (var i = 0; i < len; i += 1) {
+        _this.writeByte(b[i + off]);
+      }
+    };
+
+    _this.writeString = function(s) {
+      for (var i = 0; i < s.length; i += 1) {
+        _this.writeByte(s.charCodeAt(i) );
+      }
+    };
+
+    _this.toByteArray = function() {
+      return _bytes;
+    };
+
+    _this.toString = function() {
+      var s = '';
+      s += '[';
+      for (var i = 0; i < _bytes.length; i += 1) {
+        if (i > 0) {
+          s += ',';
+        }
+        s += _bytes[i];
+      }
+      s += ']';
+      return s;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64EncodeOutputStream
+  //---------------------------------------------------------------------
+
+  var base64EncodeOutputStream = function() {
+
+    var _buffer = 0;
+    var _buflen = 0;
+    var _length = 0;
+    var _base64 = '';
+
+    var _this = {};
+
+    var writeEncoded = function(b) {
+      _base64 += String.fromCharCode(encode(b & 0x3f) );
+    };
+
+    var encode = function(n) {
+      if (n < 0) {
+        // error.
+      } else if (n < 26) {
+        return 0x41 + n;
+      } else if (n < 52) {
+        return 0x61 + (n - 26);
+      } else if (n < 62) {
+        return 0x30 + (n - 52);
+      } else if (n == 62) {
+        return 0x2b;
+      } else if (n == 63) {
+        return 0x2f;
+      }
+      throw 'n:' + n;
+    };
+
+    _this.writeByte = function(n) {
+
+      _buffer = (_buffer << 8) | (n & 0xff);
+      _buflen += 8;
+      _length += 1;
+
+      while (_buflen >= 6) {
+        writeEncoded(_buffer >>> (_buflen - 6) );
+        _buflen -= 6;
+      }
+    };
+
+    _this.flush = function() {
+
+      if (_buflen > 0) {
+        writeEncoded(_buffer << (6 - _buflen) );
+        _buffer = 0;
+        _buflen = 0;
+      }
+
+      if (_length % 3 != 0) {
+        // padding
+        var padlen = 3 - _length % 3;
+        for (var i = 0; i < padlen; i += 1) {
+          _base64 += '=';
+        }
+      }
+    };
+
+    _this.toString = function() {
+      return _base64;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64DecodeInputStream
+  //---------------------------------------------------------------------
+
+  var base64DecodeInputStream = function(str) {
+
+    var _str = str;
+    var _pos = 0;
+    var _buffer = 0;
+    var _buflen = 0;
+
+    var _this = {};
+
+    _this.read = function() {
+
+      while (_buflen < 8) {
+
+        if (_pos >= _str.length) {
+          if (_buflen == 0) {
+            return -1;
+          }
+          throw 'unexpected end of file./' + _buflen;
+        }
+
+        var c = _str.charAt(_pos);
+        _pos += 1;
+
+        if (c == '=') {
+          _buflen = 0;
+          return -1;
+        } else if (c.match(/^\s$/) ) {
+          // ignore if whitespace.
+          continue;
+        }
+
+        _buffer = (_buffer << 6) | decode(c.charCodeAt(0) );
+        _buflen += 6;
+      }
+
+      var n = (_buffer >>> (_buflen - 8) ) & 0xff;
+      _buflen -= 8;
+      return n;
+    };
+
+    var decode = function(c) {
+      if (0x41 <= c && c <= 0x5a) {
+        return c - 0x41;
+      } else if (0x61 <= c && c <= 0x7a) {
+        return c - 0x61 + 26;
+      } else if (0x30 <= c && c <= 0x39) {
+        return c - 0x30 + 52;
+      } else if (c == 0x2b) {
+        return 62;
+      } else if (c == 0x2f) {
+        return 63;
+      } else {
+        throw 'c:' + c;
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // gifImage (B/W)
+  //---------------------------------------------------------------------
+
+  var gifImage = function(width, height) {
+
+    var _width = width;
+    var _height = height;
+    var _data = new Array(width * height);
+
+    var _this = {};
+
+    _this.setPixel = function(x, y, pixel) {
+      _data[y * _width + x] = pixel;
+    };
+
+    _this.write = function(out) {
+
+      //---------------------------------
+      // GIF Signature
+
+      out.writeString('GIF87a');
+
+      //---------------------------------
+      // Screen Descriptor
+
+      out.writeShort(_width);
+      out.writeShort(_height);
+
+      out.writeByte(0x80); // 2bit
+      out.writeByte(0);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Global Color Map
+
+      // black
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+
+      // white
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+
+      //---------------------------------
+      // Image Descriptor
+
+      out.writeString(',');
+      out.writeShort(0);
+      out.writeShort(0);
+      out.writeShort(_width);
+      out.writeShort(_height);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Local Color Map
+
+      //---------------------------------
+      // Raster Data
+
+      var lzwMinCodeSize = 2;
+      var raster = getLZWRaster(lzwMinCodeSize);
+
+      out.writeByte(lzwMinCodeSize);
+
+      var offset = 0;
+
+      while (raster.length - offset > 255) {
+        out.writeByte(255);
+        out.writeBytes(raster, offset, 255);
+        offset += 255;
+      }
+
+      out.writeByte(raster.length - offset);
+      out.writeBytes(raster, offset, raster.length - offset);
+      out.writeByte(0x00);
+
+      //---------------------------------
+      // GIF Terminator
+      out.writeString(';');
+    };
+
+    var bitOutputStream = function(out) {
+
+      var _out = out;
+      var _bitLength = 0;
+      var _bitBuffer = 0;
+
+      var _this = {};
+
+      _this.write = function(data, length) {
+
+        if ( (data >>> length) != 0) {
+          throw 'length over';
+        }
+
+        while (_bitLength + length >= 8) {
+          _out.writeByte(0xff & ( (data << _bitLength) | _bitBuffer) );
+          length -= (8 - _bitLength);
+          data >>>= (8 - _bitLength);
+          _bitBuffer = 0;
+          _bitLength = 0;
+        }
+
+        _bitBuffer = (data << _bitLength) | _bitBuffer;
+        _bitLength = _bitLength + length;
+      };
+
+      _this.flush = function() {
+        if (_bitLength > 0) {
+          _out.writeByte(_bitBuffer);
+        }
+      };
+
+      return _this;
+    };
+
+    var getLZWRaster = function(lzwMinCodeSize) {
+
+      var clearCode = 1 << lzwMinCodeSize;
+      var endCode = (1 << lzwMinCodeSize) + 1;
+      var bitLength = lzwMinCodeSize + 1;
+
+      // Setup LZWTable
+      var table = lzwTable();
+
+      for (var i = 0; i < clearCode; i += 1) {
+        table.add(String.fromCharCode(i) );
+      }
+      table.add(String.fromCharCode(clearCode) );
+      table.add(String.fromCharCode(endCode) );
+
+      var byteOut = byteArrayOutputStream();
+      var bitOut = bitOutputStream(byteOut);
+
+      // clear code
+      bitOut.write(clearCode, bitLength);
+
+      var dataIndex = 0;
+
+      var s = String.fromCharCode(_data[dataIndex]);
+      dataIndex += 1;
+
+      while (dataIndex < _data.length) {
+
+        var c = String.fromCharCode(_data[dataIndex]);
+        dataIndex += 1;
+
+        if (table.contains(s + c) ) {
+
+          s = s + c;
+
+        } else {
+
+          bitOut.write(table.indexOf(s), bitLength);
+
+          if (table.size() < 0xfff) {
+
+            if (table.size() == (1 << bitLength) ) {
+              bitLength += 1;
+            }
+
+            table.add(s + c);
+          }
+
+          s = c;
+        }
+      }
+
+      bitOut.write(table.indexOf(s), bitLength);
+
+      // end code
+      bitOut.write(endCode, bitLength);
+
+      bitOut.flush();
+
+      return byteOut.toByteArray();
+    };
+
+    var lzwTable = function() {
+
+      var _map = {};
+      var _size = 0;
+
+      var _this = {};
+
+      _this.add = function(key) {
+        if (_this.contains(key) ) {
+          throw 'dup key:' + key;
+        }
+        _map[key] = _size;
+        _size += 1;
+      };
+
+      _this.size = function() {
+        return _size;
+      };
+
+      _this.indexOf = function(key) {
+        return _map[key];
+      };
+
+      _this.contains = function(key) {
+        return typeof _map[key] != 'undefined';
+      };
+
+      return _this;
+    };
+
+    return _this;
+  };
+
+  var createDataURL = function(width, height, getPixel) {
+    var gif = gifImage(width, height);
+    for (var y = 0; y < height; y += 1) {
+      for (var x = 0; x < width; x += 1) {
+        gif.setPixel(x, y, getPixel(x, y) );
+      }
+    }
+
+    var b = byteArrayOutputStream();
+    gif.write(b);
+
+    var base64 = base64EncodeOutputStream();
+    var bytes = b.toByteArray();
+    for (var i = 0; i < bytes.length; i += 1) {
+      base64.writeByte(bytes[i]);
+    }
+    base64.flush();
+
+    return 'data:image/gif;base64,' + base64;
+  };
+
+  //---------------------------------------------------------------------
+  // returns qrcode function.
+
+  return qrcode;
+}();
+
+// multibyte support
+!function() {
+
+  qrcode.stringToBytesFuncs['UTF-8'] = function(s) {
+    // http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
+    function toUTF8Array(str) {
+      var utf8 = [];
+      for (var i=0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+          utf8.push(0xc0 | (charcode >> 6),
+              0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+          utf8.push(0xe0 | (charcode >> 12),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+          i++;
+          // UTF-16 encodes 0x10000-0x10FFFF by
+          // subtracting 0x10000 and splitting the
+          // 20 bits of 0x0-0xFFFFF into two halves
+          charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+            | (str.charCodeAt(i) & 0x3ff));
+          utf8.push(0xf0 | (charcode >>18),
+              0x80 | ((charcode>>12) & 0x3f),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+      }
+      return utf8;
+    }
+    return toUTF8Array(s);
+  };
+
+}();
+
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+      define([], factory);
+  } else if (typeof exports === 'object') {
+      module.exports = factory();
+  }
+}(function () {
+    return qrcode;
+}));
+
+</script>
+<script>
+/* 센터원 업무 공유 — 화면 (사이트: 실제 저장 / 강의안: 가짜 예시 데이터)
+   CenterApp.mount(el, { mode:'live'|'demo', room, api, step, tab, notch }) */
+(function () {
+  'use strict';
+
+  var STATES = [
+    ['출근', '#0F9F8F'], ['외근', '#2F80ED'], ['휴가', '#E5484D'],
+    ['반차', '#E59A12'], ['교육', '#8B5CF6'], ['재택', '#8C8BA0'],
+  ];
+  var CATS = [
+    ['공업사', '#2F80ED', 'wrench'], ['병원', '#E5484D', 'cross'], ['렌트', '#0F9F8F', 'car'],
+    ['견인', '#E59A12', 'truck'], ['노하우', '#8B5CF6', 'bulb'], ['기타', '#8C8BA0', 'dot'],
+  ];
+  var ICON = {
+    home: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
+    swap: '<path d="M7 7h12l-3-3"/><path d="M17 17H5l3 3"/>',
+    book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
+    pin: '<path d="M12 17v4"/><path d="M8 3h8l-1 6 3 4H6l3-4z"/>',
+    bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    x: '<path d="M6 6l12 12M18 6L6 18"/>',
+    check: '<path d="M5 12l5 5 9-10"/>',
+    arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+    phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+    warn: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>',
+    wrench: '<path d="M14 6a4 4 0 0 0 5 5l-9 9-3-3 9-9a4 4 0 0 0-2-2z"/>',
+    cross: '<path d="M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z"/>',
+    car: '<path d="M5 16l1.5-5h11L19 16"/><rect x="3" y="16" width="18" height="4" rx="1"/><circle cx="7" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/>',
+    truck: '<path d="M2 6h11v10H2z"/><path d="M13 10h4l4 4v2h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+    bulb: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/>',
+    dot: '<circle cx="12" cy="12" r="4"/>',
+  };
+  function svg(n) { return '<svg viewBox="0 0 24 24">' + ICON[n] + '</svg>'; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function kst(d) { return new Date((d || Date.now()) + 9 * 3600e3); }
+  function today() { return kst().toISOString().slice(0, 10); }
+  function addDays(n) { return kst(Date.now() + n * 864e5).toISOString().slice(0, 10); }
+  function prettyDate() {
+    var d = kst(); var w = '일월화수목금토'[d.getUTCDay()];
+    return (d.getUTCMonth() + 1) + '월 ' + d.getUTCDate() + '일 (' + w + ')';
+  }
+  function ago(ms) {
+    var s = (Date.now() - ms) / 1000;
+    if (s < 60) return '방금'; if (s < 3600) return Math.floor(s / 60) + '분 전';
+    if (s < 86400) return Math.floor(s / 3600) + '시간 전'; return Math.floor(s / 86400) + '일 전';
+  }
+  function dday(due) {
+    if (!due) return null;
+    var diff = Math.round((Date.parse(due) - Date.parse(today())) / 864e5);
+    if (diff === 0) return ['오늘까지', ''];
+    if (diff < 0) return [(-diff) + '일 지남', ''];
+    return ['D-' + diff, diff > 2 ? 'ok' : ''];
+  }
+  function stateColor(s) { for (var i = 0; i < STATES.length; i++) if (STATES[i][0] === s) return STATES[i][1]; return '#8C8BA0'; }
+  function cat(c) { for (var i = 0; i < CATS.length; i++) if (CATS[i][0] === c) return CATS[i]; return CATS[5]; }
+  var AV = ['#4338CA', '#0F9F8F', '#E5484D', '#E59A12', '#2F80ED', '#8B5CF6', '#C2410C', '#0B7A6C'];
+  function avColor(name) { var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0; return AV[h % AV.length]; }
+
+  // ---------- 예시 데이터 (모두 가짜)
+  function sample() {
+    var t = today();
+    return [
+      { kind: 'notice', author: '윤센터', data: { text: '이번 주 금요일 오후 4시 센터 회의 (3층 회의실)\n미결 건 현황 챙겨 와 주세요.', pin: true } },
+      { kind: 'notice', author: '이대물', data: { text: '렌트 협력업체 단가표가 바뀌었어요. 노하우 탭에 올려 뒀습니다.' } },
+      { kind: 'notice', author: '박총무', data: { text: '연말 휴가 신청은 이번 달 말까지 부탁드립니다.' } },
+      { kind: 'status', author: '이대물', data: { date: t, state: '외근', note: '가나공업사 현장 확인, 15시 복귀' } },
+      { kind: 'status', author: '박대인', data: { date: t, state: '휴가', sub: '최렌트' } },
+      { kind: 'status', author: '최렌트', data: { date: t, state: '출근' } },
+      { kind: 'status', author: '정사정', data: { date: t, state: '교육', note: '오전 교육, 오후 복귀' } },
+      { kind: 'status', author: '한과실', data: { date: t, state: '반차', note: '오후 반차', sub: '김보상' } },
+      { kind: 'status', author: '윤센터', data: { date: t, state: '출근' } },
+      { kind: 'handover', author: '박대인', data: { caseNo: '2026-000123', title: '후미 추돌 · 수리 진행', to: '최렌트', progress: '공업사 입고, 견적 확인 완료. 렌트 사용 중', next: '출고 예정일 확인 후 렌트 종료 안내', due: addDays(1) } },
+      { kind: 'handover', author: '박대인', data: { caseNo: '2026-000187', title: '주차장 접촉 · 과실 협의', to: '최렌트', progress: '상대 보험사와 과실 협의 중', next: '상대사 회신 오면 고객에게 통화', due: addDays(3) } },
+      { kind: 'handover', author: '한과실', data: { caseNo: '2026-000201', title: '통원 치료 · 서류 대기', to: '김보상', progress: '진단서 접수, 통원 확인서 미제출', next: '고객에게 서류 재요청 문자', due: t } },
+      { kind: 'handover', author: '정사정', data: { caseNo: '2026-000099', title: '단독 사고 · 지급 완료', to: '이대물', progress: '지급 완료', next: '종결 처리' }, done: true },
+      { kind: 'tip', author: '이대물', data: { cat: '공업사', name: '가나공업사 (예시)', area: '○○구', phone: '02-000-1234', text: '수입차 판금 잘함. 견적 사진을 바로 보내 줌' } },
+      { kind: 'tip', author: '최렌트', data: { cat: '병원', name: '다라정형외과 (예시)', area: '△△동', phone: '02-000-5678', text: '서류 발급이 빠름. 오전 방문 추천' } },
+      { kind: 'tip', author: '이대물', data: { cat: '렌트', name: '마바렌트 (예시)', phone: '1588-0000', text: '야간 · 주말 배차 가능. 협력 단가는 공지 참고' } },
+      { kind: 'tip', author: '정사정', data: { cat: '견인', name: '사아견인 (예시)', phone: '010-0000-0000', text: '고속도로 출동이 빠름' } },
+      { kind: 'tip', author: '윤센터', data: { cat: '노하우', name: '과실 협의 전 체크', text: '블랙박스 원본부터 확보 → 과실비율 기준에서 사고 유형 먼저 찾아 두기' } },
+      { kind: 'tip', author: '최렌트', data: { cat: '노하우', name: '렌트 종료 안내 요령', text: '출고 확정 연락 받은 날 바로 렌트 종료 안내. 반납 시간까지 같이 안내' } },
+    ];
+  }
+
+  // ---------- 저장소: 강의안용 (메모리)
+  var demoItems = null;
+  function demoStore() {
+    if (!demoItems) {
+      var base = Date.now();
+      demoItems = sample().map(function (x, i) {
+        return { id: 'd' + i, kind: x.kind, author: x.author, data: x.data, done: !!x.done, at: base - (i + 1) * 47 * 60e3, mine: x.author === '김보상' };
+      });
+    }
+    return {
+      load: function () { return Promise.resolve({ today: today(), items: demoItems.slice() }); },
+      send: function (a) {
+        if (a.op === 'delete') demoItems = demoItems.filter(function (x) { return x.id !== a.id; });
+        else if (a.op === 'done') demoItems.forEach(function (x) { if (x.id === a.id) x.done = !x.done; });
+        else if (a.op === 'add') {
+          if (a.kind === 'status') demoItems = demoItems.filter(function (x) { return !(x.kind === 'status' && x.mine); });
+          demoItems.unshift({ id: 'n' + Date.now(), kind: a.kind, author: a.author, data: a.data, done: false, at: Date.now(), mine: true });
+        }
+        return Promise.resolve({ ok: true });
+      },
+    };
+  }
+
+  // ---------- 저장소: 사이트용 (서버)
+  function liveStore(api, room, cid) {
+    return {
+      load: function () {
+        return fetch(api + '?room=' + encodeURIComponent(room), { headers: { 'x-cid': cid }, cache: 'no-store' })
+          .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || r.status); return j; }); });
+      },
+      send: function (a) {
+        a.room = room; a.cid = cid;
+        return fetch(api, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) })
+          .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || r.status); return j; }); });
+      },
+    };
+  }
+
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  function mount(root, opts) {
+    opts = opts || {};
+    var live = opts.mode === 'live';
+    var step = live ? 5 : (opts.step || 4);
+    var tabs = [['home', '홈', 'home']];
+    if (step >= 3) tabs.push(['handover', '인수인계', 'swap']);
+    if (step >= 4) tabs.push(['tips', '노하우', 'book']);
+    var tab = opts.tab || 'home';
+    var me = live ? (lsGet('ca:name') || '') : '김보상';
+    var cid = lsGet('ca:cid');
+    if (!cid) { cid = 'c' + Math.random().toString(36).slice(2) + Date.now().toString(36); lsSet('ca:cid', cid); }
+    var store = live ? liveStore(opts.api || '/api/center', opts.room || 'main', cid) : demoStore();
+    var data = { today: today(), items: [] };
+    var hoFilter = 'all', tipCat = '전체', query = '';
+    var online = true, lastJson = '';
+
+    root.classList.add('ca');
+    root.innerHTML = '';
+    var head = el('div', 'ca-head' + (opts.notch ? ' pad-top' : ''));
+    var scroll = el('div', 'ca-scroll');
+    var bar = el('div', 'ca-tabbar');
+    root.appendChild(head); root.appendChild(scroll);
+    if (tabs.length > 1) root.appendChild(bar);
+
+    function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+    function toast(msg) { var t = el('div', 'ca-toast', esc(msg)); root.appendChild(t); setTimeout(function () { t.remove(); }, 1800); }
+    function of(kind) { return data.items.filter(function (x) { return x.kind === kind; }); }
+
+    function refresh() {
+      return store.load().then(function (d) {
+        online = true;
+        var j = JSON.stringify(d);
+        if (j !== lastJson) { lastJson = j; data = d; draw(); } else drawHead();
+      }, function (e) { online = false; drawHead(); if (live && !data.items.length) scroll.innerHTML = '<div class="ca-sec"><div class="ca-empty">불러오지 못했어요. 잠시 후 다시 시도해 주세요.<br>' + esc(e.message) + '</div></div>'; });
+    }
+    function act(a) {
+      if (live && !me) { askName(function () { act(a); }); return; }
+      a.author = me;
+      return store.send(a).then(refresh, function (e) { toast('저장하지 못했어요: ' + e.message); });
+    }
+
+    // ---------- 머리
+    function drawHead() {
+      var st = of('status'); var cnt = {};
+      st.forEach(function (s) { cnt[s.data.state] = (cnt[s.data.state] || 0) + 1; });
+      var sum = ['출근', '외근', '휴가', '반차', '교육', '재택'].filter(function (k) { return cnt[k]; })
+        .map(function (k) { return '<span>' + k + '<b>' + cnt[k] + '</b></span>'; }).join('');
+      head.innerHTML =
+        '<div class="ca-top"><div class="ca-logo"><i>C1</i>센터원</div>' +
+        '<button class="ca-me" data-a="name">' + svg('user') + esc(me || '이름 설정') + '</button></div>' +
+        '<div class="ca-date">' + prettyDate() + (live ? ' · <span class="ca-live' + (online ? '' : ' off') + '"><i></i>' + (online ? '실시간' : '연결 끊김') + '</span>' : '') + '</div>' +
+        '<div class="ca-title">' + (tab === 'home' ? '오늘 우리 센터' : tab === 'handover' ? '인수인계' : '센터 노하우') + '</div>' +
+        (tab === 'home' && sum ? '<div class="ca-sum">' + sum + '</div>' : '');
+    }
+
+    // ---------- 홈: 공지 + 근무 현황
+    function drawHome() {
+      var notices = of('notice').sort(function (a, b) { return (b.data.pin ? 1 : 0) - (a.data.pin ? 1 : 0) || b.at - a.at; });
+      var st = of('status');
+      var mine = st.filter(function (s) { return s.mine; })[0];
+      var h = (live ? '<div class="ca-warn">' + svg('warn') + '<span>교육용 공유 공간이에요. 실제 고객 이름 · 연락처 · 주민번호는 넣지 마세요.</span></div>' : '');
+      h += '<div class="ca-sec"><div class="ca-sec-h"><h3>' + svg('bell') + '공지</h3><button class="ca-add" data-a="notice">' + svg('plus') + '공지</button></div><div class="ca-list">';
+      h += notices.length ? notices.map(function (n) {
+        return '<div class="ca-card ca-notice' + (n.data.pin ? ' pinned' : '') + '"><span class="pin">' + svg(n.data.pin ? 'pin' : 'bell') + '</span><div style="flex:1;min-width:0"><div class="tx">' + esc(n.data.text) + '</div>' +
+          '<div class="ca-meta">' + esc(n.author) + ' · ' + ago(n.at) + (n.mine ? ' <button class="ca-del" data-del="' + n.id + '">삭제</button>' : '') + '</div></div></div>';
+      }).join('') : '<div class="ca-empty">아직 공지가 없어요</div>';
+      h += '</div></div>';
+
+      h += '<div class="ca-sec"><div class="ca-sec-h"><h3>' + svg('user') + '오늘 근무 <small>' + st.length + '명</small></h3></div>';
+      h += '<div class="ca-card"><div style="font-weight:800;font-size:.8em;color:var(--sub);margin-bottom:.5em">내 상태 ' + (mine ? '· <b style="color:var(--ink)">' + esc(mine.data.state) + '</b>' : '선택') + '</div><div class="ca-mystat">' +
+        STATES.map(function (s) { var on = mine && mine.data.state === s[0]; return '<button class="ca-chip' + (on ? ' on' : '') + '" style="' + (on ? 'background:' + s[1] : '') + '" data-st="' + s[0] + '">' + s[0] + '</button>'; }).join('') +
+        '</div></div>';
+      var order = {}; STATES.forEach(function (s, i) { order[s[0]] = i; });
+      st.sort(function (a, b) { return (order[a.data.state] - order[b.data.state]) || a.author.localeCompare(b.author); });
+      h += '<div class="ca-people">' + (st.length ? st.map(function (s) {
+        var c = stateColor(s.data.state);
+        var note = [s.data.note, s.data.sub ? '대직 ' + s.data.sub : ''].filter(Boolean).join(' · ');
+        return '<div class="ca-card ca-person"><span class="ca-av" style="background:' + avColor(s.author) + '">' + esc(s.author.slice(0, 1)) + '</span>' +
+          '<div><div class="nm">' + esc(s.author) + (s.mine ? ' <small style="color:var(--faint)">(나)</small>' : '') + '</div>' + (note ? '<div class="nt">' + esc(note) + '</div>' : '') + '</div>' +
+          '<span class="ca-badge" style="background:' + c + '">' + esc(s.data.state) + '</span></div>';
+      }).join('') : '<div class="ca-empty">아직 아무도 체크하지 않았어요</div>') + '</div></div>';
       return h;
     }
 
-    function draw(){
-      if(bar) Array.prototype.forEach.call(bar.children,function(b){ b.classList.toggle('on', b.getAttribute('data-t')===tab); });
-      scroll.innerHTML='';
-      status.classList.toggle('dark', tab!=='plan');
-      if(tab==='plan'){
-        scroll.appendChild(hero());
-        var days=el('div','tp-days');
-        DAYS.forEach(function(D,ix){ var b=el('button','tp-day'+(ix===day?' on':''),'<div class="n">DAY '+(ix+1)+'</div><div class="d">'+dayDate(ix)+'</div><div class="c">'+D.city+'</div>');
-          b.onclick=function(){ day=ix; draw(); }; days.appendChild(b); });
-        scroll.appendChild(days);
-        var D=DAYS[day];
-        scroll.appendChild(el('div','tp-dayhead','<span class="city">'+D.city+' · '+D.sum+'</span><span class="meta">일정 '+D.plan.length+'개</span>'));
-        var tl=el('div','tp-tl');
-        D.plan.forEach(function(p){
-          var tips=(p[4]||[]); var warn=tips[1]==='warn';
-          var tipHtml=tips.length?'<div class="tips"><span class="'+(warn?'warn':'')+'">'+esc(tips[0])+'</span></div>':'';
-          tl.appendChild(el('div','tp-ev','<span class="t">'+p[0]+'</span><span class="dot" style="background:'+TYPE[p[1]]+'">'+svg(p[1])+'</span>'+
-            '<div class="body"><div class="ttl">'+esc(p[2])+'</div><div class="ds">'+esc(p[3])+'</div>'+tipHtml+'</div>'));
-        });
-        scroll.appendChild(tl);
-        if(level>=3){
-          var sec=el('div','tp-sec'); sec.appendChild(el('h4',null,'오늘의 추천 <small>'+D.city+'</small>'));
-          var fl=el('div','tp-filter');
-          [['all','전체'],['sight','관광'],['food','맛집'],['shop','쇼핑']].forEach(function(k){ var b=el('button',kind===k[0]?'on':null,k[1]); b.onclick=function(){ kind=k[0]; draw(); }; fl.appendChild(b); });
-          sec.appendChild(fl);
-          var pl=el('div','tp-places');
-          var list=D.spots.filter(function(s){ return kind==='all'||s[0]===kind; });
-          list.forEach(function(s){ var c=CATC[s[0]];
-            pl.appendChild(el('div','tp-place','<div class="th" style="background:'+c[2]+'">'+svg(s[0])+'</div>'+
-              '<div><div class="cat" style="color:'+c[1]+'">'+c[0]+'</div><div class="nm">'+esc(s[1])+'</div><div class="ds">'+esc(s[2])+'</div><span class="pick">'+esc(s[3])+'</span></div>')); });
-          if(!list.length) pl.appendChild(el('div','ds','이 날은 해당 추천이 없어요'));
-          sec.appendChild(pl); scroll.appendChild(sec);
-        }
-      } else if(tab==='check'){
-        scroll.appendChild(el('div','tp-title','<h2>여행 준비물</h2><p>출발까지 D-'+dday+' · 체크하면 저장돼요</p>'));
-        var st=loadCk(), all=0, done=0;
-        CHECK.forEach(function(g){ all+=g[2].length; g[2].forEach(function(x){ if(st[x]) done++; }); });
-        var C=2*Math.PI*16, pct=all?done/all:0;
-        scroll.appendChild(el('div','tp-ckhead','<div class="tp-ring"><svg viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="16"/><circle class="fg" cx="20" cy="20" r="16" stroke-dasharray="'+C+'" stroke-dashoffset="'+(C*(1-pct))+'"/></svg><b>'+Math.round(pct*100)+'%</b></div>'+
-          '<div><div class="tt">여행 준비</div><div class="ss">'+done+' / '+all+' 완료 · '+(all-done?(all-done)+'개 남음':'준비 끝')+'</div></div>'));
-        CHECK.forEach(function(g){
-          var gr=el('div','tp-group'); gr.appendChild(el('div','gh',svg(g[0])+'<span>'+g[1]+'</span>'));
-          g[2].forEach(function(x){ var row=el('div','tp-ck'+(st[x]?' done':''),'<span class="box">'+svg('check')+'</span><span>'+esc(x)+'</span>');
-            row.onclick=function(){ var s2=loadCk(); s2[x]=!s2[x]; saveCk(s2); var y=scroll.scrollTop; draw(); scroll.scrollTop=y; }; gr.appendChild(row); });
-          scroll.appendChild(gr);
-        });
-        scroll.appendChild(el('div','tp-pad'));
-      } else {
-        scroll.appendChild(el('div','tp-title','<h2>여행 회화</h2><p>누르면 태국어로 읽어 줘요</p>'));
-        var sits=el('div','tp-sits');
-        TALK.forEach(function(g,ix){ var b=el('button',ix===sit?'on':null,g[0]); b.onclick=function(){ sit=ix; draw(); }; sits.appendChild(b); });
-        scroll.appendChild(sits);
-        var ph=el('div','tp-phrases'); var note=el('div','tp-note');
-        TALK[sit][1].forEach(function(p){
-          var c=el('div','tp-ph','<div class="ko">'+esc(p[0])+'</div><div class="th">'+p[1]+'</div><div class="rd">'+esc(p[2])+'</div>');
-          var b=el('button',null,PLAY); b.setAttribute('aria-label','듣기'); b.onclick=function(){ speak(p[1],c,note); }; c.appendChild(b); ph.appendChild(c); });
-        scroll.appendChild(ph); scroll.appendChild(note);
-        scroll.appendChild(el('div','tp-tipcard','<b>!</b><div>문장 끝에 남자는 <em>캅</em>, 여자는 <em>카</em>를 붙이면 공손한 말이 돼요.<br>예) 컵쿤 <em>캅</em> / 컵쿤 <em>카</em></div>'));
-      }
+    // ---------- 인수인계
+    function drawHandover() {
+      var all = of('handover').sort(function (a, b) { return (a.done - b.done) || String(a.data.due || '9').localeCompare(String(b.data.due || '9')) || b.at - a.at; });
+      var list = all.filter(function (x) {
+        if (hoFilter === 'tome') return !x.done && x.data.to === me;
+        if (hoFilter === 'byme') return !x.done && x.author === me;
+        if (hoFilter === 'done') return x.done;
+        return !x.done;
+      });
+      var tome = all.filter(function (x) { return !x.done && x.data.to === me; }).length;
+      var h = '<div class="ca-sec"><div class="ca-sec-h"><h3>' + svg('swap') + '진행 중 <small>' + all.filter(function (x) { return !x.done; }).length + '건</small></h3><button class="ca-add" data-a="handover">' + svg('plus') + '인수인계</button></div>';
+      h += '<div class="ca-filter">' + [['all', '전체'], ['tome', '나에게 온 것' + (tome ? ' ' + tome : '')], ['byme', '내가 넘긴 것'], ['done', '완료']].map(function (f) {
+        return '<button class="' + (hoFilter === f[0] ? 'on' : '') + '" data-hf="' + f[0] + '">' + f[1] + '</button>';
+      }).join('') + '</div><div class="ca-list">';
+      h += list.length ? list.map(function (x) {
+        var d = x.done ? null : dday(x.data.due);
+        return '<div class="ca-card ca-ho' + (x.done ? ' done' : '') + '"><div class="row1"><span class="no">' + esc(x.data.caseNo || '번호 없음') + '</span>' + (d ? '<span class="due ' + d[1] + '">' + d[0] + '</span>' : '') + '</div>' +
+          '<div class="tt">' + esc(x.data.title) + '</div>' +
+          '<div class="flow"><b>' + esc(x.author) + '</b>' + svg('arrow') + '<b>' + esc(x.data.to || '누구나') + '</b></div>' +
+          (x.data.progress ? '<div class="box"><em>진행 상황</em>' + esc(x.data.progress) + '</div>' : '') +
+          (x.data.next ? '<div class="box"><em>다음 할 일</em>' + esc(x.data.next) + '</div>' : '') +
+          '<div class="acts"><span class="ca-meta">' + ago(x.at) + (x.mine ? ' <button class="ca-del" data-del="' + x.id + '">삭제</button>' : '') + '</span>' +
+          '<button class="ca-done-btn" data-done="' + x.id + '">' + svg('check') + (x.done ? '되돌리기' : '처리 완료') + '</button></div></div>';
+      }).join('') : '<div class="ca-empty">' + (hoFilter === 'tome' ? '나에게 온 인수인계가 없어요' : '해당하는 인수인계가 없어요') + '</div>';
+      return h + '</div></div>';
     }
-    draw();
-    // 추천 카드가 새로 생긴 단계는 그 부분부터 보이게
-    if(host.getAttribute('data-focus')==='spots'){ var sec=scroll.querySelector('.tp-sec'); if(sec) scroll.scrollTop=Math.max(0,sec.offsetTop-scroll.clientHeight*.35); status.classList.toggle('dark', scroll.scrollTop>40); }
+
+    // ---------- 노하우
+    function hl(s) {
+      var t = esc(s); if (!query) return t;
+      var q = esc(query).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return t.replace(new RegExp(q, 'gi'), function (m) { return '<mark class="ca-hl">' + m + '</mark>'; });
+    }
+    function drawTips() {
+      var q = query.toLowerCase();
+      var list = of('tip').filter(function (x) {
+        if (tipCat !== '전체' && x.data.cat !== tipCat) return false;
+        if (!q) return true;
+        return [x.data.name, x.data.area, x.data.phone, x.data.text, x.data.cat, x.author].join(' ').toLowerCase().indexOf(q) >= 0;
+      }).sort(function (a, b) { return b.at - a.at; });
+      var h = '<div class="ca-sec"><div class="ca-search">' + svg('search') + '<input id="caQ" placeholder="공업사, 병원, 지역, 노하우 검색" value="' + esc(query) + '"></div>';
+      h += '<div class="ca-filter">' + ['전체'].concat(CATS.map(function (c) { return c[0]; })).map(function (c) {
+        return '<button class="' + (tipCat === c ? 'on' : '') + '" data-tc="' + c + '">' + c + '</button>';
+      }).join('') + '</div>';
+      h += '<div class="ca-sec-h"><h3>' + svg('book') + '목록 <small>' + list.length + '개</small></h3><button class="ca-add" data-a="tip">' + svg('plus') + '등록</button></div><div class="ca-list">';
+      h += list.length ? list.map(function (x) {
+        var c = cat(x.data.cat);
+        return '<div class="ca-card ca-tip"><span class="ic" style="background:' + c[1] + '">' + svg(c[2]) + '</span><div style="min-width:0">' +
+          '<div class="nm">' + hl(x.data.name) + '<span class="cat">' + esc(x.data.cat) + (x.data.area ? ' · ' + hl(x.data.area) : '') + '</span></div>' +
+          (x.data.text ? '<div class="tx">' + hl(x.data.text) + '</div>' : '') +
+          (x.data.phone ? '<a class="ph" href="tel:' + esc(x.data.phone.replace(/[^0-9+]/g, '')) + '">' + svg('phone') + hl(x.data.phone) + '</a>' : '') +
+          '<div class="ca-meta">' + esc(x.author) + ' · ' + ago(x.at) + (x.mine ? ' <button class="ca-del" data-del="' + x.id + '">삭제</button>' : '') + '</div></div></div>';
+      }).join('') : '<div class="ca-empty">' + (q ? '"' + esc(query) + '" 검색 결과가 없어요' : '아직 등록된 게 없어요') + '</div>';
+      return h + '</div></div>';
+    }
+
+    function draw() {
+      drawHead();
+      var keepFocus = document.activeElement && document.activeElement.id === 'caQ' && root.contains(document.activeElement);
+      var pos = keepFocus ? document.activeElement.selectionStart : 0;
+      var y = scroll.scrollTop;
+      var h = tab === 'home' ? drawHome() : tab === 'handover' ? drawHandover() : drawTips();
+      if (live && !data.items.length && online) h += '<div class="ca-seed"><button data-a="seed">예시 데이터로 채워 보기</button></div>';
+      scroll.innerHTML = h;
+      scroll.scrollTop = y;
+      if (keepFocus) { var q = root.querySelector('#caQ'); q.focus(); q.setSelectionRange(pos, pos); }
+      var tome = of('handover').filter(function (x) { return !x.done && x.data.to === me; }).length;
+      bar.innerHTML = tabs.map(function (t) {
+        return '<button class="' + (tab === t[0] ? 'on' : '') + '" data-tab="' + t[0] + '">' + svg(t[2]) + '<span>' + t[1] + '</span>' + (t[0] === 'handover' && tome ? '<span class="dot">' + tome + '</span>' : '') + '</button>';
+      }).join('');
+    }
+
+    // ---------- 입력 시트
+    function sheet(title, body, onSubmit) {
+      var bg = el('div', 'ca-sheet-bg');
+      bg.innerHTML = '<div class="ca-sheet"><h4>' + esc(title) + '<button class="ca-x" data-x>' + svg('x') + '</button></h4><form class="ca-f">' + body + '<button class="ca-go" type="submit">저장</button></form></div>';
+      root.appendChild(bg);
+      var form = bg.querySelector('form');
+      function close() { bg.remove(); }
+      bg.addEventListener('click', function (e) { if (e.target === bg || e.target.closest('[data-x]')) close(); });
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var v = {}; Array.prototype.forEach.call(form.elements, function (f) { if (f.name) v[f.name] = f.type === 'checkbox' ? f.checked : f.value.trim(); });
+        if (onSubmit(v) !== false) close();
+      });
+      var first = form.querySelector('input,textarea'); if (first && live) setTimeout(function () { first.focus(); }, 50);
+    }
+    function askName(then) {
+      sheet('이름을 알려 주세요', '<label>이름 (센터에서 부르는 이름)<input name="n" maxlength="12" value="' + esc(me) + '" placeholder="예: 김보상" required></label>', function (v) {
+        if (!v.n) return false; me = v.n; lsSet('ca:name', me); draw(); if (then) then();
+      });
+    }
+    var forms = {
+      notice: function () {
+        sheet('공지 올리기', '<label>내용<textarea name="text" maxlength="200" required placeholder="예: 금요일 16시 센터 회의"></textarea></label><label class="chk"><input type="checkbox" name="pin">맨 위에 고정</label>',
+          function (v) { if (!v.text) return false; act({ op: 'add', kind: 'notice', data: { text: v.text, pin: v.pin } }); toast('공지를 올렸어요'); });
+      },
+      handover: function () {
+        var people = of('status').map(function (s) { return s.author; }).filter(function (n, i, a) { return n !== me && a.indexOf(n) === i; });
+        sheet('인수인계 남기기',
+          '<div class="two"><label>사고번호<input name="caseNo" maxlength="20" placeholder="2026-000000"></label><label>받는 사람<input name="to" maxlength="12" list="caPeople" required placeholder="이름"></label></div>' +
+          '<datalist id="caPeople">' + people.map(function (p) { return '<option value="' + esc(p) + '">'; }).join('') + '</datalist>' +
+          '<label>건 요약<input name="title" maxlength="40" required placeholder="예: 후미 추돌 · 수리 진행"></label>' +
+          '<label>진행 상황<textarea name="progress" maxlength="200" placeholder="어디까지 했나요?"></textarea></label>' +
+          '<label>다음 할 일<input name="next" maxlength="120" placeholder="받는 사람이 할 일"></label>' +
+          '<label>기한<input type="date" name="due" value="' + addDays(1) + '"></label>',
+          function (v) { if (!v.title || !v.to) return false; act({ op: 'add', kind: 'handover', data: v }); toast(v.to + '님에게 넘겼어요'); });
+      },
+      tip: function () {
+        sheet('노하우 · 연락처 등록',
+          '<div class="two"><label>종류<select name="cat">' + CATS.map(function (c) { return '<option>' + c[0] + '</option>'; }).join('') + '</select></label><label>지역<input name="area" maxlength="20" placeholder="예: ○○구"></label></div>' +
+          '<label>이름 · 제목<input name="name" maxlength="40" required placeholder="예: 가나공업사 / 과실 협의 요령"></label>' +
+          '<label>연락처<input name="phone" maxlength="20" inputmode="tel" placeholder="선택"></label>' +
+          '<label>메모<textarea name="text" maxlength="300" placeholder="잘하는 것, 주의할 점, 요령"></textarea></label>',
+          function (v) { if (!v.name) return false; act({ op: 'add', kind: 'tip', data: v }); toast('등록했어요'); });
+      },
+      status: function (state) {
+        var mine = of('status').filter(function (s) { return s.mine; })[0];
+        var needSub = state === '휴가' || state === '반차';
+        sheet('오늘 ' + state,
+          '<label>메모 (선택)<input name="note" maxlength="30" placeholder="' + (state === '외근' ? '예: 현장 확인, 15시 복귀' : '예: 오후 복귀') + '" value="' + esc(mine && mine.data.state === state ? mine.data.note || '' : '') + '"></label>' +
+          (needSub ? '<label>대직자<input name="sub" maxlength="12" placeholder="이름" value="' + esc(mine && mine.data.sub || '') + '"></label>' : ''),
+          function (v) { act({ op: 'add', kind: 'status', data: { date: today(), state: state, note: v.note || '', sub: v.sub || '' } }); toast('오늘 ' + state + '(으)로 표시했어요'); });
+      },
+    };
+
+    // ---------- 클릭
+    root.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b || !root.contains(b)) return;
+      if (b.closest('.ca-sheet-bg')) return;
+      var d = b.dataset;
+      if (d.tab) { tab = d.tab; scroll.scrollTop = 0; draw(); return; }
+      if (d.a === 'name') { if (live) askName(); return; }
+      if (d.a === 'seed') {
+        if (!me) { askName(function () { b.click(); }); return; }
+        store.send({ op: 'seed', author: me, items: sample() }).then(function () { toast('예시를 채웠어요'); refresh(); }, function (er) { toast(er.message); });
+        return;
+      }
+      if (d.a && forms[d.a]) { if (live && !me) { askName(forms[d.a]); return; } forms[d.a](); return; }
+      if (d.st) { if (live && !me) { askName(function () { forms.status(d.st); }); return; } forms.status(d.st); return; }
+      if (d.hf) { hoFilter = d.hf; draw(); return; }
+      if (d.tc) { tipCat = d.tc; draw(); return; }
+      if (d.done) { act({ op: 'done', id: d.done }); return; }
+      if (d.del) { if (window.confirm('삭제할까요?')) act({ op: 'delete', id: d.del }); return; }
+    });
+    root.addEventListener('input', function (e) { if (e.target.id === 'caQ') { query = e.target.value; draw(); } });
+
+    refresh();
+    if (live) {
+      if (!me) setTimeout(function () { askName(); }, 400);
+      setInterval(function () { if (!document.hidden && !root.querySelector('.ca-sheet-bg')) refresh(); }, 5000);
+    }
+    return { refresh: refresh };
   }
-  function speak(t,card,note){
-    var ok=false;
-    try{ if(window.speechSynthesis){ var v=speechSynthesis.getVoices().filter(function(x){ return /^th/i.test(x.lang); })[0];
-      if(v){ var u=new SpeechSynthesisUtterance(t); u.voice=v; u.lang=v.lang; u.rate=.85; card.classList.add('playing');
-        u.onend=function(){ card.classList.remove('playing'); }; speechSynthesis.cancel(); speechSynthesis.speak(u); ok=true; } } }catch(e){}
-    note.textContent=ok?'':'이 기기에는 태국어 음성이 없어요. 한글 발음을 보고 말해 보세요';
-  }
-  document.querySelectorAll('[data-trip]').forEach(buildTrip);
-  try{ if(window.speechSynthesis) speechSynthesis.getVoices(); }catch(e){}
+
+  window.CenterApp = { mount: mount, sample: sample };
+})();
+
+</script>
+<script>
+/* ===== 센터원 업무 공유 (제작 예시) ===== */
+(function(){
+  // 진단 · 센터원 사이트 주소. 바뀌면 여기만 고치면 된다
+  var LIVE_BASE='https://ai-level-survey.vercel.app';
+  var apps=[];
+  document.querySelectorAll('[data-center]').forEach(function(h){
+    apps.push({ host:h, app:CenterApp.mount(h,{ mode:'demo', step:+h.getAttribute('data-center'), tab:h.getAttribute('data-tab')||'home', notch:true }) });
+  });
+  // 장을 넘겨도 앞 장에서 바꾼 내용이 이어지게
+  setInterval(function(){ apps.forEach(function(a){ var s=a.host.closest('.slide'); if(s&&s.classList.contains('active')) a.app.refresh(); }); },1000);
+
+  // QR: 오늘 날짜 방 (같은 날 들어온 사람끼리 공유)
+  var box=document.getElementById('centerQR'); if(!box) return;
+  var d=new Date(Date.now()+9*3600e3).toISOString().slice(2,10).replace(/-/g,'');
+  var url=LIVE_BASE+box.getAttribute('data-path')+'?room='+d;
+  var q=qrcode(0,'M'); q.addData(url); q.make();
+  var n=q.getModuleCount(), cell=10, pad=2, c=document.createElement('canvas');
+  c.width=c.height=(n+pad*2)*cell; var g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height); g.fillStyle='#17142b';
+  for(var r=0;r<n;r++) for(var k=0;k<n;k++) if(q.isDark(r,k)) g.fillRect((k+pad)*cell,(r+pad)*cell,cell,cell);
+  box.appendChild(c);
+  var t=document.getElementById('centerURL'); if(t) t.textContent=url.replace(/^https?:\/\//,'');
 })();
 </script>
 </body>
