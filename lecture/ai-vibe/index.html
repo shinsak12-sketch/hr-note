@@ -803,6 +803,28 @@ body[data-tool="spot"] .spot{display:block}
 .host-link:hover{transform:translateY(-2px)}
 .host-link svg{width:1.15em;height:1.15em;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
 @media print{.host-link{display:none}}
+/* AI 모델 출시 연표 */
+.mtl{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#6250d6;--s5:#e87ba4;position:relative;margin-top:clamp(12px,2vh,22px);background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(8px,1vw,14px) clamp(10px,1.4vw,20px);box-shadow:var(--shadow)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .mtl{--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#9085e9;--s5:#d55181} }
+:root[data-theme="dark"] .mtl{--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#9085e9;--s5:#d55181}
+.mtl svg{display:block;width:100%;height:auto;max-height:44vh;font-family:var(--font-sans)}
+.mtl .grid{stroke:var(--line);stroke-width:1}
+.mtl .lane{stroke:var(--line-strong);stroke-width:1;stroke-dasharray:2 6}
+.mtl .yr{fill:var(--ink-faint);font-size:19px;font-weight:700;font-family:var(--font-mono)}
+.mtl .ln{fill:var(--ink);font-size:19px;font-weight:800}
+.mtl .mark{stroke:var(--coral);stroke-width:2;stroke-dasharray:6 5}
+.mtl .mk{fill:var(--coral);font-size:17px;font-weight:800}
+.mtl .dot{stroke:var(--surface);stroke-width:2.5}
+.mtl .dot.s1,.mtl .tip i.s1{fill:var(--s1);background:var(--s1)} .mtl .dot.s2,.mtl .tip i.s2{fill:var(--s2);background:var(--s2)}
+.mtl .dot.s3,.mtl .tip i.s3{fill:var(--s3);background:var(--s3)} .mtl .dot.s4,.mtl .tip i.s4{fill:var(--s4);background:var(--s4)}
+.mtl .dot.s5,.mtl .tip i.s5{fill:var(--s5);background:var(--s5)}
+.mtl .hit{fill:transparent;cursor:pointer}
+.mtl .pt:hover .dot{r:12}
+.mtl .lb{fill:var(--ink-soft);font-size:15px;font-weight:700;pointer-events:none}
+.mtl .tip{position:absolute;z-index:3;pointer-events:none;background:var(--code-bg);color:#fff;border-radius:10px;padding:8px 12px;box-shadow:var(--shadow);white-space:nowrap;display:flex;align-items:center;gap:8px;font-size:15px}
+.mtl .tip[hidden]{display:none}
+.mtl .tip i{width:10px;height:10px;border-radius:50%;flex:none}
+.mtl .tip span{color:#C9C6DD;font-weight:600}
 </style>
 </head>
 <body>
@@ -1361,6 +1383,23 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
     <div class="idx">02</div>
     <h2 class="headline">지금 AI는 <span class="accent">어디로</span> 가고 있나</h2>
     <p class="lead wide">대답하는 AI에서, 일하는 AI로</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="indigo" data-title="AI 모델 출시 연표"
+  data-notes="[연표 · 2분] 점 하나 = 회사의 대표 모델 하나(각 회사 공식 발표일 기준, 대표 모델만 골라 표시). 점에 마우스를 올리면 이름과 날짜가 나온다.
+멘트: 'ChatGPT(2022년 11월) 전에는 몇 년에 하나씩 나오던 점이, 이후로는 회사마다 두세 달 간격으로 찍힙니다. 오늘 보는 메뉴와 기능도 내년이면 또 바뀝니다. 그래서 특정 버튼보다 시키는 법을 익히는 게 오래갑니다.'
+날짜: OpenAI GPT-1 2018.6 · GPT-2 2019.2 · GPT-3 2020.5 · ChatGPT 2022.11.30 · GPT-4 2023.3.14 · GPT-4o 2024.5.13 · o1 2024.9.12 · GPT-4.5 2025.2.27 · GPT-5 2025.8.7 · GPT-5.2 2025.12.11 · GPT-6 Astra 2026.9.3
+Google BERT 2018.10 · PaLM 2022.4 · Bard 2023.3.21 · Gemini 1.0 2023.12.6 · Gemini 1.5 2024.2.15 · Gemini 2.0 2024.12.11 · Gemini 2.5 Pro 2025.3.25 · Gemini 3 Pro 2025.11.18 · Gemini 3.1 Pro 2026.2.19 · Gemini 3.5 Flash 2026.5.19
+Anthropic Claude 2023.3.14 · Claude 2 2023.7.11 · Claude 3 2024.3.4 · Claude 3.5 Sonnet 2024.6.20 · Claude 3.7 Sonnet 2025.2.24 · Claude 4 2025.5.22 · Sonnet 4.5 2025.9.29 · Opus 4.5 2025.11.24 · Opus 4.6 2026.2.5 · Opus 5 2026.7.24 · Opus 5.5 2026.9.22
+Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024.7.23 · Llama 4 2025.4.5
+기타 DeepSeek-R1 2025.1.20">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> AI 모델 출시 연표</span>
+    <h2 class="subhead">ChatGPT 이후, 새 모델이 <span class="accent">두세 달마다</span> 나옵니다</h2>
+    <p class="desc">점 하나가 회사의 대표 모델 하나입니다. 2022년 11월 ChatGPT 전에는 몇 년에 하나씩이던 점이, 이후로는 회사마다 두세 달 간격으로 찍힙니다. 오늘 보는 메뉴도 내년이면 또 바뀝니다. 그래서 버튼보다 <b>시키는 법</b>을 익히는 게 오래갑니다.</p>
+    <div class="mtl" id="tl" role="img" aria-label="2018년부터 2026년까지 회사별 대표 AI 모델 출시 시점 점도표"></div>
+    <p class="src">각 회사 공식 발표일 기준 · 대표 모델만 표시 · 2026년 10월 기준 · 점에 마우스를 올리면 이름과 날짜</p>
   </div>
 </section>
 
@@ -5383,6 +5422,50 @@ var qrcode = function() {
     mc.querySelector('[data-mc-reset]').onclick=function(){ total=inside=0; frame(); stat(); };
     frame(); stat();
   }
+})();
+</script>
+<script>
+/* ===== AI 모델 출시 연표 (점도표) ===== */
+(function(){
+  var box=document.getElementById('tl'); if(!box) return;
+  var LANES=[['OpenAI','s1'],['Google','s2'],['Anthropic','s3'],['Meta','s4'],['기타','s5']];
+  // [회사 칸, 이름, 날짜, 라벨 위치(u 위 / d 아래 / 없으면 마우스로만)]
+  var D=[
+    [0,'GPT-1','2018-06-11','u'],[0,'GPT-2','2019-02-14'],[0,'GPT-3','2020-05-28','u'],[0,'ChatGPT','2022-11-30','ul'],[0,'GPT-4','2023-03-14','d'],
+    [0,'GPT-4o','2024-05-13'],[0,'o1','2024-09-12'],[0,'GPT-4.5','2025-02-27'],[0,'GPT-5','2025-08-07','u'],[0,'GPT-5.2','2025-12-11'],[0,'GPT-6 Astra','2026-09-03','ul'],
+    [1,'BERT','2018-10-11','u'],[1,'PaLM','2022-04-04','u'],[1,'Bard','2023-03-21'],[1,'Gemini 1.0','2023-12-06','u'],[1,'Gemini 1.5','2024-02-15'],
+    [1,'Gemini 2.0','2024-12-11'],[1,'Gemini 2.5 Pro','2025-03-25'],[1,'Gemini 3 Pro','2025-11-18','u'],[1,'Gemini 3.1 Pro','2026-02-19'],[1,'Gemini 3.5 Flash','2026-05-19'],
+    [2,'Claude','2023-03-14','u'],[2,'Claude 2','2023-07-11'],[2,'Claude 3','2024-03-04','u'],[2,'Claude 3.5 Sonnet','2024-06-20'],[2,'Claude 3.7 Sonnet','2025-02-24'],
+    [2,'Claude 4','2025-05-22','u'],[2,'Claude Sonnet 4.5','2025-09-29'],[2,'Claude Opus 4.5','2025-11-24'],[2,'Claude Opus 4.6','2026-02-05'],[2,'Claude Opus 5','2026-07-24'],[2,'Claude Opus 5.5','2026-09-22','ul'],
+    [3,'LLaMA','2023-02-24','u'],[3,'Llama 2','2023-07-18'],[3,'Llama 3','2024-04-18'],[3,'Llama 3.1','2024-07-23'],[3,'Llama 4','2025-04-05','u'],
+    [4,'DeepSeek-R1','2025-01-20','u']
+  ];
+  var W=1400,H=388,L=120,R=1376,T=34,lane=58,x0=Date.UTC(2018,0,1),x1=Date.UTC(2027,0,1);
+  function X(d){ var p=d.split('-'); return L+(Date.UTC(+p[0],+p[1]-1,+p[2])-x0)/(x1-x0)*(R-L); }
+  function Y(k){ return T+lane*k+lane/2; }
+  var h='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">';
+  for(var yr=2018;yr<=2027;yr++){ var gx=X(yr+'-01-01');
+    h+='<line class="grid" x1="'+gx+'" y1="'+T+'" x2="'+gx+'" y2="'+(T+lane*5)+'"/>';
+    if(yr<2027) h+='<text class="yr" x="'+(gx+(X((yr+1)+'-01-01')-gx)/2)+'" y="'+(T+lane*5+30)+'" text-anchor="middle">'+yr+'</text>'; }
+  LANES.forEach(function(l,k){ h+='<line class="lane" x1="'+L+'" y1="'+Y(k)+'" x2="'+R+'" y2="'+Y(k)+'"/>'+
+    '<text class="ln" x="'+(L-16)+'" y="'+(Y(k)+6)+'" text-anchor="end">'+l[0]+'</text>'; });
+  var cx=X('2022-11-30');
+  h+='<line class="mark" x1="'+cx+'" y1="'+(T-14)+'" x2="'+cx+'" y2="'+(T+lane*5)+'"/><text class="mk" x="'+(cx+8)+'" y="'+(T-4)+'">ChatGPT 출시 이후 →</text>';
+  D.forEach(function(d,n){ var x=X(d[2]), y=Y(d[0]);
+    h+='<g class="pt" data-n="'+n+'"><circle class="hit" cx="'+x+'" cy="'+y+'" r="16"/><circle class="dot '+LANES[d[0]][1]+'" cx="'+x+'" cy="'+y+'" r="9"/>';
+    if(d[3]) h+='<text class="lb" x="'+(d[3]==='ul'?x+8:x)+'" y="'+(d[3]==='d'?y+29:y-17)+'" text-anchor="'+(d[3]==='ul'?'end':'middle')+'">'+d[1]+'</text>';
+    h+='</g>'; });
+  h+='</svg><div class="tip" hidden></div>';
+  box.innerHTML=h;
+  var tip=box.querySelector('.tip');
+  box.addEventListener('mouseover',function(e){ var g=e.target.closest('.pt'); if(!g){ tip.hidden=true; return; }
+    var d=D[+g.getAttribute('data-n')], p=d[2].split('-');
+    tip.innerHTML='<i class="'+LANES[d[0]][1]+'"></i><b>'+d[1]+'</b><span>'+LANES[d[0]][0]+' · '+p[0]+'년 '+(+p[1])+'월 '+(+p[2])+'일</span>';
+    var r=box.getBoundingClientRect(), c=g.querySelector('.dot').getBoundingClientRect();
+    tip.hidden=false; var tx=c.left-r.left+c.width/2, tw=tip.offsetWidth;
+    tip.style.left=Math.max(0,Math.min(r.width-tw,tx-tw/2))+'px'; tip.style.top=(c.top-r.top-tip.offsetHeight-12)+'px'; });
+  box.addEventListener('mouseleave',function(){ tip.hidden=true; });
+  window.dispatchEvent(new Event('resize')); // 그림이 들어간 뒤 화면 맞춤 다시
 })();
 </script>
 </body>
