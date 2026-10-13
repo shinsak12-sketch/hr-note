@@ -743,6 +743,39 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
 .jstop p{font-size:clamp(15px,1.6vw,20px);color:var(--ink-soft);line-height:1.5}
 .jarrow{align-self:center;width:0;height:0;border-left:clamp(14px,1.6vw,22px) solid var(--accent,var(--coral));border-top:clamp(10px,1.2vw,16px) solid transparent;border-bottom:clamp(10px,1.2vw,16px) solid transparent}
 @media (max-width:760px){.journey{grid-template-columns:1fr}.jarrow{justify-self:center;transform:rotate(90deg)}}
+
+/* 만드는 법 4단계 */
+.how{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,1.6vw,22px);margin-top:clamp(16px,2.6vh,28px)}
+.hcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(12px,1.4vw,20px);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.35em}
+.hcard.hot{border-color:var(--accent,var(--coral));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,var(--coral)) 30%,transparent),var(--shadow)}
+.hcard svg{width:100%;height:auto;display:block;background:#F7F5FF;border-radius:12px;margin-bottom:.4em}
+.hcard .n{font-family:var(--font-mono);font-weight:800;color:var(--accent,var(--coral));font-size:clamp(13px,1.4vw,18px)}
+.hcard h3{font-size:clamp(17px,1.9vw,25px)}
+.hcard p{margin:0;color:var(--ink-soft);font-size:clamp(13px,1.45vw,18px);font-weight:600;line-height:1.45}
+.hcard small{color:var(--ink-faint);font-size:.85em}
+/* 3박자 */
+.beats{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,1.6vw,22px);margin-top:clamp(14px,2.4vh,26px)}
+.beat{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(14px,1.6vw,22px);box-shadow:var(--shadow);display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr;gap:.6em clamp(10px,1.2vw,18px);align-items:start}
+.beat.hot{border-color:var(--accent,var(--coral));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,var(--coral)) 30%,transparent),var(--shadow)}
+.beat .n{grid-column:1/-1;font-family:var(--font-mono);font-weight:800;color:var(--accent,var(--coral));font-size:clamp(13px,1.45vw,18px)}
+.beat .say{background:var(--coral);color:#fff;border-radius:16px 16px 4px 16px;padding:.7em .85em;font-weight:700;font-size:clamp(14px,1.5vw,19px);line-height:1.45}
+.beat .say.think{background:var(--bg-2);color:var(--ink);border-radius:16px}
+.mph{width:clamp(96px,9vw,138px);aspect-ratio:9/16;border:5px solid #1E1B33;border-radius:16px;background:#fff;color:#1E1B33;padding:.7em .5em;display:flex;flex-direction:column;align-items:center;gap:.35em;font-size:clamp(10px,.95vw,13px);text-align:center}
+.mph b{font-weight:900;background:#5D57E8;color:#fff;border-radius:6px;padding:.2em .4em;width:100%}
+.mph i{font-style:normal;background:#F1EEE8;border-radius:5px;padding:.25em .3em;width:100%}
+.mph em{font-style:normal;font-weight:900;font-size:2.2em;line-height:1.1;margin-top:.2em}
+.mph u{text-decoration:none;font-weight:900;font-size:1.8em;color:#E59A12}
+.mph s{text-decoration:none;font-weight:900;color:#fff;background:#E5484D;border-radius:6px;padding:.3em .3em;width:100%;line-height:1.3}
+/* 수첩과 게시판 */
+.yn.tight{margin-top:0;gap:clamp(10px,1.2vw,16px)}
+.yn.tight .col{padding:clamp(12px,1.4vw,20px)}
+.yn.tight h3{font-size:clamp(16px,1.8vw,23px);margin-bottom:.45em}
+.yn.tight li{font-size:clamp(14px,1.55vw,19px)}
+.yn .nope{margin:.7em 0 0;font-size:clamp(12px,1.3vw,15px);color:var(--ink-faint);font-weight:700;line-height:1.4}
+/* 템플릿 두 칸 */
+.tpl2{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,28px);margin-top:clamp(14px,2.4vh,26px)}
+.tpl2 .prompt{margin-top:.5em;font-size:clamp(14px,1.6vw,20px);line-height:1.6}
+@media (max-width:900px){.how,.beats,.tpl2{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -841,7 +874,7 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
     <div class="grid cols-3 agenda">
       <div class="card"><span class="k">시작 · 8분</span><h3>AI 활용 등급 진단</h3><ul><li>QR로 1분 설문</li><li>우리 수준 확인</li></ul></div>
       <div class="card hot"><span class="k">1부 · 55분</span><h3>업무 자동화하기</h3><ul><li>AI는 왜 마법 같은가</li><li>지금 AI는 어디로 가나</li><li>알려 주고 잘 시키기</li><li>파일 · 스킬로 맡기기</li></ul></div>
-      <div class="card hot"><span class="k">2부 · 45분 · 상급자</span><h3>바이브코딩</h3><ul><li>왜 도구를 만들어야 하나</li><li>시연 두 가지</li><li>제작 예시 · 센터원 업무 공유</li><li>진짜 사이트 같이 써 보기</li></ul></div>
+      <div class="card hot"><span class="k">2부 · 45분 · 상급자</span><h3>바이브코딩</h3><ul><li>왜 도구를 만들어야 하나</li><li>만드는 법 · 3박자</li><li>제작 예시 · 센터원 업무 공유</li><li>진짜 사이트 같이 써 보기</li></ul></div>
     </div>
     <p class="src">쉬는 시간 5분 · 마무리 5분</p>
   </div>
@@ -1531,25 +1564,41 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
   </div>
 </section>
 
-<section class="slide wide compact" data-accent="teal" data-title="방식 ② 친구처럼 대화하기"
-  data-notes="[방식 ② · 3분] 업무 지시만 하다 보면 대화가 한 방향이 된다. 정답이 없는 질문을 친구에게 묻듯 던져 보는 경험을 한 번 해 보라고 권하기. AI가 되묻고, 내가 답하고, 대화가 양방향이 된다. 대화 내용은 예시(실제로는 매번 다르게 나온다). 강의장에서 실제로 쳐 보면 반응이 좋다.
-업무 연결: 이렇게 시작한 대화가 기획 · 고민 정리 · 아이디어 회의가 된다. 마음에 드는 결과가 나오면 '지금까지 대화를 요청문으로 정리해줘' → 방식 ①의 프롬프트.">
+<section class="slide wide compact" data-accent="teal" data-title="방식 ② 깊이 대화하기 · 토론"
+  data-notes="[방식 ② · 4분] 업무 지시만 하다 보면 대화가 한 방향(내가 시키고 AI가 따르는)이 된다. 정답이 없는 주제로 내 입장을 걸고 토론해 보는 경험을 권하기. 예시는 강사가 창조론, AI가 진화론 입장으로 해 본 대화를 줄인 것(실제 답은 매번 다르게 나온다).
+포인트: 첫 줄에 '봐주지 말고 근거로 반박해 줘'라고 판을 깔면 AI가 맞장구만 치지 않는다.
+※ 종교 · 신념을 평가하는 장이 아니다. 주제가 아니라 '대화 방식'을 보여 주는 것.
+사실 확인: 눈의 단계적 진화(빛 감지 세포 → 오목한 눈 → 렌즈 눈)는 지금 사는 동물들에서도 관찰됨. 틱타알릭(2006 보고, 물고기와 네발동물의 중간), 시조새(공룡과 새의 중간). 사람은 원숭이에서 나온 게 아니라 공통 조상에서 갈라졌다는 것이 진화론의 설명.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 방식 ② · 대화하면서 풀어 가기</span>
-    <h2 class="subhead">가끔은 시키지 말고, <span class="accent">친구처럼 대화</span>해 보세요</h2>
-    <p class="desc">업무 지시만 하다 보면 대화가 한 방향이 됩니다. 정답이 없는 질문을 친구에게 묻듯 던져 보세요. AI가 되묻고, 내가 답하면서 생각이 넓어지는 경험을 꼭 한 번 해 보시길 권합니다.</p>
+    <span class="eyebrow"><span class="dot"></span> 방식 ② · 깊이 대화하기</span>
+    <h2 class="subhead">가끔은 시키지 말고, <span class="accent">입장을 걸고 토론</span>해 보세요</h2>
+    <p class="desc">업무 지시만 하다 보면 대화가 한 방향이 됩니다. 정답이 없는 주제로 내 입장을 걸어 보세요. 예를 들어 나는 <b>창조론</b>, AI는 <b>진화론</b>. AI는 맞장구만 치지 않고 근거로 반박합니다.</p>
     <div class="chat mini">
-      <div class="turn me"><div class="avatar">나</div><div class="bubble">신은 존재한다고 생각해?</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble">저는 믿음을 가진 존재가 아니라 단정하긴 어려워요. 철학에서는 '있다 · 없다 · 알 수 없다'는 입장이 오래 부딪혀 왔어요. 혹시 어느 쪽에 마음이 가세요?</div></div>
-      <div class="turn me"><div class="avatar">나</div><div class="bubble">잘 모르겠어. 근데 사람들은 왜 신을 믿을까?</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble">불안할 때 기댈 곳, 함께하는 공동체, 삶의 의미를 찾는 마음… 여러 설명이 있어요. 요즘 이런 질문이 떠오른 계기가 있으셨어요?</div></div>
-      <div class="turn me"><div class="avatar">나</div><div class="bubble">요즘 일이 많아서 그런가 ㅎㅎ</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble">그럴 때 큰 질문이 떠오르곤 하죠. 요즘 어떤 일이 제일 버거우세요? 같이 하나씩 정리해 볼까요?</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble">토론하자. 나는 창조론, 너는 진화론 입장. <b>봐주지 말고 근거로 반박해 줘.</b> 눈처럼 정교한 기관이 우연히 생겼다는 게 말이 돼?</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble">진화론은 '우연'만 말하지 않아요. 돌연변이는 무작위지만, 살아남을 것을 고르는 건 <b>자연선택</b>이에요. 눈도 빛만 느끼는 세포 → 오목한 눈 → 렌즈가 있는 눈까지, 그 중간 단계들을 지금 사는 동물들에서도 볼 수 있어요.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble">그럼 중간 단계 화석은? 원숭이랑 사람 사이 화석은 왜 없어?</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble">꽤 찾았어요. 물고기와 네발 동물 사이의 <b>틱타알릭</b>, 공룡과 새 사이의 <b>시조새</b>가 대표적이에요. 그리고 진화론은 사람이 원숭이에서 나왔다고 하지 않아요. <b>공통 조상</b>에서 갈라졌다고 하죠.</div></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>정답을 받는 대화가 아니라 <b>생각이 넓어지는 대화</b>입니다. 이렇게 시작한 대화가 기획 · 고민 정리 · 아이디어로 이어집니다.</p></div>
   </div>
 </section>
 
+<section class="slide wide compact" data-accent="teal" data-title="방식 ② 토론 · 이어서"
+  data-notes="[방식 ② 이어서] 이 장의 포인트 세 가지: ① AI가 인정할 건 인정한다(생명의 기원은 미해결) ② 과학이 답할 수 없는 영역은 선을 긋는다 ③ 마지막에 나에게 되묻는다 → 내 생각이 정리된다. 이게 '생각이 깊어지는 대화'.
+사실 확인: 생명의 기원(무생물 → 생명)은 아직 과학적으로 풀리지 않은 문제이고, 진화론은 생명이 생긴 뒤의 다양화를 설명한다. 프랜시스 콜린스(인간 게놈 프로젝트 책임자, 미국 국립보건원장 역임)는 진화론을 받아들이는 기독교인으로 『신의 언어』(2006)를 썼다.
+업무 연결: 이렇게 깊게 주고받은 뒤 '지금까지 대화를 정리해 줘'라고 하면 기획서 · 보고서의 뼈대가 된다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 방식 ② · 토론 이어서</span>
+    <h2 class="subhead">인정할 건 인정하고, <span class="accent">나에게 되묻습니다</span></h2>
+    <div class="chat mini">
+      <div class="turn me"><div class="avatar">나</div><div class="bubble">좋아, 그럼 첫 생명은? 무생물에서 생명이 저절로 생겼다는 건 증명 못 했잖아.</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><b>맞아요, 그건 인정해요.</b> 생명이 처음 어떻게 생겼는지는 아직 풀리지 않은 문제예요. 다만 그건 진화론과는 다른 질문이에요. 진화론은 생명이 생긴 <b>다음</b>에 어떻게 다양해졌는지를 설명해요.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble">그럼 결국 처음은 누군가 만들었다고 봐도 되는 거 아냐?</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble">거기서부터는 <b>과학이 답할 수 없는 영역</b>이에요. 실제로 진화론을 받아들이면서 신앙을 가진 과학자도 있어요. 인간 게놈 프로젝트를 이끈 프랜시스 콜린스처럼요. 하나 여쭤볼게요. 창조를 믿으시는 이유는 <b>증거</b> 때문인가요, <b>의미</b> 때문인가요?</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble">음… 생각해 보니 의미 쪽이 더 크네.</div></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>반박하고, 인정하고, 되묻습니다. 정답을 받는 대화가 아니라 <b>내 생각이 깊어지는 대화</b>입니다. 기획 · 고민 정리 · 보고서 논리 점검도 이렇게 합니다.</p></div>
+  </div>
+</section>
 
 <section class="slide center" data-accent="teal" data-title="5요소도 AI가 만든다"
   data-notes="[반전] 5요소를 외우게 하려는 게 아니다. 매번 떠올리기 어렵다면 AI에게 물어보게 하면 된다. 다음 장이 오늘 이론에서 딱 하나만 가져간다면 이것.">
@@ -1675,7 +1724,7 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
 </section>
 
 <section class="slide wide" data-accent="coral" data-title="스킬을 만화로"
-  data-notes="[스킬 만화 · 2분] 왼쪽: 스킬이 없으면 매번 처음부터 길게 설명해야 한다(나도 지치고, 빠뜨리기도 한다). 오른쪽: 스킬이 있으면 '민원 답변!' 한마디에 AI가 책장에서 해당 매뉴얼을 꺼내 그대로 따라 한다. 책장에는 매뉴얼 여러 권이 꽂혀 있고, AI가 필요한 걸 골라 꺼낸다 — 이게 스킬의 핵심.">
+  data-notes="[스킬 만화 · 2분] 왼쪽: 스킬이 없으면 매번 처음부터 길게 설명해야 한다(나도 지치고, 빠뜨리기도 한다). 오른쪽: 스킬이 있으면 '분쟁심의!' 한마디에 AI가 책장에서 해당 매뉴얼을 꺼내 그대로 따라 한다. 책장에는 매뉴얼 여러 권이 꽂혀 있고, AI가 필요한 걸 골라 꺼낸다 — 이게 스킬의 핵심.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 스킬을 만화로</span>
     <h2 class="subhead">매번 설명하던 걸, <span class="accent">책장에 매뉴얼로</span> 꽂아 둡니다</h2>
@@ -1687,9 +1736,9 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
           <use href="#stu" x="270" y="118" width="110" height="138"/><use href="#f-think" x="270" y="118" width="110" height="138"/>
           <rect x="12" y="32" width="300" height="94" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
           <path d="M60 126 L64 140 L80 126" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
-          <text x="24" y="54" class="ct sm">민원 답변 써줘. 아 그리고 사과는 하되</text>
-          <text x="24" y="74" class="ct sm">책임 인정은 빼고, 처리 예정일 넣고,</text>
-          <text x="24" y="94" class="ct sm">4줄로, 존댓말로, 이모티콘 없이, 또…</text>
+          <text x="24" y="54" class="ct sm">분쟁심의 자료 만들어줘. 회사 양식으로,</text>
+          <text x="24" y="74" class="ct sm">사고 개요 → 쟁점 → 과실 근거 → 의견,</text>
+          <text x="24" y="94" class="ct sm">판례는 출처 달고, 표는 이렇게, 또…</text>
           <text x="24" y="116" class="ct sm coral">(어제도 한 말 · 내일도 할 말)</text>
           <text x="325" y="290" class="ct xs" text-anchor="middle">AI</text><text x="65" y="290" class="ct xs" text-anchor="middle">나</text>
         </svg>
@@ -1700,19 +1749,19 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
           <use href="#me" x="10" y="118" width="110" height="138"/><use href="#f-happy" x="10" y="118" width="110" height="138"/>
           <rect x="16" y="40" width="112" height="44" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
           <path d="M56 84 L62 102 L76 84" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
-          <text x="72" y="68" class="ct" text-anchor="middle">민원 답변!</text>
+          <text x="72" y="68" class="ct" text-anchor="middle">분쟁심의!</text>
           <rect x="176" y="20" width="210" height="150" rx="6" fill="#C8A27A" stroke="#1E1B33" stroke-width="3"/>
           <path d="M176 95 H386" stroke="#1E1B33" stroke-width="3"/>
           <rect x="188" y="30" width="26" height="62" fill="#5D57E8" stroke="#1E1B33" stroke-width="2.5"/><rect x="218" y="30" width="26" height="62" fill="#FFD43B" stroke="#1E1B33" stroke-width="2.5"/><rect x="248" y="30" width="26" height="62" fill="#80CBC4" stroke="#1E1B33" stroke-width="2.5"/>
           <rect x="188" y="104" width="26" height="62" fill="#FFB74D" stroke="#1E1B33" stroke-width="2.5"/><rect x="218" y="104" width="26" height="62" fill="#B7A6FF" stroke="#1E1B33" stroke-width="2.5"/>
-          <text x="330" y="52" class="ct xs" text-anchor="middle">분쟁심의 자료</text><text x="330" y="70" class="ct xs" text-anchor="middle">회사 PPT 양식</text><text x="330" y="88" class="ct xs" text-anchor="middle">안내 문자</text>
+          <text x="330" y="52" class="ct xs" text-anchor="middle">민원 답변</text><text x="330" y="70" class="ct xs" text-anchor="middle">회사 PPT 양식</text><text x="330" y="88" class="ct xs" text-anchor="middle">안내 문자</text>
           <use href="#stu" x="262" y="130" width="110" height="138"/><use href="#f-cool" x="262" y="130" width="110" height="138"/>
-          <g transform="rotate(-12 262 150)"><rect x="236" y="120" width="40" height="70" fill="#FF5A4D" stroke="#1E1B33" stroke-width="3"/><text x="256" y="150" class="ct xs white" text-anchor="middle">민원</text><text x="256" y="166" class="ct xs white" text-anchor="middle">답변</text></g>
+          <g transform="rotate(-12 262 150)"><rect x="236" y="120" width="40" height="70" fill="#FF5A4D" stroke="#1E1B33" stroke-width="3"/><text x="256" y="150" class="ct xs white" text-anchor="middle">분쟁</text><text x="256" y="166" class="ct xs white" text-anchor="middle">심의</text></g>
           <text x="317" y="290" class="ct xs" text-anchor="middle">AI</text><text x="65" y="290" class="ct xs" text-anchor="middle">나</text>
         </svg>
       </div>
     </div>
-    <p class="desc">스킬이 없으면 매번 처음부터 길게 설명해야 하고, 가끔 빠뜨립니다. 스킬로 등록해 두면 AI의 책장에 매뉴얼이 꽂혀 있다가, <b>"민원 답변!" 한마디에 AI가 맞는 매뉴얼을 골라 꺼내</b> 그대로 따라 합니다.</p>
+    <p class="desc">스킬이 없으면 매번 처음부터 길게 설명해야 하고, 가끔 빠뜨립니다. 스킬로 등록해 두면 AI의 책장에 매뉴얼이 꽂혀 있다가, <b>"분쟁심의!" 한마디에 AI가 맞는 매뉴얼을 골라 꺼내</b> 그대로 따라 합니다.</p>
   </div>
 </section>
 
@@ -1807,17 +1856,15 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
   </div>
 </section>
 
-<section class="slide center" data-accent="coral" data-title="시연 · 스킬"
-  data-notes="[시연 · 3분] ① 민원 답변을 대화로 한 번 → ② '스킬로 만들어줘' → ③ 등록 → ④ 새 대화에서 '민원 답변 써줘'만 쳐도 스킬 순서대로 질문부터 하는 것 보여 주기.">
+<section class="slide center" data-accent="coral" data-title="시연 · 분쟁심의위원회 자료 작성"
+  data-notes="[시연 · 강사 진행] Claude로 분쟁심의위원회 자료 작성 스킬 시연. 양식과 작성 순서를 스킬로 등록해 두고, 새 대화에서 한마디로 자료를 만드는 것까지 보여 준다.">
   <div class="slide-inner demo-cover">
     <span class="live"><i></i> 시연</span>
-    <div class="screen">스킬 만들고 써 보기</div>
-    <h2 class="subhead">새 대화에서 <span class="accent">"민원 답변 써줘"</span> 한마디</h2>
-    <p class="lead">등록한 매뉴얼대로 AI가 알아서 움직이는지 봅니다</p>
+    <div class="screen">Claude · 스킬</div>
+    <h2 class="subhead"><span class="accent">분쟁심의위원회 자료</span> 작성</h2>
+    <p class="lead">양식과 작성 순서를 스킬로 등록해 두고, 한마디로 만들어 봅니다</p>
   </div>
 </section>
-
-
 
 <section class="slide wide" data-accent="teal" data-title="1부 정리 · 내 AI 업무 환경"
   data-notes="[1:02 · 정리] 1부 흐름을 한 장으로: 알려 주기 → 잘 시키기 → 파일로 받기 → 심어 두기. 마지막 문장 두 개만 기억하면 된다. 다음은 쉬는 시간.">
@@ -1826,7 +1873,7 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
     <h2 class="subhead">내 AI 업무 환경은 <span class="accent">이렇게 쌓입니다</span></h2>
     <div class="flow" style="--n:4">
       <div class="step"><span class="n">01 · 알려 주기</span><h3>맞춤 지침 · 프로젝트</h3><p>내가 누구고 어떻게 일하는지 (메모라이징)</p></div>
-      <div class="step"><span class="n">02 · 잘 시키기</span><h3>두 가지 방식</h3><p>체계적 프롬프트 · 친구처럼 대화</p></div>
+      <div class="step"><span class="n">02 · 잘 시키기</span><h3>두 가지 방식</h3><p>체계적 프롬프트 · 깊이 대화하기</p></div>
       <div class="step"><span class="n">03 · 받기</span><h3>파일 생성</h3><p>결과는 엑셀 · 워드 · PPT로</p></div>
       <div class="step hot"><span class="n">04 · 심어 두기</span><h3>스킬</h3><p>자주 쓰는 프롬프트 · 업무 매뉴얼</p></div>
     </div>
@@ -1992,70 +2039,136 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
   </div>
 </section>
 
-<section class="slide center" data-accent="coral" data-title="시연 · 차량 파손 분석 보상 카메라 어플"
-  data-notes="[시연 1] 폰 미러링. 순서 예: 사고번호 없이 촬영 → 차량 · 단계 꼬리표 → AR 측정(바닥 찍기 → 높이, 길이, 원 · 네모) → 수리 배지 → 사진대지 PDF 미리 보기 → 보내기. 포인트: 앱 설치 파일까지 대화로 만들었다.">
-  <div class="slide-inner demo-cover">
-    <span class="live"><i></i> 시연</span>
-    <div class="phone">보상 카메라</div>
-    <h2 class="subhead">차량 파손 분석 <span class="accent">보상 카메라</span> 어플</h2>
-    <p class="lead">촬영 · AR 측정 · 수리 배지 · 사진대지</p>
+<section class="slide wide" data-accent="coral" data-title="실제로는 이렇게 만든다"
+  data-notes="[만드는 법 · 3분] 바이브코딩이 막연하게 들리는 이유는 '그래서 뭘 누르는데?'가 안 보여서. 실제 순서는 네 단계뿐.
+① 평소 쓰는 AI 채팅창에 말로 요청 ② AI가 코드를 쓰고, 화면 옆에 바로 미리 보기가 뜬다(Claude는 아티팩트, ChatGPT는 캔버스) ③ 마음에 들면 .html 파일로 저장 → 더블클릭하면 인터넷 창(크롬 · 엣지)에서 프로그램처럼 열린다 ④ 카톡 · 메일로 파일을 보내면 동료 폰 · PC에서도 그대로 열린다.
+HTML = 인터넷 창이 읽는 파일 형식. 설치가 필요 없어서 회사 PC에서도 쓰기 좋다. 코드는 한 줄도 안 읽어도 된다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 만드는 법 · 실제 순서</span>
+    <h2 class="subhead">코드는 몰라도 됩니다. <span class="accent">이 네 단계</span>가 전부입니다</h2>
+    <p class="desc">결과물은 대부분 <b>HTML 파일 하나</b>입니다. HTML은 인터넷 창이 읽는 파일이라, 설치 없이 폰과 PC에서 바로 열립니다. 코드는 AI가 쓰고, 우리는 열어서 써 보기만 합니다.</p>
+    <div class="how">
+      <div class="hcard">
+        <svg viewBox="0 0 200 120"><rect x="6" y="6" width="188" height="108" rx="10" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <rect x="70" y="20" width="114" height="34" rx="12" fill="#FF5A4D"/><text x="127" y="35" class="ct xs white" text-anchor="middle">사고일 넣으면</text><text x="127" y="49" class="ct xs white" text-anchor="middle">경과일 계산기!</text>
+          <rect x="16" y="64" width="110" height="24" rx="10" fill="#EEECFF"/><text x="71" y="80" class="ct xs" text-anchor="middle">네, 만들어 볼게요</text>
+          <rect x="16" y="94" width="168" height="12" rx="6" fill="#F1EEE8"/></svg>
+        <span class="n">01</span><h3>채팅창에 말로</h3><p>평소 쓰는 AI에게 만들고 싶은 걸 설명</p></div>
+      <div class="hcard">
+        <svg viewBox="0 0 200 120"><rect x="6" y="6" width="92" height="108" rx="10" fill="#1E1B33"/>
+          <rect x="16" y="20" width="50" height="7" rx="3" fill="#7CF5E2"/><rect x="24" y="34" width="60" height="7" rx="3" fill="#FFD43B"/><rect x="24" y="48" width="44" height="7" rx="3" fill="#FF8A65"/><rect x="16" y="62" width="64" height="7" rx="3" fill="#fff"/><rect x="24" y="76" width="40" height="7" rx="3" fill="#7CF5E2"/><rect x="16" y="90" width="52" height="7" rx="3" fill="#FFD43B"/>
+          <rect x="106" y="6" width="88" height="108" rx="10" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <text x="150" y="28" class="ct xs" text-anchor="middle">미리 보기</text>
+          <rect x="116" y="38" width="68" height="18" rx="5" fill="#F1EEE8"/><rect x="116" y="62" width="68" height="20" rx="10" fill="#5D57E8"/><text x="150" y="76" class="ct xs white" text-anchor="middle">계산</text>
+          <text x="150" y="104" class="ct sm coral" text-anchor="middle">45일</text></svg>
+        <span class="n">02</span><h3>AI가 코드 + 미리 보기</h3><p>채팅창 옆에 바로 화면이 뜸<br><small>Claude 아티팩트 · ChatGPT 캔버스</small></p></div>
+      <div class="hcard">
+        <svg viewBox="0 0 200 120"><path d="M14 22 H50 L64 36 V98 H14 Z" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/><path d="M50 22 V36 H64" fill="none" stroke="#1E1B33" stroke-width="3"/>
+          <rect x="18" y="58" width="42" height="16" rx="4" fill="#FF5A4D"/><text x="39" y="70" class="ct xs white" text-anchor="middle">.html</text>
+          <path d="M72 60 H92 M86 54 L92 60 L86 66" stroke="#0FB6A4" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="100" y="14" width="94" height="92" rx="10" fill="#fff" stroke="#1E1B33" stroke-width="3"/><path d="M100 32 H194" stroke="#1E1B33" stroke-width="3"/>
+          <circle cx="111" cy="23" r="3" fill="#FF5A4D"/><circle cx="121" cy="23" r="3" fill="#FFD43B"/><circle cx="131" cy="23" r="3" fill="#0FB6A4"/>
+          <rect x="110" y="42" width="74" height="16" rx="5" fill="#F1EEE8"/><rect x="110" y="64" width="74" height="18" rx="9" fill="#5D57E8"/><text x="147" y="96" class="ct sm coral" text-anchor="middle">45일</text></svg>
+        <span class="n">03</span><h3>파일로 저장 → 더블클릭</h3><p>인터넷 창에서 프로그램처럼 열림. 설치 없음</p></div>
+      <div class="hcard hot">
+        <svg viewBox="0 0 200 120"><path d="M14 30 H44 L56 42 V92 H14 Z" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/><rect x="18" y="58" width="34" height="14" rx="4" fill="#FF5A4D"/><text x="35" y="69" class="ct xs white" text-anchor="middle">.html</text>
+          <path d="M64 50 L96 36 M64 62 H100 M64 74 L96 88" stroke="#0FB6A4" stroke-width="4" stroke-linecap="round"/>
+          <rect x="104" y="14" width="36" height="66" rx="8" fill="#1E1B33"/><rect x="108" y="20" width="28" height="54" rx="4" fill="#fff"/><rect x="112" y="40" width="20" height="10" rx="5" fill="#5D57E8"/>
+          <rect x="150" y="30" width="36" height="66" rx="8" fill="#1E1B33"/><rect x="154" y="36" width="28" height="54" rx="4" fill="#fff"/><rect x="158" y="56" width="20" height="10" rx="5" fill="#5D57E8"/>
+          <text x="145" y="112" class="ct xs" text-anchor="middle">동료 폰 · PC</text></svg>
+        <span class="n">04</span><h3>카톡 · 메일로 공유</h3><p>파일 하나 보내면 동료도 바로 사용</p></div>
+    </div>
   </div>
 </section>
-<section class="slide center" data-accent="indigo" data-title="시연 · AI 차량손해사정 프로그램"
-  data-notes="[시연 2] 사이트 접속해서 시연.">
-  <div class="slide-inner demo-cover">
-    <span class="live" style="color:var(--indigo-soft)"><i style="background:var(--indigo-soft)"></i> 시연</span>
-    <div class="screen">AI 차량손해사정</div>
-    <h2 class="subhead">AI <span class="accent">차량손해사정</span> 프로그램</h2>
-  </div>
-</section>
-<section class="slide" data-accent="coral" data-title="바이브코딩 3박자"
-  data-notes="[핵심] 요청 → 써 보기 → 바꿔줘. 실력은 첫 요청이 아니라 '고쳐 달라는 말'에서 난다. 한 번에 하나씩 고치고, 잘 될 때마다 파일 저장.">
+
+<section class="slide wide" data-accent="coral" data-title="바이브코딩 3박자"
+  data-notes="[3박자 · 3분] 경과일 계산기로 3박자를 한 바퀴. ① 첫 요청 → 기본 계산기 ② 써 보니 '주말 빼고 영업일로도 봐야 하네'가 보인다 ③ 그걸 그대로 말하면 고쳐 준다. 한 번에 완벽한 프로그램은 안 나온다. 그게 정상. 고칠 때는 한 번에 하나씩, 잘 될 때마다 파일 저장(망가지면 그 파일로 돌아가면 된다). 1부의 '깊이 대화하기'와 같은 방식.
+화면 숫자 예: 사고일 2026-08-29 → 2026-10-13 기준 45일, 주말 뺀 영업일 32일.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 바이브코딩 3박자</span>
-    <h2 class="subhead">한 번에 완성되지 않아도 <span class="accent">정상</span></h2>
-    <p class="desc">한 번에 완벽한 프로그램은 안 나옵니다. 그게 정상입니다. 써 보고, 이상한 곳을 말로 고쳐 달라고 하는 걸 반복하면 됩니다. 1부의 '친구처럼 대화하기'와 똑같습니다.</p>
-    <div class="flow" style="--n:3">
-      <div class="step"><span class="n">01</span><h3>말로 요청</h3><p>템플릿으로 첫 요청</p></div>
-      <div class="step"><span class="n">02</span><h3>직접 써 보기</h3><p>눌러 보고 틀린 곳 찾기</p></div>
-      <div class="step hot"><span class="n">03</span><h3>"이렇게 바꿔줘"</h3><p>한 번에 하나씩, 될 때마다 저장</p></div>
+    <h2 class="subhead"><span class="accent">요청 → 써 보기 → 바꿔줘</span>, 이걸 반복합니다</h2>
+    <p class="desc">한 번에 완벽한 프로그램은 안 나옵니다. 그게 정상입니다. 써 보면 '아, 이것도 필요하네'가 보이고, 그걸 그대로 말하면 됩니다. 경과일 계산기로 한 바퀴 돌아 볼게요.</p>
+    <div class="beats">
+      <div class="beat">
+        <span class="n">01 · 말로 요청</span>
+        <div class="say">"사고일 넣으면 오늘까지 며칠 지났는지 보여 주는 계산기 만들어줘"</div>
+        <div class="mph"><b>경과일 계산기</b><i>사고일 8월 29일</i><em>45일</em></div>
+      </div>
+      <div class="beat">
+        <span class="n">02 · 직접 써 보기</span>
+        <div class="say think">써 보니… <b>주말은 빼고 봐야</b> 하는데?</div>
+        <div class="mph"><b>경과일 계산기</b><i>사고일 8월 29일</i><em>45일</em><u>?</u></div>
+      </div>
+      <div class="beat hot">
+        <span class="n">03 · 이렇게 바꿔줘</span>
+        <div class="say">"주말 뺀 영업일도 같이 보여 주고, 30일 넘으면 빨간색으로"</div>
+        <div class="mph"><b>경과일 계산기</b><i>사고일 8월 29일</i><em>45일</em><s>영업일 32일 · 30일 초과</s></div>
+      </div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>실력은 첫 요청이 아니라 <b>"이렇게 바꿔줘"</b>에서 납니다.</p></div>
+    <div class="callout tip"><span class="bang">!</span><p>실력은 첫 요청이 아니라 <b>"이렇게 바꿔줘"</b>에서 납니다. 한 번에 하나씩 고치고, 잘 될 때마다 파일을 저장해 두세요.</p></div>
   </div>
 </section>
-<section class="slide wide" data-accent="teal" data-title="되는 것 / 안 되는 것"
-  data-notes="[가장 중요] 내가 만들 도구를 고를 때 이 표가 기준. 왼쪽 칸에 들어가는 것부터. 오른쪽은 서버 · 계정 · 별도 키가 필요하다 — 단, 제작 예시 ⑤처럼 AI에게 물으면 방법은 알려 준다.">
+
+<section class="slide wide" data-accent="teal" data-title="수첩과 게시판"
+  data-notes="[한계 · 3분] HTML 파일 하나 = 내 수첩. 내 폰(브라우저) 안에만 저장된다. 혼자 쓰는 계산 · 정리 · 문서 도구는 이걸로 충분. 그런데 '센터 사람들이 다 같이 보는' 도구는 공용 게시판, 즉 서버가 필요하다. 그것도 막히면 AI에게 물으면 된다 — 오늘 제작 예시 마지막(대화 ⑤)에서 실제로 게시판까지 붙인다.
+회사 시스템 연동 · 자동 로그인 · 개인정보 대량 처리는 보안 문제로 하지 않는다.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 무엇을 만들 수 있나</span>
-    <h2 class="subhead">HTML 파일 하나로 <span class="accent">되는 것 / 안 되는 것</span></h2>
-    <p class="desc">파일 하나로 만든 프로그램은 그 기기 안에서 돌아갑니다. 그래서 혼자 쓰는 계산 · 정리 · 문서 도구는 잘 되지만, 여러 사람이 같은 데이터를 보려면 서버가 필요합니다. 그것도 방법은 있습니다. 제작 예시 마지막에 보여 드립니다.</p>
-    <div class="yn">
-      <div class="col ok"><h3><i>✓</i>잘 되는 것</h3><ul>
-        <li><b>계산기</b> · 경과일, 감가, 비율</li>
-        <li><b>체크리스트</b> · 진행 관리</li>
-        <li><b>양식 입력 → 문서 · 문자</b> 자동 완성</li>
-        <li><b>기록 저장</b> (그 기기 안에)</li>
-        <li><b>엑셀 읽기 · 만들기</b>, 인쇄 · PDF</li>
-      </ul></div>
-      <div class="col no"><h3><i>✕</i>어렵거나 안 되는 것</h3><ul>
-        <li>여러 사람이 <b>같은 데이터</b> 보기</li>
-        <li>회사 시스템 <b>연동 · 자동 로그인</b></li>
-        <li>프로그램 안에 <b>AI 넣기</b></li>
-        <li><b>개인정보</b> 대량 처리</li>
-      </ul></div>
+    <h2 class="subhead">파일 하나는 <span class="accent">'내 수첩'</span>, 같이 보려면 <span class="accent">'게시판'</span></h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">수첩 vs 게시판</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="200" height="300" fill="#FFF8E6"/><rect x="200" y="0" width="200" height="300" fill="#EAFBF7"/>
+          <line x1="200" y1="0" x2="200" y2="300" stroke="#1E1B33" stroke-width="3"/>
+          <text x="100" y="58" class="ct" text-anchor="middle">HTML 파일 하나</text><text x="300" y="58" class="ct" text-anchor="middle">서버 붙이면</text>
+          <use href="#me" x="20" y="130" width="96" height="120"/><use href="#f-happy" x="20" y="130" width="96" height="120"/>
+          <rect x="96" y="176" width="54" height="68" rx="4" fill="#FFD43B" stroke="#1E1B33" stroke-width="3"/><path d="M104 192 H142 M104 206 H142 M104 220 H130" stroke="#1E1B33" stroke-width="2.5"/>
+          <text x="123" y="262" class="ct xs" text-anchor="middle">내 수첩</text>
+          <rect x="112" y="78" width="80" height="44" rx="12" fill="#fff" stroke="#1E1B33" stroke-width="3"/><text x="152" y="98" class="ct xs" text-anchor="middle">나도 보고</text><text x="152" y="113" class="ct xs" text-anchor="middle">싶은데…</text>
+          <text x="100" y="290" class="ct xs coral" text-anchor="middle">내 폰에만 저장</text>
+          <rect x="226" y="76" width="150" height="96" rx="6" fill="#C8A27A" stroke="#1E1B33" stroke-width="3"/>
+          <rect x="236" y="86" width="40" height="34" fill="#fff" stroke="#1E1B33" stroke-width="2"/><rect x="282" y="90" width="40" height="34" fill="#FFD43B" stroke="#1E1B33" stroke-width="2"/><rect x="328" y="86" width="40" height="34" fill="#B7E4FF" stroke="#1E1B33" stroke-width="2"/>
+          <rect x="250" y="128" width="40" height="34" fill="#FFC9C2" stroke="#1E1B33" stroke-width="2"/><rect x="304" y="128" width="40" height="34" fill="#fff" stroke="#1E1B33" stroke-width="2"/>
+          <use href="#stu" x="212" y="186" width="70" height="88"/><use href="#f-happy" x="212" y="186" width="70" height="88"/>
+          <use href="#me" x="266" y="186" width="70" height="88"/><use href="#f-cool" x="266" y="186" width="70" height="88"/>
+          <use href="#stu" x="320" y="186" width="70" height="88"/><use href="#f-happy" x="320" y="186" width="70" height="88"/>
+          <text x="300" y="290" class="ct xs teal" text-anchor="middle">센터 모두가 같이 봄</text>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">파일 하나로 만든 프로그램은 <b>내 수첩</b>과 같습니다. 내 폰 안에만 저장돼서 혼자 쓰는 도구는 바로 되지만, 센터 사람들이 같이 보려면 <b>공용 게시판(서버)</b>이 필요합니다.</p>
+        <div class="yn tight">
+          <div class="col ok"><h3><i>✓</i>수첩으로 충분</h3><ul><li>경과일 · 감가 <b>계산기</b></li><li><b>체크리스트</b> · 진행 관리</li><li>양식 입력 → <b>문서 · 문자</b></li><li><b>엑셀</b> 정리 · 인쇄 · PDF</li></ul></div>
+          <div class="col no"><h3><i>!</i>게시판이 필요</h3><ul><li>여럿이 <b>같은 데이터</b> 보기</li><li>센터 <b>공지 · 메신저</b></li></ul><p class="nope">회사 시스템 연동 · 자동 로그인 · 개인정보 대량 처리는 하지 않습니다</p></div>
+        </div>
+        <div class="callout tip"><span class="bang">!</span><p>오늘 만들 센터원도 수첩으로 시작해서, 마지막엔 <b>게시판까지</b> 붙입니다.</p></div>
+      </div>
     </div>
   </div>
 </section>
-<section class="slide" data-accent="coral" data-title="첫 요청 템플릿"
-  data-notes="[템플릿] 내일 그대로 쓰는 양식. 노란 부분만 채우면 된다. 채우기 어려우면? 팁 ① — '이 템플릿 채우게 나한테 질문해줘'.">
+
+<section class="slide wide" data-accent="coral" data-title="첫 요청 템플릿"
+  data-notes="[템플릿 · 2분] 막연한 '앱 만들어줘'보다 누가 · 언제 · 무엇을 · 어떻게 보여 줄지 말하면 첫 결과물부터 달라진다. 1부 5요소와 같은 원리. 오른쪽은 바로 다음 제작 예시(센터원)의 첫 요청을 이 템플릿으로 채운 것 → 그대로 다음 장으로 넘어간다. 채우기 어려우면 팁 ① 역질문: '이 템플릿 채울 수 있게 나한테 질문해줘'.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 첫 요청 템플릿 · 내일 그대로</span>
-    <div class="prompt" id="tplPrompt"><button class="copy" data-copy="tplPrompt">복사</button><span class="blank">[누가]</span> <span class="blank">[어떤 상황에서]</span> 쓰는 <span class="blank">[무엇]</span>을 HTML 파일 하나로 만들어줘.
-- 입력: <span class="blank">[사용자가 넣는 것]</span>
-- 처리 · 규칙: <span class="blank">[계산 기준, 조건]</span>
-- 결과: <span class="blank">[화면에 보여줄 것, 복사 · 저장 · 인쇄]</span>
-- 조건: 폰에서 보기 좋게, 버튼 크게,
-  데이터는 브라우저에 저장, 외부 서버 없이</div>
+    <h2 class="subhead">첫 요청은 <span class="accent">이 빈칸만</span> 채우면 됩니다</h2>
+    <p class="desc">"앱 만들어줘"보다 <b>누가 · 언제 · 무엇을 · 어떻게</b> 보여 줄지 말하면 첫 결과물부터 달라집니다. 1부의 5요소와 같은 원리입니다. 오른쪽은 바로 다음에 만들 센터원을 채워 본 것입니다.</p>
+    <div class="tpl2">
+      <div><span class="badge">템플릿</span>
+        <div class="prompt" id="tplPrompt"><button class="copy" data-copy="tplPrompt">복사</button><span class="blank">[누가]</span> <span class="blank">[언제]</span> 쓰는 <span class="blank">[무엇]</span>을
+HTML 파일 하나로 만들어줘.
+- 넣는 것: <span class="blank">[입력할 내용]</span>
+- 규칙: <span class="blank">[계산 기준 · 조건]</span>
+- 보여 줄 것: <span class="blank">[화면 · 저장 · 인쇄]</span>
+- 조건: 폰에서 보기 좋게, 버튼 크게</div></div>
+      <div><span class="badge">채워 보면 · 센터원</span>
+        <div class="prompt"><span class="blank">보상센터 직원들이</span> <span class="blank">출근해서 하루 종일</span> 쓰는 <span class="blank">업무 공유 앱</span>을
+HTML 파일 하나로 만들어줘.
+- 넣는 것: <span class="blank">공지, 할 일(날짜 · 담당자 선택)</span>
+- 규칙: <span class="blank">밀린 일은 빨갛게, 오늘 · 내일 순</span>
+- 보여 줄 것: <span class="blank">폰 앱처럼 아래 탭으로 이동</span>
+- 조건: 폰에서 보기 좋게, 버튼 크게</div></div>
+    </div>
     <div class="callout tip"><span class="bang">!</span><p>채우기 어려우면? <b>"이 템플릿을 채울 수 있게 나한테 질문해줘."</b></p></div>
   </div>
 </section>
@@ -2171,7 +2284,7 @@ Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100�
 </section>
 
 <section class="slide wide compact" data-accent="indigo" data-title="대화 ⑤ 다 같이 쓰려면?"
-  data-notes="[대화 ⑤ · 반전] 지금까지 만든 건 파일 하나라 내 폰에만 저장된다(되는 것 / 안 되는 것 장과 연결). 그런데 막히면 AI에게 물으면 된다. AI가 서버 붙이는 길을 알려 준다.
+  data-notes="[대화 ⑤ · 반전] 지금까지 만든 건 파일 하나라 내 폰에만 저장된다(수첩과 게시판 장과 연결). 그런데 막히면 AI에게 물으면 된다. AI가 서버 붙이는 길을 알려 준다.
 멘트: '그래서 진짜로 붙여 봤습니다. 오늘 아침 진단 설문도 이렇게 만든 사이트입니다.'">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 대화 ⑤ · 막히면 물어보기</span>
