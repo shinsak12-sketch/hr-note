@@ -796,6 +796,13 @@ body[data-tool="spot"] .spot{display:block}
 .jump{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:60;background:var(--code-bg);color:#fff;font-family:var(--font-mono);font-weight:800;
   font-size:20px;padding:10px 18px;border-radius:12px;display:none;box-shadow:var(--shadow)}
 .jump.show{display:block}
+
+/* 진단 QR 장: 강사용 현황 바로 가기 */
+.host-link{display:inline-flex;align-items:center;gap:.5em;margin-top:clamp(14px,2.4vh,24px);padding:.65em 1.2em;border-radius:999px;background:var(--ink);color:var(--bg);
+  font-weight:800;font-size:clamp(15px,1.6vw,19px);text-decoration:none;box-shadow:var(--shadow);transition:transform .12s}
+.host-link:hover{transform:translateY(-2px)}
+.host-link svg{width:1.15em;height:1.15em;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+@media print{.host-link{display:none}}
 </style>
 </head>
 <body>
@@ -920,6 +927,7 @@ body[data-tool="spot"] .spot{display:block}
         <h2 class="subhead">휴대폰 카메라로<br><span class="accent">QR</span>을 찍어 주세요</h2>
         <p class="lead">8문항 · 1분 · 닉네임만</p>
         <p class="src" data-qr-url="/" style="text-align:left"></p>
+        <a class="host-link" data-live-link="/host" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>현황 보기 (강사 화면)</a>
       </div>
     </div>
   </div>
@@ -2401,6 +2409,7 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
         <h2 class="subhead">처음 그 진단, <span class="accent">다시</span> 해 보세요</h2>
         <p class="desc" style="margin-top:.6em">같은 폰으로 다시 하면 응답이 새로 바뀝니다. 아침의 나와 지금의 나, 등급이 얼마나 달라졌을까요?</p>
         <p class="src" data-qr-url="/" style="text-align:left"></p>
+        <a class="host-link" data-live-link="/host" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>현황 보기 (강사 화면)</a>
       </div>
     </div>
   </div>
@@ -5371,6 +5380,7 @@ var qrcode = function() {
     for(var r=0;r<n;r++) for(var k=0;k<n;k++) if(q.isDark(r,k)) g.fillRect((k+pad)*cell,(r+pad)*cell,cell,cell);
     box.appendChild(c);
   });
+  document.querySelectorAll('[data-live-link]').forEach(function(l){ l.href=liveUrl(l.getAttribute('data-live-link')); });
   document.querySelectorAll('[data-qr-url]').forEach(function(t){ t.textContent=liveUrl(t.getAttribute('data-qr-url')).replace(/^https?:\/\//,''); });
 
   // 몬테카를로: 네모 안 무작위 점 → 원 안 비율 × 4 ≈ 원주율
