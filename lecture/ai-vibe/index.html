@@ -618,6 +618,35 @@ mark.ca-hl{background:#FFE58A;color:inherit;border-radius:.2em;padding:0}
   .ac,.ba,.stages,.vs-row{grid-template-columns:1fr}
 }
 
+/* ===== 만화 장면 (오픈북 시험 이야기) ===== */
+.comic{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(18px,2.8vw,44px);align-items:center;margin-top:clamp(12px,2vh,22px)}
+.panel{position:relative;background:#FFFDF8;border:3px solid #1E1B33;border-radius:20px;box-shadow:7px 7px 0 #1E1B33;overflow:hidden;aspect-ratio:4/3;max-height:58vh;justify-self:center;width:100%}
+.panel svg{display:block;width:100%;height:100%}
+.ptag{position:absolute;top:10px;left:12px;z-index:2;background:#1E1B33;color:#fff;font-weight:900;font-size:clamp(12px,1.35vw,16px);border-radius:999px;padding:.25em .85em;letter-spacing:.02em}
+.ct{font-family:var(--font-sans);font-weight:800;font-size:17px;fill:#1E1B33}
+.ct.sm{font-size:14px}.ct.xs{font-size:11.5px}.ct.big{font-size:24px;font-weight:900}
+.ct.coral{fill:#FF5A4D}.ct.teal{fill:#0B9A8B}.ct.white{fill:#fff}.ct.yellow{fill:#FFD43B;font-size:19px}
+.story{display:flex;flex-direction:column;gap:clamp(10px,1.6vh,16px)}
+.story .desc{margin-top:0}
+.aibox{background:var(--surface);border:2px solid var(--accent,var(--coral));border-radius:18px;padding:clamp(14px,1.8vw,22px);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.35em}
+.aibox .k{font-size:clamp(13px,1.45vw,17px);font-weight:900;color:var(--accent,var(--coral));letter-spacing:.03em}
+.aibox .num{font-size:clamp(28px,3.6vw,48px);font-weight:900;letter-spacing:-.03em;line-height:1.1;color:var(--ink)}
+.aibox .num sup{font-size:.5em;vertical-align:.9em}
+.aibox p{margin:0;font-size:clamp(15px,1.75vw,22px);line-height:1.55;color:var(--ink-soft)}
+.aibox p b{color:var(--ink)}
+.story .src{margin-top:0}
+.story .callout{margin-top:0}
+.qcard{background:#1E1B33;color:#fff;border-radius:16px;padding:clamp(12px,1.6vw,20px) clamp(16px,2vw,24px)}
+.qcard .k{font-weight:900;color:#FFD43B;font-size:clamp(13px,1.4vw,17px)}
+.qcard p{margin:.2em 0 0;font-size:clamp(18px,2.2vw,28px);font-weight:700}
+.qcard p b{color:#FFD43B}
+.map{margin-top:clamp(16px,2.6vh,28px);background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.map .row{display:grid;grid-template-columns:1fr 3em 1.6fr;align-items:center;padding:clamp(12px,1.8vh,18px) clamp(16px,2vw,28px);border-top:1px solid var(--line);font-size:clamp(16px,2vw,25px);font-weight:600;color:var(--ink-soft)}
+.map .row b{color:var(--ink);font-weight:800}
+.map .row i{font-style:normal;text-align:center;font-weight:900;color:var(--accent,var(--coral))}
+.map .row.head{border-top:none;background:var(--bg-2);font-size:clamp(13px,1.5vw,18px);font-weight:900;color:var(--ink-faint)}
+@media (max-width:900px){ .comic{grid-template-columns:1fr} .map .row{grid-template-columns:1fr 2em 1.3fr} }
+
 /* 컨트롤 UI */
 .progress{position:fixed;left:0;right:0;bottom:0;height:4px;z-index:40}
 .progress .bar{height:100%;width:0;background:linear-gradient(90deg,var(--coral),var(--indigo-soft));transition:width .4s ease}
@@ -673,6 +702,69 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
 </style>
 </head>
 <body>
+<!-- 만화 그림 부품 (오픈북 시험 이야기) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- 학생 몸 (얼굴 없음) -->
+    <symbol id="stu" viewBox="0 0 120 150">
+      <path d="M18 150 Q18 100 60 97 Q102 100 102 150 Z" fill="#5D57E8" stroke="#1E1B33" stroke-width="3"/>
+      <path d="M47 99 L60 115 L73 99" fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round"/>
+      <circle cx="27" cy="64" r="7" fill="#FFDDBF" stroke="#1E1B33" stroke-width="3"/>
+      <circle cx="93" cy="64" r="7" fill="#FFDDBF" stroke="#1E1B33" stroke-width="3"/>
+      <circle cx="60" cy="62" r="34" fill="#FFDDBF" stroke="#1E1B33" stroke-width="3"/>
+      <path d="M26 60 Q22 22 60 22 Q99 22 94 60 Q88 40 72 43 Q62 33 50 43 Q34 39 26 60 Z" fill="#2B2440" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+    </symbol>
+    <!-- 표정들 (학생과 같은 크기로 겹쳐 씀) -->
+    <symbol id="f-worry" viewBox="0 0 120 150">
+      <path d="M41 53 L52 49 M68 49 L79 53" stroke="#1E1B33" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="47" cy="64" r="4" fill="#1E1B33"/><circle cx="73" cy="64" r="4" fill="#1E1B33"/>
+      <path d="M49 83 Q54 78 60 83 Q66 88 71 83" fill="none" stroke="#1E1B33" stroke-width="3" stroke-linecap="round"/>
+      <path d="M99 30 Q106 42 99 47 Q92 42 99 30 Z" fill="#8FD3FF" stroke="#1E1B33" stroke-width="2.5"/>
+    </symbol>
+    <symbol id="f-happy" viewBox="0 0 120 150">
+      <path d="M41 65 Q47 57 53 65 M67 65 Q73 57 79 65" fill="none" stroke="#1E1B33" stroke-width="3.5" stroke-linecap="round"/>
+      <ellipse cx="38" cy="75" rx="6" ry="4" fill="#FF9DA0" opacity=".7"/><ellipse cx="82" cy="75" rx="6" ry="4" fill="#FF9DA0" opacity=".7"/>
+      <path d="M47 78 Q60 95 73 78 Z" fill="#E2504A" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="f-dizzy" viewBox="0 0 120 150">
+      <path d="M42 59 L52 69 M52 59 L42 69 M68 59 L78 69 M78 59 L68 69" stroke="#1E1B33" stroke-width="3.5" stroke-linecap="round"/>
+      <ellipse cx="60" cy="84" rx="6" ry="7" fill="#1E1B33"/>
+      <path d="M99 30 Q106 42 99 47 Q92 42 99 30 Z" fill="#8FD3FF" stroke="#1E1B33" stroke-width="2.5"/>
+      <path d="M14 30 Q20 24 26 30" fill="none" stroke="#1E1B33" stroke-width="2.5" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="f-cool" viewBox="0 0 120 150">
+      <path d="M37 58 H83 V66 Q83 74 74 74 H66 Q62 74 60 66 Q58 74 54 74 H46 Q37 74 37 66 Z" fill="#1E1B33"/>
+      <path d="M50 84 Q62 90 72 80" fill="none" stroke="#1E1B33" stroke-width="3.5" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="f-think" viewBox="0 0 120 150">
+      <circle cx="50" cy="59" r="4" fill="#1E1B33"/><circle cx="76" cy="59" r="4" fill="#1E1B33"/>
+      <path d="M41 50 L52 52 M68 52 L79 50" stroke="#1E1B33" stroke-width="3" stroke-linecap="round"/>
+      <path d="M52 84 H68" stroke="#1E1B33" stroke-width="3.5" stroke-linecap="round"/>
+    </symbol>
+    <!-- 종이 한 장 -->
+    <symbol id="sheet" viewBox="0 0 60 76">
+      <rect x="2" y="2" width="56" height="72" rx="4" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+      <path d="M12 20 H48 M12 32 H48 M12 44 H40 M12 56 H44" stroke="#C9C4DA" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+    <!-- 반도체 -->
+    <symbol id="chip" viewBox="0 0 80 80">
+      <path d="M22 6 V16 M34 6 V16 M46 6 V16 M58 6 V16 M22 64 V74 M34 64 V74 M46 64 V74 M58 64 V74 M6 22 H16 M6 34 H16 M6 46 H16 M6 58 H16 M64 22 H74 M64 34 H74 M64 46 H74 M64 58 H74" stroke="#1E1B33" stroke-width="3.5" stroke-linecap="round"/>
+      <rect x="14" y="14" width="52" height="52" rx="8" fill="#2B2440" stroke="#1E1B33" stroke-width="3"/>
+      <path d="M44 22 L30 42 H40 L35 58 L52 36 H42 Z" fill="#FFD43B" stroke="#1E1B33" stroke-width="2" stroke-linejoin="round"/>
+    </symbol>
+    <!-- 주사위 -->
+    <symbol id="dice" viewBox="0 0 50 50">
+      <rect x="3" y="3" width="44" height="44" rx="10" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+      <circle cx="15" cy="15" r="4.5" fill="#FF5A4D"/><circle cx="25" cy="25" r="4.5" fill="#1E1B33"/><circle cx="35" cy="35" r="4.5" fill="#1E1B33"/>
+    </symbol>
+    <!-- 시계 -->
+    <symbol id="clock" viewBox="0 0 60 60">
+      <circle cx="30" cy="32" r="24" fill="#fff" stroke="#1E1B33" stroke-width="3.5"/>
+      <path d="M30 32 V18 M30 32 L40 38" stroke="#FF5A4D" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M14 8 L22 12 M46 8 L38 12" stroke="#1E1B33" stroke-width="3.5" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
 <div class="deck" id="deck">
 
 <!-- ============ 표지 ============ -->
@@ -779,122 +871,278 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
 
 <!-- 01 원리 -->
 <section class="slide center divider" data-accent="indigo" data-title="01 AI는 왜 마법 같은가"
-  data-notes="[0:10 · 11분] 원리. 수학은 빼고 질문 세 개로. 목표는 'AI를 어디까지 믿고 어디서 조심할지' 감 잡기.">
+  data-notes="[0:10 · 11분] 원리. 오픈북 시험 보는 학생 이야기로 푼다. 장면 1~4 = 왜 똑똑해졌나(읽은 양 · 계산력), 장면 5~6 = 왜 가끔 틀리나(뽑기 · 지어내기), 몬테카를로 · 알파고 · 생각 모드 = 어떻게 더 잘 맞히나. 목표는 'AI를 어디까지 믿고 어디서 조심할지' 감 잡기.">
   <div class="slide-inner">
     <div class="idx">01</div>
     <h2 class="headline">AI는 왜 <span class="accent">마법</span> 같은가</h2>
-    <p class="lead">원리를 알면 어디까지 믿고, 어디서 조심해야 하는지 보입니다</p>
+    <p class="lead">오픈북 시험을 보는 한 학생 이야기</p>
   </div>
 </section>
 
-<section class="slide wide" data-accent="indigo" data-title="질문 세 개"
-  data-notes="[도입] '오늘 이론은 이 세 질문이 전부입니다.' 답은 말하지 말고 궁금하게 만들기. 각 질문 끝날 때마다 이 장의 순서를 다시 짚어 준다.">
+<section class="slide wide" data-accent="indigo" data-title="오픈북 시험을 보는 학생"
+  data-notes="[도입 · 1분] '오늘 이론은 한 학생 이야기로 하겠습니다. 이 학생이 바로 AI입니다.' 이 학생은 평생 오픈북 시험만 봅니다. 문제는 늘 하나 — 빈칸에 들어갈 다음 말 맞히기. 휴대폰 자동완성과 같은 문제다.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 오늘의 이론은 질문 세 개</span>
-    <h2 class="subhead">AI는 어떻게 이렇게 <span class="accent">똑똑해졌을까?</span></h2>
-    <p class="desc">어려운 수학은 빼겠습니다. 아래 세 가지 질문에만 답할 수 있으면, AI를 어디까지 믿고 어디서 조심해야 하는지 감이 옵니다.</p>
-    <div class="grid cols-3">
-      <div class="card"><span class="k">질문 1</span><h3>AI는 뭘 하는 기계인가?</h3><p>AI가 실제로 하는 일은 생각보다 훨씬 단순합니다.</p></div>
-      <div class="card"><span class="k">질문 2</span><h3>그런데 왜 이렇게 잘하나?</h3><p>단순한 일을 상상할 수 없는 규모로 하기 때문입니다.</p></div>
-      <div class="card"><span class="k">질문 3</span><h3>그런데 왜 가끔 틀리나?</h3><p>답을 '아는' 게 아니라 '뽑기' 때문입니다.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="slide wide" data-accent="indigo" data-title="질문 1 · 엄청나게 큰 자동완성"
-  data-notes="[질문 1 · 2분] 휴대폰 자동완성 비유. 청중에게 '오늘 점심' 쳐 보면 뭐 뜨는지 물어봐도 좋다. 대화형 AI(LLM)는 글을 조각(토큰) 단위로 읽고, 다음 조각을 하나씩 골라 이어 붙인다. 오른쪽 확률은 설명용 예시.">
-  <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 질문 1 · AI는 뭘 하는 기계인가</span>
-    <h2 class="subhead">AI는 <span class="accent">엄청나게 큰 자동완성</span>입니다</h2>
-    <div class="ac">
-      <div class="ac-col">
-        <div class="ac-lab">휴대폰 키보드</div>
-        <div class="kb"><div class="kb-in">오늘 점심<i></i></div><div class="kb-sug"><span>뭐</span><span class="on">먹을까</span><span>메뉴</span></div></div>
-        <p class="desc sm">내가 쓴 문자를 보고 다음 말을 추천합니다.</p>
+    <span class="eyebrow"><span class="dot"></span> 오늘의 이론 · 한 학생 이야기</span>
+    <h2 class="subhead">AI는 <span class="accent">오픈북 시험을 보는 학생</span>입니다</h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">등장인물</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#FFF7E8"/>
+          <rect x="230" y="22" width="156" height="76" rx="16" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M246 98 L236 116 L262 98" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+          <text x="308" y="52" class="ct" text-anchor="middle">저는 AI예요.</text>
+          <text x="308" y="78" class="ct" text-anchor="middle">시험만 봐요!</text>
+          <use href="#stu" x="120" y="72" width="120" height="150"/><use href="#f-happy" x="120" y="72" width="120" height="150"/>
+          <circle cx="180" cy="196" r="13" fill="#FFD43B" stroke="#1E1B33" stroke-width="2.5"/><text x="180" y="201" class="ct sm" text-anchor="middle">AI</text>
+          <rect x="40" y="214" width="320" height="18" rx="4" fill="#E9C89C" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M70 232 V284 M330 232 V284" stroke="#1E1B33" stroke-width="5" stroke-linecap="round"/>
+          <use href="#sheet" x="250" y="160" width="44" height="56"/>
+          <text x="272" y="152" class="ct sm" text-anchor="middle">시험지</text>
+        </svg>
       </div>
-      <div class="ac-arrow">인터넷의 글을<br>거의 다 읽히면</div>
-      <div class="ac-col">
-        <div class="ac-lab">대화형 AI</div>
-        <div class="card ac-ai"><p class="ac-sent">고객님, 수리비는 서류 확인 후 <b>___</b></p>
-          <div class="cand top"><span>3일 이내</span><div class="track"><div class="fill" style="width:82%"></div></div><b>41%</b></div>
-          <div class="cand"><span>순차적으로</span><div class="track"><div class="fill" style="width:52%"></div></div><b>26%</b></div>
-          <div class="cand"><span>다음 주에</span><div class="track"><div class="fill" style="width:34%"></div></div><b>17%</b></div>
-        </div>
-        <p class="desc sm">다음 말 하나를 고르고, 붙이고, 또 고르기를 수백 번 반복해 긴 답을 만듭니다.</p>
+      <div class="story">
+        <p class="desc">이 학생은 평생 오픈북 시험만 봅니다. 문제는 늘 한 종류, <b>빈칸에 들어갈 다음 말 맞히기</b>입니다.</p>
+        <div class="qcard"><span class="k">시험 문제</span><p>"고객님, 수리비는 서류 확인 후 <b>___</b>"</p></div>
+        <p class="desc">휴대폰 키보드가 "오늘 점심" 다음에 "뭐 먹을까"를 띄워 주는 것과 같은 문제예요. AI가 긴 답을 쓰는 것도, 이 빈칸 맞히기를 수백 번 이어 붙인 겁니다.</p>
       </div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>AI의 답은 '아는 것'을 꺼낸 게 아니라, <b>가장 그럴듯한 다음 말을 이어 붙인 결과</b>입니다.</p></div>
-    <p class="src">확률은 설명용 예시</p>
   </div>
 </section>
 
-<section class="slide wide" data-accent="indigo" data-title="질문 2 · 빈칸 맞히기 수조 번"
-  data-notes="[질문 2-① · 2분] 학습 = 빈칸 맞히기 시험. 틀리면 내부 숫자(파라미터)를 아주 조금씩 고친다. 이걸 인터넷 규모로 반복하면 문법 · 말투 · 지식이 숫자 안에 녹아든다.
-수치: Meta Llama 3.1 405B — 파라미터 4,050억 개, 학습 데이터 15조 토큰 이상(Meta 논문, 2024). 토큰 = 단어 조각.">
+<section class="slide wide" data-accent="indigo" data-title="장면 1 · 오픈북이 한 장"
+  data-notes="[장면 1] 처음 만든 AI는 아는 게 없다. 오픈북이 한 장이라 엉뚱한 답만 쓴다.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 질문 2 · 왜 이렇게 잘하나 ① 읽은 양</span>
-    <h2 class="subhead">빈칸 맞히기 시험을 <span class="accent">수조 번</span> 봤습니다</h2>
-    <p class="desc">AI를 학습시킨다는 건, 문장의 다음 말을 가려 놓고 맞히게 하는 시험을 끝없이 보게 하는 겁니다. 틀리면 AI 안의 숫자를 아주 조금씩 고칩니다. 이걸 인터넷 규모의 글로 수조 번 반복하면 문법도, 말투도, 업무 지식도 그 숫자들 안에 녹아듭니다.</p>
-    <div class="grid cols-2">
-      <div class="card"><span class="k">AI 안의 숫자(파라미터)</span><span class="big">4,050억 개</span><p>학습하면서 조금씩 조정되는 숫자. 이 숫자들이 곧 AI의 '실력'입니다.</p></div>
-      <div class="card hot"><span class="k">학습에 쓴 글</span><span class="big">15조 토큰 이상</span><p>토큰은 단어 조각. 사람이 평생 읽을 수 있는 양의 수만 배입니다.</p></div>
+    <span class="eyebrow"><span class="dot"></span> 장면 1 · 오픈북이 한 장뿐</span>
+    <h2 class="subhead">처음엔 오픈북이 <span class="accent">딱 한 장</span>이었습니다</h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">장면 1</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#F3F1FF"/>
+          <rect x="236" y="18" width="152" height="84" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <text x="312" y="44" class="ct sm coral" text-anchor="middle">문제</text>
+          <text x="312" y="68" class="ct" text-anchor="middle">수리비는 서류</text>
+          <text x="312" y="90" class="ct" text-anchor="middle">확인 후 ___ ?</text>
+          <use href="#sheet" x="34" y="96" width="72" height="92"/>
+          <rect x="40" y="70" width="60" height="22" rx="11" fill="#1E1B33"/><text x="70" y="86" class="ct sm white" text-anchor="middle">오픈북</text>
+          <text x="70" y="212" class="ct coral" text-anchor="middle">단 1장</text>
+          <use href="#stu" x="140" y="76" width="120" height="150"/><use href="#f-worry" x="140" y="76" width="120" height="150"/>
+          <rect x="30" y="218" width="340" height="18" rx="4" fill="#E9C89C" stroke="#1E1B33" stroke-width="3"/>
+          <rect x="262" y="128" width="112" height="44" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M268 160 L252 168 L272 150" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+          <text x="318" y="156" class="ct" text-anchor="middle">음… 전액?</text>
+          <g transform="rotate(-12 330 262)"><rect x="276" y="244" width="108" height="38" rx="8" fill="none" stroke="#FF5A4D" stroke-width="4"/><text x="330" y="270" class="ct coral big" text-anchor="middle">땡! ✗</text></g>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">갓 만든 AI의 오픈북에는 거의 아무것도 없습니다. 찾아볼 데가 없으니 답을 못 쓰거나, 엉뚱한 답을 씁니다.</p>
+        <div class="aibox"><span class="k">AI로 치면</span><p>처음 만든 AI는 머릿속 숫자가 아무렇게나 맞춰져 있어서, 무슨 문제든 엉터리 답을 냅니다.</p></div>
+      </div>
     </div>
-    <p class="src">수치: Meta Llama 3.1 405B, "The Llama 3 Herd of Models"(2024)</p>
   </div>
 </section>
 
-<section class="slide wide" data-accent="coral" data-title="질문 2 · 계산력"
-  data-notes="[질문 2-② · 2분] 이런 학습이 가능해진 건 AI 전용 반도체 덕분.
-· NVIDIA H100: BF16 기준 989 TFLOPS(희소성 미적용) ≈ 1초에 약 1,000조 번. 1 TFLOPS = 1초에 1조 번.
-· 사람 비교(강사 환산): 1,000조 초 ÷ 1년(약 3,156만 초) ≈ 3,170만 년.
-· Llama 3.1 405B 학습: H100 1만 6천 장 이상, 총 약 3.8×10²⁵번 계산(Meta 논문). ÷ 5,100만 명 ≈ 7.5×10¹⁷초 ≈ 236억 년.">
+<section class="slide wide" data-accent="teal" data-title="장면 2 · 남의 오픈북 베끼기"
+  data-notes="[장면 2] 오픈북을 두껍게 만들려고 보이는 걸 다 베낀다 = 인터넷 규모의 글을 읽힌다. Meta Llama 3.1 405B는 15조 개가 넘는 토큰(글 조각)을 읽었다(Meta 논문 2024, 15.6조).
+비교(강사 환산): 15조 ÷ 1년(약 3,156만 초) ≈ 47만 5천 년 → 사람이 1초에 한 조각씩 쉬지 않고 읽어도 약 48만 년.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 질문 2 · 왜 이렇게 잘하나 ② 계산력</span>
-    <h2 class="subhead">그 시험을 감당할 <span class="accent">계산력</span>이 생겼습니다</h2>
-    <p class="desc">이 정도 학습이 가능해진 건 AI 전용 반도체 덕분입니다. 요즘 AI 반도체는 한 장이 1초에 약 1,000조 번 계산하고, 이런 반도체를 수만 장 묶어 몇 달씩 돌립니다.</p>
-    <div class="grid cols-2">
-      <div class="card"><span class="k">AI 반도체 한 장 · 1초</span><span class="big">약 1,000조 번</span><p>사람이 1초에 한 번씩 계산하면 <b>약 3,200만 년</b> 걸리는 양을 1초에 합니다.</p></div>
-      <div class="card hot"><span class="k">AI 하나 학습 · 반도체 1만 6천 장+</span><span class="big">3.8×10<sup>25</sup>번</span><p>국민 5,100만 명이 1초에 한 번씩 쉬지 않고 해도 <b>약 236억 년</b>. 우주 나이(138억 년)보다 깁니다.</p></div>
+    <span class="eyebrow"><span class="dot"></span> 장면 2 · 남의 오픈북을 베끼다</span>
+    <h2 class="subhead">그래서 <span class="accent">보이는 대로 다 베꼈습니다</span></h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">장면 2</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#EAFBF7"/>
+          <g transform="rotate(-18 330 34)"><rect x="300" y="24" width="60" height="18" rx="3" fill="#FF8A65" stroke="#1E1B33" stroke-width="3"/></g>
+          <g transform="rotate(14 262 22)"><rect x="236" y="14" width="56" height="16" rx="3" fill="#7CC8FF" stroke="#1E1B33" stroke-width="3"/></g>
+          <path d="M372 52 l-10 10 M384 40 l-14 14 M222 34 l-12 6" stroke="#1E1B33" stroke-width="2.5" stroke-linecap="round"/>
+          <g class="books">
+            <rect x="232" y="196" width="134" height="20" rx="3" fill="#5D57E8"/><text x="299" y="211" class="ct xs white" text-anchor="middle">선배 노트</text>
+            <rect x="240" y="176" width="122" height="20" rx="3" fill="#FFD43B"/><text x="301" y="191" class="ct xs" text-anchor="middle">업무 매뉴얼</text>
+            <rect x="228" y="156" width="130" height="20" rx="3" fill="#0FB6A4"/><text x="293" y="171" class="ct xs white" text-anchor="middle">신문</text>
+            <rect x="236" y="136" width="126" height="20" rx="3" fill="#FF5A4D"/><text x="299" y="151" class="ct xs white" text-anchor="middle">책</text>
+            <rect x="244" y="116" width="116" height="20" rx="3" fill="#B7A6FF"/><text x="302" y="131" class="ct xs" text-anchor="middle">인터넷 글</text>
+            <rect x="234" y="96" width="124" height="20" rx="3" fill="#FFB74D"/><text x="296" y="111" class="ct xs" text-anchor="middle">블로그</text>
+            <rect x="242" y="76" width="112" height="20" rx="3" fill="#80CBC4"/><text x="298" y="91" class="ct xs" text-anchor="middle">백과사전</text>
+          </g>
+          <use href="#stu" x="70" y="78" width="120" height="150"/><use href="#f-happy" x="70" y="78" width="120" height="150"/>
+          <rect x="20" y="216" width="360" height="18" rx="4" fill="#E9C89C" stroke="#1E1B33" stroke-width="3"/>
+          <rect x="14" y="18" width="190" height="62" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M110 80 L118 98 L128 80" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+          <text x="109" y="44" class="ct" text-anchor="middle">아! 수리비 다음엔</text>
+          <text x="109" y="68" class="ct teal" text-anchor="middle">'3일 이내'구나!</text>
+          <circle cx="196" cy="26" r="15" fill="#0FB6A4" stroke="#1E1B33" stroke-width="2.5"/><path d="M188 26 l6 6 l10 -12" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">선배 노트, 업무 매뉴얼, 신문, 책, 인터넷 글까지 닥치는 대로 베껴 붙였습니다. 한 장이던 오픈북이 수억 장이 되자 웬만한 문제는 비슷한 내용이 어딘가에 있습니다. <b>답이 맞기 시작합니다.</b></p>
+        <div class="aibox"><span class="k">AI로 치면 · 읽은 양</span><div class="num">15조 개+</div><p>Meta의 AI가 학습한 글 조각(토큰) 수. 사람이 1초에 한 조각씩 쉬지 않고 읽어도 <b>약 48만 년</b> 걸리는 양입니다.</p></div>
+        <p class="src">Meta "The Llama 3 Herd of Models"(2024) · 사람 비교는 강사 환산</p>
+      </div>
     </div>
-    <p class="src">출처: NVIDIA H100 데이터시트(BF16 989 TFLOPS), Meta "The Llama 3 Herd of Models"(2024) · 사람 비교는 강사 환산</p>
   </div>
 </section>
 
-<section class="slide center" data-accent="coral" data-title="질문 2의 답"
-  data-notes="[질문 2 정리] 2017년 구글 '트랜스포머'(Vaswani 외, Attention Is All You Need) — 문장 전체를 한 번에 보고 단어 사이 관계를 계산하는 방식. GPT의 T. 2020년 OpenAI 연구(Kaplan 외, 규모의 법칙) — 모델 · 데이터 · 연산을 키울수록 성능이 일정한 규칙으로 좋아진다. 그래서 '더 크게'가 경쟁이 됐다.">
+<section class="slide wide" data-accent="coral" data-title="장면 3 · 너무 오래 걸린다"
+  data-notes="[장면 3] 오픈북이 두꺼워질수록 문제 하나 푸는 데 넘겨 볼 양이 폭발한다. 학습에서는 글 조각 하나를 볼 때마다 머릿속 숫자 전체(4,050억 개)를 계산하고 고쳐야 해서, 읽은 양 × AI 크기만큼 계산이 늘어난다.
+Llama 3.1 405B 학습 총 계산량 약 3.8×10²⁵번(Meta 논문). ÷ 5,100만 명 ≈ 7.5×10¹⁷초 ≈ 236억 년(강사 환산). 우주 나이 약 138억 년.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 질문 2의 답</span>
-    <p class="big-quote">똑똑해서가 아니라,<br><span class="mark">엄청 많이 읽고, 엄청 많이 계산해서</span></p>
-    <p class="desc" style="max-width:62ch;margin-left:auto;margin-right:auto">2017년 구글이 문장 전체를 한 번에 읽는 방법(트랜스포머, ChatGPT의 'T')을 내놓았고, 2020년에는 "키울수록 일정하게 좋아진다"는 연구가 나왔습니다. 그 뒤로 AI는 계속 커지고 있고, 지금의 AI는 그 결과입니다.</p>
-    <p class="src">출처: Vaswani 외(Google, 2017), Kaplan 외(OpenAI, 2020)</p>
-  </div>
-</section>
-
-<section class="slide wide" data-accent="amber" data-title="질문 3 · 뽑기 때문"
-  data-notes="[질문 3 · 2분] AI는 다음 말을 늘 1등만 고르지 않고 확률에 따라 뽑는다. 그래서 같은 질문에도 답이 다르고, 모르는 것도 그럴듯하게 채운다(환각). 세 답은 예시. 판례 번호 · 조항 · 금액처럼 '정해진 모양'이 있는 정보가 제일 위험 — 모양은 맞는데 내용이 틀린다.">
-  <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 질문 3 · 왜 가끔 틀리나</span>
-    <h2 class="subhead">답을 '아는' 게 아니라 <span class="accent">'뽑기'</span> 때문입니다</h2>
-    <p class="desc">AI는 다음 말을 고를 때 늘 1등만 고르지 않고, 확률에 따라 뽑습니다. 그래서 같은 질문을 해도 답이 조금씩 다르고, 잘 모르는 내용도 그럴듯한 문장으로 채워 버립니다. 이걸 '환각'이라고 부릅니다.</p>
-    <div class="grid cols-3">
-      <div class="card tight"><span class="k">같은 질문 · 1번째</span><p>"서류가 접수되는 대로 <b>3일 이내</b> 지급됩니다."</p></div>
-      <div class="card tight"><span class="k">같은 질문 · 2번째</span><p>"서류 확인 후 <b>순차적으로</b> 지급될 예정입니다."</p></div>
-      <div class="card tight"><span class="k">같은 질문 · 3번째</span><p>"확인이 끝나면 <b>바로</b> 안내드리겠습니다."</p></div>
+    <span class="eyebrow"><span class="dot"></span> 장면 3 · 문제가 생겼다</span>
+    <h2 class="subhead">두꺼워진 오픈북, <span class="accent">넘겨 보다 몇 년이 갑니다</span></h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">장면 3</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#FFF0EE"/>
+          <g>
+            <rect x="250" y="196" width="120" height="20" rx="3" fill="#5D57E8"/><rect x="256" y="176" width="110" height="20" rx="3" fill="#FFD43B"/>
+            <rect x="246" y="156" width="118" height="20" rx="3" fill="#0FB6A4"/><rect x="254" y="136" width="112" height="20" rx="3" fill="#FF5A4D"/>
+            <rect x="248" y="116" width="116" height="20" rx="3" fill="#B7A6FF"/><rect x="256" y="96" width="108" height="20" rx="3" fill="#FFB74D"/>
+            <rect x="250" y="76" width="114" height="20" rx="3" fill="#80CBC4"/><rect x="258" y="56" width="104" height="20" rx="3" fill="#7CC8FF"/>
+            <rect x="252" y="36" width="110" height="20" rx="3" fill="#FF8A65"/><rect x="260" y="16" width="100" height="20" rx="3" fill="#5D57E8"/>
+            <path d="M310 0 V16" stroke="#1E1B33" stroke-width="3" stroke-dasharray="4 5"/>
+            <text x="310" y="250" class="ct sm" text-anchor="middle">수억 장…</text>
+          </g>
+          <g transform="rotate(-20 200 60)"><use href="#sheet" x="180" y="40" width="30" height="38"/></g>
+          <g transform="rotate(25 228 120)"><use href="#sheet" x="214" y="100" width="26" height="34"/></g>
+          <use href="#stu" x="86" y="86" width="110" height="138"/><use href="#f-dizzy" x="86" y="86" width="110" height="138"/>
+          <rect x="20" y="216" width="360" height="18" rx="4" fill="#E9C89C" stroke="#1E1B33" stroke-width="3"/>
+          <use href="#clock" x="18" y="20" width="64" height="64"/>
+          <rect x="88" y="26" width="132" height="48" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <text x="154" y="56" class="ct coral" text-anchor="middle">한 문제에 몇 년…</text>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">그런데 문제가 생겼습니다. 오픈북이 두꺼울수록 <b>한 문제 풀 때마다 넘겨 볼 양</b>도 늘어납니다. 수억 장을 다 넘겨 보다가 시험 시간이 끝나 버립니다.</p>
+        <div class="aibox"><span class="k">AI로 치면 · 필요한 계산</span><div class="num">3.8×10<sup>25</sup>번</div><p>AI 하나를 학습시키는 데 든 계산. 국민 5,100만 명이 1초에 한 번씩 계산해도 <b>약 236억 년</b>, 우주 나이(138억 년)보다 깁니다.</p></div>
+        <p class="src">Meta "The Llama 3 Herd of Models"(2024) · 사람 비교는 강사 환산</p>
+      </div>
     </div>
-    <div class="callout warn"><span class="bang">!</span><p>판례 번호 · 약관 조항 · 금액처럼 <b>정해진 모양이 있는 정보</b>가 제일 위험합니다. 모양은 그럴듯한데 내용이 틀릴 수 있습니다.</p></div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="amber" data-title="장면 4 · 빠른 손과 1만 6천 명"
+  data-notes="[장면 4] 해결책 두 가지. ① 넘기는 손을 엄청 빠르게 = AI 반도체 한 장(NVIDIA H100, BF16 989 TFLOPS)이 1초에 약 1,000조 번 계산. 사람이 1초에 한 번씩 하면 약 3,200만 년(강사 환산). ② 1만 6천 명이 나눠서 동시에 = 반도체 1만 6천 장 이상을 묶어 함께 학습(Meta).
+어림 계산: 실제 효율(장당 1초에 약 400조 번) × 1만 6천 장으로 3.8×10²⁵번을 하면 약 580만 초 ≈ 두 달 남짓. '반도체 1만 6천 장을 두 달 넘게 쉬지 않고 돌려야 AI 하나가 나온다.'">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 장면 4 · 해결</span>
+    <h2 class="subhead">엄청 <span class="accent">빠른 손</span>을 만들고, <span class="accent">1만 6천 명</span>이 나눠 봤습니다</h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">장면 4</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#FFF8E1"/>
+          <use href="#chip" x="22" y="40" width="120" height="120"/>
+          <path d="M150 74 h26 M150 100 h34 M150 126 h26" stroke="#F0A020" stroke-width="5" stroke-linecap="round"/>
+          <rect x="16" y="170" width="132" height="52" rx="12" fill="#1E1B33"/>
+          <text x="82" y="192" class="ct sm white" text-anchor="middle">1초에</text>
+          <text x="82" y="214" class="ct yellow" text-anchor="middle">1,000조 번</text>
+          <g>
+            <use href="#stu" x="196" y="24" width="44" height="56"/><use href="#f-happy" x="196" y="24" width="44" height="56"/>
+            <use href="#stu" x="244" y="24" width="44" height="56"/><use href="#f-happy" x="244" y="24" width="44" height="56"/>
+            <use href="#stu" x="292" y="24" width="44" height="56"/><use href="#f-happy" x="292" y="24" width="44" height="56"/>
+            <use href="#stu" x="340" y="24" width="44" height="56"/><use href="#f-happy" x="340" y="24" width="44" height="56"/>
+            <use href="#stu" x="196" y="104" width="44" height="56"/><use href="#f-happy" x="196" y="104" width="44" height="56"/>
+            <use href="#stu" x="244" y="104" width="44" height="56"/><use href="#f-happy" x="244" y="104" width="44" height="56"/>
+            <use href="#stu" x="292" y="104" width="44" height="56"/><use href="#f-happy" x="292" y="104" width="44" height="56"/>
+            <use href="#stu" x="340" y="104" width="44" height="56"/><use href="#f-happy" x="340" y="104" width="44" height="56"/>
+            <rect x="200" y="80" width="36" height="9" rx="2" fill="#5D57E8"/><rect x="248" y="80" width="36" height="9" rx="2" fill="#FFD43B"/><rect x="296" y="80" width="36" height="9" rx="2" fill="#0FB6A4"/><rect x="344" y="80" width="36" height="9" rx="2" fill="#FF5A4D"/>
+            <rect x="200" y="160" width="36" height="9" rx="2" fill="#B7A6FF"/><rect x="248" y="160" width="36" height="9" rx="2" fill="#FFB74D"/><rect x="296" y="160" width="36" height="9" rx="2" fill="#80CBC4"/><rect x="344" y="160" width="36" height="9" rx="2" fill="#7CC8FF"/>
+          </g>
+          <text x="290" y="214" class="ct coral big" text-anchor="middle">× 16,000명</text>
+          <text x="290" y="240" class="ct sm" text-anchor="middle">페이지를 나눠서 동시에!</text>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">해결책은 두 가지였습니다. 첫째, 페이지를 <b>엄청 빠르게 넘기는 손</b>. 둘째, 혼자 넘기지 않고 <b>1만 6천 명이 페이지를 나눠 동시에</b> 보기. 이 둘이 바로 AI 반도체입니다.</p>
+        <div class="aibox"><span class="k">AI로 치면 · 계산력</span><div class="num">1초에 약 1,000조 번</div><p>AI 반도체 한 장의 계산 속도. 사람이 1초에 한 번씩 하면 <b>약 3,200만 년</b> 걸릴 계산을 1초에 합니다. 이런 반도체 <b>1만 6천 장</b>을 두 달 넘게 돌려야 AI 하나가 나옵니다.</p></div>
+        <p class="src">NVIDIA H100 데이터시트(BF16 989 TFLOPS) · Meta(2024) · 사람 비교 · 기간은 강사 어림 계산</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="indigo" data-title="정리 · 두꺼운 오픈북과 빠른 손"
+  data-notes="[정리] 표로 한 번에. 읽은 양과 계산력은 짝: 오픈북이 두꺼울수록 똑똑해지지만 넘겨 볼 양도 늘어나서, 빠른 손 없이는 쓸 수가 없다.
+덧붙일 거리: 2017년 구글의 '트랜스포머'(문장 전체를 한 번에 보는 방식, ChatGPT의 T)가 넘겨 보는 방식을 바꿨고, 2020년 OpenAI 연구는 '오픈북과 손을 키울수록 일정하게 좋아진다'(규모의 법칙)를 보여 줬다. 그래서 지금도 더 크게 만드는 경쟁 중.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 여기까지 정리</span>
+    <h2 class="subhead">AI가 똑똑한 이유: <span class="accent">두꺼운 오픈북 + 빠른 손</span></h2>
+    <p class="desc">오픈북이 두꺼울수록 똑똑해지지만, 넘겨 볼 양도 같이 늘어납니다. 그래서 <b>읽은 양과 계산력은 늘 짝</b>입니다. 빠른 손이 없으면 두꺼운 오픈북은 쓸 수가 없습니다.</p>
+    <div class="map">
+      <div class="row head"><span>오픈북 시험</span><span></span><span>실제 AI</span></div>
+      <div class="row"><span>오픈북 두께</span><i>=</i><span><b>읽은 양</b> · 15조 개+ 글 조각</span></div>
+      <div class="row"><span>넘기는 손의 속도</span><i>=</i><span><b>계산력</b> · 반도체 한 장이 1초에 1,000조 번</span></div>
+      <div class="row"><span>1만 6천 명이 나눠 보기</span><i>=</i><span>반도체 <b>1만 6천 장</b>을 함께 돌리기</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="amber" data-title="장면 5 · 주사위를 굴린다"
+  data-notes="[장면 5 · 질문 3 시작] 오픈북에서 후보를 찾아도 학생은 늘 1등만 고르지 않는다. 점수대로 '뽑는다'. 그래서 같은 질문에도 답이 다르다. '다시 생성' 버튼 = 다시 뽑기. 확률 숫자는 설명용.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 장면 5 · 그런데 왜 가끔 틀릴까</span>
+    <h2 class="subhead">학생은 답을 '아는' 게 아니라 <span class="accent">뽑습니다</span></h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">장면 5</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#FFF8E1"/>
+          <use href="#stu" x="28" y="82" width="120" height="150"/><use href="#f-think" x="28" y="82" width="120" height="150"/>
+          <rect x="10" y="222" width="380" height="18" rx="4" fill="#E9C89C" stroke="#1E1B33" stroke-width="3"/>
+          <g transform="rotate(-14 176 186)"><use href="#dice" x="152" y="162" width="48" height="48"/></g>
+          <g transform="rotate(12 214 196)"><use href="#dice" x="194" y="176" width="40" height="40"/></g>
+          <rect x="236" y="34" width="150" height="40" rx="10" fill="#FFD43B" stroke="#1E1B33" stroke-width="3"/><text x="311" y="60" class="ct" text-anchor="middle">3일 이내 41%</text>
+          <rect x="236" y="84" width="150" height="40" rx="10" fill="#fff" stroke="#1E1B33" stroke-width="3"/><text x="311" y="110" class="ct" text-anchor="middle">순차적으로 26%</text>
+          <rect x="236" y="134" width="150" height="40" rx="10" fill="#fff" stroke="#1E1B33" stroke-width="3"/><text x="311" y="160" class="ct" text-anchor="middle">다음 주에 17%</text>
+          <rect x="20" y="18" width="186" height="50" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M84 68 L92 86 L104 68" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+          <text x="113" y="49" class="ct" text-anchor="middle">이번엔… 이걸로!</text>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">오픈북에서 후보 답을 찾으면, 학생은 늘 1등만 고르지 않고 <b>점수대로 주사위를 굴리듯 뽑습니다.</b> 그래서 같은 질문을 세 번 하면 답이 조금씩 다릅니다.</p>
+        <div class="aibox"><span class="k">AI로 치면</span><p>같은 질문에 "3일 이내" · "순차적으로" · "바로"처럼 답이 바뀌는 이유입니다. 답이 마음에 안 들면 <b>"다시 생성"</b> = 주사위를 다시 굴리기.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="장면 6 · 없으면 지어낸다"
+  data-notes="[장면 6 · 환각] 남의 오픈북을 닥치는 대로 베꼈으니 틀린 내용 · 오래된 내용도 섞여 있다. 그리고 딱 맞는 답이 없으면 비슷한 걸 이어 붙여 그럴듯하게 지어 쓴다(환각). 판례 번호 · 약관 조항 · 금액처럼 '모양'이 정해진 정보가 제일 위험: 모양은 그럴듯한데 내용이 틀린다. 그림 속 판결 번호는 가짜 예시.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 장면 6 · 반전</span>
+    <h2 class="subhead">오픈북에 없으면, <span class="accent">그럴듯하게 지어냅니다</span></h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">장면 6</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#FFF0EE"/>
+          <use href="#stu" x="30" y="86" width="120" height="150"/><use href="#f-cool" x="30" y="86" width="120" height="150"/>
+          <rect x="10" y="222" width="380" height="18" rx="4" fill="#E9C89C" stroke="#1E1B33" stroke-width="3"/>
+          <rect x="10" y="16" width="262" height="62" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M90 78 L96 96 L110 78" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+          <text x="141" y="42" class="ct sm" text-anchor="middle">확실합니다!</text>
+          <text x="141" y="66" class="ct" text-anchor="middle">"○○다 12345 판결"에 따르면…</text>
+          <rect x="226" y="104" width="150" height="104" rx="8" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M301 104 V208" stroke="#1E1B33" stroke-width="2.5"/>
+          <path d="M238 124 H290 M238 140 H284 M238 156 H290 M312 124 H364 M312 140 H352" stroke="#C9C4DA" stroke-width="3" stroke-linecap="round"/>
+          <text x="338" y="180" class="ct big" text-anchor="middle">???</text>
+          <g transform="rotate(-14 300 250)"><rect x="232" y="232" width="138" height="38" rx="8" fill="none" stroke="#FF5A4D" stroke-width="4"/><text x="301" y="258" class="ct coral" text-anchor="middle">그런 판례 없음</text></g>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">닥치는 대로 베꼈으니 오픈북에는 <b>틀린 내용, 오래된 내용</b>도 섞여 있습니다. 게다가 딱 맞는 답이 없으면, 비슷한 걸 이어 붙여 <b>자신 있게 지어서</b> 씁니다. 이걸 '환각'이라고 합니다.</p>
+        <div class="callout warn"><span class="bang">!</span><p>판례 번호 · 약관 조항 · 금액처럼 <b>정해진 모양이 있는 정보</b>가 제일 위험합니다. 모양은 그럴듯한데 내용이 틀립니다.</p></div>
+      </div>
+    </div>
   </div>
 </section>
 
 <section class="slide wide" data-accent="teal" data-title="몬테카를로"
-  data-notes="[체험 · 2분] '뽑기로 답하는데 어떻게 정답에 다가갈까?' → 몬테카를로 방법. 네모 안에 점을 아무렇게나 찍고 원 안 비율 × 4 = 원주율. +100개 → 엉터리, +1만 개 → 3.14에 붙는 걸 직접 눌러 보여 주기.
-연결 멘트: '무작위라도 많이 해 보면 정답에 가까워진다. 이걸 바둑에 쓴 게 알파고입니다.'">
+  data-notes="[체험 · 2분] '주사위를 굴린다면 운에 맡기는 거 아니냐?' → 몬테카를로 방법: 한 번 굴리면 운이지만, 많이 굴리면 정답에 가까워진다. 네모 안에 점을 아무렇게나 찍고 원 안 비율 × 4 = 원주율. +100개 → 들쭉날쭉, +1만 개 → 3.14에 붙는 걸 직접 눌러 보여 주기.
+연결: '이걸 바둑에 쓴 게 알파고입니다.'">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 질문 3 · 그럼 뽑기로 어떻게 정답에 다가가나</span>
-    <h2 class="subhead">무작위라도 <span class="accent">많이 해 보면</span> 정답에 가까워집니다</h2>
+    <span class="eyebrow"><span class="dot"></span> 쉬어 가는 체험 · 몬테카를로 방법</span>
+    <h2 class="subhead">주사위도 <span class="accent">한 번은 운, 만 번은 실력</span>입니다</h2>
     <div class="mc" id="mc">
       <canvas width="560" height="560" aria-label="몬테카를로 원주율 어림 그림"></canvas>
       <div class="mc-side">
-        <p class="mc-how">'몬테카를로 방법'이라는 오래된 수학 기법입니다. 네모 안에 점을 아무렇게나 찍고, <b>원 안에 들어간 비율 × 4</b>로 원주율을 어림합니다. 100개면 엉터리지만, 1만 개면 3.14에 거의 붙습니다.</p>
+        <p class="mc-how">"뽑는다면 운에 맡기는 거 아니야?" 아닙니다. 네모 안에 점을 아무렇게나 찍고 <b>원 안에 들어간 비율 × 4</b>를 계산하면 원주율이 나옵니다. 100개면 엉터리, <b>1만 개면 3.14</b>에 거의 붙습니다.</p>
         <div class="mc-stat"><span>찍은 점</span><b data-mc="n">0</b></div>
         <div class="mc-stat hot"><span>원주율 어림</span><b data-mc="pi">-</b></div>
         <div class="mc-stat"><span>실제 원주율</span><b>3.14159</b></div>
@@ -906,41 +1154,70 @@ kbd{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--l
 </section>
 
 <section class="slide wide" data-accent="teal" data-title="알파고"
-  data-notes="[알파고 · 1분] 2016년 3월 이세돌 9단과 4:1. 구글 딥마인드 Nature 논문(Silver 외, 2016): 신경망이 둘 만한 수를 추리고, 몬테카를로 트리 탐색으로 후보 수마다 앞으로의 진행을 수없이 시뮬레이션해서 가장 좋은 수를 고른다.
-연결 멘트: '한 번에 정답을 아는 게 아니라, 많이 따져 봐서 좋은 답을 찾는다. 요즘 AI도 같은 방향으로 가고 있습니다.'">
+  data-notes="[알파고 · 1분] 2016년 3월 이세돌 9단과 4:1. 딥마인드 Nature 논문(Silver 외, 2016): 신경망이 둘 만한 수를 추리고, 몬테카를로 트리 탐색으로 수마다 앞날을 수없이 시뮬레이션해서 가장 좋은 수를 고른다. '한 번에 정답을 아는 게 아니라, 많이 굴려 보고 좋은 답을 찾는다.'">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 2016 · 알파고</span>
     <h2 class="subhead">이 원리를 바둑에 쓴 게 <span class="accent">알파고</span>입니다</h2>
-    <p class="desc">알파고는 둘 만한 수를 몇 개 추린 뒤, 수마다 앞으로의 진행을 수없이 미리 둬 봤습니다. 그리고 가장 많이 이긴 수를 골랐습니다. 한 번에 정답을 아는 게 아니라, 많이 따져 봐서 좋은 답을 찾은 겁니다.</p>
-    <div class="flow" style="--n:3">
-      <div class="step"><span class="n">01</span><h3>후보 고르기</h3><p>둘 만한 수를 몇 개로 추린다</p></div>
-      <div class="step hot"><span class="n">02</span><h3>미리 둬 보기</h3><p>후보마다 끝까지 수없이 시뮬레이션</p></div>
-      <div class="step"><span class="n">03</span><h3>가장 좋은 수</h3><p>가장 많이 이긴 수를 둔다</p></div>
+    <div class="comic">
+      <div class="panel"><span class="ptag">2016</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#EAFBF7"/>
+          <use href="#stu" x="22" y="96" width="120" height="150"/><use href="#f-think" x="22" y="96" width="120" height="150"/>
+          <circle cx="132" cy="100" r="7" fill="#fff" stroke="#1E1B33" stroke-width="2.5"/><circle cx="150" cy="82" r="10" fill="#fff" stroke="#1E1B33" stroke-width="2.5"/>
+          <rect x="164" y="14" width="222" height="196" rx="40" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <g stroke="#C9C4DA" stroke-width="2"><path d="M190 46 H252 M190 62 H252 M190 78 H252 M190 94 H252 M206 30 V110 M222 30 V110 M238 30 V110"/></g>
+          <circle cx="206" cy="62" r="6" fill="#1E1B33"/><circle cx="222" cy="78" r="6" fill="#fff" stroke="#1E1B33" stroke-width="2"/><circle cx="238" cy="62" r="6" fill="#1E1B33"/>
+          <path d="M262 70 L296 40 M262 70 L296 70 M262 70 L296 100 M296 40 L326 30 M296 40 L326 50 M296 70 L326 64 M296 70 L326 80 M296 100 L326 96 M296 100 L326 112" stroke="#0FB6A4" stroke-width="3" stroke-linecap="round"/>
+          <text x="346" y="35" class="ct xs" text-anchor="middle">패</text><text x="346" y="55" class="ct xs teal" text-anchor="middle">승</text><text x="346" y="69" class="ct xs" text-anchor="middle">패</text><text x="346" y="85" class="ct xs teal" text-anchor="middle">승</text><text x="346" y="101" class="ct xs teal" text-anchor="middle">승</text><text x="346" y="117" class="ct xs" text-anchor="middle">패</text>
+          <text x="275" y="150" class="ct" text-anchor="middle">이 수를 두면…</text>
+          <text x="275" y="176" class="ct teal" text-anchor="middle">미리 수천 번 둬 보자!</text>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">알파고는 둘 만한 수를 몇 개 추린 뒤, 수마다 앞으로의 진행을 <b>수없이 미리 둬 봤습니다.</b> 그리고 가장 많이 이긴 수를 골랐습니다. 한 번에 정답을 아는 게 아니라, <b>많이 굴려 보고</b> 좋은 답을 찾은 겁니다.</p>
+        <div class="aibox"><span class="k">결과</span><div class="num">이세돌 9단에게 4:1</div><p>계산을 많이 할수록 강해진다는 걸 보여 준 사건입니다.</p></div>
+        <p class="src">Silver 외, Nature(2016)</p>
+      </div>
     </div>
-    <p class="desc" style="margin-top:clamp(14px,2.2vh,24px)">결과는 <b>이세돌 9단에게 4:1 승리</b>. 계산을 많이 할수록 강해진다는 걸 보여 준 사건입니다.</p>
-    <p class="src">출처: Silver 외, "Mastering the game of Go with deep neural networks and tree search", Nature(2016)</p>
   </div>
 </section>
 
 <section class="slide wide" data-accent="indigo" data-title="생각 모드"
-  data-notes="[생각 모드 · 1분] ChatGPT · Claude · Gemini 모두 답 전에 오래 생각하는 모드가 있다(이름은 서비스마다 다름). 바로 답하지 않고 풀이 과정을 길게 써 보며 검토한 뒤 답한다. 계산을 더 쓰는 만큼 어려운 문제에 강하다 — 알파고와 같은 방향.
-바로 쓰는 팁 두 개: 어려운 일엔 생각 모드, 마음에 안 들면 다시 생성(= 다시 뽑기).">
+  data-notes="[생각 모드 · 1분] 요즘 AI(ChatGPT · Claude · Gemini)에는 답 전에 오래 생각하는 모드가 있다(이름은 서비스마다 다름). 학생이 바로 답하지 않고 연습장에 풀이를 여러 번 써 보고 답하는 것과 같다. 계산을 더 쓰는 만큼 어려운 문제에 강하다 — 알파고와 같은 방향. 팁: 어렵거나 중요한 일엔 생각 모드, 마음에 안 들면 다시 생성.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 그래서 요즘 AI는</span>
-    <h2 class="subhead">'생각 모드'도 <span class="accent">같은 방향</span>입니다</h2>
-    <p class="desc">요즘 대화형 AI에는 답하기 전에 오래 생각하는 모드가 있습니다. 바로 답하지 않고 풀이 과정을 길게 써 보며 이 방향, 저 방향을 따져 본 뒤 답합니다. 계산을 더 쓰는 만큼 어려운 문제에서 더 정확해집니다.</p>
-    <div class="grid cols-2">
-      <div class="card"><span class="k">기본 모드</span><h3>빠르게 답한다</h3><p>간단한 질문, 문장 다듬기, 요약에 충분합니다.</p></div>
-      <div class="card hot"><span class="k">생각 모드</span><h3>따져 보고 답한다</h3><p>느리지만 꼼꼼합니다. 계산, 비교, 조건이 여러 개 얽힌 정리에 씁니다.</p></div>
+    <h2 class="subhead">'생각 모드' = <span class="accent">연습장에 풀어 보고 답하기</span></h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">요즘 AI</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#F3F1FF"/>
+          <use href="#stu" x="24" y="84" width="120" height="150"/><use href="#f-think" x="24" y="84" width="120" height="150"/>
+          <rect x="10" y="222" width="380" height="18" rx="4" fill="#E9C89C" stroke="#1E1B33" stroke-width="3"/>
+          <g transform="rotate(-8 210 150)"><rect x="168" y="96" width="84" height="110" rx="6" fill="#fff" stroke="#1E1B33" stroke-width="3"/><text x="210" y="124" class="ct sm" text-anchor="middle">풀이 1</text><path d="M180 144 H240 M180 160 H232 M180 176 H238" stroke="#C9C4DA" stroke-width="3" stroke-linecap="round"/><path d="M188 186 l40 -40 M188 146 l40 40" stroke="#FF5A4D" stroke-width="3.5" stroke-linecap="round" opacity=".8"/></g>
+          <g transform="rotate(2 268 150)"><rect x="226" y="92" width="84" height="110" rx="6" fill="#fff" stroke="#1E1B33" stroke-width="3"/><text x="268" y="120" class="ct sm" text-anchor="middle">풀이 2</text><path d="M238 140 H298 M238 156 H290 M238 172 H296" stroke="#C9C4DA" stroke-width="3" stroke-linecap="round"/></g>
+          <g transform="rotate(10 330 150)"><rect x="288" y="96" width="84" height="110" rx="6" fill="#fff" stroke="#1E1B33" stroke-width="3"/><text x="330" y="124" class="ct sm" text-anchor="middle">풀이 3</text><path d="M300 144 H360 M300 160 H352" stroke="#C9C4DA" stroke-width="3" stroke-linecap="round"/><circle cx="330" cy="184" r="14" fill="#0FB6A4" stroke="#1E1B33" stroke-width="2.5"/><path d="M323 184 l5 5 l9 -10" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+          <rect x="20" y="18" width="226" height="50" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
+          <path d="M80 68 L86 86 L100 68" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
+          <text x="133" y="49" class="ct" text-anchor="middle">잠깐, 풀어 보고 답할게요</text>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">요즘 AI에는 답하기 전에 오래 생각하는 모드가 있습니다. 바로 답하지 않고 <b>연습장에 풀이를 여러 번 써 보며</b> 따져 본 뒤 답합니다. 알파고처럼 계산을 더 쓰는 만큼 어려운 문제에 강합니다.</p>
+        <div class="grid cols-2" style="margin-top:clamp(10px,1.6vh,16px)">
+          <div class="card tight"><span class="k">기본 모드</span><p>빠르게. 간단한 질문 · 문장 다듬기 · 요약</p></div>
+          <div class="card tight hot"><span class="k">생각 모드</span><p>느리지만 꼼꼼. 계산 · 비교 · 조건이 얽힌 정리</p></div>
+        </div>
+        <div class="callout tip"><span class="bang">!</span><p>어렵거나 중요한 일엔 <b>생각 모드</b>, 답이 별로면 <b>다시 생성</b>.</p></div>
+      </div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>어렵거나 중요한 일엔 <b>생각 모드</b>를 켜고, 답이 마음에 안 들면 <b>"다시 생성"</b>으로 다시 뽑으세요.</p></div>
   </div>
 </section>
+
 
 <section class="slide center" data-accent="coral" data-title="정리 · 초안은 AI, 판단은 나"
   data-notes="[원리 정리 → 활용 연결] 세 질문의 답을 한 번에 정리. 마지막 줄이 다음 파트로 넘어가는 다리: 'AI는 우리 회사, 우리 업무를 모릅니다. 그래서 지금부터는 AI에게 우리 일을 알려 주는 방법입니다.'">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 세 질문의 답</span>
+    <span class="eyebrow"><span class="dot"></span> 이야기 정리</span>
     <p class="big-quote">초안과 형식은 <span class="mark">AI에게</span>,<br>사실과 판단은 <span class="mark">나에게</span></p>
     <div class="grid cols-2" style="width:100%;max-width:1150px">
       <div class="card tight"><span class="k" style="color:var(--teal)">그래서 잘하는 것</span><p>글 쓰기 · 다듬기 · 요약 · 형식 바꾸기처럼 <b>'그럴듯한 문장'이 곧 결과물</b>인 일</p></div>
