@@ -1341,6 +1341,19 @@ body[data-tool="spot"] .spot{display:block}
 .dtree.has-real .tree{display:none}
 .dtree.has-real .treeimg{display:block;width:fit-content;max-width:100%}
 .dtree .treeimg img{display:block;width:auto;max-width:100%;height:auto;max-height:min(64vh,680px);object-fit:contain}
+/* 챕터 2 · 응용(스킬북 소환 · 반복 업무) */
+.dsum{display:grid;grid-template-columns:1fr 1.35fr;gap:clamp(16px,2.2vw,30px);margin-top:clamp(14px,2.4vh,24px);align-items:start}
+.dsum .call{display:grid;gap:clamp(10px,1.6vh,16px)}
+.dsum .cb{padding:.7em 1em;border:1px solid #4a3a22;font-size:clamp(15px,1.75vw,22px);font-weight:600;line-height:1.5;max-width:92%}
+.dsum .cb.me{justify-self:end;background:#3a2412;color:#f3e6c8;border-color:#8a6d3b}
+.dsum .cb.ai{justify-self:start;background:rgba(0,0,0,.8);color:var(--ink)}
+.dsum .cb b{color:var(--gold)}
+.sbook .sg{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px 8px;align-items:stretch;padding:.5em 0;border-bottom:1px solid #2e2416}
+.sbook .gl{grid-row:span 2;align-self:center;font-size:clamp(12px,1.35vw,16px);font-weight:800;color:#a8895a;writing-mode:horizontal-tb;min-width:2.6em}
+.sbook .it2{display:flex;flex-direction:column;background:#0b0805;border:1px solid #444;padding:.35em .6em;font-size:clamp(13px,1.5vw,18px);font-weight:800}
+.sbook .it2 small{font-size:.75em;font-weight:600;color:#9d8d6f}
+.sbook .it2.qu{color:#d4a94f;border-color:#8a6d3b}.sbook .it2.qr{color:#ffff6e;border-color:#6a6a2a}
+.sbook .it2.qs{color:#4be24b;border-color:#2e6a2e}.sbook .it2.qm{color:#ffbf80;border-color:#8e3b20}.sbook .it2.qd{color:#9cc6ff;border-color:#2e4f7a}
 </style>
 </head>
 <body>
@@ -2339,6 +2352,54 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
         <ul><li>문서 검수 · 책임 인정 · 확정 약속 표현 찾기</li><li>누락 서류 점검</li><li>숫자 · 출처 확인</li><li>개인정보 가림 확인</li><li>회사 규정 위반 체크</li></ul></div>
     </div>
     <div class="callout tip"><span class="bang">!</span><p>스킬은 <b>양식 만들기에만 쓰는 게 아닙니다.</b> 반복되는 일이면 검사 · 점검 · 확인도 전부 스킬이 됩니다.</p></div>
+  </div>
+</section>
+
+<section class="slide wide game" data-accent="gold" data-title="응용 ① 스킬북 소환"
+  data-notes="[스킬북 소환 · 3분] 스킬이 여러 개로 늘어나면 뭐가 뭐였는지 가물가물해진다. 그래서 '스킬북 소환' 스킬을 하나 만들어 둔다. AI는 대화를 시작할 때 내 계정에 깔린 스킬들의 이름과 설명을 먼저 훑어보기 때문에, 이걸 업무별로 정리해 보여 주고 하려는 일에 맞는 스킬을 골라 줄 수 있다.
+만드는 법도 대화: '내 스킬 목록을 업무별로 정리해서 보여 주고, 내가 하려는 일을 말하면 맞는 스킬을 골라 주는 스킬 만들어 줘. 이름은 스킬북 소환.'
+한계: 추천 정확도는 각 스킬의 설명란에 달려 있다. 그 서비스 계정에 깔린 스킬만 보인다. 사용 기록은 모른다.
+※ 목록 중 디비-양식 · 장표-스타일 · 입회보고서는 실제 계정 스킬, 민원 회신 · 회신 검수는 강의 예시.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 액티브 응용 ① · 스킬이 늘어나면</span>
+    <h2 class="subhead"><span class="accent">스킬북 소환</span>: 내 스킬을 한눈에</h2>
+    <div class="dsum">
+      <div class="call">
+        <div class="cb me">스킬북 소환</div>
+        <div class="cb me">고객한테 보낼 파손 확인 보고서 만들어야 해. 뭐 쓰면 돼?</div>
+        <div class="cb ai"><b class="u">입회보고서</b> 스킬을 쓰세요.<br>넣을 것: 현장 사진 + 짧은 메모</div>
+      </div>
+      <div class="gp sbook"><span class="gk">📖 스킬북 · 7개</span>
+        <div class="sg"><span class="gl">장표</span><span class="it2 qu">디비-양식-일반<small>A4 가로 보고서</small></span><span class="it2 qu">디비-양식-와이드<small>16:9 장표</small></span><span class="it2 qu">디비-양식-세로<small>A4 세로 기안</small></span><span class="it2 qr">디비-장표-스타일<small>장표 디자인 규칙</small></span></div>
+        <div class="sg"><span class="gl">현장</span><span class="it2 qs">입회보고서<small>사진 + 메모 → 보고서</small></span></div>
+        <div class="sg"><span class="gl">민원</span><span class="it2 qm">민원 회신<small>⚔ 회신 문안</small></span><span class="it2 qd">회신 검수<small>🛡 표현 · 날짜 점검</small></span></div>
+      </div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>스킬이 몇 개로 늘어나도, <b>"스킬북 소환"</b> 한마디면 펼쳐 보고 맞는 걸 골라 줍니다.</p></div>
+  </div>
+</section>
+
+<section class="slide wide game" data-accent="gold" data-title="응용 ② 반복 업무 찾기"
+  data-notes="[반복 업무 찾기 · 2분] 뭘 스킬로 만들지 모르겠다면 AI에게 찾게 한다. 같은 프로젝트에서 여러 번 비슷한 작업을 했다면, 그 프로젝트 안에서 새 채팅을 하나 켜고 '지금까지 이 프로젝트에서 한 업무들 보고, 반복해서 스킬로 등록할 만한 게 있는지 찾아 줘'. AI가 지난 대화들을 훑어보고 후보를 골라 준다. 고르면 그 자리에서 '그걸 스킬로 만들어 줘'.
+조건: 지난 대화를 찾아보는 기능이 켜져 있어야 한다. Claude는 설정의 '채팅 검색 및 참조'(프로젝트 안에서는 그 프로젝트 대화만 찾음), ChatGPT는 '채팅 기록 참조' · 프로젝트 전용 메모리(요금제에 따라 다름). 메뉴 이름 · 지원 요금제는 강의 직전 확인.
+※ 표의 횟수는 예시.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 액티브 응용 ② · 뭘 스킬로 만들지 모를 때</span>
+    <h2 class="subhead">반복한 일은 <span class="accent">AI가 찾아</span> 줍니다</h2>
+    <div class="dsum">
+      <div class="call">
+        <div class="cb me">이 프로젝트에서 지금까지 한 업무들 보고, <b>반복해서 스킬로 등록할 만한 게</b> 있는지 찾아 줘.</div>
+        <div class="cb ai">지난 대화 23개를 살펴봤어요. 이 세 가지를 반복하고 계세요. 스킬로 만들까요?</div>
+      </div>
+      <div class="gp"><span class="gk">⚑ 퀘스트 기록 · 반복 사냥 감지</span>
+        <table class="dchk"><thead><tr><th>반복한 일</th><th>횟수</th><th>스킬 후보</th></tr></thead><tbody>
+          <tr><td>통화 메모 → 민원 회신 문자</td><td>8번</td><td>민원 회신</td></tr>
+          <tr><td>현장 사진 · 메모 → 보고서</td><td>5번</td><td>입회 보고</td></tr>
+          <tr><td>처리 현황 → 주간 보고</td><td>4번</td><td>주간 보고</td></tr>
+        </tbody></table></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>프로젝트 안에서 새 채팅 하나 켜고 물어보면, <b>내 업무 기록에서 스킬 후보</b>를 골라 줍니다.</p></div>
+    <p class="src">지난 대화 참조 기능이 켜져 있어야 함 · Claude '채팅 검색 및 참조' · ChatGPT '채팅 기록 참조'(요금제별 상이)</p>
   </div>
 </section>
 
