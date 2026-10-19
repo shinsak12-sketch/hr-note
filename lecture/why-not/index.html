@@ -937,6 +937,100 @@ body[data-tool="spot"] .spot{display:block}
 .alt p b{color:#FFD43B}
 .alt .w{font-size:clamp(12px,1.25vw,15px);color:#A9A6C4;font-weight:600}
 @media (max-width:900px){.steps5,.cheap{grid-template-columns:1fr}.steps5 .st5{margin-top:0!important}}
+/* ===== 서론 v5 ===== */
+/* 몬테카를로 사람 vs AI */
+.mcvs{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,28px);margin-top:clamp(12px,2vh,22px)}
+.mcvs .side{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(14px,1.6vw,22px);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.6em}
+.mcvs .side.ai{opacity:1;border-color:var(--teal);box-shadow:0 0 0 2px color-mix(in srgb,var(--teal) 25%,transparent),var(--shadow)}
+.mcvs .who{font-size:clamp(16px,1.8vw,23px);font-weight:800;display:flex;opacity:1;margin:0;letter-spacing:0;align-items:center;gap:.5em}
+.mcvs .tag{font-size:.75em;font-weight:900;color:#fff;background:var(--ink-soft);border-radius:999px;padding:.2em .7em}
+.mcvs .ai .tag{background:var(--teal)}
+.mcvs .stage{display:grid;grid-template-columns:auto 1fr;gap:clamp(12px,1.6vw,22px);align-items:center}
+.mcvs .circ,.mcvs canvas{width:clamp(170px,32vh,330px);height:clamp(170px,32vh,330px);display:block}
+.mcvs .circ{color:var(--ink)}
+.mcvs canvas{border-radius:6px;background:#fff;border:1px solid var(--line)}
+.mcvs .formula .ln{margin:.25em 0;font-size:clamp(18px,2.1vw,28px);font-weight:700;opacity:0;transform:translateY(6px);transition:all .4s}
+.mcvs .formula .ln.on{opacity:1;transform:none}
+.mcvs .formula .res{font-size:clamp(26px,3.2vw,44px);font-weight:900;color:var(--ink)}
+.mcvs .meter{display:grid;grid-template-columns:auto 1fr;gap:.25em .8em;align-items:baseline;font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft);font-weight:700}
+.mcvs .meter b{font-family:var(--font-mono);font-size:clamp(18px,2.1vw,28px);color:var(--ink);font-variant-numeric:tabular-nums}
+.mcvs .meter b.pi{font-size:clamp(28px,3.6vw,50px);color:var(--teal)}
+.mcvs .foot{margin-top:auto;font-size:clamp(14px,1.55vw,19px);font-weight:800;color:var(--ink-faint)}
+.mcbtns{display:flex;gap:10px;justify-content:center;margin-top:clamp(12px,2vh,20px)}
+.mcbtns .mcplay{background:var(--teal);color:#fff;border-color:var(--teal);font-size:18px;height:46px;padding:0 22px}
+/* Why Now */
+.headline.why-now{font-size:clamp(70px,13vw,180px);letter-spacing:-.045em;line-height:.95}
+/* 사람을 넘다 */
+.esc{display:grid;grid-template-columns:1.4fr 1fr;gap:clamp(16px,2.4vw,36px);margin-top:clamp(14px,2.4vh,26px);align-items:center}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(18px,2.2vw,30px);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:clamp(14px,2.2vh,24px)}
+.chart h4,.math h4{font-size:clamp(15px,1.7vw,21px);font-weight:800;color:var(--ink-soft)}
+.crow{display:grid;grid-template-columns:clamp(150px,17vw,250px) 1fr auto;gap:clamp(10px,1.4vw,20px);align-items:center}
+.crow .ck{font-size:clamp(14px,1.6vw,20px);font-weight:700;color:var(--ink-soft)}
+.crow .cv{font-family:var(--font-mono);font-size:clamp(24px,3vw,40px);font-weight:900}
+.stones{display:flex;gap:clamp(6px,.8vw,12px)}
+.stones i{width:clamp(34px,3.6vw,52px);height:clamp(34px,3.6vw,52px);border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:900;font-size:clamp(12px,1.3vw,16px)}
+.stones .w{background:#1E1B33;color:#fff}
+.stones .l{background:#fff;color:#1E1B33;border:3px solid #1E1B33}
+.hbar{height:clamp(30px,3.4vw,46px);background:var(--bg-2);border-radius:8px;overflow:hidden}
+.hbar i{display:block;height:100%;background:var(--accent,var(--indigo));border-radius:8px}
+.cnote{margin:0;font-size:clamp(13px,1.45vw,18px);color:var(--ink-faint);font-weight:600}
+.qside{border-left:4px solid var(--accent,var(--indigo));padding:.3em 0 .3em 1em}
+.qside p{margin:0;font-size:clamp(22px,2.7vw,36px);font-weight:800;line-height:1.35;letter-spacing:-.02em}
+.qside p b{color:var(--accent,var(--indigo))}
+.qside span{display:block;margin-top:.6em;font-size:clamp(13px,1.4vw,17px);color:var(--ink-faint);font-weight:600;line-height:1.5}
+.code2{display:grid;gap:clamp(14px,2.2vh,22px);margin-top:clamp(16px,2.6vh,28px)}
+.code2 .yr{display:grid;grid-template-columns:clamp(90px,9vw,130px) 1fr;gap:clamp(12px,1.6vw,22px);align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(14px,1.8vw,24px);box-shadow:var(--shadow)}
+.code2 .yr.hot{border-color:var(--accent,var(--indigo));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,var(--indigo)) 30%,transparent),var(--shadow)}
+.code2 .y{font-family:var(--font-mono);font-weight:900;font-size:clamp(20px,2.4vw,32px);color:var(--accent,var(--indigo))}
+.code2 .yr:not(.hot) .y{color:var(--ink-faint)}
+.pod{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pod div{border-radius:12px;padding:.7em 1em;background:var(--bg-2);display:flex;gap:.7em;align-items:baseline}
+.pod b{font-size:clamp(18px,2vw,26px);font-weight:900}
+.pod span{font-size:clamp(14px,1.6vw,20px);font-weight:700;color:var(--ink-soft)}
+.pod .p1{background:color-mix(in srgb,var(--ink) 8%,var(--surface))}
+.probs{display:flex;gap:6px}
+.probs i{height:clamp(40px,5vh,56px);border-radius:8px;background:var(--accent,var(--indigo));color:#fff;font-style:normal;font-weight:900;display:grid;place-items:center;font-size:clamp(14px,1.6vw,20px);position:relative}
+.probs i::after{content:"✓";position:absolute;right:8px;top:4px;font-size:.8em}
+.pnote{grid-column:2;margin:.5em 0 0;font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft);font-weight:600}
+.pnote b{color:var(--ink)}
+.math2{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2.4vw,36px);margin-top:clamp(16px,2.6vh,28px);align-items:center}
+.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(8px,1vw,14px)}
+.tiles i{aspect-ratio:1;border-radius:14px;background:var(--accent,var(--indigo));color:#fff;font-style:normal;font-weight:900;font-size:clamp(22px,2.8vw,40px);display:grid;place-items:center;box-shadow:var(--shadow)}
+.facts{display:grid;gap:clamp(10px,1.6vh,16px)}
+.facts div{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(12px,1.5vw,20px);box-shadow:var(--shadow);display:flex;gap:1em;align-items:baseline}
+.facts b{font-size:clamp(24px,3vw,40px);font-weight:900;color:var(--accent,var(--indigo));white-space:nowrap}
+.facts span{font-size:clamp(14px,1.6vw,20px);font-weight:700;color:var(--ink-soft)}
+.bars{display:grid;gap:clamp(10px,1.6vh,16px)}
+.bars.big{margin-top:clamp(18px,3vh,32px);background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(18px,2.4vw,34px);box-shadow:var(--shadow)}
+.brow{display:grid;grid-template-columns:clamp(160px,17vw,250px) 1fr clamp(80px,8vw,120px);gap:clamp(10px,1.4vw,20px);align-items:center}
+.brow .bk{font-size:clamp(15px,1.7vw,22px);font-weight:700;color:var(--ink-soft)}
+.brow .bt{height:clamp(30px,4.2vh,46px);background:var(--bg-2);border-radius:8px;overflow:hidden}
+.brow .bt i{display:block;height:100%;min-width:4px;background:color-mix(in srgb,var(--accent,var(--indigo)) 55%,var(--bg-2));border-radius:8px}
+.brow.human .bt i{background:var(--ink-soft)}
+.brow.hot .bt i{background:var(--accent,var(--indigo))}
+.brow b{text-align:right;font-family:var(--font-mono);font-size:clamp(20px,2.5vw,34px);font-weight:900}
+.brow.hot b{color:var(--accent,var(--indigo))}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(16px,2.4vw,40px);margin-top:clamp(16px,2.6vh,28px);align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(18px,2.4vw,32px) clamp(24px,4vw,64px);box-shadow:var(--shadow)}
+.cl{display:flex;flex-direction:column;align-items:center;gap:.35em;text-align:center}
+.cl .cb{width:clamp(60px,7vw,110px);height:clamp(160px,30vh,300px);display:flex;align-items:flex-end;border-bottom:2px solid var(--line-strong)}
+.cl .cb i{display:block;width:100%;border-radius:10px 10px 0 0;background:color-mix(in srgb,var(--accent,var(--coral)) 45%,var(--bg-2))}
+.cl.hot .cb i{background:var(--accent,var(--coral))}
+.cl b{font-family:var(--font-mono);font-size:clamp(22px,2.8vw,38px);font-weight:900}
+.cl.hot b{color:var(--accent,var(--coral))}
+.cl span{font-size:clamp(13px,1.4vw,17px);color:var(--ink-faint);font-weight:700;line-height:1.4}
+/* 6시간 격차 */
+.gap6{display:grid;grid-template-columns:repeat(6,1fr);gap:clamp(10px,1.6vw,24px);margin-top:clamp(16px,2.6vh,28px);align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(18px,2.4vw,30px);box-shadow:var(--shadow)}
+.gap6 .g{display:flex;flex-direction:column;align-items:center;gap:.3em;text-align:center}
+.gap6 .gb{width:clamp(50px,6vw,96px);height:clamp(150px,28vh,280px);display:flex;align-items:flex-end;border-bottom:2px solid var(--line-strong);position:relative}
+.gap6 .gb i{display:block;position:relative;width:100%;border-radius:10px 10px 0 0;background:color-mix(in srgb,var(--coral) 50%,var(--bg-2))}
+.gap6 .now .gb i{background:var(--coral)}
+.gap6 .fut .gb i{background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--coral) 30%,transparent) 6px 12px);border:2px dashed color-mix(in srgb,var(--coral) 55%,transparent);border-bottom:none}
+.gap6 .gb em{position:absolute;top:-1.9em;left:50%;transform:translateX(-50%);font-style:normal;font-weight:900;font-size:clamp(13px,1.4vw,17px);color:#fff;background:var(--coral);border-radius:999px;padding:.15em .7em;white-space:nowrap}
+.gap6 b{font-size:clamp(18px,2.2vw,30px);font-weight:900}
+.gap6 .now b{color:var(--coral)}
+.gap6 .fut b{color:var(--ink-faint)}
+.gap6 span{font-size:clamp(12px,1.3vw,16px);color:var(--ink-faint);font-weight:700}
+@media (max-width:900px){.mcvs,.esc,.math2{grid-template-columns:1fr}.gap6,.cols4{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
@@ -1032,15 +1126,6 @@ body[data-tool="spot"] .spot{display:block}
   </div>
 </section>
 
-<section class="slide center mid" data-accent="coral" data-title="Why not의 뜻 · 오늘의 목표"
-  data-notes="[0:04 · 2분] 'Why not'은 '왜 안 돼?'이자 '안 될 게 뭐 있어?'. 오늘의 목표는 기술을 외우는 게 아니라 생각의 전환. AI 앞에서 '이게 될까?' 하고 멈추던 습관을 'Why not? 일단 시켜 보자'로 바꾸는 것.">
-  <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 오늘의 목표</span>
-    <p class="big-quote">"이게 될까?"에서<br><span class="mark">"Why not?"</span>으로</p>
-    <p class="lead wide">안 될 이유보다 해 볼 방법을 먼저 찾는 것. 오늘 세 시간 동안 AI로 안 되는 줄 알았던 일들이 <b>하나씩 되는 걸</b> 보여 드리겠습니다.</p>
-  </div>
-</section>
-
 <!-- ===== 3. 설문 ===== -->
 <section class="slide center" data-accent="amber" data-title="설문 · QR"
   data-notes="[0:06 · 5분] 휴대폰 카메라로 QR → 9문항 1분. 다 모이면 '현황 보기'로 강사 화면을 열고 Space로 결과 공개 → → 키로 문항별 결과를 한 장씩 넘기며 이야기한다.
@@ -1090,7 +1175,7 @@ body[data-tool="spot"] .spot{display:block}
 </section>
 
 <section class="slide wide" data-accent="coral" data-title="다른 질문도 뻔하다"
-  data-notes="[0:14 · 2분] 다른 질문도 마찬가지. 청중에게 '이런 거 물어봐서 비슷한 답 받아 본 적 있죠?' 하고 손 들게 하면 좋다. 답은 예시(실제로는 매번 조금씩 다름). 마지막에 '왜 이럴까요?'로 다음 장(원리)으로 넘긴다.">
+  data-notes="[0:14 · 2분] 다른 질문도 마찬가지. 청중에게 '이런 거 물어봐서 비슷한 답 받아 본 적 있죠?' 하고 손 들게 하면 좋다. 답은 예시(실제로는 매번 조금씩 다름). 마지막 문장 '실망하셨다면, AI를 잘못 쓰고 계신 겁니다'로 다음 장(원리)으로 넘긴다.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 다른 질문도 마찬가지</span>
     <h2 class="subhead">무엇을 물어도, <span class="accent">누구나 아는 답</span>이 나옵니다</h2>
@@ -1100,7 +1185,7 @@ body[data-tool="spot"] .spot{display:block}
       <div class="qa"><span class="q">"회식 장소 추천해 줘"</span><span class="a">삼겹살집 · 횟집 · 한정식</span></div>
       <div class="qa"><span class="q">"보고서 잘 쓰는 법 알려 줘"</span><span class="a">결론부터 · 간결하게 · 숫자로 · 표로</span></div>
     </div>
-    <div class="callout warn"><span class="bang">?</span><p>우리는 <b>색다른 답</b>을 기대했는데, 나온 건 <b>누구나 아는 이야기</b>입니다. AI가 멍청해서일까요? <b>아닙니다. 원래 그렇게 만들어졌습니다.</b></p></div>
+    <div class="callout warn"><span class="bang">?</span><p>우리는 <b>색다른 답</b>을 기대했는데, 나온 건 <b>누구나 아는 이야기</b>입니다. 실망하셨다면, <b>AI를 잘못 쓰고 계신 겁니다.</b></p></div>
     <p class="src">답은 예시 · 실제 답은 물을 때마다 조금씩 다릅니다</p>
   </div>
 </section>
@@ -1199,6 +1284,39 @@ body[data-tool="spot"] .spot{display:block}
   </div>
 </section>
 
+<section class="slide wide" data-accent="teal" data-title="몬테카를로 · 사람 vs AI"
+  data-notes="[0:20 · 3분 · 체험] 원주율(π)을 구하는 두 가지 방법. ▶ 재생을 누르면 동시에 시작.
+사람: 공식을 안다. 원의 넓이 = π × r² → 바로 3.14159…
+AI: 공식을 모른다. 네모 안에 점을 무작위로 뿌리고, 원 안에 들어간 비율 × 4로 π를 '추정'한다. 처음엔 엉뚱하다가 점이 많아질수록 3.14에 다가간다(몬테카를로 방법).
+멘트: 'AI는 답을 아는 게 아니라, 엄청나게 많이 해 보고 가장 그럴듯한 답에 다가갑니다. 한 번은 운이지만, 만 번이면 실력입니다. 이게 앞 장의 '많이 나온 걸 뽑는다'와 같은 원리예요.'">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> AI 원리 · 몬테카를로</span>
+    <h2 class="subhead">사람은 <span class="accent">공식</span>으로, AI는 <span class="accent">무작위로 아주 많이</span></h2>
+    <div class="mcvs" id="mcvs">
+      <div class="side human">
+        <div class="who"><span class="tag">사람</span>공식을 압니다</div>
+        <div class="stage">
+          <svg viewBox="0 0 200 200" class="circ"><rect x="10" y="10" width="180" height="180" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><circle cx="100" cy="100" r="90" fill="none" stroke="currentColor" stroke-width="3"/><line x1="100" y1="100" x2="190" y2="100" stroke="currentColor" stroke-width="2.5" stroke-dasharray="5 4"/><text x="145" y="92" text-anchor="middle" font-size="16" font-weight="800" fill="currentColor">r</text></svg>
+          <div class="formula">
+            <p class="ln l1">원의 넓이 = π × r²</p>
+            <p class="ln l2">π = 원의 넓이 ÷ r²</p>
+            <p class="ln l3 res">π = 3.14159…</p>
+          </div>
+        </div>
+        <div class="foot">한 번에 정답</div>
+      </div>
+      <div class="side ai">
+        <div class="who"><span class="tag">AI</span>공식을 모릅니다. 점을 뿌립니다</div>
+        <div class="stage"><canvas width="440" height="440"></canvas>
+          <div class="meter"><span>찍은 점</span><b data-v="n">0</b><span>원 안</span><b data-v="in">0</b><span>추정한 π</span><b class="pi" data-v="pi">-</b></div>
+        </div>
+        <div class="foot">많이 할수록 정답에 가까워짐</div>
+      </div>
+    </div>
+    <div class="mcbtns"><button class="btn mcplay" type="button">▶ 재생</button><button class="btn mcreset" type="button">처음으로</button></div>
+  </div>
+</section>
+
 <section class="slide wide" data-accent="coral" data-title="그래서 · AI를 쓰는 시각을 바꾸자"
   data-notes="[0:21 · 3분] 원리의 결론. AI는 많은 사람이 쓴 답을 뽑는 기계 → 색다른 답을 '물어서' 받으려 하면 실망할 수밖에 없다. 색다른 결과는 AI가 아니라 '내 조건'에서 나온다.
 같은 여행 질문으로 비교: 물어보면 누구나 받는 답, 시키면 우리 부부만의 계획표.
@@ -1211,7 +1329,16 @@ body[data-tool="spot"] .spot{display:block}
       <div class="card dim"><span class="k">물어보기 · 검색처럼</span><h3>"여행지 추천해 줘"</h3><p>많은 사람이 쓴 답을 뽑아 줍니다. 누가 물어도 같은 답입니다.</p><div class="ex">→ 가평 · 춘천 · 양평… 누구나 받는 답</div></div>
       <div class="card hot"><span class="k">시키기 · 일처럼</span><h3>"우리 조건으로 계획표를 짜 줘"</h3><p>차로 1시간 반 이내, 북적이지 않는 곳, 숙소 15만 원 이하. 후보를 비교표로 만들고 1박 2일 동선까지 짜 달라고 합니다.</p><div class="ex">→ 우리 부부만의 비교표와 동선표</div></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>이제부터 AI는 <b>검색하고 물어보는 도구</b>가 아니라 <b>시켜서 만드는 도구</b>입니다.</p></div>
+    <div class="callout tip"><span class="bang">!</span><p>이제부턴 AI를 <b>일을 시켜서 나를 돕는 도구</b>로 써 봅시다.</p></div>
+  </div>
+</section>
+
+<section class="slide center divider" data-accent="coral" data-title="Why Now?"
+  data-notes="[0:25 · 질문] 잠깐 멈추고 질문을 던진다. '원리는 알았습니다. 그런데 왜 하필 지금일까요? 왜 지금 시작해야 할까요?' → 다음 장부터 답.">
+  <div class="slide-inner">
+    <span class="part-tag">질문</span>
+    <h2 class="headline why-now">Why <span class="accent">Now?</span></h2>
+    <p class="lead">원리는 알았습니다. 그런데 <b>왜 하필 지금</b>일까요?</p>
   </div>
 </section>
 
@@ -1225,37 +1352,108 @@ Anthropic Claude 2023.3.14 · Claude 2 2023.7.11 · Claude 3 2024.3.4 · Claude 
 Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024.7.23 · Llama 4 2025.4.5
 기타 Mistral 7B(Mistral AI) 2023.9.27 · Grok(xAI) 2023.11.4 · DeepSeek-V3 2024.12.26 · DeepSeek-R1 2025.1.20 · Grok 3 2025.2.17 · Grok 4 2025.7.9 · Kimi K2(Moonshot AI) 2025.7.11">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> AI 발전 속도 ① · 모델 출시 연표</span>
-    <h2 class="subhead">AI 모델이 <span class="accent">빠르게 진화하며, 늘어나고</span> 있습니다</h2>
-    <p class="desc">점 하나가 회사의 대표 모델 하나입니다. ChatGPT 전 약 5년 동안 <b>5개</b>였던 점이, 이후 4년 사이 <b>46개</b>로 늘었습니다. 이름 뒤 숫자도 GPT-1에서 GPT-6까지 쉬지 않고 올라갑니다. 지금 이 순간에도 더 똑똑한 AI가 나오고 있습니다.</p>
+    <span class="eyebrow"><span class="dot"></span> AI 발전 속도 · 모델 출시 연표</span>
+    <h2 class="subhead">새 모델이 몇 개월마다 나옵니다. <span class="accent">그리고 이건 시작입니다</span></h2>
+    <p class="desc">점 하나가 회사의 대표 모델 하나입니다. ChatGPT 전 약 5년 동안 <b>5개</b>였던 점이, 이후 4년 사이 <b>46개</b>로 늘었습니다. 회사마다 <b>몇 개월에 한 번씩</b> 새 모델을 내고, 그 간격은 점점 짧아지고 있습니다. 그런데 이건 <b>시작일 뿐</b>입니다.</p>
     <div class="mtl" id="tl" role="img" aria-label="2018년부터 2026년까지 회사별 대표 AI 모델 출시 시점 점도표"></div>
     <p class="src">각 회사 공식 발표 기준 · 대표 모델만 골라 표시(연도별 수도 이 표 기준) · 2026년 10월 기준 · 점에 마우스를 올리면 이름과 출시 월</p>
   </div>
 </section>
 
-<section class="slide wide" data-accent="indigo" data-title="AI가 사람을 넘는 속도"
-  data-notes="[0:27 · 3분] 연표가 '많아지고 있다'였다면 이 장은 '사람을 넘고 있다'. 왼쪽부터 순서대로.
-① 2016.3 알파고 vs 이세돌 4:1. 2017 알파고 제로는 사람 기보 없이 독학해 이세돌을 이긴 판(알파고 리)을 100:0으로 이김(Silver 외, Nature 2017).
-② 2026.7 AtCoder 월드투어 파이널(도쿄, 세계 최상위 코딩 대회): OpenAI가 시범 참가해 알고리즘 부문 5문제를 모두 풀고 사람 참가자 전원을 앞섰다. 1년 전(2025.7) 같은 대회 휴리스틱 부문에선 사람(Psyho)에게 근소하게 져 2위였다.
-③ 2026.8.1 OpenAI 'Ten advances in mathematics and theoretical computer science': 차세대 모델(Astra)이 10년 넘게 진전이 없던 수학 · 이론 컴퓨터과학 문제 10개에서 새 결과. 증명은 Lean(컴퓨터 증명 검증 도구)으로 검증, 문제당 토큰 비용 2,000달러 미만(OpenAI 발표).
-④ ARC-AGI-3(2026.3 공개, 사람에게 쉽고 AI에게 어렵게 만든 시험): 공개 당시 사람 100%, 최신 AI 1% 미만 → 2026.9 GPT-6 Astra 62.7%(ARC 표준 평가 기준. OpenAI 자체 설정으로는 99.9%). ARC Prize는 이것이 AGI를 뜻하지는 않는다고 밝힘. ※ 2차 보도 기준.
-⑤ 인류의 마지막 시험(Humanity's Last Exam, CAIS · Scale AI): 전문가 약 1,000명이 낸 2,500문항. 2025.1 공개 당시 최고 AI도 10% 미만 → 2026.9 Scale AI 리더보드 1위 GPT-6 Astra 60.6%.
-인용: 장강명(소설가), 『먼저 온 미래』(동아시아, 2025) — 알파고 이후 바둑계를 취재한 책. '바둑계에서 먼저 벌어진 일이 이제 다른 업계에서 벌어진다.'">
+<section class="slide wide" data-accent="indigo" data-title="사람을 넘다 ① 바둑"
+  data-notes="[1/5 · 바둑] 긴장감을 쌓는 첫 장. 2016년 3월 서울, 알파고 vs 이세돌 9단 5번기 4:1(이세돌 9단은 4국에서 승리). 2017년 알파고 제로는 사람 기보 없이 혼자 학습해, 이세돌 9단을 이긴 버전(알파고 리)을 100:0으로 이김(Silver 외, Nature 2017).
+장강명 작가는 알파고 이후 바둑계 10년을 취재한 책 『먼저 온 미래』(동아시아, 2025)에서 '바둑계에 미래가 먼저 왔다'고 썼다. 멘트: '그때 바둑에서 벌어진 일이 이제 다른 곳에서 벌어집니다.'">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> AI 발전 속도 ②</span>
-    <h2 class="subhead">게임에서 시작된 일이, 이제 <span class="accent">일 전체</span>에서 벌어집니다</h2>
-    <div class="steps5">
-      <div class="st5"><span class="yr">2016 · 2017</span><b>바둑</b><p>알파고가 이세돌에 4:1. 1년 뒤 알파고 제로는 독학으로 <em>100:0</em></p><span class="sr">Nature(2017)</span></div>
-      <div class="st5"><span class="yr">2026.7</span><b>코딩 세계대회</b><p>세계 최상위 대회 결승에서 <em>5문제 전부</em> 풀고 사람 전원을 앞섬. 1년 전엔 근소하게 졌다</p><span class="sr">AtCoder 월드투어 파이널</span></div>
-      <div class="st5"><span class="yr">2026.8</span><b>수학 난제</b><p>10년 넘게 진전 없던 문제 <em>10개</em>에서 새 결과. 컴퓨터로 증명 검증</p><span class="sr">OpenAI 발표</span></div>
-      <div class="st5"><span class="yr">2026.3 → 9</span><b>사람만 풀던 시험</b><p>사람 100%, AI 1% 미만이던 시험을 반년 만에 <em>62.7%</em></p><span class="sr">ARC-AGI-3 · 표준 평가</span></div>
-      <div class="st5 hot"><span class="yr">2025.1 → 2026.9</span><b>인류의 마지막 시험</b><p>전문가 1,000명이 낸 2,500문항. 10% 미만 → <em>60.6%</em></p><span class="sr">CAIS · Scale AI</span></div>
+    <span class="eyebrow"><span class="dot"></span> 사람을 넘다 · 1 / 5</span>
+    <h2 class="subhead">시작은 <span class="accent">바둑</span>이었습니다</h2>
+    <div class="esc">
+      <div class="chart">
+        <div class="crow"><span class="ck">2016 · 알파고 vs 이세돌</span>
+          <div class="stones"><i class="w">승</i><i class="w">승</i><i class="w">승</i><i class="l">패</i><i class="w">승</i></div><span class="cv">4 : 1</span></div>
+        <div class="crow"><span class="ck">2017 · 알파고 제로 vs 알파고</span>
+          <div class="hbar"><i style="width:100%"></i></div><span class="cv">100 : 0</span></div>
+        <p class="cnote">알파고 제로는 사람 기보 없이 혼자 배웠습니다</p>
+      </div>
+      <div class="qside"><p>"나는 바둑계에 <b>미래가 먼저 왔다</b>고 생각한다."</p><span>장강명, 『먼저 온 미래』(2025)<br>알파고 이후 바둑계 10년을 취재한 책</span></div>
     </div>
-    <div class="quote-line"><p>"나는 바둑계에 미래가 먼저 왔다고 생각한다."</p><span>장강명, 『먼저 온 미래』(2025) · 알파고 이후 바둑계 10년을 취재한 책</span></div>
+    <p class="src">구글 딥마인드 · Silver 외, Nature(2017) · 장강명, 동아시아(2025)</p>
   </div>
 </section>
 
-<section class="slide wide" data-accent="coral" data-title="더 똑똑하고, 더 싸진다 · 도태"
+<section class="slide wide" data-accent="indigo" data-title="사람을 넘다 ② 코딩"
+  data-notes="[2/5 · 코딩] 세계 최상위 프로그래밍 대회 AtCoder 월드투어 파이널.
+2025년 7월(도쿄) 휴리스틱 부문: OpenAI가 시범 참가해 사람 우승자 Psyho에게 근소하게 져 2위.
+2026년 7월(도쿄) 알고리즘 부문: OpenAI가 다섯 문제(900 · 900 · 1500 · 2500 · 2500점)를 모두 풀고 사람 참가자 전원을 앞섰다(시범 참가, 공식 순위 외). 관전자들은 두 문제를 특히 어렵다고 평가.
+멘트: '1년 만에, 근소한 패배가 전 문제 해결로 바뀌었습니다.'">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 사람을 넘다 · 2 / 5</span>
+    <h2 class="subhead">다음은 <span class="accent">코딩</span>이었습니다</h2>
+    <p class="desc">세계 최상위 프로그래머들이 겨루는 대회 결승. 1년 전엔 사람이 근소하게 이겼습니다. 1년 뒤, AI는 <b>모든 문제를 풀었습니다.</b></p>
+    <div class="code2">
+      <div class="yr"><span class="y">2025.7</span><div class="pod"><div class="p1"><b>1위</b><span>사람 (Psyho)</span></div><div class="p2"><b>2위</b><span>OpenAI · 근소한 차이</span></div></div></div>
+      <div class="yr hot"><span class="y">2026.7</span>
+        <div class="probs"><i style="flex:900">A</i><i style="flex:900">B</i><i style="flex:1500">C</i><i style="flex:2500">D</i><i style="flex:2500">E</i></div>
+        <p class="pnote"><b>5문제 전부 해결</b> · 사람 참가자 전원을 앞섬 (칸 너비 = 배점)</p></div>
+    </div>
+    <p class="src">AtCoder World Tour Finals 2025 · 2026(도쿄) · OpenAI는 시범 참가 · The Decoder, OfficeChai 보도</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="indigo" data-title="사람을 넘다 ③ 수학 난제"
+  data-notes="[3/5 · 수학] OpenAI 'Ten advances in mathematics and theoretical computer science'(2026.8.1, 249쪽). 차세대 모델 Astra가 10년 넘게 주요 진전이 없던 수학 · 이론 컴퓨터과학 문제 10개에서 새 결과. 분야: 고차원 기하, 부호 이론, 산술 회로 복잡도, 군론, 양자 복잡도, 격자 암호, 극값 조합론 등. 증명은 Lean(컴퓨터 증명 검증 도구)으로 검증해 공개, 문제당 토큰 비용 2,000달러 미만(OpenAI 발표 · 실패한 시도 수는 밝히지 않음). 에르되시 문제 데이터베이스 관리자 토머스 블룸은 '큰 뉴스'라고 평가.
+멘트: '이제 시험 문제가 아니라, 사람이 수십 년 못 푼 진짜 문제입니다.'">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 사람을 넘다 · 3 / 5</span>
+    <h2 class="subhead">이제 시험이 아니라, <span class="accent">수학자들이 못 푼 문제</span>입니다</h2>
+    <p class="desc">10년 넘게 진전이 없던 수학 문제 10개에서 AI가 새 결과를 냈습니다. 사람이 낸 시험 문제가 아니라, <b>답을 아무도 모르던 문제</b>입니다.</p>
+    <div class="math2">
+      <div class="tiles"><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i></div>
+      <div class="facts">
+        <div><b>10개</b><span>새 결과를 낸 미해결 문제</span></div>
+        <div><b>10년+</b><span>각 문제가 진전 없이 멈춰 있던 기간</span></div>
+        <div><b>컴퓨터 검증</b><span>증명을 Lean으로 검증해 공개</span></div>
+      </div>
+    </div>
+    <p class="src">OpenAI, "Ten advances in mathematics and theoretical computer science"(2026.8.1)</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="indigo" data-title="사람을 넘다 ④ 사람만 풀던 시험"
+  data-notes="[4/5 · 사람이 앞서던 영역] ARC-AGI-3(ARC Prize, 2026.3 공개): 설명 없는 게임을 직접 해 보며 규칙을 알아내야 하는 시험. 사람에게는 쉽고 AI에게는 어렵게 일부러 만들었다. 공개 당시 사람 100%, 최신 AI 1% 미만(예: Gemini 3.1 Pro 0.37%). 2026.7 Claude Opus 5 30.2%, 2026.9 GPT-6 Astra 62.7%(ARC 표준 평가. OpenAI 자체 설정으로는 99.9%). ARC Prize는 이 결과가 AGI를 뜻하지는 않는다고 밝힘. ※ 2차 보도 기준.
+멘트: '사람만 풀 수 있게 일부러 만든 시험인데, 반년 만에 이렇게 됐습니다.'">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 사람을 넘다 · 4 / 5</span>
+    <h2 class="subhead">사람만 풀 수 있게 만든 시험도, <span class="accent">반년 만에</span></h2>
+    <p class="desc">설명 없는 게임을 직접 해 보며 규칙을 알아내는 시험입니다. <b>사람에게는 쉽고 AI에게는 어렵게</b> 일부러 만들었습니다.</p>
+    <div class="bars big">
+      <div class="brow human"><span class="bk">사람</span><div class="bt"><i style="width:100%"></i></div><b>100%</b></div>
+      <div class="brow"><span class="bk">AI · 2026.3 공개 때</span><div class="bt"><i style="width:0.6%"></i></div><b>0.37%</b></div>
+      <div class="brow"><span class="bk">AI · 2026.7</span><div class="bt"><i style="width:30.2%"></i></div><b>30.2%</b></div>
+      <div class="brow hot"><span class="bk">AI · 2026.9</span><div class="bt"><i style="width:62.7%"></i></div><b>62.7%</b></div>
+    </div>
+    <p class="src">ARC Prize · ARC-AGI-3(2026.3 공개) · 2026.9는 ARC 표준 평가 기준(GPT-6 Astra) · 언론 보도 종합</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="사람을 넘다 ⑤ 인류의 마지막 시험"
+  data-notes="[5/5 · 절정] Humanity's Last Exam(CAIS · Scale AI): 수학 · 인문 · 자연과학 등 수십 분야 전문가 약 1,000명이 낸 2,500문항. 기존 시험들이 80~90%로 포화되자 만든 '마지막 시험'.
+공개 당시(2025.1) o1 약 8%, GPT-4o 2.7%. 이후 Gemini 3 Pro 37.5%(2026.2 기록), Gemini 3.1 Pro 46.4%(2026.6 기록), 2026.9 Scale AI 리더보드 1위 GPT-6 Astra 60.6%. ※ 도구 사용 여부 · 시점에 따라 출처마다 숫자가 조금씩 다르다.
+멘트: '인류가 낼 수 있는 가장 어려운 문제를 모았는데, 1년 반 만에 절반을 넘었습니다.'">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 사람을 넘다 · 5 / 5</span>
+    <h2 class="subhead">그리고 <span class="accent">'인류의 마지막 시험'</span>까지</h2>
+    <p class="desc">전문가 약 1,000명이 낸 2,500문항. 다른 시험을 다 풀어 버리자 만든 마지막 시험입니다. 공개 당시 최고 AI도 <b>한 자릿수</b>였습니다.</p>
+    <div class="cols4">
+      <div class="cl"><div class="cb"><i style="height:8%"></i></div><b>8%</b><span>2025.1<br>o1 · 공개 당시</span></div>
+      <div class="cl"><div class="cb"><i style="height:37.5%"></i></div><b>37.5%</b><span>2026.2<br>Gemini 3 Pro</span></div>
+      <div class="cl"><div class="cb"><i style="height:46.4%"></i></div><b>46.4%</b><span>2026.6<br>Gemini 3.1 Pro</span></div>
+      <div class="cl hot"><div class="cb"><i style="height:60.6%"></i></div><b>60.6%</b><span>2026.9<br>GPT-6 Astra</span></div>
+    </div>
+    <p class="src">Humanity's Last Exam(CAIS · Scale AI) · 리더보드 기록 시점 기준 · 도구 사용 여부에 따라 출처마다 조금씩 다름</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="더 똑똑하고, 더 싸진다"
   data-notes="[0:30 · 3분] 똑똑해지는 것만이 아니라 싸지고 있다.
 ① 샘 올트먼 「Three Observations」(2025.2): 같은 수준의 AI를 쓰는 비용은 12개월마다 약 10분의 1로 떨어진다.
 ② Payden & Rygel(자산운용사, 2026.5): GPT-4 수준 지능의 비용이 백만 토큰당 출시가 60달러 → 2026.1 0.05달러, 99.9% 이상 하락.
@@ -1263,7 +1461,7 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
 올트먼의 말: 「The Gentle Singularity」(2025.6) — 데이터센터 생산이 자동화되면 지능의 비용은 결국 전기 요금 수준에 가까워질 것. (ChatGPT 질문 1번 ≈ 0.34Wh, 고효율 전구를 몇 분 켜는 전기). G20 혁신장관회의(2026.9, 미국 채플힐): AI는 전기만큼 필수, 쓰는 건 '협상 불가(non-negotiable)'. 전기를 거부한 나라가 뒤처졌듯 AI도 그렇다.
 결론 멘트: '전등 켤 때 전기 요금 생각 안 하죠. AI도 그렇게 됩니다. 그때 AI를 쓸 줄 모르면? 전기를 안 쓰는 것과 같습니다.'">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> AI 발전 속도 ③</span>
+    <span class="eyebrow"><span class="dot"></span> AI 발전 속도 · 가격</span>
     <h2 class="subhead">더 똑똑해지고, <span class="accent">전기처럼 싸집니다</span></h2>
     <div class="cheap">
       <div class="nums">
@@ -1279,7 +1477,29 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
         <span class="w">G20 혁신장관회의 2026.9</span>
       </div>
     </div>
-    <p class="verdict2">전등 켤 때 전기 요금을 따지지 않듯, AI도 그렇게 됩니다. 그때 AI를 쓸 줄 모르면, <b>전기를 안 쓰는 것과 같습니다.</b><br>AI를 쓰지 않으면 <b>도태될 수밖에 없습니다.</b></p>
+    <p class="verdict2">전등 켤 때 전기 요금을 따지지 않듯, AI도 그렇게 됩니다. 그때 AI를 쓸 줄 모르면, <b>전기를 안 쓰는 것과 같습니다.</b><br>그리고 AI가 흔해질수록, <b>쓰는 사람과 안 쓰는 사람의 차이는 벌어집니다.</b></p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="Why Now의 답 · 아직 6시간 차이"
+  data-notes="[Why Now의 답 · 3분] AI를 쓰는 사람과 안 쓰는 사람의 차이를 '시간'으로 보면.
+2023년 초 30초 → 2025년 약 45분 → 2026년 초 약 6시간. 이 숫자는 강연 자료에서 인용한 것으로, AI 평가 기관 METR가 잰 'AI가 혼자 해내는 일의 길이(사람 전문가 기준)'를 바탕으로 한다. METR 측정으로는 2025년 초 최상위 모델이 약 1시간 안팎, Claude Opus 4.5 약 4시간 49분(2025.11), Claude Opus 4.6 약 14.5시간(2026.2, 2차 보도 · 벤치마크 포화로 불확실).
+흐린 막대(1주 · 2년 · 커리어 전체)는 같은 강연의 예측. 추세가 이어진다면의 이야기.
+결론 멘트: '지금은 아직 6시간 차이입니다. 하루면 따라잡을 수 있는 차이예요. 1년 뒤엔 2년, 몇 년 뒤엔 커리어 전체가 될 수 있습니다. 그래서 지금, 오늘 시작해야 합니다. Why not?'
+※ 막대 길이는 로그 눈금(30초와 커리어 전체를 한 화면에 담기 위해).">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> Why Now의 답</span>
+    <h2 class="subhead">AI를 쓰는 사람과 안 쓰는 사람, <span class="accent">지금은 6시간 차이</span>입니다</h2>
+    <div class="gap6">
+      <div class="g"><div class="gb"><i style="height:16%"></i></div><b>30초</b><span>2023년 초</span></div>
+      <div class="g"><div class="gb"><i style="height:38%"></i></div><b>45분</b><span>2025년</span></div>
+      <div class="g now"><div class="gb"><i style="height:48%"><em>지금</em></i></div><b>6시간</b><span>2026년 초</span></div>
+      <div class="g fut"><div class="gb"><i style="height:64%"></i></div><b>1주</b><span>2026년 말 · 예측</span></div>
+      <div class="g fut"><div class="gb"><i style="height:86%"></i></div><b>2년</b><span>2028년 말 · 예측</span></div>
+      <div class="g fut"><div class="gb"><i style="height:100%"></i></div><b>커리어 전체</b><span>2030년 말 · 예측</span></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>아직은 <b>6시간</b>, 하루면 따라잡을 수 있는 차이입니다. 벌어지기 전에, <b>지금 우리도 AI를 쓰기 시작해야 합니다.</b> Why not?</p></div>
+    <p class="src">AI 사용 여부에 따른 격차: 강연 자료 인용(METR 'AI가 혼자 해내는 일의 길이' 측정 기반) · 2026년 말 이후는 예측 · 막대는 로그 눈금</p>
   </div>
 </section>
 
@@ -4309,6 +4529,32 @@ var qrcode = function() {
     tip.style.left=Math.max(0,Math.min(r.width-tw,tx-tw/2))+'px'; tip.style.top=(c.top-r.top-tip.offsetHeight-12)+'px'; });
   box.addEventListener('mouseleave',function(){ tip.hidden=true; });
   window.dispatchEvent(new Event('resize')); // 그림이 들어간 뒤 화면 맞춤 다시
+})();
+</script>
+<script>
+/* ===== 몬테카를로 사람 vs AI ===== */
+(function(){
+  var root=document.getElementById('mcvs'); if(!root) return;
+  var sl=root.closest('.slide'), cv=root.querySelector('canvas'), g=cv.getContext('2d'), W=cv.width;
+  var lines=root.querySelectorAll('.formula .ln'), n=0, inn=0, raf=null, timers=[];
+  var el=function(k){ return root.querySelector('[data-v="'+k+'"]'); };
+  function frame(){ g.fillStyle='#fff'; g.fillRect(0,0,W,W); g.strokeStyle='#C9C4DA'; g.lineWidth=3; g.strokeRect(1.5,1.5,W-3,W-3); arc(); }
+  function arc(){ g.beginPath(); g.arc(0,W,W,-Math.PI/2,0); g.strokeStyle='#1E1B33'; g.lineWidth=3; g.stroke(); }
+  function stat(){ el('n').textContent=n.toLocaleString(); el('in').textContent=inn.toLocaleString(); el('pi').textContent=n?(4*inn/n).toFixed(4):'-'; }
+  function reset(){ cancelAnimationFrame(raf); timers.forEach(clearTimeout); timers=[]; n=inn=0; frame(); stat(); lines.forEach(function(l){ l.classList.remove('on'); }); }
+  function play(){ reset();
+    lines.forEach(function(l,i){ timers.push(setTimeout(function(){ l.classList.add('on'); },300+i*600)); });
+    var target=50000, t0=performance.now(), dur=10000;
+    (function step(t){ var want=Math.min(target,Math.floor(target*Math.pow((t-t0)/dur,1.6)));
+      var r=Math.max(1.8,9-Math.log10(want+1)*1.6);
+      while(n<want){ var x=Math.random(), y=Math.random(), ok=x*x+y*y<=1; n++; if(ok) inn++;
+        g.fillStyle=ok?'rgba(15,182,164,.85)':'rgba(255,90,77,.8)'; g.fillRect(x*W-r/2,W-y*W-r/2,r,r); }
+      arc(); stat(); if(n<target) raf=requestAnimationFrame(step); })(t0);
+  }
+  root.parentNode.querySelector('.mcplay').addEventListener('click',function(e){ e.currentTarget.blur(); play(); });
+  root.parentNode.querySelector('.mcreset').addEventListener('click',function(e){ e.currentTarget.blur(); reset(); });
+  new MutationObserver(function(){ if(!sl.classList.contains('active')) cancelAnimationFrame(raf); }).observe(sl,{attributes:true,attributeFilter:['class']});
+  reset();
 })();
 </script>
 </body>
