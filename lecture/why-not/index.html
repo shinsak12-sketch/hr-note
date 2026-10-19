@@ -834,6 +834,7 @@ body[data-tool="spot"] .spot{display:block}
 /* Why not? 표지 */
 .title-slide .headline.why{font-size:clamp(80px,15vw,210px);letter-spacing:-.045em;line-height:.95}
 .title-slide .tagline b{color:var(--ink)}
+.title-slide .headline.do-all{font-weight:900;font-size:clamp(44px,7.5vw,110px);letter-spacing:-.035em;line-height:1;margin-top:.25em}
 /* 마지막 메시지: 무게감 있게 어둡고 조용한 톤 */
 .slide.sober{--bg:#100F1A;--bg-2:#191826;--surface:#1A1928;--ink:#EEEDF5;--ink-soft:#B9B6CC;--ink-faint:#7D7A93;--line:#2B2A3D;--line-strong:#3A3850;
   background:var(--bg);color:var(--ink)}
@@ -1371,6 +1372,17 @@ body[data-tool="spot"] .spot{display:block}
 .s3do b{color:var(--accent,var(--teal))}
 .s3chk{border-left:5px solid var(--accent,var(--teal));background:color-mix(in srgb,var(--teal) 10%,var(--surface));border-radius:0 12px 12px 0;padding:.7em 1em;font-size:clamp(15px,1.75vw,21px);font-weight:700;color:var(--ink)}
 .s3chk b{color:var(--accent,var(--teal))}
+.s4tip{margin:0;font-size:clamp(15px,1.7vw,21px);font-weight:600;color:var(--ink-soft)}
+.s4tip b{color:var(--ink)}
+.s4log{display:grid;gap:clamp(6px,1vh,10px);background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(12px,1.6vw,20px);box-shadow:var(--shadow)}
+.s4log .k{font-size:clamp(13px,1.4vw,17px);font-weight:800;color:var(--ink-faint)}
+.s4t{display:grid;grid-template-columns:2.2em 1fr;gap:.6em;align-items:start}
+.s4t em{font-style:normal;font-size:clamp(12px,1.25vw,15px);font-weight:900;text-align:center;border-radius:6px;padding:.15em 0;background:var(--indigo);color:#fff}
+.s4t.me em{background:var(--coral)}
+.s4t p{margin:0;font-size:clamp(14px,1.6vw,20px);font-weight:600;color:var(--ink-soft);line-height:1.45}
+.s4t p b{color:var(--ink);font-weight:800}
+.s4t.fin p{color:var(--ink)}
+.s4t.fin p b{color:var(--teal)}
 .s3q{display:grid;gap:.4em;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(12px,1.6vw,20px);box-shadow:var(--shadow)}
 .s3q span{font-size:clamp(13px,1.4vw,17px);font-weight:800;color:var(--ink-faint)}
 .s3q b{font-size:clamp(15px,1.7vw,21px);font-weight:700;color:var(--ink);padding-left:.8em;border-left:3px solid var(--indigo)}
@@ -2496,12 +2508,12 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
   </div>
 </section>
 
-<section class="slide wide game" data-accent="gold" data-title="스킬의 선입관을 지우자"
+<section class="slide wide game" data-accent="gold" data-title="스킬의 선입관을 없애자"
   data-notes="[핵심 메시지 · 3분] 스킬 하면 다들 '양식 만들기'만 떠올린다. 아니다. 게임에도 공격 스킬만 있는 게 아니라 방어 스킬이 있듯, AI 스킬도 결과물을 만드는 것(공격)만이 아니라 결과물을 검사하고 지키는 것(방어)도 된다. 스킬은 어떤 양식에 한정되지 않는다. 반복되는 일이면 무엇이든 스킬이 된다.
 방어 스킬 요령: 바로 고치게 하지 말고 '표시만' 하게 한다.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 액티브 · 스킬 만들기 전에</span>
-    <h2 class="subhead">스킬을 만들 때도 <span class="accent">선입관</span>을 지워야 합니다</h2>
+    <h2 class="subhead">스킬을 만들 때도 <span class="accent">선입관</span>을 없애야 합니다</h2>
     <div class="dbias">
       <div class="gp"><span class="gk">⚔ 공격 스킬 · 결과물을 만든다</span>
         <ul><li>민원 회신 문안</li><li>사진대지</li><li>주간 보고</li><li>수리비 협의 문안</li><li>회사 양식 보고서</li></ul></div>
@@ -2687,21 +2699,24 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
 </section>
 
 <section class="slide wide compact" data-accent="teal" data-title="STEP 4 · 스킬 만들기"
-  data-notes="[STEP 4 · 스킬 · 10분] 업무 규칙은 전부 여기, 스킬 안으로. 스킬도 대화로 만든다. 아래 문장을 붙여 넣으면 AI가 하나씩 묻는다. 넣을 자료(사진 종류 · 메모 틀), 문서 구성 순서, 결과 형식을 답하면 스킬 파일을 만들어 준다. 회사의 '디비-분심-생성' 스킬도 이렇게 시작해서 키운 것.">
+  data-notes="[STEP 4 · 스킬 · 10분] 업무 규칙은 전부 여기, 스킬 안으로. 강사가 실제로 분심 입증자료 스킬을 만든 대화(이틀, 10번 남짓 주고받음)를 줄인 것. 핵심: 처음부터 규칙을 다 적어 내려고 하지 말고, 동료한테 말하듯 '귀찮은 일'을 설명하고 '이해돼?'로 시작한다. AI가 구성안과 선택지를 내면 고르고, 시안을 보면서 고칠 점을 말로 던진다. 규칙(허위 금지 · 정중한 결론)은 시안을 보다가 생긴다. 다 됐으면 '이제 스킬로 만들자'와 발동 방식만 말하면 된다.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> STEP 4 / 4</span>
     <h2 class="subhead">스킬도 <span class="accent">대화로</span> 만듭니다</h2>
     <div class="s3row">
-      <div class="prompt s3cp" id="cp3-skill"><button class="copy" data-copy="cp3-skill">복사</button>분쟁심의 답변서 만드는 걸 스킬로 만들고 싶어.
-"분심 답변서 만들어줘"라고 하면 필요한 자료(사진 · 메모)를 먼저 안내하고,
-받은 자료로 답변서 초안을 만들어 줘. 꼭 지킬 규칙:
-- 본문은 음슴체, 결론만 "~요청드립니다"
-- 사실은 내 메모 · 사진에 있는 것만
-- 상대측 주장은 내가 쓴 그대로만
-- 과실 도표 번호는 내가 준 것만, 추측 금지
-<span class="blank">필요한 건 한 번에 하나씩 물어봐.</span></div>
       <div class="s3side">
-        <div class="s3q"><span>AI가 물어볼 것 (예)</span><b>어떤 사진을 받나요? (약도 · 현장 · 파손 · 블랙박스)</b><b>메모는 어떤 틀로 받을까요? (구분 · 과실 · 사고 · 우리 주장 · 상대 주장)</b><b>문서 순서는요? (사고 요약 → 사진 → 쟁점 대비표 → 법적 근거 → 결론)</b><b>결과는 어떤 파일로 받을까요?</b></div>
+        <div class="prompt s3cp" id="cp3-skill"><button class="copy" data-copy="cp3-skill">복사</button>분쟁심의위원회에 답변서 낼 때 약도, 현장사진, 파손사진, 우리 주장, 상대 주장을 정리해서 PDF로 내거든.
+근데 매번 만들기 너무 귀찮아. 위원들이 보기에 정성 들인 티 나게 양식을 만들어서 스킬로 등록해 두고 싶어.
+<span class="blank">이해돼? 아직 만들지 말고 어떻게 할지 먼저 물어봐.</span></div>
+        <p class="s4tip">처음부터 규칙을 다 쓰지 않아도 됩니다. <b>동료한테 말하듯</b> 시작하세요.</p>
+      </div>
+      <div class="s4log"><span class="k">그다음 대화 (실제 기록 · 줄임)</span>
+        <div class="s4t"><em>AI</em><p>구성안을 내고 묻는다 · 약도는? 디자인 톤은? 주장은 누가 써?</p></div>
+        <div class="s4t me"><em>나</em><p>"목차 넣고, 청구 쪽인지 표시해. 법 근거도 넣어. <b>일단 디자인부터 뽑아 봐</b>"</p></div>
+        <div class="s4t me"><em>나</em><p>"내가 쓸 게 너무 많아. <b>개인정보는 빼</b>, 어차피 입력칸에 있어"</p></div>
+        <div class="s4t me"><em>나</em><p>"상대 주장은 <b>내가 쓴 것만</b>. 지어내면 사기야"</p></div>
+        <div class="s4t me"><em>나</em><p>"'요청함'은 건방져 보여. <b>'요청드립니다'</b>로"</p></div>
+        <div class="s4t me fin"><em>나</em><p>"이제 스킬로 만들자. <b>고르고 엔터 치면 뭘 넣을지 먼저 알려 줘</b>"</p></div>
       </div>
     </div>
   </div>
@@ -2833,7 +2848,7 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
 </section>
 
 <section class="slide wide bp" data-accent="indigo" data-title="가이드 ① 목표 = 개성"
-  data-notes="[가이드 ① · 3분] 설계에서 목표를 정하는 건 이 프로그램의 개성을 정하는 것. 개성은 한 번 정해지면 바꾸기 어렵다. AI는 지금까지의 대화와 처음 만든 결과물을 기준으로 삼는다(선입관). 그래서 '그냥 만들어 줘'로 시작해 수정 · 수정 · 수정해도 처음 틀을 못 벗어나 답답해진다. 챕터 2의 '선입관을 지우자'와 연결.
+  data-notes="[가이드 ① · 3분] 설계에서 목표를 정하는 건 이 프로그램의 개성을 정하는 것. 개성은 한 번 정해지면 바꾸기 어렵다. AI는 지금까지의 대화와 처음 만든 결과물을 기준으로 삼는다(선입관). 그래서 '그냥 만들어 줘'로 시작해 수정 · 수정 · 수정해도 처음 틀을 못 벗어나 답답해진다. 챕터 2의 '선입관을 없애자'와 연결.
 정확히는 AI가 '학습'하는 게 아니라 그 대화 기록에 끌려가는 것. 그래서 새 채팅을 열면 선입관이 사라진다(가이드 ⑥에서 활용).">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 가이드 ① · 목표 정하기</span>
@@ -3142,12 +3157,27 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
   </div>
 </section>
 
-<section class="slide center divider bp" data-accent="indigo" data-title="2부 마무리"
-  data-notes="[마무리] 바이브코딩은 별거 없다. 대화로 만든다. 다만 만들기 전에 설계 대화(목표 · 뼈대)를 충분히. 오늘부터 여러분은 게임을 하던 사람에서, 만드는 사람입니다.">
+<section class="slide bp" data-accent="amber" data-title="보안 세팅"
+  data-notes="[보안 · 1분] 마지막으로 보안. 대화 내용은 서비스 회사 서버로 가고, 개인 요금제는 설정에 따라 서비스 개선(학습)에 쓰일 수 있다. 메뉴 이름은 서비스마다 다름. 회사 보안 정책이 언제나 먼저.">
   <div class="slide-inner">
-    <span class="part-tag">마무리</span>
-    <h2 class="headline">게임을 하던 사람에서,<br><span class="accent">만드는 사람</span>으로</h2>
-    <p class="lead wide">만들기 전에 설계 대화 · 특히 목표와 뼈대</p>
+    <span class="eyebrow"><span class="dot"></span> 마지막으로, 보안</span>
+    <h2 class="subhead">이것만은 <span class="accent">꼭</span> 지킵니다</h2>
+    <p class="desc">AI에 입력한 내용은 서비스 회사의 서버로 갑니다. 개인 요금제는 설정에 따라 AI 학습에 쓰일 수도 있습니다. 편리함보다 먼저 챙겨야 할 네 가지입니다.</p>
+    <ul class="list num-list">
+      <li><span class="mk"></span><span>설정에서 <b>"모델 학습에 내 대화 사용" 끄기</b></span></li>
+      <li><span class="mk"></span><span>민감한 건 <b>임시 채팅</b>으로 (기록 · 메모리에 안 남음)</span></li>
+      <li><span class="mk"></span><span>고객 이름 · 주민번호 · 연락처 · 차량번호는 <b>넣지 않거나 가리기</b></span></li>
+      <li><span class="mk"></span><span>AI 결과를 <b>그대로 고객에게 보내지 않기</b></span></li>
+    </ul>
+    <div class="callout warn"><span class="bang">!</span><p><b>회사 보안 정책</b>이 언제나 먼저입니다.</p></div>
+  </div>
+</section>
+
+<section class="slide center title-slide bp" data-accent="indigo" data-title="마무리 · Why not? Do Everything!"
+  data-notes="[마무리] 표지의 질문으로 돌아와 닫는다. 마무리 멘트는 강사가 직접.">
+  <div class="slide-inner">
+    <h1 class="headline why">Why <span style="color:var(--coral)">not?</span></h1>
+    <p class="headline do-all">Do <span class="accent">Everything!</span></p>
   </div>
 </section>
 
