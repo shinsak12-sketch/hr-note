@@ -1354,6 +1354,53 @@ body[data-tool="spot"] .spot{display:block}
 .sbook .it2 small{font-size:.75em;font-weight:600;color:#9d8d6f}
 .sbook .it2.qu{color:#d4a94f;border-color:#8a6d3b}.sbook .it2.qr{color:#ffff6e;border-color:#6a6a2a}
 .sbook .it2.qs{color:#4be24b;border-color:#2e6a2e}.sbook .it2.qm{color:#ffbf80;border-color:#8e3b20}.sbook .it2.qd{color:#9cc6ff;border-color:#2e4f7a}
+/* ===== 챕터 3 · 같이 만들기 ===== */
+.s3map{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,18px);margin-top:clamp(18px,3vh,30px)}
+.s3map .s3{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(16px,2vw,26px);box-shadow:var(--shadow)}
+.s3map .s3.hot{border-color:var(--accent,var(--teal));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,var(--teal)) 30%,transparent),var(--shadow)}
+.s3map .n,.s3done i{font-family:var(--font-mono);font-weight:900;font-size:clamp(13px,1.4vw,17px);color:var(--accent,var(--teal))}
+.s3map b{display:block;font-size:clamp(20px,2.4vw,32px);font-weight:900;margin:.2em 0}
+.s3map p{margin:0;font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft);font-weight:600}
+.s3need{display:flex;flex-wrap:wrap;gap:.5em;align-items:center;margin-top:clamp(16px,2.6vh,26px);font-size:clamp(15px,1.7vw,21px)}
+.s3need b{font-weight:900;margin-right:.3em}
+.s3need span{background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:.25em .9em;font-weight:700;color:var(--ink-soft)}
+.s3row{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(16px,2.4vw,34px);margin-top:clamp(12px,2vh,20px);align-items:start}
+.s3row .prompt.s3cp{margin-top:0;font-size:clamp(15px,1.75vw,22px);line-height:1.6}
+.s3side{display:grid;gap:clamp(10px,1.6vh,16px)}
+.s3do{margin:0;padding-left:1.3em;display:grid;gap:.5em;font-size:clamp(17px,2vw,25px);font-weight:600;color:var(--ink)}
+.s3do b{color:var(--accent,var(--teal))}
+.s3chk{border-left:5px solid var(--accent,var(--teal));background:color-mix(in srgb,var(--teal) 10%,var(--surface));border-radius:0 12px 12px 0;padding:.7em 1em;font-size:clamp(15px,1.75vw,21px);font-weight:700;color:var(--ink)}
+.s3chk b{color:var(--accent,var(--teal))}
+.s3q{display:grid;gap:.4em;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(12px,1.6vw,20px);box-shadow:var(--shadow)}
+.s3q span{font-size:clamp(13px,1.4vw,17px);font-weight:800;color:var(--ink-faint)}
+.s3q b{font-size:clamp(15px,1.7vw,21px);font-weight:700;color:var(--ink);padding-left:.8em;border-left:3px solid var(--indigo)}
+.s3tip{margin:0;font-size:clamp(15px,1.75vw,21px);color:var(--ink-soft);font-weight:600;line-height:1.5}
+.s3tip b{color:var(--ink)}
+.s3ok,.s3no{display:flex;flex-wrap:wrap;gap:.4em;align-items:center;font-size:clamp(14px,1.6vw,20px)}
+.s3ok b,.s3no b{width:100%;font-weight:900}
+.s3ok b{color:var(--teal)}.s3no b{color:var(--coral)}
+.s3ok span{background:color-mix(in srgb,var(--teal) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--teal) 40%,var(--line));border-radius:10px;padding:.3em .7em;font-weight:700}
+.s3no span{background:color-mix(in srgb,var(--coral) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--coral) 40%,var(--line));border-radius:10px;padding:.3em .7em;font-weight:700}
+.mock{background:var(--surface);border:1px solid var(--line-strong);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);font-size:clamp(15px,1.75vw,21px)}
+.mock .mk-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--bg-2);border-bottom:1px solid var(--line);font-weight:800;color:var(--ink-soft);font-size:.8em}
+.mock .mk-bar i{width:10px;height:10px;border-radius:50%;background:#FF5F57}.mock .mk-bar i:nth-child(2){background:#FEBC2E}.mock .mk-bar i:nth-child(3){background:#28C840;margin-right:8px}
+.mock .mk-f{padding:.7em 1.1em 0}
+.mock .mk-f label{display:block;font-size:.75em;font-weight:800;color:var(--ink-faint);margin-bottom:.25em}
+.mock .in{border:1px solid var(--line-strong);border-radius:10px;padding:.55em .8em;font-weight:600;color:var(--ink)}
+.mock .in.hi{border:2px solid var(--accent,var(--teal));font-weight:900}
+.mock .mk-btn{margin:1em 1.1em 1.1em auto;width:fit-content;background:var(--accent,var(--teal));color:#fff;font-weight:900;border-radius:10px;padding:.5em 1.4em}
+.mock .mk-m{display:flex;justify-content:space-between;padding:.75em 1.1em;border-bottom:1px solid var(--line);font-weight:700}
+.mock .mk-m small{color:var(--ink-faint);margin-left:.4em}
+.mock .mk-m em{font-style:normal;color:var(--ink-faint);font-size:.85em}
+.mock .mk-m.on{background:color-mix(in srgb,var(--teal) 10%,var(--surface))}
+.mock .mk-files{display:grid;gap:.4em;padding:.8em 1.1em 1.1em}
+.mock .mk-files span{font-weight:600;color:var(--ink-soft)}
+.s3done{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,18px);margin-top:clamp(18px,3vh,30px)}
+.s3done div{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(16px,2vw,26px);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.3em}
+.s3done i{font-style:normal;width:1.8em;height:1.8em;border-radius:50%;display:grid;place-items:center;background:var(--teal);color:#fff;font-size:clamp(16px,1.8vw,22px)}
+.s3done b{font-size:clamp(20px,2.4vw,32px);font-weight:900}
+.s3done span{font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft);font-weight:600}
+@media (max-width:900px){.s3map,.s3done{grid-template-columns:1fr 1fr}.s3row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -2421,6 +2468,162 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
         <div class="party"><span>공개하고</span><i>→</i><span>서로 고쳐 주고</span><i>→</i><span>같이 키운다</span></div>
         <p>그래야 속도를 따라잡고, <b>새로운 아이디어</b>가 나옵니다.</p></div>
     </div>
+  </div>
+</section>
+
+<!-- ===== 챕터 3 · 같이 만들기 ===== -->
+<section class="slide center divider" data-accent="teal" data-title="CHAPTER 3 · 같이 만들기"
+  data-notes="[챕터 3 · 실습] 지금까지 배운 프로젝트 · 지침 · 자료 · 스킬을 다 같이 하나로 만들어 본다. 공통 주제는 분쟁심의 답변서. 다 같은 걸 만들어야 빨리 끝나고, 막힌 사람을 옆 사람이 도와줄 수 있다.">
+  <div class="slide-inner">
+    <div class="idx">03</div>
+    <h2 class="headline">같이 만들기: <span class="accent">분쟁심의답변서생성기</span></h2>
+    <p class="lead wide">4단계로 내 작업장을 완성합니다</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="오늘 만들 것 · 4단계"
+  data-notes="[미리 보기 · 2분] 완성하면: 프로젝트 하나 안에 지침 · 자료 · 스킬이 들어 있고, 새 채팅에서 '분심 답변서 만들어줘' 한마디면 입력 안내부터 나온다.
+준비물: 로그인한 AI 계정, 자료 파일 1~2개(개인정보 없는 것). 화면 메뉴 이름은 서비스와 업데이트에 따라 조금씩 다르니 강의 직전 실제 화면 확인.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 오늘 만들 것</span>
+    <h2 class="subhead">4단계면 <span class="accent">내 작업장</span>이 완성됩니다</h2>
+    <div class="s3map">
+      <div class="s3"><span class="n">STEP 1</span><b>프로젝트 만들기</b><p>이름: 분쟁심의답변서생성기</p></div>
+      <div class="s3"><span class="n">STEP 2</span><b>자기소개 · 지침</b><p>AI가 나를 인터뷰해서 지침을 씀</p></div>
+      <div class="s3"><span class="n">STEP 3</span><b>자료 저장</b><p>기준 · 양식 · 잘 쓴 예시</p></div>
+      <div class="s3 hot"><span class="n">STEP 4</span><b>스킬 만들기</b><p>"분심 답변서 만들어줘" 한마디로</p></div>
+    </div>
+    <div class="s3need"><b>준비물</b><span>로그인한 AI 계정</span><span>자료 파일 1~2개 (개인정보 없는 것)</span><span>옆 사람</span></div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="STEP 1 · 프로젝트 만들기"
+  data-notes="[STEP 1 · 프로젝트] 왼쪽 메뉴에서 프로젝트 → 새 프로젝트. 이름은 모두 같게 '분쟁심의답변서생성기'. 설명은 한 줄. 다 만들었으면 손 들기.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> STEP 1 / 4</span>
+    <h2 class="subhead"><span class="accent">프로젝트</span>를 만듭니다</h2>
+    <div class="s3row">
+      <div class="mock">
+        <div class="mk-bar"><i></i><i></i><i></i><span>새 프로젝트</span></div>
+        <div class="mk-f"><label>이름</label><div class="in hi">분쟁심의답변서생성기</div></div>
+        <div class="mk-f"><label>설명</label><div class="in">구상금분쟁심의위원회 제출용 답변서 초안 만들기</div></div>
+        <div class="mk-btn">만들기</div>
+      </div>
+      <div class="s3side">
+        <ol class="s3do"><li>왼쪽 메뉴에서 <b>프로젝트</b></li><li><b>새 프로젝트</b> 누르기</li><li>이름 · 설명 입력하고 <b>만들기</b></li></ol>
+        <div class="s3chk">확인 · 프로젝트 화면에 <b>지침 · 파일 칸</b>이 보이나요?</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide compact" data-accent="teal" data-title="STEP 2 · 자기소개 · 지침"
+  data-notes="[STEP 2 · 지침 · 10분] 프로젝트 안에서 채팅창을 열고 아래 문장을 그대로 붙여 넣는다. AI가 한 번에 하나씩 질문하면 답만 한다(챕터 1 역질문). 마지막에 AI가 써 준 지침을 복사해서 프로젝트의 지침 칸에 붙여 넣는다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> STEP 2 / 4</span>
+    <h2 class="subhead">채팅창을 열고, <span class="accent">AI가 나를 인터뷰</span>하게 합니다</h2>
+    <div class="s3row">
+      <div class="prompt s3cp" id="cp3-intro"><button class="copy" data-copy="cp3-intro">복사</button>나는 DB손해사정 대물 보상 담당이야.
+이 프로젝트는 구상금분쟁심의위원회(분심)에 낼 답변서를 만드는 곳이야.
+나를 인터뷰해서 이 프로젝트의 지침을 써 줘.
+<span class="blank">한 번에 하나씩 물어보고, 충분하면 멈추고 지침을 써 줘.</span></div>
+      <div class="s3side">
+        <div class="s3q"><span>AI가 물어볼 것 (예)</span><b>청구 · 피청구 중 어느 쪽 답변이 많나요?</b><b>문서 말투는 어떻게 할까요?</b><b>꼭 들어가야 할 구성이 있나요?</b><b>절대 하면 안 되는 게 있나요?</b></div>
+        <div class="s3chk">마지막에 나온 지침을 복사 → <b>프로젝트 지침 칸</b>에 붙여 넣기</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="STEP 2 · 지침 완성 예시"
+  data-notes="[STEP 2 · 지침 예시] 인터뷰가 끝나면 이런 지침이 나온다. 핵심은 '없는 사실 쓰지 않기', '상대 주장은 내가 쓴 그대로만', '도표 번호 추측 금지'. 회사의 분심 스킬에도 그대로 들어 있는 규칙들이다. 붙여 넣은 뒤 새 채팅에서 '이 프로젝트에서 너는 뭘 하는 역할이야?'라고 물어 확인.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> STEP 2 / 4 · 지침 완성 예시</span>
+    <h2 class="subhead">이런 지침이 <span class="accent">프로젝트에 붙습니다</span></h2>
+    <div class="s3row">
+      <div class="prompt s3cp" id="cp3-rule"><button class="copy" data-copy="cp3-rule">복사</button>이 프로젝트는 분쟁심의 답변서 초안을 만드는 곳이다.
+- 문서 본문은 음슴체(~함, ~임). 결론 문장만 "~요청드립니다."
+- 사실은 내가 준 메모 · 사진에 있는 것만 쓴다. 없는 속도 · 거리 · 신호는 지어내지 않는다.
+- <span class="blank">상대측 주장은 내가 쓴 그대로만 옮긴다.</span> 뜻을 바꾸거나 더하지 않는다.
+- 우리측 주장은 설득력 있게 다듬되, 감정적 표현은 쓰지 않는다.
+- 법 조문은 번호 · 원문이 확실한 것만. 아니면 "(요지)"로 적는다.
+- 과실비율 도표 번호는 내가 준 것만 쓴다. 추측하지 않는다.
+- 사고 일시 · 장소 · 차량번호 · 이름은 넣지 않는다.</div>
+      <div class="s3side">
+        <div class="s3chk">확인 · 새 채팅에서 <b>"이 프로젝트에서 너는 뭘 하는 역할이야?"</b></div>
+        <p class="s3tip">이 규칙들이 <b>패시브 효과</b>입니다. 이 프로젝트의 모든 대화에 늘 적용돼요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="STEP 3 · 자료 저장"
+  data-notes="[STEP 3 · 자료 · 5분] 프로젝트의 파일(컨텍스트) 칸에 올린다. 넣을 것: 과실비율 인정기준(손해보험협회 공개 자료), 개인정보를 가린 잘 쓴 답변서 예시, 자주 쓰는 도로교통법 조문 정리. 넣으면 안 되는 것: 고객 개인정보가 담긴 원본. 올린 뒤 지침에 '과실 도표 얘기가 나오면 과실비율 인정기준 파일 기준' 한 줄 추가. ※ 파일 이름은 예시.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> STEP 3 / 4</span>
+    <h2 class="subhead">필요한 <span class="accent">자료</span>를 프로젝트에 넣습니다</h2>
+    <div class="s3row">
+      <div class="mock">
+        <div class="mk-bar"><i></i><i></i><i></i><span>분쟁심의답변서생성기</span></div>
+        <div class="mk-m"><span>지침</span><em>✓ 설정됨</em></div>
+        <div class="mk-m on"><span>파일 <small>3개</small></span><em>추가</em></div>
+        <div class="mk-files"><span>📄 과실비율인정기준.pdf</span><span>📄 답변서예시_가림.docx</span><span>📄 자주쓰는조문.txt</span></div>
+      </div>
+      <div class="s3side">
+        <div class="s3ok"><b>넣을 것</b><span>과실비율 인정기준</span><span>잘 쓴 답변서 예시 (개인정보 가린 것)</span><span>자주 쓰는 법 조문 정리</span></div>
+        <div class="s3no"><b>넣으면 안 되는 것</b><span>고객 개인정보가 담긴 원본</span></div>
+        <div class="s3chk">확인 · <b>"올린 파일 목록이랑 각각 언제 쓰는지 정리해 줘"</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide compact" data-accent="teal" data-title="STEP 4 · 스킬 만들기"
+  data-notes="[STEP 4 · 스킬 · 10분] 스킬도 대화로 만든다. 아래 문장을 붙여 넣으면 AI가 하나씩 묻는다. 넣을 자료(사진 종류 · 메모 틀), 문서 구성 순서, 결과 형식을 답하면 스킬 파일을 만들어 준다. 회사의 '디비-분심-생성' 스킬도 이렇게 시작해서 키운 것.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> STEP 4 / 4</span>
+    <h2 class="subhead">스킬도 <span class="accent">대화로</span> 만듭니다</h2>
+    <div class="s3row">
+      <div class="prompt s3cp" id="cp3-skill"><button class="copy" data-copy="cp3-skill">복사</button>분쟁심의 답변서 만드는 걸 스킬로 만들고 싶어.
+내가 "분심 답변서 만들어줘"라고 하면,
+먼저 필요한 자료(사진 · 메모)를 안내하고
+받은 자료로 답변서 초안을 만들어 주는 스킬이야.
+<span class="blank">필요한 건 한 번에 하나씩 물어봐.</span></div>
+      <div class="s3side">
+        <div class="s3q"><span>AI가 물어볼 것 (예)</span><b>어떤 사진을 받나요? (약도 · 현장 · 파손 · 블랙박스)</b><b>메모는 어떤 틀로 받을까요? (구분 · 과실 · 사고 · 우리 주장 · 상대 주장)</b><b>문서 순서는요? (사고 요약 → 사진 → 쟁점 대비표 → 법적 근거 → 결론)</b><b>결과는 어떤 파일로 받을까요?</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="STEP 4 · 스킬 등록 · 시험"
+  data-notes="[STEP 4 · 등록 · 5분] 받은 스킬 파일을 스킬 메뉴에 올리고 켠다(Claude: 설정에서 '코드 실행 및 파일 생성'을 켜야 스킬을 쓸 수 있음). 새 채팅에서 '분심 답변서 만들어줘' → 사진 · 메모 입력 안내가 먼저 나오면 성공. 틀린 곳은 '방금 고친 걸 스킬에 반영해 줘'로 바로 레벨업.
+회사에는 이걸 계속 키운 완성판 '디비-분심-생성'이 있다: 사진과 메모만 넣으면 약도 · 사진 · 쟁점 대비표 · 법적 근거 · 결론까지 갖춘 PDF가 나온다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> STEP 4 / 4 · 등록하고 시험하기</span>
+    <h2 class="subhead">올리고, 켜고, <span class="accent">불러 봅니다</span></h2>
+    <div class="flow" style="--n:3">
+      <div class="step"><span class="n">01</span><h3>스킬 파일 올리기</h3><p>받은 파일을 <b>스킬 메뉴</b>에 올리고 켜기</p></div>
+      <div class="step"><span class="n">02</span><h3>새 채팅에서 부르기</h3><p>"분심 답변서 만들어줘"</p></div>
+      <div class="step hot"><span class="n">03</span><h3>입력 안내가 뜨면 성공</h3><p>사진 · 메모 틀이 먼저 나오면 완성. 틀린 곳은 <b>"스킬에 반영해 줘"</b></p></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>이걸 계속 키우면, 사진과 메모만 넣어도 <b>약도 · 쟁점 대비표 · 법적 근거 · 결론</b>까지 갖춘 답변서가 나옵니다.</p></div>
+    <p class="src">Claude 스킬: 설정에서 '코드 실행 및 파일 생성' 켜기 필요(Anthropic 도움말) · 메뉴 이름은 서비스 · 업데이트에 따라 다를 수 있음</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="완성 체크"
+  data-notes="[마무리 · 1분] 네 칸 다 체크됐으면 오늘 작업장 완성. 이제부터 쓰면서 틀린 곳을 스킬에 한 줄씩 반영하면 된다(레벨업).">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 완성 체크</span>
+    <h2 class="subhead">네 칸 다 채웠으면, <span class="accent">작업장 완성</span>입니다</h2>
+    <div class="s3done">
+      <div><i>✓</i><b>프로젝트</b><span>분쟁심의답변서생성기</span></div>
+      <div><i>✓</i><b>지침</b><span>AI 인터뷰로 작성 · 붙여 넣기</span></div>
+      <div><i>✓</i><b>자료</b><span>기준 · 예시 · 조문</span></div>
+      <div><i>✓</i><b>스킬</b><span>"분심 답변서 만들어줘"</span></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>오늘부터는 <b>쓰면서 레벨업</b>. 틀린 곳이 나오면 스킬에 한 줄씩 반영하면 됩니다.</p></div>
   </div>
 </section>
 
