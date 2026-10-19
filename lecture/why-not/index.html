@@ -1336,6 +1336,11 @@ body[data-tool="spot"] .spot{display:block}
 .dlv .party i{font-style:normal;color:#a8895a;font-weight:900}
 .dlv .gp.hot p+p{margin-top:.4em}
 .slide.game .part-tag{background:#3a2412;color:#d4a94f;border:1px solid #c9a35a}
+.dtree .treeimg{display:none;padding:clamp(4px,.6vw,8px);background:#000}
+.dtree.has-real{grid-template-columns:auto minmax(280px,1fr)}
+.dtree.has-real .tree{display:none}
+.dtree.has-real .treeimg{display:block;width:fit-content;max-width:100%}
+.dtree .treeimg img{display:block;width:auto;max-width:100%;height:auto;max-height:min(64vh,680px);object-fit:contain}
 </style>
 </head>
 <body>
@@ -2161,6 +2166,7 @@ AI에게 다듬게 하기: Gemini에서 젬(Gem)을 만들 때 지침 칸 아래
     <span class="eyebrow"><span class="dot"></span> 디아블로 II · 소서리스 스킬 트리</span>
     <h2 class="subhead">스킬에는 <span class="accent">두 종류</span>가 있습니다</h2>
     <div class="dtree">
+      <div class="gp treeimg"><img src="img/diablo2.jpg" alt="디아블로 스킬 트리" onload="var d=this.closest('.dtree');d.classList.add('has-real');var c=d.parentNode.querySelector('.src');if(c)c.textContent='디아블로 II: 레저렉션(블리자드) 스킬 트리 화면'" onerror="this.parentNode.remove()"></div>
       <div class="gp tree">
         <div class="tabs"><b class="on">화염</b><b>번개</b><b>냉기</b></div>
         <div class="nodes">
