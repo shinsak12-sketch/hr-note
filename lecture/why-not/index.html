@@ -908,6 +908,35 @@ body[data-tool="spot"] .spot{display:block}
 .verdict2{margin-top:clamp(20px,3.2vh,34px);font-size:clamp(19px,2.3vw,30px);font-weight:600;line-height:1.5;color:var(--ink-soft)}
 .verdict2 b{color:var(--ink);font-weight:900}
 @media (max-width:900px){.let,.qa4,.strip{grid-template-columns:1fr}}
+/* AI 발전 속도 ②③ */
+.steps5{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(10px,1.2vw,18px);margin-top:clamp(10px,1.6vh,18px);align-items:start}
+.st5{min-height:clamp(190px,27vh,250px)}
+.st5{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(14px,1.5vw,22px);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.45em}
+.steps5 .st5:nth-child(1){margin-top:clamp(64px,10vh,120px)}
+.steps5 .st5:nth-child(2){margin-top:clamp(48px,7.5vh,90px)}
+.steps5 .st5:nth-child(3){margin-top:clamp(32px,5vh,60px)}
+.steps5 .st5:nth-child(4){margin-top:clamp(16px,2.5vh,30px)}
+.st5 .yr{font-family:var(--font-mono);font-weight:800;font-size:clamp(12px,1.3vw,16px);color:var(--accent,var(--indigo))}
+.st5 b{font-size:clamp(18px,2vw,26px);font-weight:900;letter-spacing:-.02em}
+.st5 p{margin:0;font-size:clamp(13px,1.45vw,18px);line-height:1.5;color:var(--ink-soft)}
+.st5 p em{font-style:normal;font-weight:900;color:var(--ink)}
+.st5 .sr{margin-top:auto;font-size:clamp(11px,1.15vw,14px);color:var(--ink-faint);font-weight:600}
+.st5.hot{border-color:var(--accent,var(--coral));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,var(--coral)) 30%,transparent),var(--shadow)}
+.quote-line{margin-top:clamp(18px,3vh,30px);border-left:4px solid var(--accent,var(--indigo));padding:.2em 0 .2em 1em}
+.quote-line p{margin:0;font-size:clamp(20px,2.4vw,32px);font-weight:800;letter-spacing:-.02em}
+.quote-line span{display:block;margin-top:.35em;font-size:clamp(13px,1.4vw,17px);color:var(--ink-faint);font-weight:600}
+.cheap{display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(16px,2.2vw,32px);margin-top:clamp(14px,2.4vh,26px)}
+.cheap .nums{display:grid;gap:clamp(10px,1.4vh,16px)}
+.nm{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(12px,1.5vw,20px) clamp(16px,1.8vw,24px);box-shadow:var(--shadow);display:grid;grid-template-columns:auto 1fr;column-gap:1em;align-items:center}
+.nm b{grid-row:span 2;font-size:clamp(24px,3vw,40px);font-weight:900;letter-spacing:-.03em;color:var(--accent,var(--coral));white-space:nowrap}
+.nm span{font-size:clamp(14px,1.6vw,20px);font-weight:700}
+.nm i{font-style:normal;font-size:clamp(11px,1.2vw,14px);color:var(--ink-faint);font-weight:600}
+.alt{background:var(--code-bg);color:#fff;border-radius:20px;padding:clamp(18px,2.2vw,30px);display:flex;flex-direction:column;gap:.4em;box-shadow:var(--shadow)}
+.alt .k{font-size:clamp(13px,1.4vw,17px);font-weight:800;color:#FFB4AC;letter-spacing:.04em}
+.alt p{margin:.4em 0 0;font-size:clamp(18px,2.15vw,28px);font-weight:700;line-height:1.4;letter-spacing:-.01em}
+.alt p b{color:#FFD43B}
+.alt .w{font-size:clamp(12px,1.25vw,15px);color:#A9A6C4;font-weight:600}
+@media (max-width:900px){.steps5,.cheap{grid-template-columns:1fr}.steps5 .st5{margin-top:0!important}}
 </style>
 </head>
 <body>
@@ -1188,7 +1217,7 @@ body[data-tool="spot"] .spot{display:block}
 
 <!-- ===== 6. AI 발전 속도 ===== -->
 <section class="slide wide" data-accent="indigo" data-title="AI 모델 출시 연표"
-  data-notes="[0:24 · 3분 · 연표] 보여 줄 것: AI 모델이 빠르게 진화하면서 계속 늘어나고 있다. 점 하나 = 회사의 대표 모델 하나(공식 발표 기준, 대표 모델만 골라 표시). 아래 막대는 이 표에 찍힌 연도별 수(2026년은 10월까지).
+  data-notes="[0:24 · 3분 · 연표 · AI 발전 속도 ①] 보여 줄 것: AI 모델이 빠르게 진화하면서 계속 늘어나고 있다. 점 하나 = 회사의 대표 모델 하나(공식 발표 기준, 대표 모델만 골라 표시). 아래 막대는 이 표에 찍힌 연도별 수(2026년은 10월까지).
 멘트: 'ChatGPT 전 5년 동안 점이 5개였습니다. 이후 4년 사이 46개. 이름 뒤 숫자도 GPT-1에서 GPT-6까지 계속 올라갑니다. 오늘 배우는 메뉴도 내년이면 또 바뀝니다. 그래서 버튼보다 시키는 법을 익히는 게 오래갑니다.'
 날짜(공식 발표 기준): OpenAI GPT-1 2018.6.11 · GPT-2 2019.2.14 · GPT-3 2020.5.28 · ChatGPT 2022.11.30 · GPT-4 2023.3.14 · GPT-4o 2024.5.13 · o1 2024.9.12 · GPT-4.5 2025.2.27 · GPT-5 2025.8.7 · GPT-5.2 2025.12.11 · GPT-5.5 2026.4 · GPT-5.6 2026.7.9 · GPT-6 Astra 2026.9.3
 Google BERT 2018.10 · PaLM 2022.4 · Bard 2023.3.21 · Gemini 1.0 2023.12.6 · Gemini 1.5 2024.2.15 · Gemini 2.0 2024.12.11 · Gemini 2.5 Pro 2025.3.25 · Gemini 3 Pro 2025.11.18 · Gemini 3.1 Pro 2026.2.19 · Gemini 3.5 Flash 2026.5.19 · Gemini 3.6 Flash 2026.7 · Gemini 3.7 Flash 2026.8
@@ -1196,7 +1225,7 @@ Anthropic Claude 2023.3.14 · Claude 2 2023.7.11 · Claude 3 2024.3.4 · Claude 
 Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024.7.23 · Llama 4 2025.4.5
 기타 Mistral 7B(Mistral AI) 2023.9.27 · Grok(xAI) 2023.11.4 · DeepSeek-V3 2024.12.26 · DeepSeek-R1 2025.1.20 · Grok 3 2025.2.17 · Grok 4 2025.7.9 · Kimi K2(Moonshot AI) 2025.7.11">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> AI 모델 출시 연표</span>
+    <span class="eyebrow"><span class="dot"></span> AI 발전 속도 ① · 모델 출시 연표</span>
     <h2 class="subhead">AI 모델이 <span class="accent">빠르게 진화하며, 늘어나고</span> 있습니다</h2>
     <p class="desc">점 하나가 회사의 대표 모델 하나입니다. ChatGPT 전 약 5년 동안 <b>5개</b>였던 점이, 이후 4년 사이 <b>46개</b>로 늘었습니다. 이름 뒤 숫자도 GPT-1에서 GPT-6까지 쉬지 않고 올라갑니다. 지금 이 순간에도 더 똑똑한 AI가 나오고 있습니다.</p>
     <div class="mtl" id="tl" role="img" aria-label="2018년부터 2026년까지 회사별 대표 AI 모델 출시 시점 점도표"></div>
@@ -1204,21 +1233,53 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
   </div>
 </section>
 
-<section class="slide wide" data-accent="coral" data-title="쓰지 않으면 도태된다"
-  data-notes="[0:27 · 3분] 속도 이야기를 숫자 세 개로.
-① METR(2025.3): AI가 50% 확률로 혼자 끝낼 수 있는 과제의 길이(사람 전문가 기준)가 지난 6년간 약 7개월마다 두 배. 소프트웨어 과제 기준. 지금 안 되는 일이 1년 뒤엔 될 수 있다.
-② 맥킨지 'The state of AI in 2025'(2025.11): 응답 기업 88%가 최소 한 부서에서 AI를 정기적으로 사용(1년 전 78%).
-③ 마이크로소프트 2026 Work Trend Index(2026.5): AI 사용 직장인 2만 명 조사. 앞서가는 16%는 '일 시작 전 AI 몫과 내 몫을 먼저 나눈다' 53%(그 외 33%), '팀에서 AI 팁 · 실수를 공유한다' 61%(그 외 36%).
-메시지: AI는 빨라지고, 회사들은 이미 쓰고, 쓰는 사람끼리도 격차가 벌어진다. 쓰지 않으면 도태될 수밖에 없다. → 다음은 본론(시키는 법).">
+<section class="slide wide" data-accent="indigo" data-title="AI가 사람을 넘는 속도"
+  data-notes="[0:27 · 3분] 연표가 '많아지고 있다'였다면 이 장은 '사람을 넘고 있다'. 왼쪽부터 순서대로.
+① 2016.3 알파고 vs 이세돌 4:1. 2017 알파고 제로는 사람 기보 없이 독학해 이세돌을 이긴 판(알파고 리)을 100:0으로 이김(Silver 외, Nature 2017).
+② 2026.7 AtCoder 월드투어 파이널(도쿄, 세계 최상위 코딩 대회): OpenAI가 시범 참가해 알고리즘 부문 5문제를 모두 풀고 사람 참가자 전원을 앞섰다. 1년 전(2025.7) 같은 대회 휴리스틱 부문에선 사람(Psyho)에게 근소하게 져 2위였다.
+③ 2026.8.1 OpenAI 'Ten advances in mathematics and theoretical computer science': 차세대 모델(Astra)이 10년 넘게 진전이 없던 수학 · 이론 컴퓨터과학 문제 10개에서 새 결과. 증명은 Lean(컴퓨터 증명 검증 도구)으로 검증, 문제당 토큰 비용 2,000달러 미만(OpenAI 발표).
+④ ARC-AGI-3(2026.3 공개, 사람에게 쉽고 AI에게 어렵게 만든 시험): 공개 당시 사람 100%, 최신 AI 1% 미만 → 2026.9 GPT-6 Astra 62.7%(ARC 표준 평가 기준. OpenAI 자체 설정으로는 99.9%). ARC Prize는 이것이 AGI를 뜻하지는 않는다고 밝힘. ※ 2차 보도 기준.
+⑤ 인류의 마지막 시험(Humanity's Last Exam, CAIS · Scale AI): 전문가 약 1,000명이 낸 2,500문항. 2025.1 공개 당시 최고 AI도 10% 미만 → 2026.9 Scale AI 리더보드 1위 GPT-6 Astra 60.6%.
+인용: 장강명(소설가), 『먼저 온 미래』(동아시아, 2025) — 알파고 이후 바둑계를 취재한 책. '바둑계에서 먼저 벌어진 일이 이제 다른 업계에서 벌어진다.'">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> AI 발전 속도</span>
-    <h2 class="subhead">AI를 쓰지 않으면, <span class="accent">도태될 수밖에 없습니다</span></h2>
-    <div class="grid cols-3 nums3">
-      <div class="card"><span class="k">AI가 혼자 해내는 일의 길이</span><span class="big">7개월마다 2배</span><p>지금 안 되는 일도 1년 뒤엔 됩니다.</p><span class="srcs">METR 2025.3</span></div>
-      <div class="card"><span class="k">AI를 정기적으로 쓰는 기업</span><span class="big">88%</span><p>1년 전 78%. 회사들은 이미 쓰고 있습니다.</p><span class="srcs">McKinsey 2025.11</span></div>
-      <div class="card hot"><span class="k">앞서가는 16%가 '일을 먼저 나누는' 비율</span><span class="big">53% vs 33%</span><p>쓰는 사람끼리도 격차가 벌어집니다.</p><span class="srcs">Microsoft Work Trend Index 2026.5</span></div>
+    <span class="eyebrow"><span class="dot"></span> AI 발전 속도 ②</span>
+    <h2 class="subhead">게임에서 시작된 일이, 이제 <span class="accent">일 전체</span>에서 벌어집니다</h2>
+    <div class="steps5">
+      <div class="st5"><span class="yr">2016 · 2017</span><b>바둑</b><p>알파고가 이세돌에 4:1. 1년 뒤 알파고 제로는 독학으로 <em>100:0</em></p><span class="sr">Nature(2017)</span></div>
+      <div class="st5"><span class="yr">2026.7</span><b>코딩 세계대회</b><p>세계 최상위 대회 결승에서 <em>5문제 전부</em> 풀고 사람 전원을 앞섬. 1년 전엔 근소하게 졌다</p><span class="sr">AtCoder 월드투어 파이널</span></div>
+      <div class="st5"><span class="yr">2026.8</span><b>수학 난제</b><p>10년 넘게 진전 없던 문제 <em>10개</em>에서 새 결과. 컴퓨터로 증명 검증</p><span class="sr">OpenAI 발표</span></div>
+      <div class="st5"><span class="yr">2026.3 → 9</span><b>사람만 풀던 시험</b><p>사람 100%, AI 1% 미만이던 시험을 반년 만에 <em>62.7%</em></p><span class="sr">ARC-AGI-3 · 표준 평가</span></div>
+      <div class="st5 hot"><span class="yr">2025.1 → 2026.9</span><b>인류의 마지막 시험</b><p>전문가 1,000명이 낸 2,500문항. 10% 미만 → <em>60.6%</em></p><span class="sr">CAIS · Scale AI</span></div>
     </div>
-    <p class="verdict2">AI는 계속 빨라지고, 쓰는 사람과 안 쓰는 사람의 차이는 <b>매달 벌어집니다.</b><br>그래서 지금부터는 <b>AI에게 일을 시키는 법</b>을 배웁니다.</p>
+    <div class="quote-line"><p>"나는 바둑계에 미래가 먼저 왔다고 생각한다."</p><span>장강명, 『먼저 온 미래』(2025) · 알파고 이후 바둑계 10년을 취재한 책</span></div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="더 똑똑하고, 더 싸진다 · 도태"
+  data-notes="[0:30 · 3분] 똑똑해지는 것만이 아니라 싸지고 있다.
+① 샘 올트먼 「Three Observations」(2025.2): 같은 수준의 AI를 쓰는 비용은 12개월마다 약 10분의 1로 떨어진다.
+② Payden & Rygel(자산운용사, 2026.5): GPT-4 수준 지능의 비용이 백만 토큰당 출시가 60달러 → 2026.1 0.05달러, 99.9% 이상 하락.
+③ 뉴욕타임스(2026.9): OpenRouter 미국 사용자 기준, 공개형(오픈) AI 모델이 AI 사용의 58% — 1년 전 10%. AT&T는 연초 대비 AI 비용을 최대 80% 줄였다고 밝힘.
+올트먼의 말: 「The Gentle Singularity」(2025.6) — 데이터센터 생산이 자동화되면 지능의 비용은 결국 전기 요금 수준에 가까워질 것. (ChatGPT 질문 1번 ≈ 0.34Wh, 고효율 전구를 몇 분 켜는 전기). G20 혁신장관회의(2026.9, 미국 채플힐): AI는 전기만큼 필수, 쓰는 건 '협상 불가(non-negotiable)'. 전기를 거부한 나라가 뒤처졌듯 AI도 그렇다.
+결론 멘트: '전등 켤 때 전기 요금 생각 안 하죠. AI도 그렇게 됩니다. 그때 AI를 쓸 줄 모르면? 전기를 안 쓰는 것과 같습니다.'">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> AI 발전 속도 ③</span>
+    <h2 class="subhead">더 똑똑해지고, <span class="accent">전기처럼 싸집니다</span></h2>
+    <div class="cheap">
+      <div class="nums">
+        <div class="nm"><b>12개월마다 1/10</b><span>같은 수준 AI를 쓰는 비용</span><i>샘 올트먼 「Three Observations」 2025.2</i></div>
+        <div class="nm"><b>$60 → $0.05</b><span>GPT-4 수준 AI, 백만 토큰당 가격 (99.9%↓)</span><i>Payden &amp; Rygel 2026.5</i></div>
+        <div class="nm"><b>10% → 58%</b><span>값싼 공개형 AI 모델이 차지한 사용 비중 (1년 사이)</span><i>뉴욕타임스 2026.9 · OpenRouter 미국 사용자</i></div>
+      </div>
+      <div class="alt">
+        <span class="k">샘 올트먼 · OpenAI CEO</span>
+        <p>"지능의 비용은 결국 <b>전기 요금 수준</b>에 가까워질 것"</p>
+        <span class="w">「The Gentle Singularity」 2025.6</span>
+        <p>"AI는 전기만큼 필수입니다. 쓰는 것은 <b>선택이 아닙니다</b>"</p>
+        <span class="w">G20 혁신장관회의 2026.9</span>
+      </div>
+    </div>
+    <p class="verdict2">전등 켤 때 전기 요금을 따지지 않듯, AI도 그렇게 됩니다. 그때 AI를 쓸 줄 모르면, <b>전기를 안 쓰는 것과 같습니다.</b><br>AI를 쓰지 않으면 <b>도태될 수밖에 없습니다.</b></p>
   </div>
 </section>
 
