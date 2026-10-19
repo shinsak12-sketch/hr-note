@@ -1310,6 +1310,29 @@ body[data-tool="spot"] .spot{display:block}
 .dlv p{margin:0;font-size:clamp(15px,1.75vw,22px);color:var(--ink-soft);font-weight:600;line-height:1.5}
 .dlv p b{color:#4be24b}
 @media (max-width:900px){.dtree,.dlearn,.dchar,.dproj,.dinst,.dskill,.ddef,.dlv,.dquest{grid-template-columns:1fr}.dchar .ar,.dquest .ar{display:none}.slots{grid-template-columns:1fr}}
+/* 챕터 2 · 캐릭터 선택 · 선입관 · 파티 */
+.dsel{position:relative;margin-top:clamp(12px,2vh,20px);height:clamp(300px,52vh,520px);overflow:hidden;background:radial-gradient(ellipse at 50% 110%,#5a2a0a 0%,#1a0d05 40%,#050302 75%)}
+.dsel .real{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:3}
+.dsel .sel-t{position:absolute;top:14px;left:0;right:0;text-align:center;font-family:Georgia,serif;letter-spacing:.3em;color:#a8895a;font-size:clamp(13px,1.5vw,18px)}
+.dsel .heroes{position:absolute;left:4%;right:4%;bottom:16%;display:flex;justify-content:space-between;align-items:flex-end}
+.dsel .hero{display:flex;flex-direction:column;align-items:center;gap:.4em;color:#2a1d10}
+.dsel .hero:nth-child(odd){transform:translateY(-6%)}
+.dsel .hero svg{width:clamp(44px,5vw,78px);height:auto;fill:#1a120a;color:#1a120a;filter:drop-shadow(0 0 6px rgba(255,140,40,.35))}
+.dsel .hero span{font-size:clamp(12px,1.35vw,17px);font-weight:800;color:#8a7c62}
+.dsel .hero.on svg{fill:#3a2412;color:#3a2412;filter:drop-shadow(0 0 14px rgba(255,190,90,.9))}
+.dsel .hero.on span{color:#d4a94f}
+.dsel .hero .glow{fill:#7ab0ff}
+.dsel .fire{position:absolute;left:50%;bottom:4%;width:clamp(60px,7vw,110px);height:clamp(40px,5vw,70px);transform:translateX(-50%);border-radius:50% 50% 40% 40%;
+  background:radial-gradient(ellipse at 50% 80%,#ffe08a,#ff8a1a 45%,rgba(200,40,0,0) 72%);filter:blur(2px);animation:flick 1.2s infinite alternate}
+@keyframes flick{from{transform:translateX(-50%) scale(1)}to{transform:translateX(-50%) scale(1.08,1.15)}}
+.dbias{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2.2vw,30px);margin-top:clamp(14px,2.4vh,24px)}
+.dbias ul{margin:.3em 0 0;padding-left:1.1em;display:grid;gap:.45em;font-size:clamp(16px,1.9vw,24px);color:var(--ink);font-weight:700}
+.dbias .gp.hot ul{color:#9cc6ff}
+.dlv .party{display:flex;flex-wrap:wrap;align-items:center;gap:.5em;margin:.7em 0;font-size:clamp(15px,1.75vw,22px)}
+.dlv .party span{background:#0f2a12;border:1px solid #2e7a2e;color:#4be24b;padding:.25em .7em;font-weight:800;border-radius:3px}
+.dlv .party i{font-style:normal;color:#a8895a;font-weight:900}
+.dlv .gp.hot p+p{margin-top:.4em}
+.slide.game .part-tag{background:#3a2412;color:#d4a94f;border:1px solid #c9a35a}
 </style>
 </head>
 <body>
@@ -2109,12 +2132,19 @@ AI에게 다듬게 하기: Gemini에서 젬(Gem)을 만들 때 지침 칸 아래
 </section>
 
 <!-- ===== 챕터 2 · 메모라이징과 스킬 (디아블로 디자인) ===== -->
-<section class="slide center divider game" data-accent="gold" data-title="CHAPTER 2 · 메모라이징과 스킬"
-  data-notes="[챕터 2 시작] 산출. 결과물을 좋게 만드는 두 가지. 여기서부터는 게임으로 설명합니다.">
+<section class="slide wide game" data-accent="gold" data-title="다들 게임 해 보셨죠?"
+  data-notes="[화두 · 1분] '다들 게임 해 보셨죠? 디아블로 아시는 분?' 캐릭터를 고르고, 사냥하고, 스킬을 찍으며 키우는 게임. 오늘 챕터 2는 이 게임으로 설명합니다.
+※ 화면은 디아블로 II 캐릭터 선택 화면을 설명용으로 다시 그린 그림. 실제 게임 캡처를 쓰려면 같은 폴더의 img/diablo.jpg 로 넣으면 그림 대신 그 사진이 뜬다.">
   <div class="slide-inner">
-    <div class="act">CHAPTER II</div>
-    <h2 class="headline"><span class="accent">메모라이징</span>과 <span class="accent">스킬</span></h2>
-    <p class="lead wide">결과물을 좋게 만드는 두 가지</p>
+    <span class="eyebrow"><span class="dot"></span> 잠깐, 게임 이야기</span>
+    <h2 class="subhead">다들 <span class="accent">게임</span> 해 보셨죠?</h2>
+    <div class="dsel gp">
+      <img class="real" src="img/diablo.jpg" alt="디아블로 게임 화면" onerror="this.remove()">
+      <div class="sel-t">SELECT HERO CLASS · 캐릭터 선택</div>
+      <div class="heroes"><div class="hero"><svg viewBox="0 0 60 120"><circle cx="30" cy="16" r="10"/><path d="M14 40q16-14 32 0l4 40H10z"/><path d="M16 80h11v38H16zM33 80h11v38H33z"/><path d="M52 20v70" stroke="currentColor" stroke-width="3" fill="none"/><path d="M52 20q10 35 0 70" stroke="currentColor" stroke-width="2" fill="none"/></svg><span>아마존</span></div><div class="hero"><svg viewBox="0 0 60 120"><circle cx="30" cy="16" r="10"/><path d="M14 40q16-14 32 0l4 40H10z"/><path d="M16 80h11v38H16zM33 80h11v38H33z"/><path d="M48 60l12-6M48 66l12-2" stroke="currentColor" stroke-width="3"/></svg><span>어쌔신</span></div><div class="hero"><svg viewBox="0 0 60 120"><circle cx="30" cy="16" r="10"/><path d="M14 40q16-14 32 0l4 40H10z"/><path d="M16 80h11v38H16zM33 80h11v38H33z"/><path d="M50 10v100" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="10" r="6"/></svg><span>네크로맨서</span></div><div class="hero"><svg viewBox="0 0 60 120"><circle cx="30" cy="16" r="10"/><path d="M14 40q16-14 32 0l4 40H10z"/><path d="M16 80h11v38H16zM33 80h11v38H33z"/><path d="M52 30l6 50" stroke="currentColor" stroke-width="5"/><path d="M4 30l-2 50" stroke="currentColor" stroke-width="5"/></svg><span>바바리안</span></div><div class="hero"><svg viewBox="0 0 60 120"><circle cx="30" cy="16" r="10"/><path d="M14 40q16-14 32 0l4 40H10z"/><path d="M16 80h11v38H16zM33 80h11v38H33z"/><path d="M2 46h14v26q-7 8-14 0z"/><path d="M50 30l6 44" stroke="currentColor" stroke-width="4"/></svg><span>팔라딘</span></div><div class="hero on"><svg viewBox="0 0 60 120"><circle cx="30" cy="16" r="10"/><path d="M14 40q16-14 32 0l4 40H10z"/><path d="M16 80h11v38H16zM33 80h11v38H33z"/><path d="M50 6v108" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="8" r="7" class="glow"/></svg><span>소서리스</span></div><div class="hero"><svg viewBox="0 0 60 120"><circle cx="30" cy="16" r="10"/><path d="M14 40q16-14 32 0l4 40H10z"/><path d="M16 80h11v38H16zM33 80h11v38H33z"/><path d="M50 14v100" stroke="currentColor" stroke-width="4"/><path d="M44 14q6-10 12 0" stroke="currentColor" stroke-width="3" fill="none"/></svg><span>드루이드</span></div></div>
+      <div class="fire"></div>
+    </div>
+    <p class="src">디아블로 II(블리자드) 캐릭터 선택 화면을 설명용으로 다시 그린 그림</p>
   </div>
 </section>
 
@@ -2148,21 +2178,12 @@ AI에게 다듬게 하기: Gemini에서 젬(Gem)을 만들 때 지침 칸 아래
   </div>
 </section>
 
-<section class="slide wide game" data-accent="gold" data-title="패시브 = 메모라이징 · 액티브 = 스킬"
-  data-notes="[대입 · 1분] AI에도 똑같이 두 종류가 있다. 패시브 = 메모라이징: 한 번 적어 두면 매 대화에 알아서 적용. 액티브 = 스킬: 필요할 때 꺼내 쓰면 정해진 결과물이 한 번에 나간다. 먼저 패시브(메모라이징)부터.">
+<section class="slide center divider game" data-accent="gold" data-title="CHAPTER 2 · 메모라이징과 스킬"
+  data-notes="[챕터 2 타이틀] 패시브 스킬과 액티브 스킬, 즉 메모라이징과 스킬을 한번 알아보겠습니다. 패시브는 한 번 적어 두면 늘 적용되는 메모라이징, 액티브는 필요할 때 꺼내 쓰는 스킬.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> AI에 대입하면</span>
-    <h2 class="subhead"><span class="accent">패시브</span>는 메모라이징, <span class="accent">액티브</span>는 스킬</h2>
-    <div class="d2">
-      <div class="sk">
-        <div class="ic passive"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="32" cy="32" r="9" fill="currentColor"/><path d="M32 4v8M32 52v8M4 32h8M52 32h8" stroke="currentColor" stroke-width="4"/></svg></div>
-        <div class="tt"><span class="ty">PASSIVE · 항상 켜져 있음</span><b>패시브 스킬</b><p class="mg">+ 한 번 적어 두면 매 대화에 자동 적용</p><p class="mg">+ 내가 누르지 않아도 늘 발동</p><p class="eq">= <em>메모라이징</em></p></div>
-      </div>
-      <div class="sk">
-        <div class="ic active"><svg viewBox="0 0 64 64"><path d="M36 4L14 36h14l-4 24 26-34H36z" fill="currentColor"/></svg></div>
-        <div class="tt"><span class="ty">ACTIVE · 누르면 발동</span><b>액티브 스킬</b><p class="mg">+ 필요할 때 꺼내 쓰면</p><p class="mg">+ 정해진 결과물이 한 번에</p><p class="eq">= <em>스킬</em></p></div>
-      </div>
-    </div>
+    <div class="act">CHAPTER II</div>
+    <h2 class="headline"><span class="accent">패시브</span>는 메모라이징,<br><span class="accent">액티브</span>는 스킬</h2>
+    <p class="lead wide">메모라이징과 스킬을 한번 알아보겠습니다</p>
   </div>
 </section>
 
@@ -2282,53 +2303,63 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
   </div>
 </section>
 
-<section class="slide wide game" data-accent="gold" data-title="액티브 응용 ① 공격 스킬"
-  data-notes="[공격 스킬 · 3분] 결과물을 만드는 스킬. 앞에서 본 점심 장표를 회사 PPT 양식 스킬(디비-양식-일반) 하나 켜고 같은 요청을 했을 때. 회사 양식 그대로, 기준 · 비교표 · 결론까지, 회사 문체(음슴체)로. 매번 같은 모양.
+<section class="slide wide game" data-accent="gold" data-title="스킬 사용 예시"
+  data-notes="[스킬 사용 예시 · 3분] 앞에서 본 점심 장표. 회사 PPT 양식 스킬(디비-양식-일반) 하나 켜고 같은 요청을 했을 때. 회사 양식 그대로, 기준 · 비교표 · 결론까지, 회사 문체(음슴체)로 나온다. 매번 같은 모양.
 ※ 이미지 글꼴은 작업 환경의 대체 글꼴. 회사 PC에서는 DB고딕. 메뉴 가격 · 시간은 예시.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 액티브 응용 ① · 공격 스킬</span>
-    <h2 class="subhead"><span class="accent">공격 스킬</span>: 결과물을 만든다</h2>
+    <span class="eyebrow"><span class="dot"></span> 액티브 · 스킬 사용 예시</span>
+    <h2 class="subhead">같은 요청, <span class="accent">스킬 하나</span> 켰을 뿐입니다</h2>
     <div class="b-atk">
       <figure class="gp"><figcaption>스킬 없이</figcaption><img src="img/lunch-before.png" alt="스킬 없이 만든 장표"></figure>
       <i class="ar">→</i>
-      <figure class="gp hot"><figcaption>⚔ 회사 양식 스킬 발동</figcaption><img src="img/lunch-after.png" alt="회사 양식 스킬로 만든 장표"></figure>
+      <figure class="gp hot"><figcaption>회사 양식 스킬 발동</figcaption><img src="img/lunch-after.png" alt="회사 양식 스킬로 만든 장표"></figure>
     </div>
-    <div class="dchips"><span>공격 스킬 예</span><b>민원 회신</b><b>사진대지</b><b>주간 보고</b><b>수리비 협의 문안</b><b>회사 양식 보고서</b></div>
   </div>
 </section>
 
-<section class="slide wide game" data-accent="gold" data-title="액티브 응용 ② 방어 스킬"
-  data-notes="[방어 스킬 · 2분] 결과물을 검사하는 스킬. 공격 스킬로 만들고 방어 스킬로 한 번 더. 요령: 바로 고치게 하지 말고 '표시만' 하게 한다. 바로 고치게 하면 맞던 곳까지 새로 망가뜨리는 일이 있다. 표는 예시.">
+<section class="slide wide game" data-accent="gold" data-title="스킬의 선입관을 지우자"
+  data-notes="[핵심 메시지 · 3분] 스킬 하면 다들 '양식 만들기'만 떠올린다. 아니다. 게임에도 공격 스킬만 있는 게 아니라 방어 스킬이 있듯, AI 스킬도 결과물을 만드는 것(공격)만이 아니라 결과물을 검사하고 지키는 것(방어)도 된다. 스킬은 어떤 양식에 한정되지 않는다. 반복되는 일이면 무엇이든 스킬이 된다.
+방어 스킬 요령: 바로 고치게 하지 말고 '표시만' 하게 한다.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 액티브 응용 ② · 방어 스킬</span>
-    <h2 class="subhead"><span class="accent">방어 스킬</span>: 결과물을 검사한다</h2>
-    <div class="ddef">
-      <div class="gp"><span class="gk">🛡 검수 스킬 발동 결과</span>
-        <table class="dchk"><thead><tr><th>해당 문장</th><th>문제</th><th>고칠 방향</th></tr></thead><tbody>
-          <tr><td>"10월 25일에 지급됩니다"</td><td>없던 날짜를 확정으로 씀</td><td>"~경 진행할 예정"</td></tr>
-          <tr><td>"당사의 처리 지연으로"</td><td>책임 인정으로 읽힘</td><td>불편에 대한 사과만</td></tr>
-          <tr><td>"**안내**"</td><td>문자에 기호가 보임</td><td>기호 없이 줄바꿈만</td></tr>
-        </tbody></table></div>
-      <div class="dshield"><b>문서 검수</b><b>누락 점검</b><b>출처 확인</b><b>개인정보 가림 확인</b></div>
+    <span class="eyebrow"><span class="dot"></span> 액티브 · 스킬 만들기 전에</span>
+    <h2 class="subhead">스킬을 만들 때도 <span class="accent">선입관</span>을 지워야 합니다</h2>
+    <div class="dbias">
+      <div class="gp"><span class="gk">⚔ 공격 스킬 · 결과물을 만든다</span>
+        <ul><li>민원 회신 문안</li><li>사진대지</li><li>주간 보고</li><li>수리비 협의 문안</li><li>회사 양식 보고서</li></ul></div>
+      <div class="gp hot"><span class="gk">🛡 방어 스킬 · 결과물을 지킨다</span>
+        <ul><li>문서 검수 · 책임 인정 · 확정 약속 표현 찾기</li><li>누락 서류 점검</li><li>숫자 · 출처 확인</li><li>개인정보 가림 확인</li><li>회사 규정 위반 체크</li></ul></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>공격 스킬로 만들고, <b>방어 스킬로 한 번 더.</b> 요령은 <b>고치지 말고 표시만</b>.</p></div>
+    <div class="callout tip"><span class="bang">!</span><p>스킬은 <b>양식 만들기에만 쓰는 게 아닙니다.</b> 반복되는 일이면 검사 · 점검 · 확인도 전부 스킬이 됩니다.</p></div>
   </div>
 </section>
 
 <section class="slide wide game" data-accent="gold" data-title="레벨업 · 파티"
-  data-notes="[레벨업 · 파티 · 2분] 레벨업: AI가 틀릴 때마다 스킬에 한 줄을 추가한다. 같은 실수를 두 번 하지 않는다(하네스 원칙). 버전 기록은 예시. 파티: 스킬은 파일 하나. 팀원에게 주면 팀 전체가 같은 품질로 일한다.">
+  data-notes="[레벨업 · 파티 · 3분] 레벨업: 스킬은 한 번 만들고 끝이 아니다. 쓰면서 부족한 부분을 계속 보완하며 쓰는 것. AI가 틀릴 때마다 한 줄씩 추가하면 같은 실수를 두 번 하지 않는다. 버전 기록은 예시.
+파티: 같은 품질을 맞추려고 나누는 게 아니다. AI는 몇 개월마다 새 모델이 나올 만큼 빠르게 발전한다. 한 사람이 혼자 따라가기엔 벅차다. 여러 사람이 스킬을 공개하고, 서로 고쳐 주고, 같이 키워야 그 속도를 따라잡고 새로운 아이디어가 나온다. 오픈소스와 같은 개념.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> 액티브 응용 ③ · 레벨업과 파티</span>
-    <h2 class="subhead">스킬은 <span class="accent">레벨업</span>하고, <span class="accent">파티</span>와 나눕니다</h2>
+    <span class="eyebrow"><span class="dot"></span> 액티브 · 레벨업과 파티</span>
+    <h2 class="subhead">스킬은 <span class="accent">쓰면서 키우고</span>, <span class="accent">같이 키웁니다</span></h2>
     <div class="dlv">
-      <div class="gp"><span class="gk">레벨업 · 틀릴 때마다 한 줄</span>
+      <div class="gp"><span class="gk">레벨업 · 쓰면서 부족한 걸 계속 보완</span>
         <div class="lvl"><b>Lv.1</b><span>"민원 답변 써줘" 한 줄</span></div>
         <div class="lvl"><b>Lv.2</b><span>없는 지급일을 지어냄 → '미확인 사항' 칸 추가</span></div>
         <div class="lvl"><b>Lv.3</b><span>과잉 사과 → 사과 수위 3단계</span></div>
         <div class="lvl hot"><b>Lv.4</b><span>가린 이름을 임의로 채움 → '가린 표시 유지' 규칙</span></div>
       </div>
-      <div class="gp hot"><span class="gk">파티 · 팀에 나누기</span><b class="big">스킬은 파일 하나</b><p>팀원에게 주면 <b>팀 전체가 같은 품질</b>로 일합니다. 한 사람이 한 번 고생하면, 모두가 덕을 봅니다.</p></div>
+      <div class="gp hot"><span class="gk">파티 · 같이 성장하기</span><b class="big">오픈소스처럼</b>
+        <p>AI는 <b>몇 개월마다</b> 새 모델이 나올 만큼 빠릅니다. 혼자서는 못 따라갑니다.</p>
+        <div class="party"><span>공개하고</span><i>→</i><span>서로 고쳐 주고</span><i>→</i><span>같이 키운다</span></div>
+        <p>그래야 속도를 따라잡고, <b>새로운 아이디어</b>가 나옵니다.</p></div>
     </div>
+  </div>
+</section>
+
+<section class="slide center divider game" data-accent="gold" data-title="다른 게임을 하고 싶다면?"
+  data-notes="[화두 · 바이브코딩으로] '그런데… 나는 디아블로 말고 다른 게임을 하고 싶은데요? 그건 안 되나요?' 남이 만든 게임(서비스) 안에서 스킬을 찍는 것까지가 지금까지. 내가 원하는 게임이 없으면? 직접 만들면 된다. → 바이브코딩으로 넘어간다.">
+  <div class="slide-inner">
+    <span class="part-tag">그런데</span>
+    <h2 class="headline">나는 디아블로 말고<br><span class="accent">다른 게임</span>을 하고 싶은데요?</h2>
+    <p class="lead wide">그건 안 되나요?</p>
   </div>
 </section>
 
