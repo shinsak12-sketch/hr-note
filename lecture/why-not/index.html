@@ -1401,6 +1401,116 @@ body[data-tool="spot"] .spot{display:block}
 .s3done b{font-size:clamp(20px,2.4vw,32px);font-weight:900}
 .s3done span{font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft);font-weight:600}
 @media (max-width:900px){.s3map,.s3done{grid-template-columns:1fr 1fr}.s3row{grid-template-columns:1fr}}
+/* ===== 2부 · 바이브코딩 (설계도 테마) ===== */
+.slide.bp{background-color:var(--bg);background-image:linear-gradient(color-mix(in srgb,var(--indigo) 7%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--indigo) 7%,transparent) 1px,transparent 1px);background-size:32px 32px}
+.slide.bp::before{display:none}
+.vstat{display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(16px,2.4vw,34px);margin-top:clamp(14px,2.4vh,24px);align-items:stretch}
+.vs-chart{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(16px,2vw,26px);box-shadow:var(--shadow);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto 1fr;gap:clamp(8px,1.2vw,16px);align-items:end}
+.vs-chart .k{grid-column:1/-1;font-size:clamp(14px,1.6vw,20px);font-weight:800;color:var(--ink-soft)}
+.vb{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:.25em;height:clamp(200px,34vh,320px)}
+.vb i{display:block;width:60%;border-radius:10px 10px 0 0;background:color-mix(in srgb,var(--indigo) 40%,var(--bg-2))}
+.vb.hot i{background:var(--indigo)}
+.vb b{font-family:var(--font-mono);font-size:clamp(20px,2.6vw,36px);font-weight:900}
+.vb.hot b{color:var(--indigo)}
+.vb span{font-size:clamp(12px,1.35vw,16px);color:var(--ink-faint);font-weight:700}
+.vs-cards{display:grid;gap:clamp(10px,1.6vh,16px)}
+.vs-cards div{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(14px,1.8vw,22px);box-shadow:var(--shadow)}
+.vs-cards b{display:block;font-size:clamp(24px,3vw,40px);font-weight:900;color:var(--indigo);letter-spacing:-.02em}
+.vs-cards span{font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft);font-weight:600;line-height:1.45}
+.vs-cards em{font-style:normal;font-weight:900;color:var(--coral)}
+.vchips{display:flex;flex-wrap:wrap;gap:.6em;justify-content:center;margin-top:clamp(20px,3.4vh,36px);font-size:clamp(20px,2.6vw,34px)}
+.vchips b{background:var(--surface);border:2px solid var(--indigo);color:var(--indigo);border-radius:999px;padding:.3em 1em;font-weight:900;box-shadow:var(--shadow)}
+.vhab{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(8px,1.2vw,14px);margin-top:clamp(12px,2vh,20px)}
+.vhab div{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(12px,1.5vw,18px);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.3em}
+.vhab b{font-size:clamp(17px,2vw,25px);font-weight:900;color:var(--ink)}
+.vhab span{font-size:clamp(13px,1.45vw,17px);color:var(--ink-soft);font-weight:600}
+.vhab em{margin-top:auto;font-style:normal;font-size:clamp(12px,1.35vw,16px);font-weight:700;color:var(--coral);border-top:1px dashed var(--line-strong);padding-top:.4em}
+.vmap{display:grid;grid-template-columns:repeat(8,1fr);gap:clamp(6px,.8vw,12px);margin-top:clamp(16px,2.6vh,26px)}
+.vmap .g{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:clamp(10px,1.2vw,16px) clamp(6px,.8vw,10px);text-align:center;box-shadow:var(--shadow)}
+.vmap .g.hot{border:2px solid var(--indigo);background:color-mix(in srgb,var(--indigo) 8%,var(--surface))}
+.vmap .g span{font-size:clamp(16px,1.9vw,24px);font-weight:900;color:var(--indigo)}
+.vmap .g b{display:block;font-size:clamp(14px,1.6vw,20px);font-weight:900;margin:.15em 0}
+.vmap .g p{margin:0;font-size:clamp(11px,1.2vw,14px);color:var(--ink-faint);font-weight:700}
+.vline{display:grid;grid-template-columns:4fr 2fr 2fr;gap:clamp(6px,.8vw,12px);margin-top:8px}
+.vline span{text-align:center;font-size:clamp(12px,1.35vw,16px);font-weight:800;color:var(--ink-soft);border-top:3px solid var(--indigo);padding-top:.3em}
+.vline span:nth-child(2){border-color:var(--teal)}.vline span:nth-child(3){border-color:var(--coral)}
+.vrow{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2.4vw,34px);margin-top:clamp(12px,2vh,20px);align-items:start}
+.vwhy{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--coral);border-radius:16px;padding:clamp(14px,1.8vw,24px);box-shadow:var(--shadow)}
+.vwhy b{display:block;font-size:clamp(18px,2.2vw,28px);font-weight:900;margin-bottom:.4em}
+.vwhy p{margin:.35em 0 0;font-size:clamp(15px,1.75vw,22px);color:var(--ink-soft);font-weight:600;line-height:1.5}
+.vwhy em{font-style:normal;font-weight:900;color:var(--coral)}
+.vlist{display:grid;gap:.5em;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(14px,1.8vw,24px);box-shadow:var(--shadow)}
+.vlist .k,.vcard .k,.vfind .k,.memo .k{font-size:clamp(13px,1.45vw,17px);font-weight:800;color:var(--indigo)}
+.vlist div,.vcard div,.vfind div{display:flex;gap:.8em;align-items:baseline;font-size:clamp(14px,1.65vw,21px);border-bottom:1px dashed var(--line);padding-bottom:.35em}
+.vlist b,.vcard b,.vfind b{flex:none;min-width:7em;font-weight:900}
+.vlist span,.vcard span,.vfind span{color:var(--ink-soft);font-weight:600}
+.vstruct{display:grid;gap:clamp(6px,1vh,10px);margin-top:clamp(12px,2vh,20px)}
+.vs-row{display:grid;grid-template-columns:clamp(110px,11vw,160px) 1fr 1fr;gap:clamp(8px,1vw,14px);align-items:center}
+.vs-row .q{font-size:clamp(14px,1.6vw,20px);font-weight:800;color:var(--ink-soft)}
+.vs-row b{border-radius:12px;padding:.5em .8em;font-size:clamp(15px,1.75vw,22px);font-weight:800;text-align:center}
+.vs-row .e{background:color-mix(in srgb,var(--teal) 14%,var(--surface));border:1px solid color-mix(in srgb,var(--teal) 45%,var(--line))}
+.vs-row .h{background:color-mix(in srgb,var(--coral) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--coral) 40%,var(--line))}
+.vs-diff{display:grid;grid-template-columns:clamp(110px,11vw,160px) auto 1fr auto;gap:10px;align-items:center;font-size:clamp(12px,1.35vw,16px);font-weight:800;color:var(--ink-faint)}
+.vs-diff span:first-child{grid-column:2}
+.vs-diff i{height:8px;border-radius:999px;background:linear-gradient(90deg,var(--teal),var(--coral))}
+.vdesign{display:grid;grid-template-columns:repeat(3,1fr) 1.1fr;gap:clamp(12px,1.6vw,22px);margin-top:clamp(12px,2vh,20px);align-items:center}
+.vdesign .ph{border-radius:22px;border:6px solid #1E1B33;height:clamp(200px,32vh,300px);padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow);position:relative}
+.vdesign .ph .bar{height:22%;border-radius:10px}
+.vdesign .ph i{display:block;height:13%;border-radius:8px}
+.vdesign .ph span{margin-top:auto;font-size:clamp(13px,1.45vw,17px);font-weight:800;text-align:center}
+.vdesign .a{background:#fff}.vdesign .a .bar{background:#EEF1F6}.vdesign .a i{background:#F3F4F7;border:1px solid #E3E5EA}.vdesign .a span{color:#333}
+.vdesign .b{background:#1B2A4A}.vdesign .b .bar{background:#2F4A80}.vdesign .b i{background:#25385F}.vdesign .b span{color:#E7ECF7}
+.vdesign .c{background:#F6EFE4}.vdesign .c .bar{background:#E8C9A0}.vdesign .c i{background:#FFF9F0;border:1px solid #E9DCC8}.vdesign .c span{color:#6A4A25}
+.vdesign .pick{outline:4px solid var(--indigo);outline-offset:4px}
+.vdesign.sm{grid-template-columns:repeat(3,1fr)}
+.vdesign.sm .ph{height:clamp(160px,26vh,240px)}
+.vpick{background:var(--surface);border:2px dashed var(--indigo);border-radius:18px;padding:clamp(14px,1.8vw,22px)}
+.vpick b{font-size:clamp(14px,1.6vw,20px);font-weight:900;color:var(--indigo)}
+.vpick p{margin:.3em 0 0;font-size:clamp(17px,2vw,26px);font-weight:800;line-height:1.4}
+.vcheck{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,18px);margin-top:clamp(16px,2.6vh,26px)}
+.vcheck div{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(16px,2vw,26px);box-shadow:var(--shadow)}
+.vcheck b{display:block;font-size:clamp(19px,2.3vw,30px);font-weight:900;color:var(--indigo)}
+.vcheck span{font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft);font-weight:600}
+.vmemo{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(12px,1.6vw,22px);margin-top:clamp(14px,2.4vh,24px);align-items:stretch}
+.vmemo .ar{align-self:center;font-style:normal;font-size:clamp(26px,3.2vw,44px);font-weight:900;color:var(--ink-faint)}
+.memo{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(16px,2vw,26px);box-shadow:var(--shadow)}
+.memo.hot{border-color:var(--indigo);box-shadow:0 0 0 2px color-mix(in srgb,var(--indigo) 25%,transparent),var(--shadow)}
+.memo .pad{margin:.6em 0;background:#FFF8D6;border:1px solid #E9D98A;border-radius:10px;padding:.7em;display:flex;flex-wrap:wrap;gap:.35em;font-size:clamp(13px,1.45vw,17px);font-weight:700;color:#6b5a14}
+.memo .pad span{background:#FFF1A8;border-radius:6px;padding:.1em .45em}
+.memo .tree{margin:.6em 0;background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:.7em .9em;display:grid;gap:.15em;font-family:var(--font-mono);font-size:clamp(13px,1.45vw,17px)}
+.memo .tree small{color:#9F9BBD;font-family:var(--font-sans);margin-left:.4em}
+.memo ul{margin:0;padding-left:1.1em;display:grid;gap:.3em;font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft);font-weight:600}
+.memo ul b{color:var(--ink)}
+.vgit{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.4vw,18px);margin-top:clamp(16px,2.6vh,26px)}
+.vgit div{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(14px,1.8vw,22px);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.25em}
+.vgit i{font-style:normal;font-size:clamp(26px,3vw,40px)}
+.vgit b{font-size:clamp(18px,2.2vw,28px);font-weight:900;color:var(--indigo)}
+.vgit span{font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft);font-weight:600}
+.vgit .warn{border-color:var(--coral);background:color-mix(in srgb,var(--coral) 8%,var(--surface))}
+.vgit .warn b{color:var(--coral)}
+.vlog{display:grid;gap:clamp(6px,1vh,10px);margin-top:clamp(14px,2.4vh,24px);background:var(--code-bg);border-radius:18px;padding:clamp(14px,1.8vw,24px);box-shadow:var(--shadow)}
+.vlog .lg{display:flex;gap:.9em;align-items:baseline;font-size:clamp(14px,1.65vw,21px);color:var(--code-ink)}
+.vlog .t{flex:none;font-family:var(--font-mono);font-weight:800;color:#8FE3D8;font-size:.85em}
+.vlog .lg.dim{opacity:.7}
+.vdemo{display:grid;grid-template-columns:1.4fr 1fr;gap:clamp(16px,2.4vw,32px);align-items:start}
+.vcard,.vfind{display:grid;gap:.5em;background:var(--surface);border:2px solid var(--indigo);border-radius:18px;padding:clamp(14px,1.8vw,24px);box-shadow:var(--shadow)}
+.vfind{border-color:var(--coral)}
+.vfind .k{color:var(--coral)}
+.vskel{display:grid;gap:clamp(12px,2vh,20px);margin-top:clamp(14px,2.4vh,24px)}
+.tabs5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.tabs5 span{text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.6em 0;font-size:clamp(15px,1.8vw,23px);font-weight:800;color:var(--ink-faint)}
+.tabs5 span.on{border:2px solid var(--indigo);color:var(--indigo);background:color-mix(in srgb,var(--indigo) 8%,var(--surface))}
+.stg{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(12px,1.6vw,22px);align-items:center}
+.stg .ar{font-style:normal;font-size:clamp(24px,3vw,40px);font-weight:900;color:var(--ink-faint)}
+.stg .st{background:var(--surface);border:1px solid color-mix(in srgb,var(--teal) 45%,var(--line));border-radius:18px;padding:clamp(14px,1.8vw,22px);box-shadow:var(--shadow)}
+.stg .st.hot{border-color:color-mix(in srgb,var(--coral) 45%,var(--line))}
+.stg .k{font-size:clamp(13px,1.45vw,17px);font-weight:800;color:var(--ink-faint)}
+.stg b{display:block;font-size:clamp(19px,2.3vw,30px);font-weight:900;margin:.15em 0}
+.stg p{margin:0;font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft);font-weight:600}
+.vskel .save{display:flex;flex-wrap:wrap;gap:.5em;align-items:center;font-size:clamp(14px,1.6vw,20px)}
+.vskel .save b{font-weight:900;margin-right:.3em}
+.vskel .save span{background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:.25em .9em;font-weight:700;color:var(--ink-soft)}
+@media (max-width:900px){.vstat,.vrow,.vdemo,.vmemo,.stg{grid-template-columns:1fr}.vhab,.vcheck{grid-template-columns:1fr 1fr}.vmap{grid-template-columns:repeat(4,1fr)}.vgit{grid-template-columns:1fr 1fr}.vdesign{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -2489,9 +2599,9 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
     <h2 class="subhead">4단계면 <span class="accent">내 작업장</span>이 완성됩니다</h2>
     <div class="s3map">
       <div class="s3"><span class="n">STEP 1</span><b>프로젝트 만들기</b><p>이름: 분쟁심의답변서생성기</p></div>
-      <div class="s3"><span class="n">STEP 2</span><b>자기소개 · 지침</b><p>AI가 나를 인터뷰해서 지침을 씀</p></div>
+      <div class="s3"><span class="n">STEP 2</span><b>자기소개 · 지침</b><p>환경설정만 가볍게</p></div>
       <div class="s3"><span class="n">STEP 3</span><b>자료 저장</b><p>기준 · 양식 · 잘 쓴 예시</p></div>
-      <div class="s3 hot"><span class="n">STEP 4</span><b>스킬 만들기</b><p>"분심 답변서 만들어줘" 한마디로</p></div>
+      <div class="s3 hot"><span class="n">STEP 4</span><b>스킬 만들기</b><p>업무 규칙은 여기에 · "분심 답변서 만들어줘"</p></div>
     </div>
     <div class="s3need"><b>준비물</b><span>로그인한 AI 계정</span><span>자료 파일 1~2개 (개인정보 없는 것)</span><span>옆 사람</span></div>
   </div>
@@ -2518,17 +2628,17 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
 </section>
 
 <section class="slide wide compact" data-accent="teal" data-title="STEP 2 · 자기소개 · 지침"
-  data-notes="[STEP 2 · 지침 · 10분] 프로젝트 안에서 채팅창을 열고 아래 문장을 그대로 붙여 넣는다. AI가 한 번에 하나씩 질문하면 답만 한다(챕터 1 역질문). 마지막에 AI가 써 준 지침을 복사해서 프로젝트의 지침 칸에 붙여 넣는다.">
+  data-notes="[STEP 2 · 지침 · 5분] 지침은 가볍게, 환경설정 정도만. 나는 누구고, 어떤 말투로, 어떤 모양으로 답해 달라는 것. 업무 규칙(문체 · 상대 주장 · 도표 등)은 STEP 4에서 스킬에 넣는다. 프로젝트 안에서 채팅창을 열고 아래 문장을 붙여 넣으면 AI가 하나씩 묻는다. 마지막에 나온 지침을 프로젝트 지침 칸에 붙여 넣는다.">
   <div class="slide-inner">
-    <span class="eyebrow"><span class="dot"></span> STEP 2 / 4</span>
-    <h2 class="subhead">채팅창을 열고, <span class="accent">AI가 나를 인터뷰</span>하게 합니다</h2>
+    <span class="eyebrow"><span class="dot"></span> STEP 2 / 4 · 환경설정</span>
+    <h2 class="subhead">지침은 가볍게, <span class="accent">환경설정</span>만 합니다</h2>
     <div class="s3row">
       <div class="prompt s3cp" id="cp3-intro"><button class="copy" data-copy="cp3-intro">복사</button>나는 DB손해사정 대물 보상 담당이야.
-이 프로젝트는 구상금분쟁심의위원회(분심)에 낼 답변서를 만드는 곳이야.
-나를 인터뷰해서 이 프로젝트의 지침을 써 줘.
-<span class="blank">한 번에 하나씩 물어보고, 충분하면 멈추고 지침을 써 줘.</span></div>
+이 프로젝트는 분쟁심의 답변서 작업 공간이야.
+업무 규칙은 나중에 스킬로 따로 만들 거니까,
+<span class="blank">지침은 기본 설정만 짧게 써 줘. 한 번에 하나씩 물어봐.</span></div>
       <div class="s3side">
-        <div class="s3q"><span>AI가 물어볼 것 (예)</span><b>청구 · 피청구 중 어느 쪽 답변이 많나요?</b><b>문서 말투는 어떻게 할까요?</b><b>꼭 들어가야 할 구성이 있나요?</b><b>절대 하면 안 되는 게 있나요?</b></div>
+        <div class="s3q"><span>AI가 물어볼 것 (예)</span><b>어떤 업무를 하시나요?</b><b>답할 때 말투는 어떻게 할까요?</b><b>답은 어떤 모양이 좋나요? (짧게 · 표로)</b><b>피해야 할 게 있나요?</b></div>
         <div class="s3chk">마지막에 나온 지침을 복사 → <b>프로젝트 지침 칸</b>에 붙여 넣기</div>
       </div>
     </div>
@@ -2536,22 +2646,20 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
 </section>
 
 <section class="slide wide" data-accent="teal" data-title="STEP 2 · 지침 완성 예시"
-  data-notes="[STEP 2 · 지침 예시] 인터뷰가 끝나면 이런 지침이 나온다. 핵심은 '없는 사실 쓰지 않기', '상대 주장은 내가 쓴 그대로만', '도표 번호 추측 금지'. 회사의 분심 스킬에도 그대로 들어 있는 규칙들이다. 붙여 넣은 뒤 새 채팅에서 '이 프로젝트에서 너는 뭘 하는 역할이야?'라고 물어 확인.">
+  data-notes="[STEP 2 · 지침 예시] 인터뷰가 끝나면 이 정도의 가벼운 지침이 나온다. 환경설정: 나는 누구, 말투, 답 모양, 개인정보 금지. 업무 규칙은 여기 넣지 않는다(스킬로). 붙여 넣은 뒤 새 채팅에서 '이 프로젝트에서 너는 뭘 하는 역할이야?'로 확인.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> STEP 2 / 4 · 지침 완성 예시</span>
-    <h2 class="subhead">이런 지침이 <span class="accent">프로젝트에 붙습니다</span></h2>
+    <h2 class="subhead">이 정도면 됩니다: <span class="accent">환경설정</span></h2>
     <div class="s3row">
-      <div class="prompt s3cp" id="cp3-rule"><button class="copy" data-copy="cp3-rule">복사</button>이 프로젝트는 분쟁심의 답변서 초안을 만드는 곳이다.
-- 문서 본문은 음슴체(~함, ~임). 결론 문장만 "~요청드립니다."
-- 사실은 내가 준 메모 · 사진에 있는 것만 쓴다. 없는 속도 · 거리 · 신호는 지어내지 않는다.
-- <span class="blank">상대측 주장은 내가 쓴 그대로만 옮긴다.</span> 뜻을 바꾸거나 더하지 않는다.
-- 우리측 주장은 설득력 있게 다듬되, 감정적 표현은 쓰지 않는다.
-- 법 조문은 번호 · 원문이 확실한 것만. 아니면 "(요지)"로 적는다.
-- 과실비율 도표 번호는 내가 준 것만 쓴다. 추측하지 않는다.
-- 사고 일시 · 장소 · 차량번호 · 이름은 넣지 않는다.</div>
+      <div class="prompt s3cp" id="cp3-rule"><button class="copy" data-copy="cp3-rule">복사</button>이 프로젝트는 분쟁심의 답변서 작업 공간이다.
+- 나는 DB손해사정 대물 보상 담당자다.
+- 존댓말로, 결론부터 짧게 답한다.
+- 길면 표나 목록으로 정리한다.
+- 모르는 건 모른다고 하고, 확인이 필요하면 <span class="blank">[확인 필요]</span>로 표시한다.
+- 고객 이름 · 차량번호 · 연락처는 쓰지 않는다.</div>
       <div class="s3side">
         <div class="s3chk">확인 · 새 채팅에서 <b>"이 프로젝트에서 너는 뭘 하는 역할이야?"</b></div>
-        <p class="s3tip">이 규칙들이 <b>패시브 효과</b>입니다. 이 프로젝트의 모든 대화에 늘 적용돼요.</p>
+        <p class="s3tip">업무 규칙(문체 · 상대 주장 · 도표 번호)은 여기 말고 <b>STEP 4 스킬</b>에 넣습니다. 지침은 늘 켜진 <b>환경설정</b>이에요.</p>
       </div>
     </div>
   </div>
@@ -2579,15 +2687,18 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
 </section>
 
 <section class="slide wide compact" data-accent="teal" data-title="STEP 4 · 스킬 만들기"
-  data-notes="[STEP 4 · 스킬 · 10분] 스킬도 대화로 만든다. 아래 문장을 붙여 넣으면 AI가 하나씩 묻는다. 넣을 자료(사진 종류 · 메모 틀), 문서 구성 순서, 결과 형식을 답하면 스킬 파일을 만들어 준다. 회사의 '디비-분심-생성' 스킬도 이렇게 시작해서 키운 것.">
+  data-notes="[STEP 4 · 스킬 · 10분] 업무 규칙은 전부 여기, 스킬 안으로. 스킬도 대화로 만든다. 아래 문장을 붙여 넣으면 AI가 하나씩 묻는다. 넣을 자료(사진 종류 · 메모 틀), 문서 구성 순서, 결과 형식을 답하면 스킬 파일을 만들어 준다. 회사의 '디비-분심-생성' 스킬도 이렇게 시작해서 키운 것.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> STEP 4 / 4</span>
     <h2 class="subhead">스킬도 <span class="accent">대화로</span> 만듭니다</h2>
     <div class="s3row">
       <div class="prompt s3cp" id="cp3-skill"><button class="copy" data-copy="cp3-skill">복사</button>분쟁심의 답변서 만드는 걸 스킬로 만들고 싶어.
-내가 "분심 답변서 만들어줘"라고 하면,
-먼저 필요한 자료(사진 · 메모)를 안내하고
-받은 자료로 답변서 초안을 만들어 주는 스킬이야.
+"분심 답변서 만들어줘"라고 하면 필요한 자료(사진 · 메모)를 먼저 안내하고,
+받은 자료로 답변서 초안을 만들어 줘. 꼭 지킬 규칙:
+- 본문은 음슴체, 결론만 "~요청드립니다"
+- 사실은 내 메모 · 사진에 있는 것만
+- 상대측 주장은 내가 쓴 그대로만
+- 과실 도표 번호는 내가 준 것만, 추측 금지
 <span class="blank">필요한 건 한 번에 하나씩 물어봐.</span></div>
       <div class="s3side">
         <div class="s3q"><span>AI가 물어볼 것 (예)</span><b>어떤 사진을 받나요? (약도 · 현장 · 파손 · 블랙박스)</b><b>메모는 어떤 틀로 받을까요? (구분 · 과실 · 사고 · 우리 주장 · 상대 주장)</b><b>문서 순서는요? (사고 요약 → 사진 → 쟁점 대비표 → 법적 근거 → 결론)</b><b>결과는 어떤 파일로 받을까요?</b></div>
@@ -2619,9 +2730,9 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
     <h2 class="subhead">네 칸 다 채웠으면, <span class="accent">작업장 완성</span>입니다</h2>
     <div class="s3done">
       <div><i>✓</i><b>프로젝트</b><span>분쟁심의답변서생성기</span></div>
-      <div><i>✓</i><b>지침</b><span>AI 인터뷰로 작성 · 붙여 넣기</span></div>
+      <div><i>✓</i><b>지침</b><span>환경설정 · 가볍게</span></div>
       <div><i>✓</i><b>자료</b><span>기준 · 예시 · 조문</span></div>
-      <div><i>✓</i><b>스킬</b><span>"분심 답변서 만들어줘"</span></div>
+      <div><i>✓</i><b>스킬</b><span>업무 규칙까지 · "분심 답변서 만들어줘"</span></div>
     </div>
     <div class="callout tip"><span class="bang">!</span><p>오늘부터는 <b>쓰면서 레벨업</b>. 틀린 곳이 나오면 스킬에 한 줄씩 반영하면 됩니다.</p></div>
   </div>
@@ -2633,6 +2744,410 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
     <span class="part-tag">그런데</span>
     <h2 class="headline">나는 <span class="accent">다른 게임</span>이<br>하고 싶은데요?</h2>
     <p class="lead wide">그건 안 되나요?</p>
+  </div>
+</section>
+
+<!-- ===== 2부 · 바이브코딩 ===== -->
+<section class="slide center divider bp" data-accent="indigo" data-title="2부 · 바이브코딩"
+  data-notes="[2부 시작] 앞 장의 질문 '나는 다른 게임이 하고 싶은데요?'에 대한 답. 원하는 게임이 없으면 직접 만들면 된다. 2부는 바이브코딩: 말로 프로그램을 만드는 것.">
+  <div class="slide-inner">
+    <span class="part-tag">2부</span>
+    <h2 class="headline">원하는 게임이 없으면,<br><span class="accent">직접 만들면</span> 됩니다</h2>
+    <p class="lead wide">바이브코딩 · 말로 프로그램 만들기</p>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="세상은 이미 이렇게 만든다"
+  data-notes="[왜 바이브코딩인가 · 3분] 숫자로 보면.
+① 구글 새 코드 중 AI가 만든 비율: 25%(2024.10 실적 발표, 피차이) → 약 50%(2025 가을) → 75%(2026.4, 구글 블로그 · 2차 보도). 엔지니어가 검토 후 반영.
+② 와이콤비네이터(실리콘밸리 대표 스타트업 육성 기관) 개리 탄 대표: 현재 배치 스타트업 4곳 중 1곳은 코드의 95%를 AI가 작성(2025.3, CNBC).
+③ 비개발자용 바이브코딩 서비스 '러버블': 2024년 말 출시, 사용자 약 800만 명(보도 기준 · 출처마다 숫자 차이).
+④ 콜린스 사전 2025 올해의 단어 = 바이브코딩.
+서론 12장(코딩 세계대회)과 연결: 이제 코딩은 전문가만의 일이 아니다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 왜 바이브코딩인가</span>
+    <h2 class="subhead">세상은 이미 <span class="accent">말로</span> 만들고 있습니다</h2>
+    <div class="vstat">
+      <div class="vs-chart"><span class="k">구글 새 코드 중 AI가 만든 비율</span>
+        <div class="vb"><i style="height:25%"></i><b>25%</b><span>2024.10</span></div>
+        <div class="vb"><i style="height:50%"></i><b>50%</b><span>2025 가을</span></div>
+        <div class="vb hot"><i style="height:75%"></i><b>75%</b><span>2026.4</span></div>
+      </div>
+      <div class="vs-cards">
+        <div><b>4곳 중 1곳</b><span>실리콘밸리 스타트업이 코드의 <em>95%</em>를 AI로 작성 (와이콤비네이터, 2025.3)</span></div>
+        <div><b>약 800만 명</b><span>비개발자용 바이브코딩 서비스 '러버블' 사용자 (보도 기준)</span></div>
+        <div><b>올해의 단어</b><span>콜린스 사전 2025 · "바이브코딩"</span></div>
+      </div>
+    </div>
+    <p class="src">Alphabet 실적 발표(2024.10) · The Decoder(2026.4) · CNBC(2025.3) · Fortune · DemandSage(러버블) · Collins Dictionary(2025.11)</p>
+  </div>
+</section>
+
+<section class="slide center mid bp" data-accent="indigo" data-title="바이브코딩, 별거 없습니다"
+  data-notes="[도입 결론] 바이브코딩, 별거 없다. 지금까지 한 것과 똑같이 대화로, 만들고 싶은 걸 말하면 된다. 누구나 할 수 있다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 결론부터</span>
+    <h2 class="headline">바이브코딩, <span class="accent">별거 없습니다</span></h2>
+    <div class="vchips"><b>똑같이 대화로</b><b>만들고 싶은 걸</b><b>누구나</b></div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="AI의 습성 · 왜 중상급인가"
+  data-notes="[왜 중상급인가 · 3분] 쉬운데 왜 중상급일까. 대화를 많이 해 보면 AI의 습성이 보인다. 지금 AI가 사람 같은 범용 지능(AGI)이 아닌 이유들이기도 하다.
+근거: 내 편 들기 — Anthropic 'Towards Understanding Sycophancy'(2023), OpenAI가 GPT-4o 업데이트를 이 문제로 되돌림(2025.4). 긴 대화에서 흐려짐 — 'Lost in the Middle'(Liu 외, 2023), Chroma 'Context Rot'(2025). 지어냄 — OpenAI 'Why language models hallucinate'(2025.9).
+멘트: '그래서 바이브코딩 할 때 가이드라인 몇 개를 알려 드리겠습니다. 이걸 알고 하는 것과 그냥 하는 것은 차이가 큽니다.'">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 쉬운데, 왜 중상급일까</span>
+    <h2 class="subhead">대화를 많이 해 보면 보이는 <span class="accent">AI의 습성</span></h2>
+    <div class="vhab">
+      <div><b>내 편 들기</b><span>내 말에 맞춰 주고 칭찬부터</span><em>이상한 설계도 "좋아요" 하고 그대로 만듦</em></div>
+      <div><b>같은 주장 반복</b><span>앞에서 한 말 · 만든 걸 고집</span><em>고쳐 달래도 처음 틀을 못 벗어남</em></div>
+      <div><b>비슷하게 만들기</b><span>새로 만들기보다 본 것을 불러옴</span><em>매번 흔한 화면이 나옴</em></div>
+      <div><b>모르면 지어냄</b><span>없는 기능도 있는 것처럼</span><em>안 되는 기능을 "됩니다"</em></div>
+      <div><b>긴 대화에서 흐려짐</b><span>길수록 앞 내용을 헷갈림</span><em>처음 정한 규칙을 뒤에서 어김</em></div>
+      <div><b>"다 됐어요"</b><span>확인 안 하고 완성이라 함</span><em>열어 보면 버튼이 안 눌림</em></div>
+      <div><b>시키지 않은 곳까지</b><span>하나 고치며 딴 데도 바꿈</span><em>잘 되던 기능이 깨짐</em></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>그래서 가이드라인이 필요합니다. <b>알고 하는 것과 그냥 하는 것은 차이가 큽니다.</b></p></div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="바이브코딩 가이드라인 · 지도"
+  data-notes="[가이드 지도 · 1분] 바이브코딩 기초 가이드 8개. 핵심은 앞의 두 개(목표 · 뼈대). 결과물은 4단계를 거친 뒤에야 받는다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 바이브코딩 기초 가이드</span>
+    <h2 class="subhead">만들기 전에 <span class="accent">설계 대화</span>부터</h2>
+    <div class="vmap">
+      <div class="g hot"><span>①</span><b>목표</b><p>개성 정하기</p></div>
+      <div class="g hot"><span>②</span><b>뼈대</b><p>화면 · 구조</p></div>
+      <div class="g"><span>③</span><b>디자인 시안</b><p>후보 받기</p></div>
+      <div class="g"><span>④</span><b>검증 대화</b><p>오류 찾기</p></div>
+      <div class="g"><span>⑤</span><b>프로토타입</b><p>샘플로 확인</p></div>
+      <div class="g"><span>⑥</span><b>결과물</b><p>세부 작동 다듬기</p></div>
+      <div class="g"><span>⑦</span><b>고칠 때</b><p>캡처로</p></div>
+      <div class="g"><span>⑧</span><b>오류 날 때</b><p>점검 요청</p></div>
+    </div>
+    <div class="vline"><span>설계 대화</span><span>만들기</span><span>다듬기</span></div>
+    <div class="callout tip"><span class="bang">!</span><p>특히 <b>① 목표와 ② 뼈대</b>가 정말 중요합니다.</p></div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="가이드 ① 목표 = 개성"
+  data-notes="[가이드 ① · 3분] 설계에서 목표를 정하는 건 이 프로그램의 개성을 정하는 것. 개성은 한 번 정해지면 바꾸기 어렵다. AI는 지금까지의 대화와 처음 만든 결과물을 기준으로 삼는다(선입관). 그래서 '그냥 만들어 줘'로 시작해 수정 · 수정 · 수정해도 처음 틀을 못 벗어나 답답해진다. 챕터 2의 '선입관을 지우자'와 연결.
+정확히는 AI가 '학습'하는 게 아니라 그 대화 기록에 끌려가는 것. 그래서 새 채팅을 열면 선입관이 사라진다(가이드 ⑥에서 활용).">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 가이드 ① · 목표 정하기</span>
+    <h2 class="subhead">목표를 정하는 건 <span class="accent">개성</span>을 정하는 것입니다</h2>
+    <div class="vrow">
+      <div class="vwhy"><b>개성은 한 번 정하면 바꾸기 어렵습니다</b>
+        <p>"그냥 만들어 줘" → 처음 나온 결과물이 AI의 <em>선입관</em>이 됩니다.</p>
+        <p>그 뒤로 수정 · 수정 · 수정해도 처음 틀을 못 벗어납니다.</p></div>
+      <div class="vlist"><span class="k">목표에서 정할 것</span>
+        <div><b>누가 · 어디서</b><span>센터 직원이 폰으로</span></div>
+        <div><b>무엇을 해결</b><span>공지가 단톡방에 묻힌다</span></div>
+        <div><b>꼭 / 좋음 / 나중에</b><span>첫 버전은 '꼭'만</span></div>
+        <div><b>완성 기준</b><span>"이게 되면 끝"</span></div></div>
+    </div>
+    <div class="prompt" id="cp-v1"><button class="copy" data-copy="cp-v1">복사</button>아직 만들지 말고, 목표부터 같이 정하자. <span class="blank">한 번에 하나씩 물어봐.</span></div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="가이드 ② 뼈대 · 구조"
+  data-notes="[가이드 ② · 3분] 뼈대 = 화면이 몇 개고 어떻게 이동하나, 무엇을 저장하나. 그리고 구조: 누가 쓰나(개인용 · 공유용), 어디서(오프라인 파일 하나 · 온라인 웹 주소), 무엇으로(웹 · 앱(APK) · PC 프로그램), 그리고 프론트엔드(보이는 화면) · 백엔드(뒤에서 처리하는 서버) · 데이터베이스(저장소), 언어 · 프레임워크는 이름만. 왼쪽 위로 갈수록 쉽고, 오른쪽 아래로 갈수록 어렵다. 뼈대가 바뀌면 나중에 전부 다시 만들어야 하니 여기서 확정.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 가이드 ② · 뼈대 만들기</span>
+    <h2 class="subhead">뼈대에서 <span class="accent">구조</span>까지 정합니다</h2>
+    <div class="vstruct">
+      <div class="vs-row"><span class="q">누가 쓰나</span><b class="e">개인용</b><b class="h">공유용 (여럿이)</b></div>
+      <div class="vs-row"><span class="q">어디서</span><b class="e">오프라인 · 파일 하나</b><b class="h">온라인 · 웹 주소</b></div>
+      <div class="vs-row"><span class="q">무엇으로</span><b class="e">웹 (브라우저)</b><b class="h">앱 (APK · iOS) · PC 프로그램</b></div>
+      <div class="vs-row"><span class="q">구조</span><b class="e">프론트엔드 · 보이는 화면</b><b class="h">백엔드 · 서버 + 데이터베이스</b></div>
+      <div class="vs-row"><span class="q">언어 · 도구</span><b class="e">HTML · CSS · JavaScript</b><b class="h">React · Node.js · Python …</b></div>
+      <div class="vs-diff"><span>쉬움</span><i></i><span>어려움</span></div>
+    </div>
+    <div class="prompt" id="cp-v2"><button class="copy" data-copy="cp-v2">복사</button>코드는 아직 만들지 말고, 화면 구성 · 저장할 항목 · 구조(개인용/공유용, 온라인/오프라인)만 정리해 줘.</div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="가이드 ③ 디자인 시안"
+  data-notes="[가이드 ③ · 2분] 많이들 빼먹는 게 디자인. 안 정하면 AI는 흔한 모양으로 만든다(습성: 비슷하게 만들기). 뼈대 단계에서 시안 후보를 받아 내 의견을 넣는다. '이 색 + 저 배치'처럼 섞어도 된다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 가이드 ③ · 디자인 시안</span>
+    <h2 class="subhead">많이들 빼먹는 것, <span class="accent">디자인</span></h2>
+    <div class="vdesign">
+      <div class="ph a"><div class="bar"></div><i></i><i></i><i></i><span>A · 깔끔한 흰색</span></div>
+      <div class="ph b"><div class="bar"></div><i></i><i></i><i></i><span>B · 진한 남색</span></div>
+      <div class="ph c"><div class="bar"></div><i></i><i></i><i></i><span>C · 따뜻한 베이지</span></div>
+      <div class="vpick"><b>내 의견</b><p>"B의 색에<br>A의 카드 배치로"</p></div>
+    </div>
+    <div class="prompt" id="cp-v3"><button class="copy" data-copy="cp-v3">복사</button>디자인 시안 후보 3개를 보여 줘. 색 · 글씨 · 배치가 서로 다르게.</div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="가이드 ④ 검증 대화"
+  data-notes="[가이드 ④ · 2분] 설계가 끝나도 바로 결과물을 뽑지 않는다. 지금까지 대화의 장단점 · 빠진 것 · 모순 · 논리 오류를 체크하는 대화를 먼저. '맞춰 주지 말고 냉정하게'를 붙이는 이유는 AI의 내 편 들기 습성 때문. 챕터 2 방어 스킬의 설계 버전.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 가이드 ④ · 검증 대화</span>
+    <h2 class="subhead">만들기 전에 <span class="accent">설계부터 검증</span>합니다</h2>
+    <div class="vrow">
+      <div class="prompt" id="cp-v4" style="margin-top:0"><button class="copy" data-copy="cp-v4">복사</button>아직 만들지 말고, 지금까지 설계의
+장단점 · 빠진 것 · 서로 모순되는 것 · 논리 오류를 찾아 줘.
+<span class="blank">맞춰 주지 말고 냉정하게.</span></div>
+      <div class="vwhy"><b>왜 "냉정하게"를 붙이나</b>
+        <p>AI는 <em>내 편 들기</em> 습성이 있어서, 그냥 물으면 "좋은 설계예요"부터 나옵니다.</p>
+        <p>설계에서 고치면 5분, 다 만든 뒤에 고치면 처음부터.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="가이드 ⑤ 프로토타입"
+  data-notes="[가이드 ⑤ · 2분] 검증까지 끝났으면 이제 결과를 뽑는데, '프로토타입'이라고 명시하고 핵심 화면만 샘플 데이터로 받는다. 완성품이 아니라 맛보기. 방향이 틀어졌으면 여기서 설계로 돌아간다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 가이드 ⑤ · 프로토타입</span>
+    <h2 class="subhead">처음 뽑는 건 <span class="accent">프로토타입</span>이라고 말합니다</h2>
+    <div class="flow" style="--n:3">
+      <div class="step"><span class="n">01</span><h3>"프로토타입이야"</h3><p>완성품이 아니라 <b>맛보기</b>라고 명시</p></div>
+      <div class="step"><span class="n">02</span><h3>핵심 화면만</h3><p><b>샘플 데이터</b>로 채워서 보여 달라고</p></div>
+      <div class="step hot"><span class="n">03</span><h3>방향 확인</h3><p>틀어졌으면 <b>설계로 돌아가기</b>. 지금이 제일 싸게 고치는 때</p></div>
+    </div>
+    <div class="prompt" id="cp-v5"><button class="copy" data-copy="cp-v5">복사</button>프로토타입이야. 핵심 화면만 샘플 데이터로 채워서 보여 줘.</div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="가이드 ⑥ 결과물 · 세부 작동"
+  data-notes="[가이드 ⑥ · 2분] 프로토타입까지 만족했으면 결과물을 달라고 한다. 결과물을 직접 눌러 보면서 세부 작동(버튼을 누르면 · 빈칸이면 · 실수로 입력하면)을 하나씩 고친다. 대화가 너무 길어졌으면 설계서를 정리해 새 채팅에서 이어 가면 선입관 없이 다시 시작할 수 있다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 가이드 ⑥ · 결과물</span>
+    <h2 class="subhead">결과물을 받고, <span class="accent">세부 작동</span>을 다듬습니다</h2>
+    <div class="vcheck">
+      <div><b>버튼을 누르면?</b><span>원하는 대로 움직이나</span></div>
+      <div><b>빈칸이면?</b><span>아무것도 안 넣고 저장하면</span></div>
+      <div><b>실수로 입력하면?</b><span>날짜 · 숫자를 잘못 넣으면</span></div>
+      <div><b>폰에서는?</b><span>작은 화면에서도 잘 보이나</span></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>대화가 길어지면 <b>설계서를 정리해 새 채팅</b>에서 이어 가세요. 선입관 없이 다시 시작합니다.</p></div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="가이드 ⑦⑧ 고칠 때 · 오류 날 때"
+  data-notes="[가이드 ⑦ ⑧ · 3분] 고칠 때: 화면을 캡처해서 붙이고, 한 번에 하나씩, '다른 곳은 건드리지 마'(습성: 시키지 않은 곳까지 고침).
+오류 날 때: '왜 안 돼? 다시 해'로 닦달하면 같은 실수를 반복하거나 '다 됐어요'만 한다. 고치기 전에 코드를 점검해서 원인부터 설명하게 한다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 가이드 ⑦ ⑧</span>
+    <h2 class="subhead">고칠 땐 <span class="accent">캡처로</span>, 오류엔 <span class="accent">점검 요청</span></h2>
+    <div class="grid cols-2">
+      <div class="card"><span class="k">⑦ 고칠 때</span><h3>캡처 + 하나씩</h3><p>화면을 캡처해 붙이고, 한 번에 하나만.</p><div class="ex">"이 버튼만 바꿔 줘. <b>다른 곳은 건드리지 마.</b>"</div></div>
+      <div class="card hot"><span class="k">⑧ 오류 날 때</span><h3>닦달 말고 점검</h3><p><s>"왜 안 돼? 다시 해"</s></p><div class="ex">"고치기 전에 <b>코드를 점검해서 원인부터</b> 설명해 줘."</div></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>여기까지가 <b>바이브코딩 기초</b>입니다.</p></div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="응용 · 메모장 하나의 한계"
+  data-notes="[응용 · 깃허브 · 2분] AI 대화창 안에서만 만들면, 특히 오프라인용 파일 하나로 만들면 모든 게 한 파일에 들어간다. 메모장 하나에 전체 작업을 하는 것과 같다. 길어질수록 AI가 전체를 다시 써야 하고, 그러다 다른 데가 깨지고, 무엇을 언제 바꿨는지 기록도 없다. 깃허브를 연결하면 여러 파일로 나눠 체계적으로 만든다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 바이브코딩 응용</span>
+    <h2 class="subhead">대화창 안에서만 만들면, <span class="accent">메모장 하나</span>입니다</h2>
+    <div class="vmemo">
+      <div class="memo"><span class="k">대화창 안 · 파일 하나</span><div class="pad"><span>화면</span><span>디자인</span><span>기능</span><span>데이터</span><span>설계</span><span>…전부 한 파일</span></div>
+        <ul><li>길어질수록 AI가 <b>전체를 다시</b> 씀</li><li>하나 고치면 <b>다른 데가 깨짐</b></li><li>언제 뭘 바꿨는지 <b>기록 없음</b></li></ul></div>
+      <i class="ar">→</i>
+      <div class="memo hot"><span class="k">깃허브 연결 · 여러 파일</span><div class="tree"><span>📁 센터원</span><span>├ index.html <small>화면</small></span><span>├ style.css <small>디자인</small></span><span>├ app.js <small>기능</small></span><span>├ data.json <small>데이터</small></span><span>└ 설계서.md <small>설계</small></span></div>
+        <ul><li>고칠 <b>파일만</b> 고침</li><li><b>세이브 포인트</b>로 되돌리기</li><li>설계서도 <b>같이 보관</b></li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="깃허브 한 장 요약"
+  data-notes="[깃허브 카드 · 2분] 깃허브(GitHub) = 코드를 보관하는 온라인 폴더. 커밋 = 게임의 세이브 포인트. 잘 될 때 저장하고, 망가지면 그때로 불러온다. 설계서도 같이 넣어 두면 새 채팅이나 다른 AI가 와도 설계서부터 읽고 이어서 작업한다. 깃허브 페이지로 웹 주소를 만들어 공유할 수도 있다.
+주의: 저장소는 비공개로. 회사 자료 · 개인정보는 올리지 않기. 회사 보안 정책이 먼저.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 깃허브 한 장 요약</span>
+    <h2 class="subhead">깃허브 = <span class="accent">온라인 폴더 + 세이브 포인트</span></h2>
+    <div class="vgit">
+      <div><i>📁</i><b>저장소</b><span>프로그램을 보관하는 온라인 폴더</span></div>
+      <div><i>💾</i><b>커밋 = 세이브</b><span>잘 될 때 저장, 망가지면 그때로</span></div>
+      <div><i>🗂</i><b>파일 나누기</b><span>화면 · 디자인 · 기능 · 데이터 따로</span></div>
+      <div><i>📝</i><b>설계서 보관</b><span>새 채팅 · 다른 AI도 설계서부터 읽고 이어 감</span></div>
+      <div><i>🔗</i><b>링크로 공유</b><span>깃허브 페이지로 웹 주소 만들기</span></div>
+      <div class="warn"><i>🔒</i><b>비공개로</b><span>회사 자료 · 개인정보는 올리지 않기</span></div>
+    </div>
+    <p class="src">시작: 깃허브 계정 → 저장소 만들기(비공개) → AI 서비스에서 깃허브 연결 · 회사 보안 정책 먼저</p>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="실화 · 이 강의안도 깃허브로"
+  data-notes="[실화 · 1분] 이 강의안도 깃허브 저장소에서 AI와 같이 만들었다. 아래는 실제 세이브 포인트(커밋) 기록 일부. 고칠 때마다 저장해 두었기 때문에, 언제든 그 시점으로 되돌릴 수 있다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 실화입니다</span>
+    <h2 class="subhead">이 강의안도 <span class="accent">깃허브</span>로 만들었습니다</h2>
+    <div class="vlog">
+      <div class="lg"><span class="t">세이브</span><b>Why not 챕터 3: 같이 만들기 실습(분쟁심의답변서생성기)</b></div>
+      <div class="lg"><span class="t">세이브</span><b>Why not 챕터 2 응용 2장: 스킬북 소환 · 반복 업무 찾기</b></div>
+      <div class="lg"><span class="t">세이브</span><b>Why not 36장: 실제 게임 화면이 잘리지 않게 원본 비율로 표시</b></div>
+      <div class="lg"><span class="t">세이브</span><b>Why not 챕터 2: 디아블로 디자인으로 다시 짬</b></div>
+      <div class="lg dim"><span class="t">…</span><b>강의안 폴더 하나에 세이브 포인트 15번 이상</b></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>고칠 때마다 저장했기 때문에, <b>언제든 그 시점으로</b> 되돌릴 수 있습니다.</p></div>
+  </div>
+</section>
+
+<!-- ===== 시연 · 센터원 ===== -->
+<section class="slide center divider bp" data-accent="indigo" data-title="시연 · 센터원"
+  data-notes="[시연 · 15분] 센터원 업무 공유 앱을 방금 배운 가이드 순서 그대로 만든다. ① 목표 → ② 뼈대 · 구조 → ③ 디자인 시안 → ④ 검증 → ⑤ 프로토타입 → ⑥ 결과물 → ⑦⑧ 고치기 · 오류 → 같이 쓰기. 폰 화면은 실제로 눌러진다(가짜 예시 데이터).">
+  <div class="slide-inner">
+    <span class="part-tag">시연</span>
+    <h2 class="headline">센터원 <span class="accent">업무 공유</span> 앱</h2>
+    <p class="lead">가이드 순서 그대로 만들어 봅니다</p>
+  </div>
+</section>
+
+<section class="slide wide compact bp" data-accent="indigo" data-title="시연 ① 목표"
+  data-notes="[시연 ①] 아직 만들지 말라고 하고 목표부터. AI가 하나씩 묻고, 답이 쌓여 목표 카드가 된다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 시연 ① · 목표 = 개성</span>
+    <div class="vdemo">
+      <div class="chat">
+        <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>우리 센터 업무 공유 앱을 만들고 싶어. 공지가 단톡방에 묻히고, 누가 뭘 하는지 모르겠어. <b>아직 만들지 말고 목표부터 같이 정하자. 한 번에 하나씩 물어봐.</b></div></div>
+        <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>누가, 주로 어디서 쓰나요? 폰인가요, PC인가요?</div></div>
+        <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>센터 직원 15명. 현장 나가니까 폰.</div></div>
+      </div>
+      <div class="vcard"><span class="k">목표 카드</span>
+        <div><b>누가 · 어디서</b><span>센터 직원 15명 · 폰</span></div>
+        <div><b>해결할 것</b><span>공지 묻힘 · 할 일 모름 · 연락처 흩어짐</span></div>
+        <div><b>꼭</b><span>공지 · 할 일</span></div>
+        <div><b>좋음 · 나중에</b><span>주소록 · 비상연락망 / 메신저</span></div>
+        <div><b>완성 기준</b><span>폰에서 공지 확인, 할 일 등록 · 완료</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="시연 ② 뼈대 · 구조"
+  data-notes="[시연 ②] 화면 5개(공지 · 할 일 · 주소록 · 비상연락망 · 메신저). 구조는 단계적으로: 처음엔 개인용 · 오프라인 · 웹 파일 하나로 만들고, 같이 쓰기로 할 때 공유용 · 온라인(서버 + 데이터베이스)으로 바꾼다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 시연 ② · 뼈대 · 구조</span>
+    <h2 class="subhead">화면 5개, 구조는 <span class="accent">쉬운 것부터</span></h2>
+    <div class="vskel">
+      <div class="tabs5"><span class="on">공지</span><span class="on">할 일</span><span>주소록</span><span>비상연락망</span><span>메신저</span></div>
+      <div class="stg">
+        <div class="st"><span class="k">1단계</span><b>개인용 · 오프라인 · 웹</b><p>HTML 파일 하나 · 내 폰에 저장</p></div>
+        <i class="ar">→</i>
+        <div class="st hot"><span class="k">나중에</span><b>공유용 · 온라인</b><p>프론트엔드 + 백엔드(서버) + 데이터베이스</p></div>
+      </div>
+      <div class="save"><b>저장할 항목</b><span>공지: 내용 · 고정</span><span>할 일: 제목 · 날짜 · 담당자 · 완료</span><span>주소록: 팀 · 이름 · 내선 · 휴대폰</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="시연 ③④ 디자인 · 검증"
+  data-notes="[시연 ③ ④] 디자인 시안 3개 중 하나를 고르고 의견을 섞는다. 그리고 만들기 전에 냉정하게 검증 요청. AI가 찾은 문제는 설계에서 바로 고친다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 시연 ③ ④ · 디자인과 검증</span>
+    <h2 class="subhead">시안을 고르고, <span class="accent">냉정하게 검증</span>합니다</h2>
+    <div class="vrow">
+      <div class="vdesign sm">
+        <div class="ph a"><div class="bar"></div><i></i><i></i><span>A</span></div>
+        <div class="ph b"><div class="bar"></div><i></i><i></i><span>B</span></div>
+        <div class="ph c pick"><div class="bar"></div><i></i><i></i><span>C ✓ 선택</span></div>
+      </div>
+      <div class="vfind"><span class="k">AI가 찾은 문제 (검증 대화)</span>
+        <div><b>담당자 없는 할 일</b><span>→ 담당자를 꼭 고르게</span></div>
+        <div><b>'밀린 일' 기준이 없음</b><span>→ 날짜가 지나면 빨갛게</span></div>
+        <div><b>파일 하나면 각자 폰에만 저장</b><span>→ 같이 쓰기는 '나중에' 단계로</span></div>
+        <div><b>실제 연락처 입력 위험</b><span>→ 교육용은 가짜 번호로</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="시연 ⑤ 프로토타입"
+  data-notes="[시연 ⑤] '프로토타입이야. 공지랑 할 일만 샘플 데이터로.' 폰 화면은 실제로 눌러진다. 동그라미를 눌러 완료해 보기.">
+  <div class="slide-inner">
+    <div class="app-stage">
+      <div class="phone-frame"><div class="phone-screen"><div data-center="2" data-tab="todo"></div></div></div>
+      <div class="app-side">
+        <span class="badge">시연 ⑤ · 프로토타입</span>
+        <h2 class="subhead">공지 · 할 일만, <span class="accent">샘플로</span></h2>
+        <div class="quote">"프로토타입이야. 핵심 화면만 샘플 데이터로 보여 줘."</div>
+        <ul class="added"><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>방향 확인 · 맛보기</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>'꼭' 기능만</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>틀어지면 설계로</li></ul>
+        <p class="tap-hint">동그라미를 눌러 완료해 보세요</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide bp" data-accent="indigo" data-title="시연 ⑥ 결과물"
+  data-notes="[시연 ⑥] 프로토타입에 만족했으면 결과물. 주소록 · 비상연락망 · 메신저까지 붙인 버전. 직접 눌러 보며 세부 작동을 다듬는다.">
+  <div class="slide-inner">
+    <div class="app-stage">
+      <div class="phone-frame"><div class="phone-screen"><div data-center="4" data-tab="emergency"></div></div></div>
+      <div class="app-side">
+        <span class="badge">시연 ⑥ · 결과물</span>
+        <h2 class="subhead">결과물을 받고 <span class="accent">세부 작동</span> 다듬기</h2>
+        <ul class="added"><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>밀린 일은 빨갛게</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>비상연락망은 누르면 바로 전화</li><li><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19.5 7"/></svg></i>주소록은 팀 · 이름으로 검색</li></ul>
+        <p class="tap-hint">아래 탭을 눌러 화면을 바꿔 보세요</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide compact bp" data-accent="indigo" data-title="시연 ⑦⑧ 고치기 · 오류"
+  data-notes="[시연 ⑦ ⑧] 고칠 때는 캡처 + 하나만 + 다른 곳은 건드리지 마. 오류가 나면 닦달 대신 점검 요청: AI가 원인부터 설명하고 고친다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 시연 ⑦ ⑧ · 고치기와 오류</span>
+    <div class="chat">
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>(화면 캡처) 할 일 완료하면 <b>줄만 긋게</b> 바꿔 줘. 다른 곳은 건드리지 마.</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>완료된 할 일에만 줄을 긋도록 바꿨어요. 다른 화면은 그대로입니다.</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>새 할 일 저장이 안 돼. <b>고치기 전에 코드를 점검해서 원인부터 설명해 줘.</b></div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>원인은 담당자를 안 고르면 저장이 막히는데, 안내 문구가 안 나와서입니다. 안내 문구를 추가할까요?</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide compact bp" data-accent="indigo" data-title="시연 · 같이 쓰려면"
+  data-notes="[시연 · 공유용으로] 지금까지는 파일 하나라 각자 폰에만 저장된다. 같이 쓰려면 구조를 공유용 · 온라인으로: 깃허브(저장소) + 버셀(웹 주소) + 데이터베이스(네온). 막히면 AI에게 물으면 길을 알려 준다. 오늘 아침 설문도 이렇게 만든 사이트. 다음 장 QR로 다 같이 써 본다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 시연 · 개인용에서 공유용으로</span>
+    <div class="chat">
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>이제 <b>센터원 다 같이</b> 쓰고 싶어. 구조를 어떻게 바꿔야 해?</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>
+        <div class="plan">지금은 파일 하나라 <b>각자 폰에만</b> 저장돼요. 공유용 · 온라인으로 바꾸려면:<br>
+        <b>① 깃허브</b> 코드를 저장소에 올리기<br>
+        <b>② 버셀</b> 연결하면 웹 주소가 생겨요<br>
+        <b>③ 데이터베이스</b> 연결하면 모두의 글이 한곳에 모여요</div>
+      </div></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>막히면 AI에게 물으면 <b>길을 알려 줍니다.</b> 오늘 아침 설문도 이렇게 만든 사이트예요.</p></div>
+  </div>
+</section>
+
+<section class="slide center bp" data-accent="indigo" data-title="직접 써 보세요 · QR"
+  data-notes="[같이 써 보기 · 5분] 진짜 사이트. 이름 입력 → 옆 사람에게 할 일 하나(날짜 · 담당자 선택) → 메신저로 한마디 → 주소록에 가짜 번호. 강사 폰 화면을 미러링하면 글이 몇 초 안에 서로의 폰에 뜨는 걸 볼 수 있다.
+QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제 고객 정보 · 실제 전화번호는 넣지 않게 다시 안내.">
+  <div class="slide-inner">
+    <span class="live"><i></i> 진짜 사이트</span>
+    <div style="display:flex;gap:clamp(24px,4vw,64px);align-items:center;justify-content:center;flex-wrap:wrap;margin-top:clamp(12px,2vh,22px)">
+      <div style="background:#fff;border-radius:28px;padding:clamp(16px,2vw,28px);box-shadow:var(--shadow)"><div data-qr="/center"></div></div>
+      <div style="text-align:left;max-width:560px">
+        <h2 class="subhead">직접 <span class="accent">써 보세요</span></h2>
+        <ul class="list num-list">
+          <li><span class="mk"></span><span><b>이름</b> 입력</span></li>
+          <li><span class="mk"></span><span>옆 사람에게 <b>할 일</b> 하나 (날짜 · 담당자)</span></li>
+          <li><span class="mk"></span><span><b>메신저</b>로 "넘겼어요" 한마디</span></li>
+          <li><span class="mk"></span><span><b>주소록</b>에 내 번호 (가짜로)</span></li>
+        </ul>
+        <p class="src" data-qr-url="/center"></p>
+      </div>
+    </div>
+    <div class="callout warn" style="max-width:820px"><span class="bang">!</span><p>교육용 공간이에요. <b>실제 고객 이름 · 연락처 · 주민번호는 넣지 마세요.</b></p></div>
+  </div>
+</section>
+
+<section class="slide center divider bp" data-accent="indigo" data-title="2부 마무리"
+  data-notes="[마무리] 바이브코딩은 별거 없다. 대화로 만든다. 다만 만들기 전에 설계 대화(목표 · 뼈대)를 충분히. 오늘부터 여러분은 게임을 하던 사람에서, 만드는 사람입니다.">
+  <div class="slide-inner">
+    <span class="part-tag">마무리</span>
+    <h2 class="headline">게임을 하던 사람에서,<br><span class="accent">만드는 사람</span>으로</h2>
+    <p class="lead wide">만들기 전에 설계 대화 · 특히 목표와 뼈대</p>
   </div>
 </section>
 
@@ -5217,7 +5732,7 @@ var qrcode = function() {
       { kind: 'notice', author: '이대물', data: { text: '렌트 협력업체 연락처가 바뀌었어요. 주소록 확인해 주세요.' } },
       { kind: 'todo', author: '윤센터', data: { title: '주간 미결 건 점검', date: t, who: '김보상' } },
       { kind: 'todo', author: '이대물', data: { title: '가나공업사 현장 확인', date: t, who: '이대물' } },
-      { kind: 'todo', author: '윤센터', data: { title: '분쟁심의 자료 준비', date: addDays(1), who: '박대인' } },
+      { kind: 'todo', author: '윤센터', data: { title: '수리비 협의 문안 검토', date: addDays(1), who: '한대물' } },
       { kind: 'todo', author: '최렌트', data: { title: '렌트 종료 안내 문자 발송', date: addDays(2), who: '최렌트' } },
       { kind: 'todo', author: '정사정', data: { title: '서류 미제출 건 재요청', date: addDays(-1), who: '김보상' } },
       { kind: 'todo', author: '정사정', data: { title: '법정 교육 이수 확인', date: addDays(-1), who: '정사정' }, done: true },
@@ -5227,11 +5742,11 @@ var qrcode = function() {
       { kind: 'contact', author: '박총무', data: { team: '대물1팀', name: '이대물', role: '대리', ext: '1102', phone: '010-0000-0003' } },
       { kind: 'contact', author: '박총무', data: { team: '대물2팀', name: '최렌트', role: '주임', ext: '1201', phone: '010-0000-0004' } },
       { kind: 'contact', author: '박총무', data: { team: '대물2팀', name: '정사정', role: '사원', ext: '1202', phone: '010-0000-0005' } },
-      { kind: 'contact', author: '박총무', data: { team: '대인팀', name: '박대인', role: '과장', ext: '1301', phone: '010-0000-0006' } },
-      { kind: 'contact', author: '박총무', data: { team: '대인팀', name: '한과실', role: '대리', ext: '1302', phone: '010-0000-0007' } },
+      { kind: 'contact', author: '박총무', data: { team: '대물3팀', name: '한대물', role: '과장', ext: '1301', phone: '010-0000-0006' } },
+      { kind: 'contact', author: '박총무', data: { team: '대물3팀', name: '오협의', role: '대리', ext: '1302', phone: '010-0000-0007' } },
       { kind: 'emergency', author: '박총무', data: { group: 'chain', step: 1, name: '윤센터', role: '센터장 · 최초 보고', phone: '010-0000-0001' } },
       { kind: 'emergency', author: '박총무', data: { group: 'chain', step: 2, name: '김보상', role: '대물1팀 대표', phone: '010-0000-0002' } },
-      { kind: 'emergency', author: '박총무', data: { group: 'chain', step: 2, name: '박대인', role: '대인팀 대표', phone: '010-0000-0006' } },
+      { kind: 'emergency', author: '박총무', data: { group: 'chain', step: 2, name: '한대물', role: '대물3팀 대표', phone: '010-0000-0006' } },
       { kind: 'emergency', author: '박총무', data: { group: 'chain', step: 3, name: '각 팀원', role: '팀 대표가 순서대로 연락', phone: '' } },
       { kind: 'emergency', author: '박총무', data: { group: 'ext', name: '건물 관리실 (예시)', role: '정전 · 누수 · 출입', phone: '02-000-0000' } },
       { kind: 'emergency', author: '박총무', data: { group: 'ext', name: '긴급출동 접수 (예시)', role: '현장 출동 요청', phone: '1588-0000' } },
