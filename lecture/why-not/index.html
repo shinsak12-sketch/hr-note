@@ -1029,6 +1029,10 @@ body[data-tool="spot"] .spot{display:block}
 .gap6 b{font-size:clamp(18px,2.2vw,30px);font-weight:900}
 .gap6 .now b{color:var(--coral)}
 .gap6 .fut b{color:var(--ink-faint)}
+.gap6{position:relative}
+.gap6 .nowline{position:absolute;left:50%;top:clamp(34px,4.6vh,48px);bottom:clamp(64px,9vh,90px);border-left:3px dashed var(--coral);transform:translateX(-1.5px);z-index:1;pointer-events:none}
+.gap6 .nowline em{position:absolute;top:-1.9em;left:0;transform:translateX(-50%);font-style:normal;font-weight:900;font-size:clamp(13px,1.4vw,17px);color:#fff;background:var(--coral);border-radius:999px;padding:.15em .8em;white-space:nowrap}
+.start-now{color:var(--coral);letter-spacing:.02em;font-weight:900}
 .gap6 span{font-size:clamp(12px,1.3vw,16px);color:var(--ink-faint);font-weight:700}
 @media (max-width:900px){.mcvs,.esc,.math2{grid-template-columns:1fr}.gap6,.cols4{grid-template-columns:repeat(3,1fr)}}
 </style>
@@ -1108,7 +1112,7 @@ body[data-tool="spot"] .spot{display:block}
 
 <!-- ===== 1. 오프닝 영상 ===== -->
 <section class="slide center mid video-slide" data-accent="indigo" data-title="오프닝 영상"
-  data-notes="[0:00 · 오프닝] 영상을 누르거나 Space로 재생. 영상 마지막 'Why not use AI?'가 나오면 → 키로 표지.
+  data-notes="[0:00 · 오프닝 · 3분] 영상을 누르거나 Space로 재생. 영상 마지막 'Why not use AI?'가 나오면 → 키로 표지.
 ※ 같은 폴더에 opening.mp4 를 두어야 재생된다. 화면이 안 나오고 소리만 나면 영상이 HEVC(H.265)라서 그렇다 → H.264로 다시 내보내기.">
   <div class="slide-inner">
     <video id="opening" src="opening.mp4" controls playsinline preload="auto"></video>
@@ -1118,7 +1122,7 @@ body[data-tool="spot"] .spot{display:block}
 
 <!-- ===== 2. 타이틀 · Why not ===== -->
 <section class="slide center title-slide" data-accent="indigo" data-title="표지 · Why not?"
-  data-notes="[0:03 · 표지] 영상의 마지막 문장을 그대로 받는다. '오늘 강의 제목은 이겁니다. Why not? 왜 안 돼요?'">
+  data-notes="[0:03 · 표지 · 2분] 영상의 마지막 문장을 그대로 받는다. '오늘 강의 제목은 이겁니다. Why not? 왜 안 돼요?'">
   <div class="slide-inner">
     <span class="kicker">생성형 AI 활용 업무 보조 바이브코딩</span>
     <h1 class="headline why">Why <span style="color:var(--coral)">not?</span></h1>
@@ -1128,7 +1132,7 @@ body[data-tool="spot"] .spot{display:block}
 
 <!-- ===== 3. 설문 ===== -->
 <section class="slide center" data-accent="amber" data-title="설문 · QR"
-  data-notes="[0:06 · 5분] 휴대폰 카메라로 QR → 9문항 1분. 다 모이면 '현황 보기'로 강사 화면을 열고 Space로 결과 공개 → → 키로 문항별 결과를 한 장씩 넘기며 이야기한다.
+  data-notes="[0:05 · 설문 · 12분(참여 4 + 결과 8)] 휴대폰 카메라로 QR → 9문항 1분. 다 모이면 '현황 보기'로 강사 화면을 열고 Space로 결과 공개 → → 키로 문항별 결과를 한 장씩 넘기며 이야기한다.
 이야깃거리: 어떤 AI를 쓰나 / 유료 비율 / 얼마나 자주 / 무엇에 쓰나 / 써 본 기능 / 아끼는 시간.">
   <div class="slide-inner">
     <span class="live"><i></i> 지금 참여</span>
@@ -1146,7 +1150,7 @@ body[data-tool="spot"] .spot{display:block}
 
 <!-- ===== 4. AI에 실망하는 이유 ===== -->
 <section class="slide wide" data-accent="coral" data-title="AI에 실망한 순간"
-  data-notes="[0:11 · 3분] 강사 실제 경험으로 시작. '이번 주말에 아내랑 1박 2일 놀러 가려고 AI한테 물어봤습니다.' 답을 하나씩 읽어 주며 반응 보기 — '원주, 양평, 가평, 춘천… 다 아는 데죠?'
+  data-notes="[0:17 · 3분] 강사 실제 경험으로 시작. '이번 주말에 아내랑 1박 2일 놀러 가려고 AI한테 물어봤습니다.' 답을 하나씩 읽어 주며 반응 보기 — '원주, 양평, 가평, 춘천… 다 아는 데죠?'
 화면의 답은 실제 받은 답을 줄인 것.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 여러분, AI에 실망한 적 있나요?</span>
@@ -1175,7 +1179,7 @@ body[data-tool="spot"] .spot{display:block}
 </section>
 
 <section class="slide wide" data-accent="coral" data-title="다른 질문도 뻔하다"
-  data-notes="[0:14 · 2분] 다른 질문도 마찬가지. 청중에게 '이런 거 물어봐서 비슷한 답 받아 본 적 있죠?' 하고 손 들게 하면 좋다. 답은 예시(실제로는 매번 조금씩 다름). 마지막 문장 '실망하셨다면, AI를 잘못 쓰고 계신 겁니다'로 다음 장(원리)으로 넘긴다.">
+  data-notes="[0:20 · 2분] 다른 질문도 마찬가지. 청중에게 '이런 거 물어봐서 비슷한 답 받아 본 적 있죠?' 하고 손 들게 하면 좋다. 답은 예시(실제로는 매번 조금씩 다름). 마지막 문장 '실망하셨다면, AI를 잘못 쓰고 계신 겁니다'로 다음 장(원리)으로 넘긴다.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 다른 질문도 마찬가지</span>
     <h2 class="subhead">무엇을 물어도, <span class="accent">누구나 아는 답</span>이 나옵니다</h2>
@@ -1192,7 +1196,7 @@ body[data-tool="spot"] .spot{display:block}
 
 <!-- ===== 5. AI 원리 ===== -->
 <section class="slide wide" data-accent="indigo" data-title="AI 원리 · 오픈북 시험 보는 학생"
-  data-notes="[0:16 · 5분] 앞 장의 '왜?'에 대한 답. 한 장에 네 컷, 왼쪽부터 순서대로.
+  data-notes="[0:22 · 5분] 앞 장의 '왜?'에 대한 답. 한 장에 네 컷, 왼쪽부터 순서대로.
 ① AI는 오픈북 시험 보는 학생. 문제는 늘 하나, 빈칸에 들어갈 '다음 말' 맞히기. 긴 답도 이걸 수백 번 이어 붙인 것.
 ② 오픈북을 두껍게 하려고 세상 글을 다 베꼈다. Meta Llama 3.1은 15조 개가 넘는 글 조각(토큰)을 읽었다(Meta 2024, 15.6조). 사람이 1초에 한 조각씩 쉬지 않고 읽어도 약 48만 년(강사 환산). 이걸 넘겨 보는 손 = AI 반도체 한 장이 1초에 약 1,000조 번 계산(NVIDIA H100, BF16 989 TFLOPS).
 ③ 핵심. 학생은 답을 '아는' 게 아니라 오픈북에 '많이 나온 것'을 뽑는다. 1박 2일 여행 글에는 가평 · 춘천이 압도적으로 많다 → 그래서 뻔한 답이 나오는 게 정상. (퍼센트는 설명용)
@@ -1285,7 +1289,7 @@ body[data-tool="spot"] .spot{display:block}
 </section>
 
 <section class="slide wide" data-accent="teal" data-title="몬테카를로 · 사람 vs AI"
-  data-notes="[0:20 · 3분 · 체험] 원주율(π)을 구하는 두 가지 방법. ▶ 재생을 누르면 동시에 시작.
+  data-notes="[0:27 · 3분 · 체험] 원주율(π)을 구하는 두 가지 방법. ▶ 재생을 누르면 동시에 시작.
 사람: 공식을 안다. 원의 넓이 = π × r² → 바로 3.14159…
 AI: 공식을 모른다. 네모 안에 점을 무작위로 뿌리고, 원 안에 들어간 비율 × 4로 π를 '추정'한다. 처음엔 엉뚱하다가 점이 많아질수록 3.14에 다가간다(몬테카를로 방법).
 멘트: 'AI는 답을 아는 게 아니라, 엄청나게 많이 해 보고 가장 그럴듯한 답에 다가갑니다. 한 번은 운이지만, 만 번이면 실력입니다. 이게 앞 장의 '많이 나온 걸 뽑는다'와 같은 원리예요.'">
@@ -1318,7 +1322,7 @@ AI: 공식을 모른다. 네모 안에 점을 무작위로 뿌리고, 원 안에
 </section>
 
 <section class="slide wide" data-accent="coral" data-title="그래서 · AI를 쓰는 시각을 바꾸자"
-  data-notes="[0:21 · 3분] 원리의 결론. AI는 많은 사람이 쓴 답을 뽑는 기계 → 색다른 답을 '물어서' 받으려 하면 실망할 수밖에 없다. 색다른 결과는 AI가 아니라 '내 조건'에서 나온다.
+  data-notes="[0:30 · 2분] 원리의 결론. AI는 많은 사람이 쓴 답을 뽑는 기계 → 색다른 답을 '물어서' 받으려 하면 실망할 수밖에 없다. 색다른 결과는 AI가 아니라 '내 조건'에서 나온다.
 같은 여행 질문으로 비교: 물어보면 누구나 받는 답, 시키면 우리 부부만의 계획표.
 마무리 멘트: '오늘 이 시간부터 AI를 쓰는 시각을 바꿔 봅시다. 검색하고 물어보는 용도에서, 시키는 용도로.'">
   <div class="slide-inner">
@@ -1334,7 +1338,7 @@ AI: 공식을 모른다. 네모 안에 점을 무작위로 뿌리고, 원 안에
 </section>
 
 <section class="slide center divider" data-accent="coral" data-title="Why Now?"
-  data-notes="[0:25 · 질문] 잠깐 멈추고 질문을 던진다. '원리는 알았습니다. 그런데 왜 하필 지금일까요? 왜 지금 시작해야 할까요?' → 다음 장부터 답.">
+  data-notes="[0:32 · 질문 · 30초] 잠깐 멈추고 질문을 던진다. '원리는 알았습니다. 그런데 왜 하필 지금일까요? 왜 지금 시작해야 할까요?' → 다음 장부터 답.">
   <div class="slide-inner">
     <span class="part-tag">질문</span>
     <h2 class="headline why-now">Why <span class="accent">Now?</span></h2>
@@ -1344,7 +1348,7 @@ AI: 공식을 모른다. 네모 안에 점을 무작위로 뿌리고, 원 안에
 
 <!-- ===== 6. AI 발전 속도 ===== -->
 <section class="slide wide" data-accent="indigo" data-title="AI 모델 출시 연표"
-  data-notes="[0:24 · 3분 · 연표 · AI 발전 속도 ①] 보여 줄 것: AI 모델이 빠르게 진화하면서 계속 늘어나고 있다. 점 하나 = 회사의 대표 모델 하나(공식 발표 기준, 대표 모델만 골라 표시). 아래 막대는 이 표에 찍힌 연도별 수(2026년은 10월까지).
+  data-notes="[0:33 · 3분 · 연표] 보여 줄 것: AI 모델이 빠르게 진화하면서 계속 늘어나고 있다. 점 하나 = 회사의 대표 모델 하나(공식 발표 기준, 대표 모델만 골라 표시). 아래 막대는 이 표에 찍힌 연도별 수(2026년은 10월까지).
 멘트: 'ChatGPT 전 5년 동안 점이 5개였습니다. 이후 4년 사이 46개. 이름 뒤 숫자도 GPT-1에서 GPT-6까지 계속 올라갑니다. 오늘 배우는 메뉴도 내년이면 또 바뀝니다. 그래서 버튼보다 시키는 법을 익히는 게 오래갑니다.'
 날짜(공식 발표 기준): OpenAI GPT-1 2018.6.11 · GPT-2 2019.2.14 · GPT-3 2020.5.28 · ChatGPT 2022.11.30 · GPT-4 2023.3.14 · GPT-4o 2024.5.13 · o1 2024.9.12 · GPT-4.5 2025.2.27 · GPT-5 2025.8.7 · GPT-5.2 2025.12.11 · GPT-5.5 2026.4 · GPT-5.6 2026.7.9 · GPT-6 Astra 2026.9.3
 Google BERT 2018.10 · PaLM 2022.4 · Bard 2023.3.21 · Gemini 1.0 2023.12.6 · Gemini 1.5 2024.2.15 · Gemini 2.0 2024.12.11 · Gemini 2.5 Pro 2025.3.25 · Gemini 3 Pro 2025.11.18 · Gemini 3.1 Pro 2026.2.19 · Gemini 3.5 Flash 2026.5.19 · Gemini 3.6 Flash 2026.7 · Gemini 3.7 Flash 2026.8
@@ -1361,7 +1365,7 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
 </section>
 
 <section class="slide wide" data-accent="indigo" data-title="사람을 넘다 ① 바둑"
-  data-notes="[1/5 · 바둑] 긴장감을 쌓는 첫 장. 2016년 3월 서울, 알파고 vs 이세돌 9단 5번기 4:1(이세돌 9단은 4국에서 승리). 2017년 알파고 제로는 사람 기보 없이 혼자 학습해, 이세돌 9단을 이긴 버전(알파고 리)을 100:0으로 이김(Silver 외, Nature 2017).
+  data-notes="[0:36 · 2분 · 1/5 바둑] 긴장감을 쌓는 첫 장. 2016년 3월 서울, 알파고 vs 이세돌 9단 5번기 4:1(이세돌 9단은 4국에서 승리). 2017년 알파고 제로는 사람 기보 없이 혼자 학습해, 이세돌 9단을 이긴 버전(알파고 리)을 100:0으로 이김(Silver 외, Nature 2017).
 장강명 작가는 알파고 이후 바둑계 10년을 취재한 책 『먼저 온 미래』(동아시아, 2025)에서 '바둑계에 미래가 먼저 왔다'고 썼다. 멘트: '그때 바둑에서 벌어진 일이 이제 다른 곳에서 벌어집니다.'">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 사람을 넘다 · 1 / 5</span>
@@ -1381,7 +1385,7 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
 </section>
 
 <section class="slide wide" data-accent="indigo" data-title="사람을 넘다 ② 코딩"
-  data-notes="[2/5 · 코딩] 세계 최상위 프로그래밍 대회 AtCoder 월드투어 파이널.
+  data-notes="[0:38 · 2분 · 2/5 코딩] 세계 최상위 프로그래밍 대회 AtCoder 월드투어 파이널.
 2025년 7월(도쿄) 휴리스틱 부문: OpenAI가 시범 참가해 사람 우승자 Psyho에게 근소하게 져 2위.
 2026년 7월(도쿄) 알고리즘 부문: OpenAI가 다섯 문제(900 · 900 · 1500 · 2500 · 2500점)를 모두 풀고 사람 참가자 전원을 앞섰다(시범 참가, 공식 순위 외). 관전자들은 두 문제를 특히 어렵다고 평가.
 멘트: '1년 만에, 근소한 패배가 전 문제 해결로 바뀌었습니다.'">
@@ -1400,7 +1404,7 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
 </section>
 
 <section class="slide wide" data-accent="indigo" data-title="사람을 넘다 ③ 수학 난제"
-  data-notes="[3/5 · 수학] OpenAI 'Ten advances in mathematics and theoretical computer science'(2026.8.1, 249쪽). 차세대 모델 Astra가 10년 넘게 주요 진전이 없던 수학 · 이론 컴퓨터과학 문제 10개에서 새 결과. 분야: 고차원 기하, 부호 이론, 산술 회로 복잡도, 군론, 양자 복잡도, 격자 암호, 극값 조합론 등. 증명은 Lean(컴퓨터 증명 검증 도구)으로 검증해 공개, 문제당 토큰 비용 2,000달러 미만(OpenAI 발표 · 실패한 시도 수는 밝히지 않음). 에르되시 문제 데이터베이스 관리자 토머스 블룸은 '큰 뉴스'라고 평가.
+  data-notes="[0:40 · 2분 · 3/5 수학] OpenAI 'Ten advances in mathematics and theoretical computer science'(2026.8.1, 249쪽). 차세대 모델 Astra가 10년 넘게 주요 진전이 없던 수학 · 이론 컴퓨터과학 문제 10개에서 새 결과. 분야: 고차원 기하, 부호 이론, 산술 회로 복잡도, 군론, 양자 복잡도, 격자 암호, 극값 조합론 등. 증명은 Lean(컴퓨터 증명 검증 도구)으로 검증해 공개, 문제당 토큰 비용 2,000달러 미만(OpenAI 발표 · 실패한 시도 수는 밝히지 않음). 에르되시 문제 데이터베이스 관리자 토머스 블룸은 '큰 뉴스'라고 평가.
 멘트: '이제 시험 문제가 아니라, 사람이 수십 년 못 푼 진짜 문제입니다.'">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 사람을 넘다 · 3 / 5</span>
@@ -1419,7 +1423,7 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
 </section>
 
 <section class="slide wide" data-accent="indigo" data-title="사람을 넘다 ④ 사람만 풀던 시험"
-  data-notes="[4/5 · 사람이 앞서던 영역] ARC-AGI-3(ARC Prize, 2026.3 공개): 설명 없는 게임을 직접 해 보며 규칙을 알아내야 하는 시험. 사람에게는 쉽고 AI에게는 어렵게 일부러 만들었다. 공개 당시 사람 100%, 최신 AI 1% 미만(예: Gemini 3.1 Pro 0.37%). 2026.7 Claude Opus 5 30.2%, 2026.9 GPT-6 Astra 62.7%(ARC 표준 평가. OpenAI 자체 설정으로는 99.9%). ARC Prize는 이 결과가 AGI를 뜻하지는 않는다고 밝힘. ※ 2차 보도 기준.
+  data-notes="[0:42 · 2분 · 4/5 사람이 앞서던 영역] ARC-AGI-3(ARC Prize, 2026.3 공개): 설명 없는 게임을 직접 해 보며 규칙을 알아내야 하는 시험. 사람에게는 쉽고 AI에게는 어렵게 일부러 만들었다. 공개 당시 사람 100%, 최신 AI 1% 미만(예: Gemini 3.1 Pro 0.37%). 2026.7 Claude Opus 5 30.2%, 2026.9 GPT-6 Astra 62.7%(ARC 표준 평가. OpenAI 자체 설정으로는 99.9%). ARC Prize는 이 결과가 AGI를 뜻하지는 않는다고 밝힘. ※ 2차 보도 기준.
 멘트: '사람만 풀 수 있게 일부러 만든 시험인데, 반년 만에 이렇게 됐습니다.'">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 사람을 넘다 · 4 / 5</span>
@@ -1436,7 +1440,7 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
 </section>
 
 <section class="slide wide" data-accent="coral" data-title="사람을 넘다 ⑤ 인류의 마지막 시험"
-  data-notes="[5/5 · 절정] Humanity's Last Exam(CAIS · Scale AI): 수학 · 인문 · 자연과학 등 수십 분야 전문가 약 1,000명이 낸 2,500문항. 기존 시험들이 80~90%로 포화되자 만든 '마지막 시험'.
+  data-notes="[0:44 · 2분 · 5/5 절정] Humanity's Last Exam(CAIS · Scale AI): 수학 · 인문 · 자연과학 등 수십 분야 전문가 약 1,000명이 낸 2,500문항. 기존 시험들이 80~90%로 포화되자 만든 '마지막 시험'.
 공개 당시(2025.1) o1 약 8%, GPT-4o 2.7%. 이후 Gemini 3 Pro 37.5%(2026.2 기록), Gemini 3.1 Pro 46.4%(2026.6 기록), 2026.9 Scale AI 리더보드 1위 GPT-6 Astra 60.6%. ※ 도구 사용 여부 · 시점에 따라 출처마다 숫자가 조금씩 다르다.
 멘트: '인류가 낼 수 있는 가장 어려운 문제를 모았는데, 1년 반 만에 절반을 넘었습니다.'">
   <div class="slide-inner">
@@ -1454,7 +1458,7 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
 </section>
 
 <section class="slide wide" data-accent="coral" data-title="더 똑똑하고, 더 싸진다"
-  data-notes="[0:30 · 3분] 똑똑해지는 것만이 아니라 싸지고 있다.
+  data-notes="[0:46 · 3분] 똑똑해지는 것만이 아니라 싸지고 있다.
 ① 샘 올트먼 「Three Observations」(2025.2): 같은 수준의 AI를 쓰는 비용은 12개월마다 약 10분의 1로 떨어진다.
 ② Payden & Rygel(자산운용사, 2026.5): GPT-4 수준 지능의 비용이 백만 토큰당 출시가 60달러 → 2026.1 0.05달러, 99.9% 이상 하락.
 ③ 뉴욕타임스(2026.9): OpenRouter 미국 사용자 기준, 공개형(오픈) AI 모델이 AI 사용의 58% — 1년 전 10%. AT&T는 연초 대비 AI 비용을 최대 80% 줄였다고 밝힘.
@@ -1482,23 +1486,24 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
 </section>
 
 <section class="slide wide" data-accent="coral" data-title="Why Now의 답 · 아직 6시간 차이"
-  data-notes="[Why Now의 답 · 3분] AI를 쓰는 사람과 안 쓰는 사람의 차이를 '시간'으로 보면.
+  data-notes="[0:49 · 3분 · Why Now의 답 → 0:52 끝] AI를 쓰는 사람과 안 쓰는 사람의 차이를 '시간'으로 보면.
 2023년 초 30초 → 2025년 약 45분 → 2026년 초 약 6시간. 이 숫자는 강연 자료에서 인용한 것으로, AI 평가 기관 METR가 잰 'AI가 혼자 해내는 일의 길이(사람 전문가 기준)'를 바탕으로 한다. METR 측정으로는 2025년 초 최상위 모델이 약 1시간 안팎, Claude Opus 4.5 약 4시간 49분(2025.11), Claude Opus 4.6 약 14.5시간(2026.2, 2차 보도 · 벤치마크 포화로 불확실).
 흐린 막대(1주 · 2년 · 커리어 전체)는 같은 강연의 예측. 추세가 이어진다면의 이야기.
-결론 멘트: '지금은 아직 6시간 차이입니다. 하루면 따라잡을 수 있는 차이예요. 1년 뒤엔 2년, 몇 년 뒤엔 커리어 전체가 될 수 있습니다. 그래서 지금, 오늘 시작해야 합니다. Why not?'
+빨간 점선 '지금'은 2026년 10월, 6시간(2026년 초)과 1주(2026년 말 예측) 사이.
+결론 멘트: '지금은 6시간을 지나 1주로 가는 중입니다. 아직은 따라잡을 수 있는 차이예요. 1년 뒤엔 2년, 몇 년 뒤엔 커리어 전체가 될 수 있습니다. 그래서 지금, 오늘 시작해야 합니다. START NOW.'
 ※ 막대 길이는 로그 눈금(30초와 커리어 전체를 한 화면에 담기 위해).">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> Why Now의 답</span>
-    <h2 class="subhead">AI를 쓰는 사람과 안 쓰는 사람, <span class="accent">지금은 6시간 차이</span>입니다</h2>
-    <div class="gap6">
+    <h2 class="subhead">AI를 쓰는 사람과 안 쓰는 사람, <span class="accent">6시간에서 1주로</span> 벌어지는 중입니다</h2>
+    <div class="gap6"><div class="nowline"><em>지금 · 2026.10</em></div>
       <div class="g"><div class="gb"><i style="height:16%"></i></div><b>30초</b><span>2023년 초</span></div>
       <div class="g"><div class="gb"><i style="height:38%"></i></div><b>45분</b><span>2025년</span></div>
-      <div class="g now"><div class="gb"><i style="height:48%"><em>지금</em></i></div><b>6시간</b><span>2026년 초</span></div>
+      <div class="g"><div class="gb"><i style="height:48%"></i></div><b>6시간</b><span>2026년 초</span></div>
       <div class="g fut"><div class="gb"><i style="height:64%"></i></div><b>1주</b><span>2026년 말 · 예측</span></div>
       <div class="g fut"><div class="gb"><i style="height:86%"></i></div><b>2년</b><span>2028년 말 · 예측</span></div>
       <div class="g fut"><div class="gb"><i style="height:100%"></i></div><b>커리어 전체</b><span>2030년 말 · 예측</span></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>아직은 <b>6시간</b>, 하루면 따라잡을 수 있는 차이입니다. 벌어지기 전에, <b>지금 우리도 AI를 쓰기 시작해야 합니다.</b> Why not?</p></div>
+    <div class="callout tip"><span class="bang">!</span><p>아직은 <b>6시간 남짓</b>, 따라잡을 수 있는 차이입니다. 1주, 2년으로 벌어지기 전에, <b>지금 우리도 AI를 쓰기 시작해야 합니다.</b> <b class="start-now">START NOW</b></p></div>
     <p class="src">AI 사용 여부에 따른 격차: 강연 자료 인용(METR 'AI가 혼자 해내는 일의 길이' 측정 기반) · 2026년 말 이후는 예측 · 막대는 로그 눈금</p>
   </div>
 </section>
