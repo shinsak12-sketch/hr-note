@@ -1041,6 +1041,147 @@ body[data-tool="spot"] .spot{display:block}
 .start-now{color:var(--coral);letter-spacing:.02em;font-weight:900}
 .gap6 span{font-size:clamp(12px,1.3vw,16px);color:var(--ink-faint);font-weight:700}
 @media (max-width:900px){.mcvs,.esc,.math2{grid-template-columns:1fr}.gap6,.cols4{grid-template-columns:repeat(3,1fr)}}
+/* ===== 본론 · 챕터 1 ===== */
+.vs2{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(14px,2vw,28px);align-items:center;margin-top:clamp(18px,3vh,34px)}
+.vs2 .vc{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:clamp(20px,2.6vw,38px);box-shadow:var(--shadow);text-align:center}
+.vs2 .vk{font-size:clamp(14px,1.6vw,20px);font-weight:800;color:var(--accent,var(--indigo));letter-spacing:.04em}
+.vs2 .vc b{display:block;font-size:clamp(34px,4.6vw,64px);font-weight:900;letter-spacing:-.03em;margin:.15em 0}
+.vs2 .vc p{margin:0;font-size:clamp(16px,1.9vw,24px);color:var(--ink-soft);font-weight:600;line-height:1.45}
+.vs2 .vsm{font-size:clamp(28px,3.6vw,50px);font-weight:900;color:var(--ink-faint);font-style:italic}
+.askq{text-align:center;margin:clamp(18px,3vh,32px) 0 0;font-size:clamp(24px,3.2vw,44px);font-weight:800;letter-spacing:-.02em}
+.askq b{color:var(--accent,var(--indigo))}
+.reveal-ans{margin:clamp(14px,2.4vh,24px) auto 0;width:fit-content;display:flex;align-items:center;gap:.7em;background:var(--coral);color:#fff;border-radius:18px;padding:.5em 1.2em;font-size:clamp(24px,3.4vw,46px);cursor:pointer;opacity:0;transform:scale(.85);transition:opacity .35s,transform .45s cubic-bezier(.2,1.6,.4,1);box-shadow:0 12px 30px color-mix(in srgb,var(--coral) 40%,transparent)}
+.reveal-ans .ak{font-size:.5em;font-weight:900;background:#fff;color:var(--coral);border-radius:999px;padding:.2em .7em}
+.reveal-ans b{font-weight:900;letter-spacing:-.02em}
+.reveal-ans.shown{opacity:1;transform:none}
+.reveal-hint{text-align:center;margin:.8em 0 0;font-size:clamp(13px,1.4vw,16px);color:var(--ink-faint);font-weight:600;transition:opacity .3s}
+.slide:has(.reveal-ans.shown) .reveal-hint{opacity:0}
+/* 긴 프롬프트 */
+.lp{display:grid;grid-template-columns:1.7fr 1fr;gap:clamp(16px,2.2vw,32px);margin-top:clamp(14px,2.2vh,24px);align-items:stretch}
+.lpdoc{background:var(--code-bg);color:var(--code-ink);border-radius:16px;padding:0 0 clamp(10px,1.4vh,16px);box-shadow:var(--shadow);overflow:hidden;font-family:var(--font-mono);font-size:clamp(10px,.9vw,12.5px);line-height:1.5}
+.lpbar{display:flex;align-items:center;gap:6px;padding:9px 14px;background:rgba(255,255,255,.06);font-family:var(--font-sans);font-size:clamp(12px,1.2vw,14px);font-weight:700;color:#B9B6D3}
+.lpbar i{width:10px;height:10px;border-radius:50%;background:#FF5F57}.lpbar i:nth-child(2){background:#FEBC2E}.lpbar i:nth-child(3){background:#28C840;margin-right:8px}
+.lpdoc pre{margin:0;padding:clamp(8px,1.2vh,14px) clamp(14px,1.6vw,22px) 0;white-space:pre-wrap;word-break:keep-all;font:inherit}
+.lphead{-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+.lptail{-webkit-mask-image:linear-gradient(transparent,#000 30%);mask-image:linear-gradient(transparent,#000 30%)}
+.lpcut{margin:.2em clamp(14px,1.6vw,22px);padding:.45em 0;text-align:center;font-family:var(--font-sans);font-weight:800;font-size:clamp(14px,1.5vw,19px);color:#FFB4AC;border-top:2px dashed rgba(255,255,255,.18);border-bottom:2px dashed rgba(255,255,255,.18)}
+.lpstat{display:flex;flex-direction:column;gap:clamp(10px,1.6vh,16px)}
+.lpstat div{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(10px,1.2vw,16px) clamp(12px,1.5vw,20px);box-shadow:var(--shadow)}
+.lpstat div b{display:block;font-size:clamp(26px,3.3vw,46px);font-weight:900;color:var(--coral);letter-spacing:-.03em;line-height:1.05}
+.lpstat div b small{font-size:.45em;margin-left:.15em}
+.lpstat div span{font-size:clamp(13px,1.45vw,18px);font-weight:700;color:var(--ink-soft)}
+.lpno{margin:auto 0 0;font-size:clamp(20px,2.5vw,32px);font-weight:800;line-height:1.3;letter-spacing:-.02em}
+.lpno b{color:var(--coral)}
+@media (max-width:900px){.vs2,.lp{grid-template-columns:1fr}}
+/* ===== 1부 본론 · 챕터 1 · 챕터 2 ===== */
+.prompt .blank{display:inline!important;position:static;inset:auto;z-index:auto;cursor:auto}
+.b-trend{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:clamp(10px,1.4vw,20px);align-items:stretch;margin-top:clamp(18px,3vh,32px)}
+.b-trend .tr{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(18px,2.2vw,30px);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.5em}
+.b-trend .tr.hot{border-color:var(--accent,var(--indigo));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,var(--indigo)) 30%,transparent),var(--shadow)}
+.b-trend .y{font-family:var(--font-mono);font-weight:900;font-size:clamp(18px,2.2vw,30px);color:var(--ink-faint)}
+.b-trend .hot .y{color:var(--accent,var(--indigo))}
+.b-trend .tr>b{font-size:clamp(24px,3vw,40px);font-weight:900;line-height:1.15;letter-spacing:-.02em}
+.b-trend .tr p{margin:0;font-size:clamp(15px,1.75vw,22px);color:var(--ink-soft);font-weight:600;line-height:1.45}
+.b-trend .tr small{margin-top:auto;font-size:clamp(12px,1.3vw,16px);color:var(--ink-faint);font-weight:600;line-height:1.45}
+.b-trend .ar,.b-map .ar,.b-atk .ar{align-self:center;font-style:normal;font-size:clamp(24px,3vw,40px);font-weight:900;color:var(--ink-faint)}
+.b-harn{display:grid;grid-template-columns:1fr auto 1.4fr;gap:clamp(14px,2vw,28px);align-items:center;margin-top:clamp(16px,2.6vh,28px)}
+.b-harn .horse,.b-harn .gear{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(18px,2.2vw,30px);box-shadow:var(--shadow)}
+.b-harn .gear{border-color:var(--accent,var(--indigo))}
+.b-harn .hk{font-size:clamp(13px,1.5vw,18px);font-weight:800;color:var(--accent,var(--indigo));letter-spacing:.04em}
+.b-harn .horse b{display:block;font-size:clamp(32px,4.2vw,58px);font-weight:900;margin:.15em 0 .2em}
+.b-harn .horse p{margin:0;font-size:clamp(15px,1.75vw,22px);color:var(--ink-soft);font-weight:600;line-height:1.45}
+.b-harn .plus{font-style:normal;font-size:clamp(30px,4vw,54px);font-weight:900;color:var(--ink-faint)}
+.b-harn ul{list-style:none;margin:.5em 0 0;padding:0;display:grid;gap:.45em}
+.b-harn li{font-size:clamp(15px,1.75vw,22px);color:var(--ink-soft);font-weight:600}
+.b-harn li b{display:inline-block;min-width:3.2em;color:var(--ink);font-weight:900}
+.b-map{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:clamp(10px,1.4vw,20px);margin-top:clamp(20px,3.4vh,36px)}
+.b-map .mp{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(20px,2.4vw,34px);box-shadow:var(--shadow);text-align:center}
+.b-map .n{font-family:var(--font-mono);font-weight:800;font-size:clamp(13px,1.4vw,17px);color:var(--accent,var(--indigo));letter-spacing:.08em}
+.b-map b{display:block;font-size:clamp(24px,3vw,40px);font-weight:900;margin:.3em 0;letter-spacing:-.02em}
+.b-map p{margin:0;font-size:clamp(15px,1.75vw,22px);color:var(--ink-soft);font-weight:600}
+.b-map em{font-style:normal;font-weight:900;color:var(--coral)}
+.b-funnel{display:flex;flex-direction:column;align-items:center;gap:clamp(6px,1vh,10px);margin-top:clamp(16px,2.6vh,28px)}
+.b-funnel .fl{width:var(--w);min-width:min(320px,100%);display:flex;justify-content:center;align-items:baseline;gap:.8em;padding:clamp(10px,1.5vh,16px) 1em;border-radius:14px;background:color-mix(in srgb,var(--accent,var(--teal)) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--accent,var(--teal)) 30%,var(--line))}
+.b-funnel .fl b{font-size:clamp(17px,2vw,26px);font-weight:900}
+.b-funnel .fl span{font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft);font-weight:600}
+.b-funnel .fl.hot{background:var(--accent,var(--teal));border-color:transparent}
+.b-funnel .fl.hot b{color:#fff;font-size:clamp(20px,2.4vw,32px)}
+.b-gauge{position:relative;margin:clamp(18px,3vh,30px) 0 clamp(14px,2vh,20px);padding-top:1.8em}
+.b-gauge .bar{height:14px;border-radius:999px;background:linear-gradient(90deg,var(--indigo),var(--teal))}
+.b-gauge span{position:absolute;top:0;font-family:var(--font-mono);font-weight:800;font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft)}
+.b-gauge .l{left:0}.b-gauge .r{right:0}
+.b-six{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.4vw,18px);margin-top:clamp(12px,2vh,20px)}
+.b-six .c{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(12px,1.5vw,20px);box-shadow:var(--shadow)}
+.b-six .c.hot{border-color:var(--coral);box-shadow:0 0 0 2px color-mix(in srgb,var(--coral) 28%,transparent),var(--shadow)}
+.b-six .n{font-family:var(--font-mono);font-size:clamp(13px,1.4vw,17px);font-weight:800;color:var(--accent,var(--teal))}
+.b-six .hot .n{color:var(--coral)}
+.b-six b{display:block;font-size:clamp(18px,2.1vw,27px);font-weight:900;margin:.15em 0 .25em}
+.b-six p{margin:0;font-size:clamp(14px,1.55vw,19px);color:var(--ink-soft);font-weight:600;line-height:1.45}
+.b-free{display:grid;grid-template-columns:2fr 1fr;gap:clamp(16px,2.4vw,36px);margin-top:clamp(12px,2vh,20px);align-items:start}
+.b-free .ftips{list-style:none;margin:0;padding:0;display:grid;gap:clamp(10px,1.6vh,16px)}
+.b-free .ftips li{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(12px,1.5vw,20px);box-shadow:var(--shadow)}
+.b-free .ftips b{display:block;font-size:clamp(18px,2.1vw,27px);font-weight:900;color:var(--accent,var(--teal))}
+.b-free .ftips span{font-size:clamp(14px,1.55vw,19px);color:var(--ink-soft);font-weight:600}
+.b-walls{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,28px);margin-top:clamp(18px,3vh,32px)}
+.b-walls .w{background:var(--code-bg);color:var(--code-ink);border-radius:22px;padding:clamp(22px,2.8vw,40px);box-shadow:var(--shadow)}
+.b-walls .n{font-family:var(--font-mono);font-weight:800;font-size:clamp(14px,1.5vw,18px);color:#FFB4AC}
+.b-walls b{display:block;font-size:clamp(36px,5vw,68px);font-weight:900;letter-spacing:-.03em;margin:.1em 0}
+.b-walls p{margin:0;font-size:clamp(17px,2vw,26px);font-weight:600;color:#D9D6EE;line-height:1.45}
+.b-walls small{font-size:.8em;color:#9F9BBD}
+.b-fix{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.6em;margin-top:clamp(18px,3vh,30px);font-size:clamp(18px,2.2vw,28px)}
+.b-fix span{font-weight:700;color:var(--ink-soft)}
+.b-fix b{background:var(--accent,var(--teal));color:#fff;border-radius:999px;padding:.25em .9em;font-weight:900}
+.b-lv{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,1.6vw,22px);margin-top:clamp(14px,2.4vh,24px)}
+.b-lv .l{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(14px,1.8vw,24px);box-shadow:var(--shadow);text-align:center}
+.b-lv .l.hot{border-color:var(--accent,var(--teal))}
+.b-lv .n{font-size:clamp(14px,1.5vw,18px);font-weight:800;color:var(--ink-faint)}
+.b-lv b{display:block;font-size:clamp(22px,2.7vw,36px);font-weight:900;color:var(--accent,var(--teal));margin:.15em 0}
+.b-lv p{margin:0;font-size:clamp(14px,1.6vw,20px);color:var(--ink-soft);font-weight:600}
+.b-cheat{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,1.2vw,14px);margin-top:clamp(14px,2.4vh,24px)}
+.b-cheat div{display:flex;gap:.8em;align-items:baseline;background:var(--code-bg);color:var(--code-ink);border-radius:14px;padding:clamp(12px,1.5vw,18px) clamp(14px,1.8vw,22px)}
+.b-cheat b{flex:none;font-size:clamp(13px,1.45vw,17px);font-weight:800;color:#8FE3D8}
+.b-cheat span{font-size:clamp(15px,1.7vw,21px);font-weight:600}
+.b-bridge{display:grid;grid-template-columns:1.45fr 1fr;gap:clamp(16px,2.4vw,36px);margin-top:clamp(12px,2vh,20px);align-items:center}
+.b-bridge .shot{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(10px,1.2vw,16px);box-shadow:var(--shadow)}
+.b-bridge .ask{display:inline-block;margin-bottom:.7em;background:var(--indigo);color:#fff;border-radius:16px 16px 16px 4px;padding:.45em .9em;font-size:clamp(14px,1.6vw,20px);font-weight:700}
+.b-bridge img,.b-atk img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.b-bridge .flaws{list-style:none;margin:0;padding:0;display:grid;gap:clamp(10px,1.6vh,16px)}
+.b-bridge .flaws li{border-left:5px solid var(--coral);background:var(--surface);border-radius:0 14px 14px 0;padding:clamp(10px,1.4vw,16px) clamp(12px,1.6vw,20px);box-shadow:var(--shadow)}
+.b-bridge .flaws b{display:block;font-size:clamp(18px,2.1vw,27px);font-weight:900;color:var(--coral)}
+.b-bridge .flaws span{font-size:clamp(14px,1.55vw,19px);color:var(--ink-soft);font-weight:600}
+.d2{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,28px);margin-top:clamp(16px,2.6vh,28px);background:radial-gradient(ellipse at 50% 0%,#2a1d12,#0b0806 70%);border:2px solid #5b4626;border-radius:10px;padding:clamp(18px,2.6vw,40px);box-shadow:inset 0 0 40px rgba(0,0,0,.8),var(--shadow)}
+.d2 .sk{display:flex;gap:clamp(12px,1.6vw,22px);align-items:flex-start}
+.d2 .ic{flex:none;width:clamp(64px,7vw,104px);height:clamp(64px,7vw,104px);border:3px solid #8a6d3b;border-radius:6px;display:grid;place-items:center;box-shadow:inset 0 0 18px rgba(0,0,0,.9),0 0 0 2px #1a120a}
+.d2 .ic svg{width:66%;height:66%}
+.d2 .ic.passive{background:radial-gradient(circle,#1d3b5c,#0a1422);color:#7fb2ff}
+.d2 .ic.active{background:radial-gradient(circle,#6b1d0c,#1e0703);color:#ffb347}
+.d2 .tt{flex:1;background:rgba(0,0,0,.72);border:1px solid #4a3a22;padding:clamp(12px,1.5vw,20px);font-family:Georgia,"Times New Roman",var(--font-sans)}
+.d2 .ty{font-size:clamp(12px,1.3vw,16px);letter-spacing:.12em;color:#9d8d6f;font-weight:700}
+.d2 .tt b{display:block;font-size:clamp(24px,3vw,40px);color:#c7a35a;font-weight:900;font-family:var(--font-sans);margin:.1em 0 .3em}
+.d2 .mg{margin:.15em 0;font-size:clamp(14px,1.6vw,20px);color:#8a8aff;font-weight:700;font-family:var(--font-sans)}
+.d2 .eq{margin:.7em 0 0;padding-top:.6em;border-top:1px solid #3a2e1c;font-size:clamp(15px,1.75vw,22px);color:#e8e2d0;font-weight:700;font-family:var(--font-sans)}
+.d2 .eq em{font-style:normal;color:#4be24b;font-weight:900}
+.b-atk{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(10px,1.4vw,20px);align-items:center;margin-top:clamp(12px,2vh,20px)}
+.b-atk figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(8px,1vw,14px);box-shadow:var(--shadow)}
+.b-atk figure.hot{border-color:var(--coral);box-shadow:0 0 0 2px color-mix(in srgb,var(--coral) 28%,transparent),var(--shadow)}
+.b-atk figcaption{font-size:clamp(14px,1.55vw,19px);font-weight:800;color:var(--ink-soft);margin-bottom:.5em}
+.b-atk .hot figcaption{color:var(--coral)}
+.b-chips{display:flex;flex-wrap:wrap;align-items:center;gap:.5em;margin-top:clamp(12px,2vh,18px);font-size:clamp(14px,1.6vw,20px)}
+.b-chips span{font-weight:700;color:var(--ink-faint);margin-right:.3em}
+.b-chips b{background:color-mix(in srgb,var(--coral) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--coral) 35%,var(--line));border-radius:999px;padding:.25em .85em;font-weight:800}
+.b-def{display:grid;grid-template-columns:2.4fr 1fr;gap:clamp(14px,2vw,28px);margin-top:clamp(14px,2.4vh,24px);align-items:start}
+.b-chk{width:100%;border-collapse:collapse;background:var(--surface);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);font-size:clamp(14px,1.55vw,19px)}
+.b-chk th{background:var(--code-bg);color:var(--code-ink);font-weight:800;text-align:left;padding:.65em .8em}
+.b-chk td{padding:.65em .8em;border-top:1px solid var(--line);font-weight:600;color:var(--ink-soft);vertical-align:top}
+.b-chk td:nth-child(2){color:var(--ink);font-weight:800}
+.b-chk td:nth-child(3){color:var(--coral)}
+.b-shield{list-style:none;margin:0;padding:0;display:grid;gap:clamp(8px,1.3vh,12px)}
+.b-shield li{background:color-mix(in srgb,var(--indigo) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--indigo) 30%,var(--line));border-radius:14px;padding:.6em .9em;font-size:clamp(16px,1.85vw,23px);font-weight:900;color:var(--indigo)}
+.b-ver{display:grid;gap:.45em;margin-top:.6em}
+.b-ver div{display:flex;gap:.7em;align-items:baseline;font-size:clamp(13px,1.5vw,18px)}
+.b-ver b{flex:none;font-family:var(--font-mono);font-weight:900;color:var(--accent,var(--coral));min-width:3em}
+.b-ver span{color:var(--ink-soft);font-weight:600}
+@media (max-width:900px){.b-trend,.b-map,.b-harn,.b-atk{grid-template-columns:1fr}.b-trend .ar,.b-map .ar,.b-atk .ar,.b-harn .plus{display:none}.b-six,.b-lv{grid-template-columns:1fr 1fr}.b-free,.b-bridge,.b-def,.b-cheat,.b-walls,.d2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -1515,6 +1656,547 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
   </div>
 </section>
 
+<!-- ===== 1부 본론 도입 ===== -->
+<section class="slide center divider" data-accent="indigo" data-title="How?"
+  data-notes="[본론 시작 · 질문] 서론은 Why not? → Why now?. 이제 세 번째 질문. '그럼, 어떻게 쓰면 될까요?' 지금부터는 사용법 이론.">
+  <div class="slide-inner">
+    <span class="part-tag">1부 · 본론</span>
+    <h2 class="headline why-now"><span class="accent">How?</span></h2>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="indigo" data-title="트렌드 · 프롬프트에서 하네스로"
+  data-notes="[트렌드 · 3분] AI를 잘 쓰는 법의 유행이 이렇게 바뀌어 왔다.
+① 2023 프롬프트 엔지니어링: 질문 문장을 잘 쓰는 요령. Anthropic이 '프롬프트 엔지니어 & 라이브러리언' 채용에 연봉 17.5만~33.5만 달러를 걸어 화제(Fortune 2023.3.9, Bloomberg 2023.3.29).
+② 2025.6 컨텍스트 엔지니어링: 쇼피파이 CEO 토비 뤼트케가 '프롬프트보다 컨텍스트'라고 제안, 안드레이 카파시가 동의. 2025.9 Anthropic이 공식 가이드('Effective context engineering for AI agents') 발표.
+③ 2026.2 하네스 엔지니어링: 미첼 하시모토(2.5) 'AI가 실수하면 다시 못 하게 환경을 고쳐 둔다', OpenAI 블로그(2.11) '사람은 방향을 잡고, 에이전트가 실행한다'.
+멘트: '질문 문장을 잘 쓰는 사람에서, AI가 일할 환경을 깔아 두는 사람으로 바뀌고 있습니다.'">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 트렌드의 변화</span>
+    <h2 class="subhead">질문을 잘 쓰는 시대에서, <span class="accent">일할 환경을 만드는</span> 시대로</h2>
+    <div class="b-trend">
+      <div class="tr"><span class="y">2023</span><b>프롬프트<br>엔지니어링</b><p>질문 문장을 <b>잘 쓰는 요령</b></p><small>'프롬프트 엔지니어' 연봉 최대 33.5만 달러 채용 공고가 화제</small></div>
+      <i class="ar">→</i>
+      <div class="tr"><span class="y">2025.6</span><b>컨텍스트<br>엔지니어링</b><p>질문 한 줄보다 AI가 보는 <b>자료 전체</b>를 잘 채우기</p><small>쇼피파이 CEO 뤼트케 제안 · 카파시 동의</small></div>
+      <i class="ar">→</i>
+      <div class="tr hot"><span class="y">2026.2</span><b>하네스<br>엔지니어링</b><p>AI가 일할 <b>환경 전체</b>를 깔아 두기</p><small>OpenAI "사람은 방향을 잡고, 에이전트가 실행한다"</small></div>
+    </div>
+    <p class="src">Fortune · Bloomberg(2023.3) · The Decoder(2025.6) · Anthropic(2025.9) · Mitchell Hashimoto(2026.2.5) · OpenAI 'Harness engineering'(2026.2.11)</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="indigo" data-title="하네스 = 말에 채우는 마구"
+  data-notes="[하네스 · 2분] 하네스(harness)는 원래 말에 채우는 마구(고삐 · 안장). AI 모델은 힘센 말이고, 마구를 채워야 원하는 방향으로 일을 시킬 수 있다. 업계에서는 'AI 모델 말고, 모델을 둘러싼 나머지 전부'를 하네스라고 부른다(LangChain: 에이전트 = 모델 + 하네스. 업계 표준 정의라기보다 이해를 돕는 틀).
+하시모토의 원칙: AI가 실수할 때마다, 다시 실수하지 않게 환경을 고쳐 둔다.
+※ 정식 하네스 엔지니어링은 AI가 혼자 여러 단계를 도는 '에이전트'가 무대. 오늘 우리가 만드는 건 그 입문판이라고 말할 것. '우리가 만든 게 하네스다'라고 단정하지 않기.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 하네스가 뭔가요</span>
+    <h2 class="subhead">하네스는 원래 <span class="accent">말에 채우는 마구</span>입니다</h2>
+    <div class="b-harn">
+      <div class="horse"><span class="hk">AI 모델</span><b>힘센 말</b><p>힘은 세지만,<br>혼자서는 원하는 방향으로 안 갑니다</p></div>
+      <i class="plus">+</i>
+      <div class="gear"><span class="hk">하네스 · 마구</span>
+        <ul><li><b>지침</b> 매번 주는 기본 규칙</li><li><b>자료</b> 미리 넣어 둔 기준 · 양식</li><li><b>기억</b> 나와 업무에 대한 메모</li><li><b>도구</b> 버튼 하나로 쓰는 스킬</li><li><b>확인</b> 결과를 검사하는 장치</li></ul></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>AI가 실수할 때마다, <b>다시 실수하지 않게 마구를 고쳐 둡니다.</b> 오늘은 그 마구를 채우는 법을 배웁니다.</p></div>
+    <p class="src">Mitchell Hashimoto, 'My AI Adoption Journey'(2026.2) · LangChain, 'The anatomy of an agent harness'(2026)</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="indigo" data-title="1부 지도 · 그래도 프롬프트부터"
+  data-notes="[1부 지도 · 1분] 마구도 결국 프롬프트로 만든다. 그래서 순서는 입력(프롬프트) → 산출(메모라이징 · 스킬) → 자동화 환경.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 1부 지도</span>
+    <h2 class="subhead">마구도 결국 <span class="accent">프롬프트</span>로 만듭니다</h2>
+    <div class="b-map">
+      <div class="mp"><span class="n">CHAPTER 1</span><b>프롬프트</b><p><em>입력</em> · 어떻게 시킬까</p></div>
+      <i class="ar">→</i>
+      <div class="mp"><span class="n">CHAPTER 2</span><b>메모라이징 · 스킬</b><p><em>산출</em> · 결과물을 어떻게 좋게</p></div>
+      <i class="ar">→</i>
+      <div class="mp"><span class="n">CHAPTER 3</span><b>자동화 환경</b><p><em>묶기</em> · 버튼 하나로 돌아가게</p></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>그래서 오늘은 <b>프롬프트부터</b> 시작합니다.</p></div>
+  </div>
+</section>
+
+<!-- ===== 챕터 1 · 프롬프트 ===== -->
+<section class="slide center divider" data-accent="teal" data-title="CHAPTER 1 · 프롬프트"
+  data-notes="[챕터 1 시작] 입력. 어떻게 시킬 것인가.">
+  <div class="slide-inner">
+    <div class="idx">01</div>
+    <h2 class="headline"><span class="accent">프롬프트</span>: 어떻게 시킬까</h2>
+    <p class="lead wide">입력이 바뀌면, 결과가 바뀝니다</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="프롬프트란?"
+  data-notes="[프롬프트란 · 2분] 서론 원리와 연결. AI는 많이 나온 답을 뽑는다. 아무 조건 없이 물으면 '세상 모든 사람의 평균 답'에서 뽑는다. 목적 · 상황 · 기준을 넣을수록 뽑는 범위가 '내 상황'으로 좁혀진다. 프롬프트는 질문 한 줄이 아니라, AI에게 주는 말과 자료 전부.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 프롬프트 기초</span>
+    <h2 class="subhead">프롬프트는 AI에게 주는 <span class="accent">말과 자료 전부</span>입니다</h2>
+    <p class="desc">AI는 많이 나온 답을 뽑는다고 했죠. 조건 없이 물으면 <b>모든 사람의 평균 답</b>에서 뽑고, 내 조건을 넣을수록 뽑는 범위가 <b>내 상황</b>으로 좁혀집니다.</p>
+    <div class="b-funnel">
+      <div class="fl" style="--w:100%"><b>조건 없음</b><span>세상 모든 사람의 평균 답</span></div>
+      <div class="fl" style="--w:82%"><b>+ 목적</b><span>무엇을, 누구에게</span></div>
+      <div class="fl" style="--w:64%"><b>+ 상황 · 자료</b><span>지금 무슨 일이 있는지, 붙여 넣은 자료</span></div>
+      <div class="fl" style="--w:46%"><b>+ 기준 · 형식</b><span>지켜야 할 규칙, 원하는 모양</span></div>
+      <div class="fl hot" style="--w:30%"><b>내 답</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="대화법 두 가지 · 자유도"
+  data-notes="[대화법 두 가지 · 2분] 시키는 방식은 두 가지. 자유도 0 쪽은 처음부터 조건을 다 갖춰서 한 번에(컨텍스트), 자유도 100 쪽은 대충 시작해서 결과를 보며 고쳐 가기(자유대화). 결과 모양이 정해진 일은 0 쪽, 정답이 없는 일은 100 쪽.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 프롬프트 기초 · 대화법</span>
+    <h2 class="subhead">대화법은 <span class="accent">두 가지</span>입니다</h2>
+    <div class="b-gauge"><div class="bar"></div><span class="l">자유도 0</span><span class="r">자유도 100</span></div>
+    <div class="grid cols-2">
+      <div class="card"><span class="k">대화법 ① · 자유도 0</span><h3>컨텍스트</h3><p>처음부터 조건을 다 갖춰서 <b>한 번에</b> 시킵니다.</p><div class="ex">잘 맞는 일: 안내 문자, 보고서처럼 <b>모양이 정해진 반복 업무</b></div></div>
+      <div class="card hot"><span class="k">대화법 ② · 자유도 100</span><h3>자유대화</h3><p>대충 시작해서, 결과를 보며 <b>하나씩 고쳐</b> 갑니다.</p><div class="ex">잘 맞는 일: 기획, 처음 해 보는 일처럼 <b>정답이 정해지지 않은 일</b></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="대화법 ① 컨텍스트 · 인수인계서"
+  data-notes="[대화법 ① · 3분] 컨텍스트 = 인수인계서. 신입에게 '이거 해 와'가 아니라 인수인계서를 주듯, AI가 볼 자료 전체를 설계한다. 6칸. 예전 5요소(역할 · 상황 · 할 일 · 형식 · 예시)와 다른 점은 재료와 기준. 이 두 칸이 컨텍스트 엔지니어링의 핵심.
+보안: 재료를 넣을 때 이름 · 차량번호 · 연락처 · 계좌는 가리고 넣는다. 회사 보안 정책이 먼저.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 대화법 ① · 컨텍스트</span>
+    <h2 class="subhead">컨텍스트는 AI에게 주는 <span class="accent">인수인계서</span>입니다</h2>
+    <p class="desc">신입에게 "이거 해 와"가 아니라 인수인계서를 주듯, 질문 한 줄이 아니라 <b>AI가 볼 자료 전체</b>를 설계합니다. 예시는 수리비 지연 민원 회신.</p>
+    <div class="b-six">
+      <div class="c"><span class="n">1 · 목적</span><b>무엇을, 누구에게</b><p>수리비 지연 민원 고객에게 보낼 회신 문자</p></div>
+      <div class="c"><span class="n">2 · 상황</span><b>지금 무슨 일이</b><p>10.9 견적 접수, 부품 단가 확인 중</p></div>
+      <div class="c hot"><span class="n">3 · 재료</span><b>붙여 넣는 자료</b><p>민원 원문 · 통화 메모 (개인정보는 가리고)</p></div>
+      <div class="c hot"><span class="n">4 · 기준</span><b>지켜야 할 규칙</b><p>책임 인정 표현 금지, 지급일 확정 약속 금지</p></div>
+      <div class="c"><span class="n">5 · 형식</span><b>원하는 모양</b><p>문자 500자 이내, 존댓말, 기호 없이</p></div>
+      <div class="c"><span class="n">6 · 예시</span><b>이런 느낌으로</b><p>지난번 잘 나간 회신 문자 붙이기</p></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>핵심은 <b>재료와 기준</b>입니다. 질문을 잘 쓰는 것보다, 무엇을 같이 넣느냐가 결과를 바꿉니다.</p></div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="대화법 ① 비포 · 애프터"
+  data-notes="[비교 · 2분] 가능하면 실제 AI에 두 요청을 넣어 보여 주기. 왼쪽은 누구에게나 보낼 수 있는 문장, 오른쪽은 지금 이 고객에게 보낼 문장. 오른쪽은 날짜를 확정하지 않고 '예정', 다음 연락 시점을 약속. 결과 문구는 예시.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 대화법 ① · 같은 일, 다른 요청</span>
+    <div class="cmp">
+      <div class="side bad">
+        <span class="k">한 줄로 시키면</span>
+        <div class="prompt">민원 답변 써줘</div>
+        <div class="out"><span class="lab">결과</span>고객님, 불편을 드려 대단히 죄송합니다. 고객님의 소중한 의견을 바탕으로 더 나은 서비스를 제공하기 위해 노력하겠습니다. 빠른 시일 내에 처리될 수 있도록 최선을 다하겠습니다…</div>
+      </div>
+      <div class="side good">
+        <span class="k">6칸으로 시키면</span>
+        <div class="prompt"><span class="tag5">목적</span>수리비 지연 민원 고객에게 보낼 회신 문자. <span class="tag5">상황</span>10.9 견적 접수, 부품 단가 확인 필요해 10.14 공업사에 요청. <span class="tag5">재료</span>(민원 원문 붙임) <span class="tag5">기준</span>책임 인정 표현 금지, 지급일은 확정하지 말고 '예정'. <span class="tag5">형식</span>문자 500자 이내, 존댓말, 기호 없이.</div>
+        <div class="out"><span class="lab">결과</span>김○○ 고객님, 수리비 안내가 늦어져 답답하셨을 것 같습니다.<br>10월 9일 받은 견적 중 부품 단가 확인이 필요한 항목이 있어, 10월 14일 공업사에 확인을 요청해 둔 상태입니다.<br>회신이 오는 대로 바로 지급 절차를 진행할 예정이며, 10월 21일(수)까지 진행 상황을 다시 연락드리겠습니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide compact" data-accent="teal" data-title="대화법 ② 자유대화"
+  data-notes="[대화법 ② · 2분] 자유도 100. 처음엔 대충 말하고, 결과를 보면서 '여긴 이렇게'를 하나씩 고쳐 간다. 정답이 정해지지 않은 일에 강하다. 대화가 너무 길어지면 AI가 앞 내용을 헷갈리기 시작하니, 정리본을 받아 새 채팅에서 이어 간다. 강사 경험: 오늘 강의 자료도 대화로 계속 고쳐 가며 만들었다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 대화법 ② · 자유대화</span>
+    <h2 class="subhead">대충 시작해서, <span class="accent">보면서 고쳐</span> 갑니다</h2>
+    <div class="b-free">
+      <div class="chat">
+        <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>다음 주 팀 회의 때 낼 업무 개선 아이디어, 같이 생각해 보자.</div></div>
+        <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>몇 가지 방향을 제안해 볼게요. ① 서류 체크리스트 통일 ② 자주 쓰는 안내 문자 모음 ③ 주간 보고 양식 간소화 …</div></div>
+        <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>2번 좋네. 근데 우리는 현장 출동이 많아서 <b>폰에서 바로 꺼내 쓰는 게</b> 중요해.</div></div>
+        <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>그럼 상황별로 짧게 나눠, 폰 메모에 붙여 넣기 좋게 다시 정리할게요 …</div></div>
+      </div>
+      <ul class="ftips">
+        <li><b>처음엔 대충</b><span>완벽한 질문을 고민하지 말고 일단 던지기</span></li>
+        <li><b>한 번에 하나씩</b><span>고칠 점은 하나씩 말해야 덜 꼬임</span></li>
+        <li><b>길어지면 새 채팅</b><span>정리본을 받아서 새 대화에 붙이고 이어 가기</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<section class="slide wide" data-accent="indigo" data-title="컨텍스트 vs 자유대화"
+  data-notes="[질문] 두 대화법을 다 설명한 뒤 던지는 질문. '둘 중에 우리는 어떤 걸 써야 할까요?' 손 들게 해도 좋다(①번? ②번?). 화면을 클릭하거나 → 키를 누르면 정답이 뜬다. 정답: 둘 다 무조건 써야 합니다. → 다음 장에서 이유.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 프롬프트 기초 · 대화법</span>
+    <div class="vs2">
+      <div class="vc"><span class="vk">대화법 ①</span><b>컨텍스트</b><p>처음부터 조건을 다 갖춰서<br>한 번에 시킨다</p></div>
+      <div class="vsm">VS</div>
+      <div class="vc"><span class="vk">대화법 ②</span><b>자유대화</b><p>대충 시작해서<br>보면서 고쳐 간다</p></div>
+    </div>
+    <p class="askq">우리는 <b>어떤 걸</b> 써야 할까요?</p>
+    <div class="reveal-ans" data-reveal><span class="ak">정답</span><b>둘 다, 무조건 써야 합니다.</b></div>
+    <p class="reveal-hint">클릭하거나 → 키를 누르면 정답</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="왜 둘 다 써야 하나 · 긴 프롬프트"
+  data-notes="[이유] 실제 업무 도구에 쓰는 프롬프트(자동차 손해사정 AI 도구 · 개정안 v3)의 앞부분과 끝부분. 가운데 약 705줄은 생략. 전체 27,870자 · 770줄.
+멘트: '이게 실제로 돌아가는 프롬프트입니다. 이걸 처음부터 한 번에 쓸 수 있는 사람은 없습니다. 저도 못 씁니다. 대충 시작해서(자유대화) 결과를 보고, 틀린 걸 고치고, 전문가 검토까지 받아 고치고 또 고친 세 번째 판(v3)입니다. 사람 머리로 단순하게 짠 프롬프트로는 결과물도 그 수준을 넘기 어렵습니다. 그래서 자유대화로 키우고, 컨텍스트로 굳힌다. 둘 다 써야 합니다.'
+→ 다음: 이렇게 굳힌 프롬프트를 파일로 저장해 두면 그게 스킬(챕터 2).">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 왜 하나만으로는 안 될까</span>
+    <h2 class="subhead">이 프롬프트, <span class="accent">처음부터</span> 쓸 수 있을까요?</h2>
+    <div class="lp">
+      <div class="lpdoc"><div class="lpbar"><i></i><i></i><i></i><span>프롬프트 개정안 v3.md</span></div>
+<pre class="lphead"># 판단 입장
+당신은 보험사 소속 차량손해사정사의 시각으로 판단합니다. 손해사정의 목적은
+불필요한 수리를 억제하고 투명하고 공정한 보험금을 지급하는 것이며, 동시에
+소속 보험사의 지급 적정성(과잉·중복·무관 청구로 인한 누수 방지)을 필수로
+고려합니다. 정당한 청구를 근거 없이 깎는 것도, 과도한 청구를 관행이라며
+넘기는 것도 모두 잘못이며, 모든 삭감·조정 의견에는 사진 또는 기준상 근거를
+붙입니다. 판단 우선순위는 (1) 수리 가능하면 교환보다 수리(PDR·복원·판금)
+우선, (2) 청구 항목 간 중복·수량 과다 배제, (3) 이번 사고와 인과관계 없는
+손상·작업 배제, (4) 회사 기준(최대인정시간·부수작업 기준 등)이 제공된
+항목은 그 기준을 한도로 적용입니다.
+
+# 경미손상 판정기준
+적용대상(이 목록에 있는 부품만 아래 1~3유형 분류를 적용하십시오. 그 외
+부품에는 절대 이 분류를 적용하지 마십시오): 앞범퍼, 뒤범퍼, 후드,</pre>
+<div class="lpcut">⋯ 중략 · 약 705줄 ⋯</div>
+<pre class="lptail">K9(RJ) 650, 스팅어 570, 니로EV 650(히트펌프 1000), 쏘울 450(EV 600/650), 스토닉 450,
+셀토스 450, 스포티지(QL) 550, 카니발(YP) 950 / 현대: 아이오닉EV 550(히트펌프 1100),
+
+[면책 판단] 자차손해에서 주정차 중 타이어·튜브에만 생긴 손해는 원칙 면책(다른 차와 충돌,
+화재·산사태, 가해자 확정 사고 등은 보상 대상 예외)
+[업무처리] 기본옵션과 다른 타이어·휠 장착 시 부속품 담보 기재여부 확인. 제원(단면폭/</pre></div>
+      <div class="lpstat">
+        <div><b>27,870<small>자</small></b><span>프롬프트 하나의 길이</span></div>
+        <div><b>770<small>줄</small></b><span>공통 블록 6 · 개별 3 · 참고자료 14</span></div>
+        <div><b>v3</b><span>고치고 또 고친 세 번째 판</span></div>
+        <p class="lpno">사람이 처음부터<br>한 번에 쓰기는 <b>불가능</b></p>
+      </div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>사람 머리로 단순하게 짠 프롬프트로는 결과물도 거기서 멈춥니다. <b>자유대화로 키우고, 컨텍스트로 굳힌다.</b> 그래서 둘 다 써야 합니다.</p></div>
+    <p class="src">실제 업무 도구 프롬프트(자동차 손해사정 AI 도구 · 개정안 v3) 앞·뒷부분 발췌</p>
+  </div>
+</section>
+
+<!-- ===== 챕터 1 · 응용 ===== -->
+<section class="slide wide" data-accent="teal" data-title="응용 · 자유대화의 두 벽"
+  data-notes="[응용 시작 · 1분] 자유대화가 결국 좋은 프롬프트를 만든다. 그런데 두 가지 벽. 전문가는 뭘 물어야 할지 알아서 자유대화가 편하지만, 처음 쓰는 분은 뭘 말해야 할지부터 막힌다. 그리고 깨지고 고치는 만큼 시간이 든다. 그래서 초보자도 자유대화의 효과를 빠르게 얻는 세 가지.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 프롬프트 응용</span>
+    <h2 class="subhead">자유대화가 답인 건 알겠는데…</h2>
+    <div class="b-walls">
+      <div class="w"><span class="n">벽 ①</span><b>어렵다</b><p>뭘 말해야 할지 모르겠다<br><small>특히 처음 쓰는 분</small></p></div>
+      <div class="w"><span class="n">벽 ②</span><b>오래 걸린다</b><p>깨지고 고치는 만큼 시간이 든다<br><small>전문가도 마찬가지</small></p></div>
+    </div>
+    <div class="b-fix"><span>그래서, 초보자도 빠르게</span><b>① 역질문</b><b>② 벤치마킹</b><b>③ 굳히기</b></div>
+  </div>
+</section>
+
+<section class="slide wide compact" data-accent="teal" data-title="응용 ① 역질문"
+  data-notes="[역질문 · 3분] 어렵다면 대화의 핸들을 AI에게 넘긴다. AI가 묻고 나는 답만 한다. 초보자에게는 이게 자유대화.
+세 가지를 같이 말해야 잘 된다: 목표(무엇을 만들지) · 한 번에 하나씩 · 언제 멈출지. 하나라도 빠지면 질문이 끝없이 이어지거나 엉뚱한 데로 샌다.
+근거: White 외, 'A Prompt Pattern Catalog'(밴더빌트대, 2023)의 '뒤집힌 대화(Flipped Interaction)' 패턴. ChatGPT 딥 리서치도 시작 전에 확인 질문이나 조사 계획을 먼저 보여 준다.
+가능하면 실제로 시연.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 응용 ① · 어렵다면</span>
+    <h2 class="subhead">대화의 핸들을 <span class="accent">AI에게</span> 넘기세요: 역질문</h2>
+    <div class="chat">
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>수리비 지연 민원 회신 문자를 쓰려고 해. <b>바로 쓰지 말고, 필요한 걸 한 번에 하나씩 물어봐. 충분하면 질문을 멈추고 써 줘.</b></div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>첫 번째 질문입니다. 지급이 늦어진 원인은 무엇인가요? (서류 · 공업사 · 내부 확인 중)</div></div>
+      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>공업사 견적에 단가 확인이 필요한 부품이 있어.</div></div>
+      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>두 번째 질문입니다. 고객에게 다음 연락 시점을 약속할 수 있나요? … <b>(질문 4개 뒤)</b> 이제 충분합니다. 회신 문안을 쓰겠습니다.</div></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>나는 <b>답만</b> 하면 됩니다. 말할 건 세 가지: <b>목표 · 한 번에 하나씩 · 언제 멈출지</b>.</p></div>
+    <p class="src">White 외, "A Prompt Pattern Catalog to Enhance Prompt Engineering with ChatGPT"(2023) · Flipped Interaction 패턴</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="응용 ② 벤치마킹"
+  data-notes="[벤치마킹 · 3분] 오래 걸린다면 남의 시행착오를 빌려 온다. 0에서 시작하지 않으니 대화 횟수가 확 준다.
+① 딥 리서치: AI가 여러 자료를 찾아 읽고 보고서로 정리. ChatGPT · Gemini · Claude 모두 있음. Gemini 딥 리서치는 2025.3.13부터 무료 사용자도(월 횟수 제한). 결과의 출처는 꼭 열어서 확인.
+② 예시 · 거꾸로 만들기: 잘 된 결과물을 붙이고 '이런 결과가 나오게 하는 요청문을 써 줘'. 말로 설명하기 어려운 말투 · 품질이 한 번에 전달된다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 응용 ② · 오래 걸린다면</span>
+    <h2 class="subhead"><span class="accent">남의 시행착오</span>를 빌려 오세요: 벤치마킹</h2>
+    <div class="grid cols-2">
+      <div class="card"><span class="k">딥 리서치 · 기준을 조사시키기</span><h3>잘하는 곳은 어떻게 하나</h3><div class="prompt">자동차보험 민원 회신을 잘 쓰는 기준을 공개 자료에서 조사해서, 체크리스트 10줄로 정리해 줘. 항목마다 출처 달아서.</div><div class="ex">ChatGPT · Gemini · Claude 모두 있음 · Gemini는 무료로도(월 횟수 제한) · <b>출처는 꼭 열어 확인</b></div></div>
+      <div class="card hot"><span class="k">예시 · 거꾸로 만들기</span><h3>좋은 결과물에서 출발</h3><div class="prompt">(잘 나간 회신 문자 붙여 넣고) 이런 결과가 나오게 하는 요청문을 써 줘.</div><div class="ex">말로 설명하기 어려운 <b>말투와 품질</b>이 한 번에 전달됩니다</div></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p><b>0에서 시작하지 않으니</b>, 깨지고 고치는 횟수가 확 줄어듭니다.</p></div>
+    <p class="src">Gemini Deep Research 무료 공개(2025.3.13, Android Authority) · OpenAI 도움말 'Deep research in ChatGPT'</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="응용 ③ 굳히기"
+  data-notes="[굳히기 · 2분] 매번 다시 하지 않게, 잘 된 대화는 요청문 하나로 굳혀 둔다. 다음부터는 그 요청문 하나로 끝.
+AI에게 다듬게 하기: Gemini에서 젬(Gem)을 만들 때 지침 칸 아래 'Gemini로 지침 다시 쓰기'(마법봉 버튼)를 누르면 짧게 쓴 지침을 AI가 정리 · 확장해 준다. 젬은 무료 요금제에서도 만들 수 있다. OpenAI도 GPT-5 가이드에서 AI가 자기 프롬프트의 문제를 찾아 고치게 하는 '메타프롬프팅'을 권한다.
+→ 이렇게 굳힌 요청문을 파일로 저장하면 그게 스킬(챕터 2).">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 응용 ③ · 매번 다시 하지 않게</span>
+    <h2 class="subhead">잘 된 대화는 <span class="accent">굳혀</span> 두세요</h2>
+    <div class="flow" style="--n:3">
+      <div class="step"><span class="n">01</span><h3>대화로 한 번</h3><p>역질문 · 벤치마킹으로 마음에 드는 결과가 나올 때까지</p></div>
+      <div class="step hot"><span class="n">02</span><h3>요청문으로 정리</h3><p>"다음엔 한 번에 이 결과가 나오게, 지금까지 대화를 <b>요청문 하나로</b> 정리해 줘"</p></div>
+      <div class="step"><span class="n">03</span><h3>AI가 다듬기</h3><p>Gemini 젬 만들기의 <b>'Gemini로 지침 다시 쓰기'</b> 버튼 · 무료 요금제도 가능</p></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>이렇게 굳힌 요청문을 파일로 저장해 두면, 그게 바로 <b>스킬</b>입니다. (챕터 2)</p></div>
+    <p class="src">Google 도움말 'Gems 시작하기' · OpenAI 'GPT-5 prompting guide'(메타프롬프팅)</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="teal" data-title="내 수준에 맞게 · 치트시트"
+  data-notes="[정리 · 2분] 수준별로 골라 쓰면 된다. 초보는 역질문, 중급은 벤치마킹 · 예시로 출발점을 높이고, 전문가는 자유대화로 바로. 어느 단계든 잘 된 건 굳혀서 다음엔 한 번에. 아래 네 문장은 실습 때 그대로 쓴다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 챕터 1 정리</span>
+    <h2 class="subhead">내 수준에 맞게 <span class="accent">골라 쓰기</span></h2>
+    <div class="b-lv">
+      <div class="l"><span class="n">초보</span><b>역질문</b><p>AI가 묻고, 나는 답한다</p></div>
+      <div class="l"><span class="n">중급</span><b>벤치마킹 · 예시</b><p>출발점을 높이고 다듬는다</p></div>
+      <div class="l hot"><span class="n">전문가</span><b>자유대화</b><p>바로 파고든다</p></div>
+    </div>
+    <div class="b-cheat">
+      <div><b>시작할 때</b><span>"바로 하지 말고, 필요한 걸 한 번에 하나씩 물어봐"</span></div>
+      <div><b>복잡할 때</b><span>"이걸 3단계로 나눠서 하자. 먼저 사실 정리부터"</span></div>
+      <div><b>확인할 때</b><span>"방금 답에서 틀렸을 수 있는 곳을 표로 표시만 해 줘"</span></div>
+      <div><b>끝났을 때</b><span>"지금까지 대화를 요청문 하나로 정리해 줘"</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 브릿지 ===== -->
+<section class="slide wide" data-accent="coral" data-title="결과물이 생각보다 별로다"
+  data-notes="[브릿지 · 2분] '여기까지 써 보신 분들은 꽤 있으실 겁니다. 그런데 써 보면 결과물이 생각보다 좋지가 않습니다.' 예: '오늘 점심 뭐 먹을지 한 장짜리 PPT로 만들어 줘'. 나쁘진 않다. 깔끔하다. 그런데 우리 회사 양식이 아니고, 기준도 결론도 없고, 다시 시키면 또 다르게 나온다. 결국 손을 다시 봐야 한다.
+'그래서 이제 결과물을 좋게 만드는 법을 배워 보겠습니다.' → 챕터 2.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 그런데</span>
+    <h2 class="subhead">써 보면, 결과물이 <span class="accent">생각보다 별로</span>입니다</h2>
+    <div class="b-bridge">
+      <div class="shot"><div class="ask">오늘 점심 뭐 먹을지 한 장짜리 PPT로 만들어 줘</div><img src="img/lunch-before.png" alt="스킬 없이 만든 점심 메뉴 장표"></div>
+      <ul class="flaws">
+        <li><b>우리 회사 양식이 아님</b><span>결국 양식에 다시 옮겨야 함</span></li>
+        <li><b>기준이 없음</b><span>가격 · 시간 · 오후 일정 같은 판단 근거가 없음</span></li>
+        <li><b>결론이 없음</b><span>"즐거운 점심 되세요"로 끝</span></li>
+        <li><b>할 때마다 다름</b><span>다시 시키면 또 다른 모양</span></li>
+      </ul>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>그래서 이제, <b>결과물을 좋게 만드는 법</b>을 배워 보겠습니다.</p></div>
+  </div>
+</section>
+
+<!-- ===== 챕터 2 · 메모라이징과 스킬 ===== -->
+<section class="slide center divider" data-accent="coral" data-title="CHAPTER 2 · 메모라이징과 스킬"
+  data-notes="[챕터 2 시작] 산출. 결과물을 좋게 만드는 두 가지: 메모라이징과 스킬.">
+  <div class="slide-inner">
+    <div class="idx">02</div>
+    <h2 class="headline"><span class="accent">메모라이징</span>과 <span class="accent">스킬</span></h2>
+    <p class="lead wide">결과물을 좋게 만드는 두 가지</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="게임으로 보면 · 패시브와 액티브"
+  data-notes="[게임 비유 · 2분] 디아블로 같은 게임의 스킬을 떠올리면 쉽다. 패시브 스킬은 한 번 찍어 두면 내가 누르지 않아도 항상 켜져 있다(예: 방어력 상승). 메모라이징이 그렇다. 액티브 스킬은 버튼을 누르면 화려하게 뭔가 나간다. 스킬이 그렇다. 누르는 순간 정해진 결과물이 한 번에 나온다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 메모라이징과 스킬이 뭔가요</span>
+    <h2 class="subhead">게임으로 보면 <span class="accent">패시브</span>와 <span class="accent">액티브</span>입니다</h2>
+    <div class="d2">
+      <div class="sk">
+        <div class="ic passive"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="32" cy="32" r="9" fill="currentColor"/><path d="M32 4v8M32 52v8M4 32h8M52 32h8" stroke="currentColor" stroke-width="4"/></svg></div>
+        <div class="tt"><span class="ty">PASSIVE · 항상 켜져 있음</span><b>패시브 스킬</b><p class="mg">+ 한 번 찍어 두면 매 대화에 자동 적용</p><p class="mg">+ 내가 누르지 않아도 늘 발동</p><p class="eq">= <em>메모라이징</em> · 맞춤 지침 · 메모리 · 프로젝트</p></div>
+      </div>
+      <div class="sk">
+        <div class="ic active"><svg viewBox="0 0 64 64"><path d="M36 4L14 36h14l-4 24 26-34H36z" fill="currentColor"/></svg></div>
+        <div class="tt"><span class="ty">ACTIVE · 누르면 발동</span><b>액티브 스킬</b><p class="mg">+ 버튼 하나로 화려하게 발동</p><p class="mg">+ 정해진 결과물이 한 번에</p><p class="eq">= <em>스킬</em> · 저장해 둔 요청문 + 양식</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="학습이 아니라 메모라이징"
+  data-notes="[메모라이징 · 2분] 많이 오해하는 부분. 맞춤 지침 · 프로젝트 · 메모리를 쓰면 AI가 '학습'한다고 생각하는데 아니다.
+학습 = 서론 만화 속 오픈북 자체를 새로 쓰는 일(AI 회사가 반도체 수만 장으로 몇 달). 우리가 하는 건 오픈북 맨 앞에 포스트잇을 붙여 두는 것 = 메모라이징. AI 머릿속(숫자)은 그대로이고, 대화를 시작할 때마다 포스트잇을 먼저 읽을 뿐.
+그래서 손이 간다: 무엇을 기억시킬지 내가 정해서 쓰고, 바뀌면 내가 고친다. 메모리 기능이 일부를 자동으로 적어 주기도 하지만, 틀린 메모는 내가 지워야 한다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 메모라이징이란</span>
+    <h2 class="subhead">이건 '학습'이 아니라 <span class="accent">'메모라이징'</span>입니다</h2>
+    <div class="comic">
+      <div class="panel"><span class="ptag">포스트잇</span>
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+          <rect x="0" y="0" width="400" height="300" fill="#F3F1FF"/>
+          <use href="#stu" x="20" y="88" width="110" height="138"/><use href="#f-happy" x="20" y="88" width="110" height="138"/>
+          <rect x="10" y="222" width="380" height="18" rx="4" fill="#E9C89C" stroke="#1E1B33" stroke-width="3"/>
+          <rect x="150" y="70" width="200" height="150" rx="8" fill="#5D57E8" stroke="#1E1B33" stroke-width="3"/>
+          <rect x="160" y="80" width="180" height="130" rx="4" fill="#7C77EE"/>
+          <text x="250" y="200" class="ct white sm" text-anchor="middle">AI의 오픈북 (그대로)</text>
+          <g transform="rotate(-5 250 128)"><rect x="186" y="88" width="132" height="92" fill="#FFE27A" stroke="#1E1B33" stroke-width="3"/>
+            <text x="252" y="112" class="ct sm" text-anchor="middle">나는 보상 담당자</text>
+            <text x="252" y="134" class="ct sm" text-anchor="middle">존댓말 · 결론부터</text>
+            <text x="252" y="156" class="ct sm coral" text-anchor="middle">모르면 [확인 필요]</text></g>
+          <path d="M372 30 Q340 40 330 80" fill="none" stroke="#1E1B33" stroke-width="3" stroke-dasharray="6 6"/>
+          <rect x="300" y="12" width="92" height="32" rx="16" fill="#1E1B33"/><text x="346" y="33" class="ct sm white" text-anchor="middle">내가 붙임</text>
+        </svg>
+      </div>
+      <div class="story">
+        <p class="desc">앞에서 본 AI의 오픈북을 새로 쓰는 건 AI 회사가 하는 '학습'입니다. 맞춤 지침 · 프로젝트 · 메모리는 그게 아닙니다. 오픈북 맨 앞에 <b>포스트잇을 붙여 두는 것</b>, 메모라이징입니다. AI 머릿속은 그대로이고, 대화할 때마다 포스트잇을 먼저 읽고 시작할 뿐입니다.</p>
+        <div class="map" style="margin-top:0">
+          <div class="row head"><span>무엇 · 누가</span><span></span><span>어떻게</span></div>
+          <div class="row"><span><b>학습</b> · AI 회사</span><i>→</i><span>오픈북 자체를 고쳐 씀. 반도체 수만 장으로 몇 달</span></div>
+          <div class="row"><span><b>메모라이징</b> · 나</span><i>→</i><span>포스트잇을 붙임. <b>내가 직접 쓰고 관리</b></span></div>
+        </div>
+        <div class="callout warn"><span class="bang">!</span><p>그래서 <b>손이 갑니다.</b> 무엇을 기억시킬지 내가 정해서 쓰고, 바뀌면 내가 고쳐야 합니다. AI가 알아서 배워 주지 않습니다.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide wide" data-accent="coral" data-title="한 번 알려 주면 계속 기억"
+  data-notes="[알려 주기 · 2분] 매번 '나는 보상 담당자고, 존댓말로…'를 붙이고 있다면 설정을 안 한 것. 3사 모두 비슷한 기능이 있고 이름만 다르다. 메뉴 이름은 업데이트마다 바뀌니 강의 직전 실제 화면 확인.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 메모라이징 · 어디에 적어 두나</span>
+    <h2 class="subhead">같은 설명을 두 번 한다면, <span class="accent">설정을 안 한 겁니다</span></h2>
+    <p class="desc">AI에게 매번 "나는 보상 담당자고, 존댓말로, 짧게…"를 붙이고 있다면 시간 낭비입니다. 대화형 AI에는 한 번 알려 주면 계속 기억하게 하는 기능이 이미 들어 있습니다.</p>
+    <div class="grid cols-3 feat">
+      <div class="card hot"><span class="k">맞춤 지침</span><h3>나에 대한 소개</h3><p>내가 누구고 어떻게 답해 주면 좋은지 적어 두면, <b>모든 대화</b>에 자동으로 붙습니다.</p><div class="names"><span><b>GPT</b>맞춤 설정</span><span><b>Claude</b>개인 선호</span><span><b>Gemini</b>개인 맞춤 지침</span></div></div>
+      <div class="card hot"><span class="k">프로젝트</span><h3>업무별 방</h3><p>방마다 지침과 참고 파일을 넣어 두면, 그 방의 대화는 <b>처음부터 그 내용을 알고</b> 시작합니다.</p><div class="names"><span><b>GPT</b>프로젝트</span><span><b>Claude</b>프로젝트</span><span><b>Gemini</b>Gem</span></div></div>
+      <div class="card"><span class="k">메모리</span><h3>대화를 넘어 기억</h3><p>대화 중 알게 된 내 정보를 다음 대화에서도 기억합니다. 민감한 건 <b>임시 채팅</b>으로.</p><div class="names"><span>3사 모두 · 켜기 · 끄기 · 지우기 가능</span></div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-accent="coral" data-title="맞춤 지침 예시"
+  data-notes="[복사해 가기] 화면을 폰으로 찍어 가도 되고, 오른쪽 위 복사 버튼. 맨 아래 줄이 핵심 — 역질문을 매번 안 써도 AI가 알아서 먼저 물어본다. [확인 필요] 표시는 앞의 가짜 판례 사례와 연결.
+이것도 AI한테: '나를 인터뷰해서 내 맞춤 지침을 써줘.'">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 메모라이징 만들기 ① · 맞춤 지침</span>
+    <h2 class="subhead">한 번 붙여 넣으면 <span class="accent">매번 안 써도</span> 됩니다</h2>
+    <div class="prompt" id="ciPrompt"><button class="copy" data-copy="ciPrompt">복사</button>나는 자동차보험 보상 담당자다.
+- 존댓말로, 결론부터, 짧게. 길면 표나 목록으로.
+- 모르면 모른다고 말하고, 약관 · 판례 · 숫자처럼 사실 확인이
+  필요한 부분은 <span class="blank">[확인 필요]</span>라고 표시해줘.
+- 고객에게 보낼 글은 정중하게, 책임을 인정하는 표현은 피해서.
+- <span class="blank">요청이 모호하면 바로 답하지 말고 먼저 질문해줘.</span></div>
+    <div class="callout tip"><span class="bang">!</span><p>이것도 AI한테: <b>"나를 인터뷰해서 내 맞춤 지침을 써줘."</b></p></div>
+  </div>
+</section>
+<section class="slide wide" data-accent="coral" data-title="프로젝트 활용"
+  data-notes="[프로젝트] 업무별로 방을 나누면 매번 배경 설명을 안 해도 된다. Gemini는 Gem을 만들 때 지침을 다듬어 주는 버튼이 있음. 프로젝트 지침도 AI한테 써 달라고 하면 됨.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 메모라이징 만들기 ② · 프로젝트</span>
+    <h2 class="subhead">업무마다 <span class="accent">방을 나누세요</span></h2>
+    <div class="grid cols-2">
+      <div class="card"><span class="k">예 · 민원 답변 방</span><h3>응대 기준 + 말투</h3><p>회사 응대 기준 파일을 올려 두고, "이 기준에 맞춰 답변 초안"이라고 지침을 써 둡니다.</p></div>
+      <div class="card hot"><span class="k">예 · 주간 보고 방</span><h3>회사 양식 + 문체</h3><p>회사 보고 양식 파일을 올려 두고, "이 양식 그대로, 음슴체로"를 지침으로 넣어 둡니다.</p></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>프로젝트 지침도 AI가 씁니다. <b>"나를 인터뷰해서 이 업무용 지침을 써줘."</b></p></div>
+  </div>
+</section>
+<section class="slide wide" data-accent="coral" data-title="명함 · 서랍 · 매뉴얼"
+  data-notes="[비교 · 2분] 셋 다 'AI에게 미리 알려 두기'지만 쓰임이 다르다. 비유로: 맞춤 지침 = 명함, 프로젝트 = 업무별 서랍, 스킬 = 업무 매뉴얼. 스킬은 평소엔 가만히 있다가 그 일이 필요할 때 AI가 알아서 꺼내 쓴다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 스킬이란</span>
+    <h2 class="subhead">스킬은 AI에게 주는 <span class="accent">업무 매뉴얼</span>입니다</h2>
+    <p class="desc">셋 다 'AI에게 미리 알려 두기'지만 쓰임이 다릅니다. 스킬은 평소엔 가만히 있다가, 그 일을 할 때가 되면 AI가 알아서 꺼내서 그대로 따라 합니다. 서식 파일까지 같이 넣어 둘 수 있습니다.</p>
+    <div class="grid cols-3">
+      <div class="card"><span class="k">맞춤 지침 = 명함</span><h3>"나는 이런 사람"</h3><p>모든 대화에 항상 붙습니다. 말투 · 답 형식처럼 늘 같은 것.</p></div>
+      <div class="card"><span class="k">프로젝트 = 업무별 서랍</span><h3>"이 방에서는"</h3><p>그 방 안에서만. 업무별 지침과 참고 파일.</p></div>
+      <div class="card hot"><span class="k">스킬 = 업무 매뉴얼</span><h3>"이 일은 이렇게"</h3><p>필요할 때 <b>AI가 알아서 꺼냅니다</b>. 작업 순서 · 규칙 · 서식 파일까지.</p></div>
+    </div>
+  </div>
+</section>
+<section class="slide wide" data-accent="coral" data-title="스킬은 이렇게 생겼다"
+  data-notes="[구조 · 2분] 핵심 파일은 SKILL.md 하나. 맨 위 name · description, 아래는 사람에게 주는 매뉴얼과 똑같다. AI는 description을 보고 '지금 이게 필요하다'고 판단해서 꺼내 쓴다 → 설명을 구체적으로. 서식 파일(워드 · PPT 양식 등)을 같은 폴더에 같이 넣을 수 있다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 스킬의 생김새 · SKILL.md</span>
+    <h2 class="subhead">열어 보면 <span class="accent">신입용 매뉴얼</span>과 똑같습니다</h2>
+    <div class="skill-row">
+      <div class="prompt skill"><span class="cm">---</span>
+<span class="blank">name:</span> complaint-reply
+<span class="blank">description:</span> 자동차보험 민원에 답변 문자나
+  메일 초안을 쓸 때 사용
+<span class="cm">---</span>
+# 민원 답변 작성
+1. 민원 내용 · 지연 원인 · 처리 예정일을 먼저
+   확인한다. 없으면 물어본다
+2. 사과는 하되 책임을 인정하는 표현은 쓰지 않는다
+3. 처리 예정일과 담당자 연락 방법을 꼭 넣는다
+4. 문자는 4줄 이내, 메일은 <span class="blank">메일서식.docx</span> 사용</div>
+      <div>
+        <p class="desc" style="margin-top:0">맨 위 두 줄은 이름과 설명, 그 아래는 사람에게 주는 업무 매뉴얼 그대로입니다.</p>
+        <ul class="list">
+          <li><span class="mk"></span><span><b>설명(description)</b> · AI가 이걸 읽고 "지금 이 매뉴얼이 필요하다"고 판단합니다. 그래서 구체적으로 씁니다.</span></li>
+          <li><span class="mk"></span><span><b>본문</b> · 순서와 규칙. 신입에게 말로 가르치던 그대로.</span></li>
+          <li><span class="mk"></span><span><b>서식 파일</b> · 양식을 같이 넣어 두면 그 양식으로 만듭니다.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide wide" data-accent="coral" data-title="스킬 만들기도 AI에게"
+  data-notes="[만드는 법 · 1분] SKILL.md를 직접 쓸 필요 없다. 대화로 한 번 작업 → '스킬로 만들어줘' → 받은 파일을 스킬 메뉴에 올리기. Claude는 모든 요금제에서 스킬 사용 가능, 설정에서 '코드 실행 및 파일 생성'을 켜야 한다(Anthropic 도움말). 메뉴 위치는 강의 직전 실제 화면 확인.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 스킬 만들기</span>
+    <h2 class="subhead">스킬 파일도 <span class="accent">AI가 만들어 줍니다</span></h2>
+    <p class="desc">매뉴얼 파일을 직접 쓸 필요가 없습니다. 평소처럼 대화로 일을 한 번 끝까지 하고, "방금 한 걸 스킬로 만들어줘"라고 하면 됩니다. 받은 파일을 스킬 메뉴에 올리면 끝입니다.</p>
+    <div class="flow" style="--n:3">
+      <div class="step"><span class="n">01</span><h3>대화로 한 번</h3><p>평소처럼 작업을 끝까지 해 본다</p></div>
+      <div class="step hot"><span class="n">02</span><h3>"스킬로 만들어줘"</h3><p>방금 한 방식을 스킬 파일로 받는다</p></div>
+      <div class="step"><span class="n">03</span><h3>등록</h3><p>받은 파일을 스킬 메뉴에 올린다</p></div>
+    </div>
+    <p class="src">Claude 스킬: 모든 요금제 · 설정에서 '코드 실행 및 파일 생성' 켜기 필요 (Anthropic 도움말)</p>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="응용 ① 공격 스킬"
+  data-notes="[공격 스킬 · 3분] 결과물을 만드는 스킬. 브릿지에서 본 점심 장표를 회사 PPT 양식 스킬(디비-양식-일반) 하나 켜고 같은 요청을 했을 때. 회사 양식 그대로, 기준 · 비교표 · 결론까지, 회사 문체(음슴체)로 나온다. 매번 같은 모양.
+※ 이미지 글꼴은 작업 환경에서 대체 글꼴로 그린 것. 회사 PC에서는 DB고딕. 메뉴 가격 · 시간은 예시.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 응용 ① · 공격 스킬</span>
+    <h2 class="subhead"><span class="accent">공격 스킬</span>: 결과물을 만든다</h2>
+    <div class="b-atk">
+      <figure><figcaption>스킬 없이</figcaption><img src="img/lunch-before.png" alt="스킬 없이 만든 장표"></figure>
+      <i class="ar">→</i>
+      <figure class="hot"><figcaption>회사 양식 스킬 하나 켜고</figcaption><img src="img/lunch-after.png" alt="회사 양식 스킬로 만든 장표"></figure>
+    </div>
+    <div class="b-chips"><span>이런 공격 스킬</span><b>민원 답변</b><b>사진대지</b><b>주간 보고</b><b>수리비 협의 문안</b><b>회사 양식 보고서</b></div>
+    <div class="callout tip"><span class="bang">!</span><p>같은 요청에 <b>스킬 하나</b> 켰을 뿐입니다. 회사 양식 · 기준 · 결론까지, 매번 같은 모양으로.</p></div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="응용 ② 방어 스킬"
+  data-notes="[방어 스킬 · 2분] 결과물을 검사하는 스킬. 공격 스킬로 만들고, 방어 스킬로 한 번 더. 요령: 바로 고치게 하지 말고 '표시만' 하게 한다. 바로 고치게 하면 맞던 곳까지 새로 망가뜨리는 일이 있다. 표를 보고 사람이 고칠 것을 고른다. 아래 표는 예시.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 응용 ② · 방어 스킬</span>
+    <h2 class="subhead"><span class="accent">방어 스킬</span>: 결과물을 검사한다</h2>
+    <div class="b-def">
+      <table class="b-chk">
+        <thead><tr><th>#</th><th>해당 문장</th><th>문제</th><th>고칠 방향</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>"10월 25일에 지급됩니다"</td><td>입력에 없던 날짜를 확정으로 씀</td><td>"~경 지급 절차를 진행할 예정"</td></tr>
+          <tr><td>2</td><td>"당사의 처리 지연으로"</td><td>책임 인정으로 읽힘</td><td>불편에 대한 사과만 남기기</td></tr>
+          <tr><td>3</td><td>"**안내**", "- 진행 상황"</td><td>문자에 기호가 그대로 보임</td><td>기호 없이 줄바꿈만</td></tr>
+        </tbody>
+      </table>
+      <ul class="b-shield"><li>문서 검수</li><li>누락 점검</li><li>출처 확인</li><li>개인정보 가림 확인</li></ul>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>공격 스킬로 만들고, <b>방어 스킬로 한 번 더.</b> 요령은 <b>고치지 말고 표시만</b> 하게 하는 것.</p></div>
+  </div>
+</section>
+
+<section class="slide wide" data-accent="coral" data-title="응용 ③ 스킬 키우기 · 나누기"
+  data-notes="[키우기 · 나누기 · 2분] 레벨업: AI가 틀릴 때마다 스킬에 한 줄을 추가한다(실패 사전). 하시모토의 하네스 원칙과 같은 얘기. 버전 기록은 예시.
+파티: 잘 만든 스킬은 파일 하나. 팀원에게 주면 팀 전체가 같은 품질로 일한다. 한 사람이 고생하면 모두가 덕을 본다.">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 응용 ③ · 레벨업과 파티</span>
+    <h2 class="subhead">스킬은 <span class="accent">키우고, 나눕니다</span></h2>
+    <div class="grid cols-2">
+      <div class="card"><span class="k">레벨업 · 틀릴 때마다 한 줄</span><h3>실패 사전</h3>
+        <div class="b-ver">
+          <div><b>v1.0</b><span>"민원 답변 써줘" 한 줄</span></div>
+          <div><b>v2.0</b><span>없는 지급일을 지어냄 → '미확인 사항' 칸 추가</span></div>
+          <div><b>v2.7</b><span>모든 문안이 과잉 사과 → 사과 수위 3단계</span></div>
+          <div><b>v3.4</b><span>가린 이름을 임의로 채움 → '가린 표시 유지' 규칙</span></div>
+        </div></div>
+      <div class="card hot"><span class="k">파티 · 팀에 나누기</span><h3>스킬은 파일 하나</h3><p>잘 만든 스킬 파일을 팀원에게 주면, <b>팀 전체가 같은 품질</b>로 일합니다.</p><div class="ex">한 사람이 한 번 고생하면, 모두가 덕을 봅니다</div></div>
+    </div>
+    <div class="callout tip"><span class="bang">!</span><p>AI가 실수할 때마다 스킬에 적어 두면, <b>같은 실수를 두 번 하지 않습니다.</b></p></div>
+  </div>
+</section>
+
+
 </div>
 
 <!-- 컨트롤 -->
@@ -1586,7 +2268,7 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
     var h=inner.scrollHeight; if(h>avail+2) inner.style.zoom=Math.max(.68,(avail/h)).toFixed(3); }
   window.addEventListener('resize',function(){ fitSlide(slides[i]); });
   function go(n){ i=Math.max(0,Math.min(total-1,n)); render(); }
-  function next(){ go(i+1); } function prev(){ go(i-1); }
+  function next(){ var r=slides[i].querySelector('[data-reveal]:not(.shown)'); if(r){ r.classList.add('shown'); return; } go(i+1); } function prev(){ go(i-1); }
   document.getElementById('btnNext').onclick=next;
   document.getElementById('btnPrev').onclick=prev;
   document.getElementById('btnOverview').onclick=toggleOverview;
@@ -4568,6 +5250,14 @@ var qrcode = function() {
   new MutationObserver(function(){ if(!sl.classList.contains('active')) cancelAnimationFrame(raf); }).observe(sl,{attributes:true,attributeFilter:['class']});
   reset();
 })();
+</script>
+<script>
+/* ===== 클릭하면 정답: [data-reveal] (→ 키도 먼저 정답부터 연다) ===== */
+document.querySelectorAll('[data-reveal]').forEach(function(el){
+  var sl=el.closest('.slide');
+  sl.addEventListener('click',function(e){ if(e.target.closest('a,button')) return; el.classList.add('shown'); });
+  new MutationObserver(function(){ if(!sl.classList.contains('active')) el.classList.remove('shown'); }).observe(sl,{attributes:true,attributeFilter:['class']});
+});
 </script>
 </body>
 </html>
