@@ -896,6 +896,11 @@ body[data-tool="spot"] .spot{display:block}
 .qa .q{font-size:clamp(18px,2.1vw,27px);font-weight:800}
 .qa .a{font-size:clamp(16px,1.9vw,24px);font-weight:600;color:var(--ink-faint)}
 .qa .a::before{content:"AI → ";color:var(--indigo-soft,#6C63FF);font-weight:800}
+.qa4.good .qa{border-color:color-mix(in srgb,var(--teal) 45%,var(--line))}
+.qa4.good .qa .a{color:var(--ink)}
+.qa4.good .qa .a::after{content:" ✓";color:var(--teal);font-weight:900}
+.callout.ask{background:color-mix(in srgb,var(--indigo) 9%,var(--surface));border-color:color-mix(in srgb,var(--indigo) 40%,var(--line))}
+.callout.ask .bang{background:var(--indigo);color:#fff}
 .strip{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,1.4vw,20px);margin-top:clamp(12px,2vh,22px)}
 .strip .cell{display:flex;flex-direction:column;gap:.45em}
 .strip .panel{width:100%;box-shadow:5px 5px 0 #1E1B33}
@@ -1523,6 +1528,74 @@ body[data-tool="spot"] .spot{display:block}
 .vskel .save b{font-weight:900;margin-right:.3em}
 .vskel .save span{background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:.25em .9em;font-weight:700;color:var(--ink-soft)}
 @media (max-width:900px){.vstat,.vrow,.vdemo,.vmemo,.stg{grid-template-columns:1fr}.vhab,.vcheck{grid-template-columns:1fr 1fr}.vmap{grid-template-columns:repeat(4,1fr)}.vgit{grid-template-columns:1fr 1fr}.vdesign{grid-template-columns:1fr 1fr}}
+
+/* ===== 모션: 장이 열릴 때 순서대로 등장 (움직임 줄이기 설정 · 인쇄에서는 끔) ===== */
+@keyframes mUp{from{opacity:0;transform:translateY(18px)}}
+@keyframes mFade{from{opacity:0}}
+@keyframes mPop{from{opacity:0;transform:scale(.86)}}
+@keyframes mBlur{from{opacity:0;filter:blur(14px);transform:scale(1.04)}}
+@keyframes mGrowY{from{transform:scaleY(0)}}
+@keyframes mGrowX{from{transform:scaleX(0)}}
+@keyframes mPulse{0%,100%{transform:none}50%{transform:scale(1.12)}}
+@keyframes mDrop{from{opacity:0;transform:translateY(-14px) scale(1.15)}}
+@media (prefers-reduced-motion:no-preference){
+  /* 1. 장 머리 → 본문 → 정리 카드 → 출처 */
+  .slide.active .slide-inner>*{animation:mUp .6s cubic-bezier(.2,.7,.2,1) .22s both}
+  .slide.active .slide-inner>.eyebrow{animation-delay:0s}
+  .slide.active .slide-inner>.subhead{animation-delay:.08s}
+  .slide.active .slide-inner>.desc{animation-delay:.16s}
+  .slide.active .slide-inner>:is(.callout,.verdict2,.vline){animation-delay:.8s}
+  .slide.active .slide-inner>:is(.src,.reveal-hint){animation:mFade .6s ease 1s both}
+  .slide.active .slide-inner>.reveal-ans{animation:none}
+  .video-slide.active .slide-inner>*{animation:none}
+
+  /* 2. 카드 묶음은 하나씩 */
+  .slide.active :is(.qa4,div.grid,.flow,.strip,.b-six,.b-funnel,.b-trend,.b-map,.b-walls,.b-lv,.s3map,.vs-cards,.vhab,.vmap,.vcheck,.vlog,.vgit,.vchips,.dquest,.dlv,.dbias,.dlearn,.nums,.vstruct,.vdesign,.heroes,.num-list,.s3done,.tiles,.lpstat,.tabs5,.vs2,.cmp,.mcvs,.two-sides,.voices)>*{animation:mUp .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:.3s}
+  .slide.active :is(.qa4,div.grid,.flow,.strip,.b-six,.b-funnel,.b-trend,.b-map,.b-walls,.b-lv,.s3map,.vs-cards,.vhab,.vmap,.vcheck,.vlog,.vgit,.vchips,.dquest,.dlv,.dbias,.dlearn,.nums,.vstruct,.vdesign,.heroes,.num-list,.s3done,.tiles,.lpstat,.tabs5,.vs2,.cmp,.mcvs,.two-sides,.voices)>:nth-child(2){animation-delay:.38s}
+  .slide.active :is(.qa4,div.grid,.flow,.strip,.b-six,.b-funnel,.b-trend,.b-map,.b-walls,.b-lv,.s3map,.vs-cards,.vhab,.vmap,.vcheck,.vlog,.vgit,.vchips,.dquest,.dlv,.dbias,.dlearn,.nums,.vstruct,.vdesign,.heroes,.num-list,.s3done,.tiles,.lpstat,.tabs5,.vs2,.cmp,.mcvs,.two-sides,.voices)>:nth-child(3){animation-delay:.46s}
+  .slide.active :is(.qa4,div.grid,.flow,.strip,.b-six,.b-funnel,.b-trend,.b-map,.b-walls,.b-lv,.s3map,.vs-cards,.vhab,.vmap,.vcheck,.vlog,.vgit,.vchips,.dquest,.dlv,.dbias,.dlearn,.nums,.vstruct,.vdesign,.heroes,.num-list,.s3done,.tiles,.lpstat,.tabs5,.vs2,.cmp,.mcvs,.two-sides,.voices)>:nth-child(4){animation-delay:.54s}
+  .slide.active :is(.qa4,div.grid,.flow,.strip,.b-six,.b-funnel,.b-trend,.b-map,.b-walls,.b-lv,.s3map,.vs-cards,.vhab,.vmap,.vcheck,.vlog,.vgit,.vchips,.dquest,.dlv,.dbias,.dlearn,.nums,.vstruct,.vdesign,.heroes,.num-list,.s3done,.tiles,.lpstat,.tabs5,.vs2,.cmp,.mcvs,.two-sides,.voices)>:nth-child(5){animation-delay:.62s}
+  .slide.active :is(.qa4,div.grid,.flow,.strip,.b-six,.b-funnel,.b-trend,.b-map,.b-walls,.b-lv,.s3map,.vs-cards,.vhab,.vmap,.vcheck,.vlog,.vgit,.vchips,.dquest,.dlv,.dbias,.dlearn,.nums,.vstruct,.vdesign,.heroes,.num-list,.s3done,.tiles,.lpstat,.tabs5,.vs2,.cmp,.mcvs,.two-sides,.voices)>:nth-child(6){animation-delay:.7s}
+  .slide.active :is(.qa4,div.grid,.flow,.strip,.b-six,.b-funnel,.b-trend,.b-map,.b-walls,.b-lv,.s3map,.vs-cards,.vhab,.vmap,.vcheck,.vlog,.vgit,.vchips,.dquest,.dlv,.dbias,.dlearn,.nums,.vstruct,.vdesign,.heroes,.num-list,.s3done,.tiles,.lpstat,.tabs5,.vs2,.cmp,.mcvs,.two-sides,.voices)>:nth-child(7){animation-delay:.78s}
+  .slide.active :is(.qa4,div.grid,.flow,.strip,.b-six,.b-funnel,.b-trend,.b-map,.b-walls,.b-lv,.s3map,.vs-cards,.vhab,.vmap,.vcheck,.vlog,.vgit,.vchips,.dquest,.dlv,.dbias,.dlearn,.nums,.vstruct,.vdesign,.heroes,.num-list,.s3done,.tiles,.lpstat,.tabs5,.vs2,.cmp,.mcvs,.two-sides,.voices)>:nth-child(n+8){animation-delay:.86s}
+
+  /* 3. 대화는 말풍선이 차례로 */
+  .slide.active :is(.chat,.s4log,.dsum .call)>*{animation:mUp .5s cubic-bezier(.2,.7,.2,1) both;animation-delay:.3s}
+  .slide.active :is(.chat,.s4log,.dsum .call)>:nth-child(2){animation-delay:.7s}
+  .slide.active :is(.chat,.s4log,.dsum .call)>:nth-child(3){animation-delay:1.1s}
+  .slide.active :is(.chat,.s4log,.dsum .call)>:nth-child(4){animation-delay:1.5s}
+  .slide.active :is(.chat,.s4log,.dsum .call)>:nth-child(5){animation-delay:1.9s}
+  .slide.active :is(.chat,.s4log,.dsum .call)>:nth-child(6){animation-delay:2.3s}
+  .slide.active :is(.chat,.s4log,.dsum .call)>:nth-child(n+7){animation-delay:2.7s}
+
+  /* 4. 막대는 자라나고 */
+  .slide.active :is(.vb i,.cl .cb i,.gap6 .gb i){transform-origin:50% 100%;animation:mGrowY 1s cubic-bezier(.2,.8,.2,1) .45s both}
+  .slide.active :is(.brow .bt i,.hbar i){transform-origin:0 50%;animation:mGrowX 1.1s cubic-bezier(.2,.8,.2,1) .45s both}
+  .slide.active .vb:nth-child(3) i,.slide.active .cl:nth-child(2) .cb i,.slide.active .brow:nth-child(2) .bt i,.slide.active .gap6 .g:nth-of-type(2) .gb i{animation-delay:.6s}
+  .slide.active .vb:nth-child(4) i,.slide.active .cl:nth-child(3) .cb i,.slide.active .brow:nth-child(3) .bt i,.slide.active .gap6 .g:nth-of-type(3) .gb i{animation-delay:.75s}
+  .slide.active .cl:nth-child(4) .cb i,.slide.active .brow:nth-child(4) .bt i,.slide.active .gap6 .g:nth-of-type(4) .gb i{animation-delay:.9s}
+  .slide.active .gap6 .g:nth-of-type(5) .gb i{animation-delay:1.05s}
+  .slide.active .gap6 .g:nth-of-type(6) .gb i{animation-delay:1.2s}
+  .slide.active .gap6 .nowline{animation:mDrop .5s cubic-bezier(.2,1.4,.4,1) 1.5s both}
+  .slide.active .gap6 .proof{animation:mPop .5s cubic-bezier(.2,1.4,.4,1) 1.8s both}
+  .slide.active .start-now{display:inline-block;animation:mPulse .7s ease-in-out 1.6s 2}
+
+  /* 5. 표지 · 구분 장 */
+  .slide.active.title-slide .headline.why{animation:mPop .8s cubic-bezier(.2,1.3,.4,1) .1s both}
+  .slide.active.title-slide :is(.kicker,.tagline,.do-all){animation:mUp .7s cubic-bezier(.2,.7,.2,1) .55s both}
+  .slide.active.title-slide .do-all{animation-delay:.7s}
+  .slide.active.divider .headline,.slide.active .headline.why-now{animation:mBlur .9s cubic-bezier(.2,.7,.2,1) .1s both}
+  .slide.active.divider :is(.idx,.act,.part-tag){animation:mPop .5s cubic-bezier(.2,1.4,.4,1) 0s both}
+  .slide.active.divider .lead{animation:mUp .6s ease .55s both}
+  .slide.active .vline span{transform-origin:0 50%;animation:mGrowX .6s ease 1s both}
+  .slide.active .phone-frame{animation:mUp .8s cubic-bezier(.2,.7,.2,1) .15s both}
+  .slide.active .app-side>*{animation:mUp .55s cubic-bezier(.2,.7,.2,1) .45s both}
+  .slide.active .app-side>:nth-child(2){animation-delay:.55s}
+  .slide.active .app-side>:nth-child(3){animation-delay:.7s}
+  .slide.active .app-side>:nth-child(n+4){animation-delay:.85s}
+}
+@media print{*{animation:none!important}}
+.slide.m-off *{animation:none!important}
 </style>
 </head>
 <body>
@@ -1667,7 +1740,7 @@ body[data-tool="spot"] .spot{display:block}
 </section>
 
 <section class="slide wide" data-accent="coral" data-title="다른 질문도 뻔하다"
-  data-notes="[0:20 · 2분] 다른 질문도 마찬가지. 청중에게 '이런 거 물어봐서 비슷한 답 받아 본 적 있죠?' 하고 손 들게 하면 좋다. 답은 예시(실제로는 매번 조금씩 다름). 마지막 문장 '실망하셨다면, AI를 잘못 쓰고 계신 겁니다'로 다음 장(원리)으로 넘긴다.">
+  data-notes="[0:20 · 2분] 다른 질문도 마찬가지. 청중에게 '이런 거 물어봐서 비슷한 답 받아 본 적 있죠?' 하고 손 들게 하면 좋다. 답은 예시(실제로는 매번 조금씩 다름). 마지막 문장 '실망하셨다면, AI를 잘못 쓰고 계신 겁니다'로 다음 장(반대로 만족한 답)으로 넘긴다.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 다른 질문도 마찬가지</span>
     <h2 class="subhead">무엇을 물어도, <span class="accent">누구나 아는 답</span>이 나옵니다</h2>
@@ -1683,6 +1756,24 @@ body[data-tool="spot"] .spot{display:block}
 </section>
 
 <!-- ===== 5. AI 원리 ===== -->
+<section class="slide wide" data-accent="teal" data-title="반대로 · 만족스러운 답"
+  data-notes="[0:21 · 2분] 반대로, AI 답에 만족했던 순간도 있다. 청중에게 '이런 건 잘 쓰고 계시죠?' 하고 손 들게 하면 좋다. 공통점: 정답이 하나로 정해져 있거나(법 조항 · 약 성분 · 함수 사용법), 일반적인 답 그 자체가 목적인 질문. 이럴 땐 '많이 나온 말'이 곧 정답이라 만족스럽다.
+하단 질문은 바로 답하지 말고 던져 두기 → 다음 장(AI 원리)에서 답: 불만족한 답은 '나만을 위한 답'을 원했는데 '많이 나온 말'이 나온 것. 만족한 답은 원래 '많이 나온 말'이 정답인 질문.
+※ 법 조항 · 수치는 그래도 원문 확인(환각은 원리 장에서).">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span> 반대로, 만족했던 순간</span>
+    <h2 class="subhead">이런 질문엔 <span class="accent">답이 꽤 만족스럽습니다</span></h2>
+    <div class="qa4 good">
+      <div class="qa"><span class="q">"도로교통법 제19조 내용 알려 줘"</span><span class="a">안전거리 확보 · 진로 변경 제한 · 급제동 금지</span></div>
+      <div class="qa"><span class="q">"타이레놀 성분이 뭐야?"</span><span class="a">아세트아미노펜 · 해열 · 진통</span></div>
+      <div class="qa"><span class="q">"엑셀 VLOOKUP 쓰는 법 알려 줘"</span><span class="a">=VLOOKUP(찾을 값, 범위, 열 번호, FALSE)</span></div>
+      <div class="qa"><span class="q">"'결제'랑 '결재' 차이가 뭐야?"</span><span class="a">결제 = 돈을 치름 · 결재 = 윗사람의 승인</span></div>
+    </div>
+    <div class="callout ask"><span class="bang">?</span><p><b>불만족한 답변</b>과 <b>만족한 답변</b>, 그 차이는 무엇일까요?</p></div>
+    <p class="src">답은 예시 · 법 조항 · 수치는 원문으로 한 번 더 확인</p>
+  </div>
+</section>
+
 <section class="slide wide" data-accent="indigo" data-title="AI 원리 · 오픈북 시험 보는 학생"
   data-notes="[0:22 · 5분] 앞 장의 '왜?'에 대한 답. 한 장에 네 컷, 왼쪽부터 순서대로.
 ① AI는 오픈북 시험 보는 학생. 문제는 늘 하나, 빈칸에 들어갈 '다음 말' 맞히기. 긴 답도 이걸 수백 번 이어 붙인 것.
@@ -1977,14 +2068,14 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
   data-notes="[0:49 · 3분 · Why Now의 답 → 0:52 끝] AI를 쓰는 사람과 안 쓰는 사람의 차이를 '시간'으로 보면.
 2023년 초 30초 → 2025년 약 45분 → 2026년 초 약 6시간. 이 숫자는 강연 자료에서 인용한 것으로, AI 평가 기관 METR가 잰 'AI가 혼자 해내는 일의 길이(사람 전문가 기준)'를 바탕으로 한다. METR 측정으로는 2025년 초 최상위 모델이 약 1시간 안팎, Claude Opus 4.5 약 4시간 49분(2025.11), Claude Opus 4.6 약 14.5시간(2026.2, 2차 보도 · 벤치마크 포화로 불확실).
 흐린 막대(1주 · 2년 · 커리어 전체)는 같은 강연의 예측. 추세가 이어진다면의 이야기.
-[실화 카드] '이 강의안 50장, 원래 최소 1주일 걸립니다. 이번엔 AI랑 2일 만에 만들었습니다. 이게 6시간~1주 차이입니다.'
+[실화 카드] '이 강의안 86장, 원래 최소 1주일 걸립니다. 이번엔 AI랑 2일 만에 만들었습니다. 이게 6시간~1주 차이입니다.'
 빨간 점선 '지금'은 2026년 10월, 6시간(2026년 초)과 1주(2026년 말 예측) 사이.
 결론 멘트: '지금은 6시간을 지나 1주로 가는 중입니다. 아직은 따라잡을 수 있는 차이예요. 1년 뒤엔 2년, 몇 년 뒤엔 커리어 전체가 될 수 있습니다. 그래서 지금, 오늘 시작해야 합니다. START NOW.'
 ※ 막대 길이는 로그 눈금(30초와 커리어 전체를 한 화면에 담기 위해).">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> Why Now의 답</span>
     <h2 class="subhead">AI를 쓰는 사람과 안 쓰는 사람, <span class="accent">6시간에서 1주로</span> 벌어지는 중입니다</h2>
-    <div class="gap6"><div class="nowline"><em>지금 · 2026.10</em></div><div class="proof"><span class="pb">!</span><div><b>실화입니다</b><p>강의안 50장, 보통 <s>최소 1주일</s> → 이번엔 <em>2일</em></p></div></div>
+    <div class="gap6"><div class="nowline"><em>지금 · 2026.10</em></div><div class="proof"><span class="pb">!</span><div><b>실화입니다</b><p>강의안 86장, 보통 <s>최소 1주일</s> → 이번엔 <em>2일</em></p></div></div>
       <div class="g"><div class="gb"><i style="height:16%"></i></div><b>30초</b><span>2023년 초</span></div>
       <div class="g"><div class="gb"><i style="height:38%"></i></div><b>45분</b><span>2025년</span></div>
       <div class="g"><div class="gb"><i style="height:48%"></i></div><b>6시간</b><span>2026년 초</span></div>
@@ -2778,7 +2869,8 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
 ② 와이콤비네이터(실리콘밸리 대표 스타트업 육성 기관) 개리 탄 대표: 현재 배치 스타트업 4곳 중 1곳은 코드의 95%를 AI가 작성(2025.3, CNBC).
 ③ 비개발자용 바이브코딩 서비스 '러버블': 2024년 말 출시, 사용자 약 800만 명(보도 기준 · 출처마다 숫자 차이).
 ④ 콜린스 사전 2025 올해의 단어 = 바이브코딩.
-서론 12장(코딩 세계대회)과 연결: 이제 코딩은 전문가만의 일이 아니다.">
+서론 13장(코딩 세계대회)과 연결: 이제 코딩은 전문가만의 일이 아니다.
+하단 카드: 개발 실력보다 '무엇을 어떻게 작동시킬지'라는 아이디어가 더 중요한 시대로 왔다.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 왜 바이브코딩인가</span>
     <h2 class="subhead">세상은 이미 <span class="accent">말로</span> 만들고 있습니다</h2>
@@ -2794,6 +2886,7 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
         <div><b>올해의 단어</b><span>콜린스 사전 2025 · "바이브코딩"</span></div>
       </div>
     </div>
+    <div class="callout tip"><span class="bang">!</span><p>이제는 코드를 짜는 실력보다, <b>무엇을 어떻게 작동시킬지 떠올리는 아이디어</b>가 더 중요한 시대입니다.</p></div>
     <p class="src">Alphabet 실적 발표(2024.10) · The Decoder(2026.4) · CNBC(2025.3) · Fortune · DemandSage(러버블) · Collins Dictionary(2025.11)</p>
   </div>
 </section>
@@ -3243,14 +3336,27 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
     var nx=document.querySelector('.ov-item[data-idx="'+i+'"]'); if(nx) nx.classList.add('current');
     if(history.replaceState) history.replaceState(null,'','#'+(i+1));
     var v=document.getElementById('opening'); if(v && !slides[i].contains(v) && !v.paused) v.pause();
-    fitSlide(slides[i]);
+    fitSlide(slides[i]); countUp(slides[i]);
     if(typeof redrawInk==='function'&&ctx) redrawInk();
   }
+  // 숫자는 0부터 세면서 올라간다 (25% · 62.7% · 27,870 등)
+  var reduceMotion=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function countUp(sl){ if(reduceMotion) return;
+    sl.querySelectorAll('.vb b, .brow b, .cols4 .cl b, .lpstat b').forEach(function(el){
+      var tn=el.firstChild; if(!tn||tn.nodeType!==3) return;
+      if(el.dataset.cu==null) el.dataset.cu=tn.nodeValue;
+      var orig=el.dataset.cu, m=orig.match(/^([\d,]+(?:\.\d+)?)(.*)$/); if(!m) return;
+      var num=parseFloat(m[1].replace(/,/g,'')), dec=(m[1].split('.')[1]||'').length, comma=m[1].indexOf(',')>=0, rest=m[2], t0=null, run=(el._cu=(el._cu||0)+1);
+      function fmt(v){ return (comma?v.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec}):v.toFixed(dec))+rest; }
+      tn.nodeValue=fmt(0);
+      function step(ts){ if(el._cu!==run) return; if(t0===null) t0=ts; var p=Math.min(1,Math.max(0,(ts-t0-450)/1000)), e=1-Math.pow(1-p,3);
+        tn.nodeValue=p<1?fmt(num*e):orig; if(p<1) requestAnimationFrame(step); }
+      requestAnimationFrame(step); }); }
   // 화면이 작아 내용이 넘치면 그 장만 살짝 줄여서 맞춘다
   function fitSlide(sl){ var inner=sl&&sl.querySelector('.slide-inner'); if(!inner) return;
-    inner.style.zoom=''; var cs=getComputedStyle(sl);
+    inner.style.zoom=''; sl.classList.add('m-off'); var cs=getComputedStyle(sl);
     var avail=sl.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
-    var h=inner.scrollHeight; if(h>avail+2) inner.style.zoom=Math.max(.68,(avail/h)).toFixed(3); }
+    var h=inner.scrollHeight; sl.classList.remove('m-off'); if(h>avail+2) inner.style.zoom=Math.max(.68,(avail/h)).toFixed(3); }
   window.addEventListener('resize',function(){ fitSlide(slides[i]); });
   function go(n){ i=Math.max(0,Math.min(total-1,n)); render(); }
   function next(){ var r=slides[i].querySelector('[data-reveal]:not(.shown)'); if(r){ r.classList.add('shown'); return; } go(i+1); } function prev(){ go(i-1); }
