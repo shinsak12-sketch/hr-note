@@ -27,6 +27,7 @@
     </div><div class="gname">연도 파일</div></div>
     <div class="rgrp"><div class="items">
       <button class="rb" data-act="changeFolder"><span class="ic">▣</span>데이터 폴더<br>바꾸기</button>
+      <button class="rb" data-act="testData" title="가짜 금액으로 2026년 계획 · 더존 손익 파일을 만듦"><span class="ic">🧪</span>2026 테스트<br>데이터</button>
       <div class="rinfo" id="folderInfo">-</div>
     </div><div class="gname">데이터 폴더</div></div>
   </div>
@@ -105,7 +106,10 @@
 
   <div class="toolbar">
     <input class="search" id="search" placeholder="계정 검색 (Ctrl+F)">
-    <div id="chips" class="chips"></div>
+    <select class="navsel" id="navT" title="대분류"></select><span class="navsep">›</span>
+    <select class="navsel" id="navM" title="중분류"></select><span class="navsep">›</span>
+    <select class="navsel" id="navS" title="소분류"></select>
+    <button class="chip warn" id="btnWarnChip" hidden></button>
     <div id="tblState" class="tblstate"></div>
     <button class="btn sm strip-btn" id="stripBtn"></button>
   </div>
@@ -159,6 +163,7 @@
 <script src="vendor/xlsx.full.min.js"></script>
 <script src="js/calc.js"></script>
 <script src="js/base.js"></script>
+<script src="js/testdata.js"></script>
 <script src="js/store.js"></script>
 <script src="js/app.js"></script>
 </body>

@@ -73,6 +73,7 @@
   // 자동 점검용: 브라우저 내부 저장소(OPFS)를 폴더처럼 사용
   function useHandle(h) { dir = h; }
   function folderName() { return dir ? dir.name : ""; }
+  function connected() { return !!dir; }
   function sub(name) { return dir.getDirectoryHandle(name, { create: true }); }
 
   function entries(folder) {
@@ -480,6 +481,11 @@
     return name;
   }
 
+  // 연결한 폴더 안 하위 폴더에 엑셀 쓰기 (테스트 데이터 등). type: xlsx | biff8(xls)
+  function writeBook(folder, name, wb, type) {
+    return writeFile(folder, name, new Uint8Array(XLSX.write(wb, { type: "array", bookType: type || "xlsx" })));
+  }
+
   function download(wb, name) {
     var blob = new Blob([toBytes(wb)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     var a = document.createElement("a");
@@ -501,9 +507,9 @@
   }
 
   root.Store = {
-    supported: supported, restore: restore, grant: grant, pick: pick, useHandle: useHandle, folderName: folderName,
+    supported: supported, restore: restore, grant: grant, pick: pick, useHandle: useHandle, folderName: folderName, connected: connected,
     listYears: listYears, load: load, save: save, loadMaster: loadMaster, saveMaster: saveMaster,
     fileName: fileName, MASTER: MASTER, exportReport: exportReport, readAnyFile: readAnyFile, stamp: stamp,
-    downloadTemplate: downloadTemplate, parseTemplate: parseTemplate, roundLabel: roundLabel
+    downloadTemplate: downloadTemplate, parseTemplate: parseTemplate, roundLabel: roundLabel, writeBook: writeBook
   };
 })(this);

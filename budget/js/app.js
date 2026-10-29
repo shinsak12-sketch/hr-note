@@ -22,7 +22,7 @@
     year: null, years: [], settings: { dispUnit: "천원", rndUnit: "천원", rndMode: "반올림" }, cat: [], plan: {}, rows: [], allRows: [], log: [],
     lock: { state: "draft", rounds: [] }, ver: { list: [], snaps: {} }
   };
-  var UI = { sel: null, collapsed: {}, group: "", onlyWarn: false, search: "", cell: null, sort: null, filters: {}, freeze: "acc", multi: {} };
+  var UI = { sel: null, collapsed: {}, nav: { t: "", m: "", s: "" }, onlyWarn: false, search: "", cell: null, sort: null, filters: {}, freeze: "acc", multi: {} };
   var undoStack = [], redoStack = [];
   var saveTimer = null, saving = false, savePending = false, saveFailed = false, masterDirty = false;
   var seq = 0; // 새 ID 번호
@@ -402,7 +402,9 @@
   function needsCheck(r) { return !r.out && (r._c.missing || !!r._c.check); }
 
   function visible(r) {
-    if (UI.group && r.l1 !== UI.group) return false;
+    if (UI.nav.t && r.l1 !== UI.nav.t) return false;
+    if (UI.nav.m && r.l2 !== UI.nav.m) return false;
+    if (UI.nav.s && r.l3 !== UI.nav.s) return false;
     if (UI.onlyWarn && !needsCheck(r)) return false;
     if (!filterOk(r)) return false;
     if (UI.search) {
@@ -416,7 +418,7 @@
   var LAST = null;
   function renderAll() {
     LAST = computeAll();
-    renderTable(LAST); renderSummary(LAST); renderChips(LAST); renderBars(); renderStatus(LAST); renderLock(); renderTools();
+    renderTable(LAST); renderSummary(LAST); renderNav(LAST); renderBars(); renderStatus(LAST); renderLock(); renderTools();
     $("fileName").textContent = S.year ? "— " + Store.fileName(S.year) : "";
     $("btnUndo").disabled = !undoStack.length;
     $("btnRedo").disabled = !redoStack.length;
@@ -511,7 +513,7 @@
     }
     return true;
   }
-  function filtering() { return !!(UI.group || UI.onlyWarn || UI.search || Object.keys(UI.filters).length); }
+  function filtering() { return !!(UI.nav.t || UI.onlyWarn || UI.search || Object.keys(UI.filters).length); }
 
   function renderTable(R) {
     var el = $("tbl");
@@ -643,13 +645,25 @@
     }).join("") + "</div>";
   }
 
-  function renderChips(R) {
-    var h = ['<span class="chip' + (!UI.group ? " on" : "") + '" data-chip="">전체</span>'];
-    R.groups.forEach(function (g) { h.push('<span class="chip' + (UI.group === g.name ? " on" : "") + '" data-chip="' + esc(g.name) + '">' + esc(g.name) + "</span>"); });
+  // 탐색바: 대분류 · 중분류 · 소분류 드롭다운 (위 칸을 고르면 아래 칸 목록이 좁혀짐)
+  function renderNav(R) {
+    var opt = function (list, v, all) {
+      return '<option value="">' + all + "</option>" + list.map(function (x) { return '<option value="' + esc(x) + '"' + (x === v ? " selected" : "") + ">" + esc(x) + "</option>"; }).join("");
+    };
+    var uniq = function (f, rows) { var o = []; rows.forEach(function (r) { var v = f(r); if (v && o.indexOf(v) < 0) o.push(v); }); return o; };
+    var rT = S.rows, rM = rT.filter(function (r) { return !UI.nav.t || r.l1 === UI.nav.t; }), rS = rM.filter(function (r) { return !UI.nav.m || r.l2 === UI.nav.m; });
+    $("navT").innerHTML = opt(uniq(function (r) { return r.l1; }, rT), UI.nav.t, "대분류 전체");
+    $("navM").innerHTML = opt(uniq(function (r) { return r.l2; }, rM), UI.nav.m, "중분류 전체");
+    var subs = uniq(function (r) { return r.l3; }, rS);
+    $("navS").innerHTML = opt(subs, UI.nav.s, subs.length ? "소분류 전체" : "소분류 없음");
+    $("navS").disabled = !subs.length;
+    ["navT", "navM", "navS"].forEach(function (k) { $(k).classList.toggle("on", !!$(k).value); });
     var w = R.missing + R.checks;
-    if (w) h.push('<span class="chip warn' + (UI.onlyWarn ? " on" : "") + '" data-chip-warn="1">확인 필요 ' + w + "</span>");
-    $("chips").innerHTML = h.join("");
+    $("btnWarnChip").hidden = !w;
+    $("btnWarnChip").textContent = "확인 필요 " + w;
+    $("btnWarnChip").classList.toggle("on", UI.onlyWarn);
   }
+
 
   function renderStatus(R) {
     $("stCount").textContent = S.year ? "계정 " + S.rows.length + " · 입력 필요 " + R.missing + (R.checks ? " · 분할 확인 " + R.checks : "") + (R.outs ? " · 계획 외 " + R.outs : "") : "";
@@ -1050,7 +1064,7 @@
           var lf = findLeaf(id).leaf;
           if (dz) lf.dz.push(dz);
           if (out && !S.plan[id]) { var b = Calc.blankPlan(); b.out = true; S.plan[id] = b; }
-          UI.sel = id; delete UI.collapsed[l1]; UI.group = UI.group && UI.group !== l1 ? "" : UI.group;
+          UI.sel = id; delete UI.collapsed[l1]; if (UI.nav.t && UI.nav.t !== l1) UI.nav = { t: "", m: "", s: "" };
         }, (mode.indexOf("revive") === 0 ? "계정 다시 사용: " : "계정 추가: ") + l1 + " › " + l2 + (l3 ? " › " + l3 : "") + (news.length ? " (분류 신설)" : "") + (out ? " (계획 외)" : ""), { master: true });
         setTimeout(function () { select(id, true); }, 0);
         toast(out ? "계획 외 계정으로 추가했습니다" : mode.indexOf("revive") === 0 ? "다시 사용합니다" : "계정을 추가했습니다. 더블클릭해서 산출 방식을 입력하세요");
@@ -1665,7 +1679,7 @@
      opts.cat: 이 분류표로 시작 (버전 복사), opts.kind / opts.memo: 저장할 때 버전 구분 · 메모 */
   function catDialog(opts) {
     opts = opts || {};
-    if (!S.year && !Store.folderName()) { toast("먼저 데이터 폴더를 연결하세요"); return; }
+    if (!S.year && !Store.connected()) { toast("먼저 데이터 폴더를 연결하세요"); return; }
     var W = clone(opts.cat || S.cat);
     ensureIds(W);
     var kind = opts.kind || "분류 관리";
@@ -2316,7 +2330,7 @@
       if (go) {
         var id = go.getAttribute("data-go"), r = rowBy(id);
         closeDialog();
-        UI.group = ""; UI.filters = {}; UI.onlyWarn = false; UI.search = ""; $("search").value = "";
+        UI.nav = { t: "", m: "", s: "" }; UI.filters = {}; UI.onlyWarn = false; UI.search = ""; $("search").value = "";
         if (r) delete UI.collapsed[r.l1];
         renderAll();
         setCell(id, "plan", true);
@@ -2460,7 +2474,7 @@
       undoStack = []; redoStack = [];
       deriveRows();
       UI.sel = S.rows.length ? S.rows[0].id : null;
-      UI.group = ""; UI.collapsed = {};
+      UI.nav = { t: "", m: "", s: "" }; UI.collapsed = {};
       try { localStorage.setItem("budget.lastYear", String(y)); } catch (e) { /* 저장소 막힘 */ }
       syncSettingSelects();
       fillYearSelect();
@@ -2489,7 +2503,7 @@
     openDialog({
       title: "새 연도 만들기", width: 520,
       body: '<div class="mdl-pad"><div class="f-row"><label>계획 연도</label><input class="inp num" id="nyYear" data-kind="int" value="' + def + '" style="width:120px"></div>' +
-        opt("inherit", can ? S.year + "년 이어받기 (추천)" : "이전 연도 이어받기 (열린 연도가 없음)", "산출 방식 · 입력값 · 월 분할 · 메모를 그대로 복사합니다. 전년 실적 칸은 비우므로 [전년 실적 가져오기]로 채우세요.", !can) +
+        opt("inherit", can ? S.year + "년 이어받기 (추천)" : "이전 연도 이어받기 (열린 연도가 없음)", "산출 방식 · 입력값 · 월 분할 · 메모를 그대로 복사합니다. 전년 실적(월별 포함)은 비우므로 [전년 실적 가져오기]로 채우세요.", !can) +
         opt("empty", "빈 계획으로 시작", "분류(계정)는 그대로 쓰고 계획 입력값만 비웁니다." + (leafCount(S.cat) ? "" : " 분류가 아직 없으면 만든 뒤 분류 관리가 열립니다.")) +
         '<div class="pv-warn" id="nyErr"></div></div>',
       okText: "만들기",
@@ -2512,7 +2526,7 @@
     var from = S.year;
     flushSave().then(function () {
       var plan = {};
-      if (mode === "inherit") Object.keys(S.plan).forEach(function (id) { var p = clone(S.plan[id]); p.prev = 0; delete p.out; plan[id] = p; });
+      if (mode === "inherit") Object.keys(S.plan).forEach(function (id) { var p = clone(S.plan[id]); p.prev = 0; p.pm = []; delete p.out; plan[id] = p; });
       keepYearLock();
       S.year = y; S.plan = plan; S.lock = { state: "draft", rounds: [] };
       S.log = [{ t: Store.stamp(), m: y + "년 파일 만듦" + (from && mode === "inherit" ? " (" + from + "년에서 이어받음)" : "") }];
@@ -2582,7 +2596,14 @@
     }
     function analyze() {
       var aoa = sheets[si].aoa, sums = {}, msums = {}, n = 0, bad = {}, mcols = Object.keys(g.months || {});
-      aoa.slice(g.head + 1).forEach(function (row) {
+      // 더존 손익 출력이면 'Ⅳ 판매관리비' ~ 다음 로마숫자 줄 사이만 읽음
+      var body = aoa.slice(g.head + 1), nameAt = function (r) { return g.name >= 0 ? nm((r || [])[g.name]) : ""; };
+      var from = body.findIndex(function (r) { return /^[ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ].*판매관리비/.test(nameAt(r)); });
+      if (from >= 0) {
+        var to = body.findIndex(function (r, i) { return i > from && /^[ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]/.test(nameAt(r)); });
+        body = body.slice(from + 1, to > 0 ? to : body.length);
+      }
+      body.forEach(function (row) {
         row = row || [];
         var code = g.code >= 0 ? String(row[g.code] === undefined ? "" : row[g.code]).trim() : "";
         var name = g.name >= 0 ? String(row[g.name] === undefined ? "" : row[g.name]).trim() : "";
@@ -2718,9 +2739,9 @@
       return loadYearLocks().then(function () {
         if (!S.years.length) {
           cover("아직 계획 파일이 없습니다", "연결한 폴더 <code>" + esc(Store.folderName()) + "</code> 의 data 폴더에 사업비 계획 파일이 없습니다.<br>" +
-            "분류는 " + (mst ? "기준정보.xlsx 의 분류" : "<b>기본 분류</b>(내부 자료 작성용 서식)") + " — " + esc(catCounts(S.cat)) + " 가 들어 있습니다.<br>새 연도를 만들어 시작하거나, 샘플 계획으로 화면을 둘러보세요.", [
+            "분류는 " + (mst ? "기준정보.xlsx 의 분류" : "<b>기본 분류</b>(내부 자료 작성용 서식)") + " — " + esc(catCounts(S.cat)) + " 가 들어 있습니다.<br>새 연도를 만들어 시작하거나, <b>2026년 테스트 데이터</b>(가짜 금액, 마감 · 변경까지)로 둘러보세요.", [
             { label: "새 연도 만들기", primary: true, fn: function () { hideCover(); newYearDialog(); } },
-            { label: "샘플 계획으로 둘러보기 (2027년)", fn: function () { hideCover(); makeSample(); } },
+            { label: "2026년 테스트 데이터로 시작", fn: function () { hideCover(); makeTest2026(); } },
             { label: "다른 폴더 고르기", fn: askFolder }
           ]);
           return;
@@ -2735,39 +2756,78 @@
     });
   }
 
-  // 샘플: 지금 분류(없으면 기본 분류)에 그럴듯한 금액을 넣은 2027년 계획
-  function makeSample() {
-    if (!leafCount(S.cat)) { S.cat = baseCat(); ensureIds(S.cat); addVersion("기본 탑재", "샘플용"); }
+  /* ---------- 2026년 테스트(더미) 데이터 ----------
+     2026년 계획(전년 = 2025 실적, 원안 마감 + 1차 변경 마감) + 더존 손익 원데이터 양식 더미(2026년 1~12월)
+     → 2027년 새 연도를 만들고 [전년 실적 가져오기]로 그 파일을 넣어 보며 테스트 */
+  var TEST_PL = "2026_손익_1-12월_테스트.xls";
+  function testDataDialog() {
+    if (!Store.connected()) { toast("먼저 데이터 폴더를 연결하세요"); return; }
+    var has = S.years.indexOf(2026) >= 0;
+    openDialog({
+      title: "2026년 테스트 데이터", width: 560, danger: has,
+      body: '<div class="mdl-pad msg">테스트용 <b>가짜 금액</b>으로 아래를 만듭니다.<br>' +
+        "• <b>data\\" + Store.fileName(2026) + "</b> — 2026년 계획 (전년 실적 = 2025년 더미, <b>원안 마감 + 1차 변경 마감</b>)<br>" +
+        "• <b>더존원본\\" + TEST_PL + "</b> — 더존 손익 원데이터 양식 (판관비 · 매출 · 영업외 · 법인세, 2026년 1~12월)<br><br>" +
+        "그다음 <b>2027년 새 연도</b>를 만들고 <b>[전년 실적 가져오기]</b>로 위 손익 파일을 고르면 전년 실적 · 월별(작년처럼)까지 들어갑니다." +
+        (has ? '<br><br><span class="em">이미 2026년 파일이 있습니다. 덮어씁니다 (이전 파일은 backup 폴더에 보관).</span>' : "") + "</div>",
+      okText: has ? "덮어쓰고 만들기" : "만들기",
+      onOk: function () { flushSave().then(makeTest2026); }
+    });
+  }
+  function makeTest2026() {
+    if (!leafCount(S.cat)) { S.cat = baseCat(); ensureIds(S.cat); addVersion("기본 탑재", "테스트 데이터용"); }
+    var list = TestData.items(S.cat), a25 = TestData.byLeaf(list, 2025);
     keepYearLock();
-    S.year = 2027;
+    S.year = 2026;
     S.settings = { dispUnit: "천원", rndUnit: "천원", rndMode: "반올림" };
     S.lock = { state: "draft", rounds: [] };
     S.plan = {};
-    var scale = { "임원보수": 1.2e9, "직원급여": 7.8e9, "상여금": 1.1e9, "잡급여": 1.6e8, "퇴직급여": 6.5e8 };
-    var k = 0, rnd = function () { k++; var x = Math.sin(k * 77.7) * 10000; return x - Math.floor(x); };
-    eachLeaf(S.cat, function (t, m, sub, lf) {
-      var p = Calc.blankPlan(), r = rnd();
-      p.prev = Math.round((scale[t.name] || 4e6 + 9.6e7 * rnd() * rnd()) * (0.85 + 0.3 * r) / 10000) * 10000;
-      var pick = k % 9;
-      if (pick === 4) { p.meth = "절대증감"; p.a = Math.round(p.prev * 0.05 / 100000) * 100000; }
-      else if (pick === 6) { p.meth = "단가×수량"; p.a = Math.round(p.prev / 12 / 25 / 1000) * 1000; p.b = 25; p.c = 12; p.memo = "월 25건 기준"; }
-      else if (pick === 7 && k % 2) { p.meth = "수기"; p.a = Math.round(p.prev * 1.1 / 100000) * 100000; p.split = "비율"; p.sv = [0, 0, .15, .1, .1, .05, 0, 0, .15, .15, .2, .1]; p.memo = "상·하반기 집중"; }
-      else if (k % 23 === 5) { p.meth = ""; }
-      else { p.meth = "%증감"; p.a = [0.03, 0.05, 0, -0.05, 0.08, 0.02][k % 6]; }
+    var k = 0, rates = [0.03, 0.02, 0, 0.05, -0.03, 0.04, 0.03];
+    eachLeaf(S.cat, function (t, m, s, lf) {
+      var pm = a25[lf.id] || new Array(12).fill(0), prev = pm.reduce(function (x, y) { return x + y; }, 0), p = Calc.blankPlan(), rt = Calc.ratiosFrom(pm);
+      k++;
+      p.prev = prev; p.pm = pm.slice();
+      if (t.name === "임원보수") { p.meth = "인원"; p.b = 6; p.c = 12; p.a = Math.round(prev * 1.03 / 72 / 10000) * 10000; p.memo = "임원 6명"; }
+      else if (/임차,관리비/.test(lf.name)) { p.meth = "단가×수량"; p.a = Math.round(prev / 12 * 1.02 / 10000) * 10000; p.b = 1; p.c = 12; p.memo = "월 임차료 2% 인상"; }
+      else if (t.name === "직원급여") { p.meth = "%증감"; p.a = 0.035; if (rt && Math.max.apply(null, rt) > 0.15) { p.split = "비율"; p.sv = rt; } }
+      else {
+        p.meth = "%증감"; p.a = rates[k % rates.length];
+        if (rt && Math.max.apply(null, rt) > 0.15) { p.split = "비율"; p.sv = rt; p.memo = "전년 월 패턴"; }
+      }
       S.plan[lf.id] = p;
     });
-    S.log = [{ t: Store.stamp(), m: "샘플 데이터로 2027년 파일 만듦" }];
+    deriveRows();
+    var s0 = snapNow();
+    S.lock.rounds.push({ n: 0, closedAt: "2025-12-19 17:30:00", openedAt: "", reason: "", total: s0.total, snap: s0.snap });
+    // 1차 변경: 인원 충원 · 지점 임차료 인상 · 외부위탁교육 축소
+    eachLeaf(S.cat, function (t, m, s, lf) {
+      var p = S.plan[lf.id];
+      if (t.name === "직원급여" && lf.name === "직원급여") { p.a = 0.045; p.memo = "하반기 충원 3명 반영"; }
+      if (/임차,관리비\(지점\)/.test(lf.name)) { p.a = Math.round(p.a * 1.05 / 10000) * 10000; p.memo = "지점 2곳 임차료 인상"; }
+      if (/외부위탁교육/.test(lf.name)) { p.meth = "%증감"; p.a = -0.2; p.memo = "외부 교육 축소"; }
+    });
+    deriveRows();
+    var s1 = snapNow();
+    S.lock.rounds.push({ n: 1, closedAt: "2026-06-30 18:10:00", openedAt: "2026-06-24 09:20:00", reason: "하반기 인원 충원 · 지점 임차료 인상", total: s1.total, snap: s1.snap });
+    S.lock.state = "closed";
+    S.log = [{ t: Store.stamp(), m: "2026년 테스트 데이터 만듦 (원안 마감 + 1차 변경 마감, 금액은 가짜)" }];
     clearUndo();
     deriveRows();
     UI.sel = S.rows.length ? S.rows[0].id : null;
     syncSettingSelects();
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(TestData.profitLoss(list, 2026, 12)), "Sheet1_1");
     var mm = masterDirty;
     masterDirty = false;
-    (mm ? Store.saveMaster(S.cat, S.ver) : Promise.resolve()).then(function () { return Store.save(S); }).then(function () { return Store.listYears(); }).then(function (ys) {
-      S.years = ys; fillYearSelect(); renderAll();
-      setSave("ok", "자동 저장됨 " + Store.stamp().slice(11, 16));
-      toast("샘플 2027년 파일을 만들었습니다 — data\\" + Store.fileName(2027));
-    }).catch(function (e) { toast("샘플을 만들지 못했습니다: " + (e && e.message || e), true, 6000); });
+    (mm ? Store.saveMaster(S.cat, S.ver) : Promise.resolve())
+      .then(function () { return Store.save(S); })
+      .then(function () { return Store.writeBook("더존원본", TEST_PL, wb, "biff8"); })
+      .then(function () { return Store.listYears(); })
+      .then(function (ys) {
+        S.years = ys; fillYearSelect(); keepYearLock(); renderAll();
+        setSave("ok", "자동 저장됨 " + Store.stamp().slice(11, 16));
+        toast("2026년 테스트 데이터를 만들었습니다 — 2027년 새 연도를 만들어 [전년 실적 가져오기]로 더존원본\\" + TEST_PL + " 을 넣어 보세요", false, 7000);
+      }).catch(function (e) { toast("테스트 데이터를 만들지 못했습니다: " + (e && e.message || e), true, 6000); });
   }
 
   /* ---------- 이벤트 ---------- */
@@ -2775,7 +2835,7 @@
     var needYear = ["importPrev", "export", "addAcc", "editAcc", "delAcc", "openPlan", "toggleAll", "onlyWarn", "undo", "redo", "reload", "lockPlan", "openChange", "cancelChange", "rounds", "bulk"];
     if (needYear.indexOf(name) >= 0 && !S.year) { toast("먼저 데이터 폴더를 연결하고 연도를 여세요"); return; }
     switch (name) {
-      case "newYear": return Store.folderName() ? newYearDialog() : toast("먼저 데이터 폴더를 연결하세요");
+      case "newYear": return Store.connected() ? newYearDialog() : toast("먼저 데이터 폴더를 연결하세요");
       case "reload": return flushSave().then(function () { return Store.loadMaster(); }).then(function (mst) {
         if (mst) { S.cat = mst.cat; S.ver = mst.ver; ensureIds(S.cat); }
         return loadYear(S.year);
@@ -2796,6 +2856,7 @@
       case "bulk": return bulkDialog();
       case "calc": return calcToggle();
       case "ribbonReset": return ribbonReset();
+      case "testData": return testDataDialog();
       case "toggleAll":
         var anyOpen = LAST.groups.some(function (g) { return !UI.collapsed[g.name]; });
         LAST.groups.forEach(function (g) { UI.collapsed[g.name] = anyOpen; });
@@ -2818,9 +2879,7 @@
       }
       var soon = e.target.closest("[data-soon]");
       if (soon) { toast("'" + soon.getAttribute("data-soon") + "' 화면은 다음 단계에서 만듭니다"); return; }
-      var chip = e.target.closest("[data-chip]");
-      if (chip) { UI.group = chip.getAttribute("data-chip"); renderAll(); return; }
-      if (e.target.closest("[data-chip-warn]")) { UI.onlyWarn = !UI.onlyWarn; renderAll(); return; }
+      if (e.target.closest("#btnWarnChip")) { UI.onlyWarn = !UI.onlyWarn; renderAll(); return; }
       if (e.target.closest("#saveState") && saveFailed) { doSave(); return; }
     });
 
@@ -2867,6 +2926,9 @@
     });
 
     $("search").addEventListener("input", function () { UI.search = this.value.trim(); renderAll(); });
+    $("navT").addEventListener("change", function () { UI.nav = { t: this.value, m: "", s: "" }; renderAll(); });
+    $("navM").addEventListener("change", function () { UI.nav.m = this.value; UI.nav.s = ""; renderAll(); });
+    $("navS").addEventListener("change", function () { UI.nav.s = this.value; renderAll(); });
     $("selYear").addEventListener("change", function () {
       var v = this.value;
       if (v === "new") { fillYearSelect(); newYearDialog(); return; }
