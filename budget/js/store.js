@@ -290,8 +290,14 @@
     e.b = Calc.num(p["인원수량"]);
     e.c = Calc.num(p["개월"]);
     e.split = Calc.SPLITS.indexOf(str(p["분할"])) >= 0 ? str(p["분할"]) : "균등";
-    for (var i = 0; i < 12; i++) e.sv[i] = Calc.num(p["분할" + (i + 1) + "월"]);
+    var i;
+    for (i = 0; i < 12; i++) e.sv[i] = Calc.num(p["분할" + (i + 1) + "월"]);
     e.memo = str(p["메모"]);
+    e.t = Calc.num(p["총액"]);
+    e.auto = { "월액": "a", "단가": "a", "인원": "b", "수량": "b", "개월": "c" }[str(p["역산"])] || "t";
+    var pm = [], has = false;
+    for (i = 1; i <= 12; i++) { var v = p["전년" + i + "월"]; if (v !== undefined && v !== "") has = true; pm.push(Calc.num(v)); }
+    e.pm = has ? pm : [];
     if (str(p["계획외"]) === "Y") e.out = true;
     return e;
   }
@@ -346,12 +352,16 @@
   var PLAN_HEAD = (function () {
     var h = ["ID", "대분류", "중분류", "소분류", "더존코드", "전년실적", "산출방식", "증감률", "금액단가", "인원수량", "개월", "분할"];
     for (var i = 1; i <= 12; i++) h.push("분할" + i + "월");
-    return h.concat(["메모", "계획외", "사용"]);
+    h = h.concat(["메모", "계획외", "사용", "총액", "역산"]);
+    for (i = 1; i <= 12; i++) h.push("전년" + i + "월");
+    return h;
   })();
   function planCells(id, l1, l2, l3, dz, e, use) {
     var isPct = e.meth === "%증감";
     return [id, l1, l2, l3, dz, e.prev, e.meth, isPct ? e.a : "", isPct ? "" : e.a, e.b || "", e.c || "", e.split]
-      .concat(e.sv.map(function (v) { return v || ""; })).concat([e.memo, e.out ? "Y" : "", use === false ? "N" : "Y"]);
+      .concat(e.sv.map(function (v) { return v || ""; })).concat([e.memo, e.out ? "Y" : "", use === false ? "N" : "Y", e.t || "",
+        Calc.isQty(e.meth) && e.auto && e.auto !== "t" ? { a: e.meth === "인원" ? "월액" : "단가", b: e.meth === "인원" ? "인원" : "수량", c: "개월" }[e.auto] : ""])
+      .concat(e.pm && e.pm.length === 12 ? e.pm : new Array(12).fill(""));
   }
 
   // state.allRows: 분류 순서대로 모든 계정(사용 안 함 포함) [{id,l1,l2,l3,dz,use, ...입력값}]

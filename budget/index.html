@@ -17,6 +17,8 @@
     <a data-tab="file">파일</a><a data-tab="plan" class="on">계획</a><a data-tab="set">설정</a><a data-tab="help">도움말</a>
   </div>
 
+  <div class="ribbons">
+  <button class="rb rb-calc" data-act="calc" id="btnCalc" title="계산기 — 열어 두고 표의 금액 칸을 누르면 그 금액이 들어갑니다"><span class="ic">🧮</span>계산기</button>
   <div class="ribbon" id="rb-file" hidden>
     <div class="rgrp"><div class="items">
       <button class="rb" data-act="newYear"><span class="ic">＋</span>새 연도<br>만들기</button>
@@ -39,6 +41,7 @@
       <button class="rb" data-act="editAcc"><span class="ic">✎</span>계정 수정</button>
       <button class="rb" data-act="delAcc"><span class="ic">－</span>계정 삭제</button>
       <button class="rb strong" data-act="openPlan"><span class="ic">▦</span>산출 입력</button>
+      <button class="rb" data-act="bulk" title="선택한 계정(Ctrl · Shift + 클릭)이나 보이는 계정에 한 번에 적용"><span class="ic">⚙</span>일괄 적용</button>
       <button class="rb" data-act="catMgr"><span class="ic">☰</span>분류 관리</button>
     </div><div class="gname">계정</div></div>
     <div class="rgrp"><div class="items">
@@ -71,13 +74,15 @@
     <div class="rgrp"><div class="items">
       <button class="rb strong" data-act="catMgr"><span class="ic">☰</span>분류 관리</button>
       <button class="rb" data-act="verHist"><span class="ic">🕘</span>버전 이력</button>
+      <button class="rb" data-act="ribbonReset" title="끌어서 바꾼 리본 묶음 순서를 처음대로"><span class="ic">↺</span>리본 배치<br>처음대로</button>
       <div class="rinfo">대분류 · 중분류 · 소분류(선택)와 순번, 더존 과목 연결을 관리합니다.<br>모든 연도가 같이 쓰며 <b>data\기준정보.xlsx</b> 에 저장됩니다.</div>
     </div><div class="gname">분류</div></div>
   </div>
 
   <div class="ribbon help" id="rb-help" hidden>
     <div class="helptext">
-      <b>계정 줄 클릭</b> = 선택 · <b>더블클릭 / Enter / 계획액 클릭</b> = 산출 입력 · <b>⋮⋮ 끌기</b> = 순서 바꾸기 (같은 중분류 안) · <b>↑↓</b> = 줄 이동 · <b>Ctrl+Z / Ctrl+Y</b> = 실행 취소 / 다시 실행 · <b>Ctrl+F</b> = 계정 검색<br>
+      <b>계획 칸 클릭</b> = 산출 입력 · <b>월 · 비고 칸</b> = 바로 입력 (숫자 치기 · 더블클릭 · F2, Enter/Tab/방향키로 이동, Delete 지우기) · <b>열 우클릭</b> = 정렬 · 필터 · 틀 고정 · 일괄 적용<br>
+      <b>Ctrl/Shift + 클릭</b> = 여러 계정 선택 · <b>⋮⋮ 끌기</b> = 순서 바꾸기 (같은 상위 안) · 리본 묶음 오른쪽 <b>⋮⋮</b> 끌기 = 묶음 위치 바꾸기 · <b>Ctrl+Z / Ctrl+Y</b> = 실행 취소 / 다시 실행 (최근 100번) · <b>Ctrl+F</b> = 계정 검색<br>
       계정 분류 · 순번 · 더존 과목 연결은 <b>설정 › 분류 관리</b>에서 바꿉니다. 소분류가 없으면 중분류가, 있으면 소분류가 계정입니다. 저장할 때마다 <b>버전</b>이 남습니다.<br>
       <b>계획 마감</b> 후에는 계획을 고칠 수 없고, 금액 있는 계정은 옮기거나 지울 수 없습니다. 고치려면 <b>계획 변경</b>(1차 · 2차 …)을 열고, 끝나면 <b>변경 마감</b>. 마감 뒤에 생긴 계정은 <b>계획 외</b>입니다.<br>
       금액은 항상 <b>원 단위</b>로 입력합니다. 표시 단위는 보기용입니다. 월별 금액은 반올림 단위로 맞추고, <b>확정 계획액 = 월별 금액의 합</b>입니다.<br>
@@ -85,19 +90,24 @@
     </div>
   </div>
 
+  </div>
+
   <div class="fbar">
     <div class="ref" id="fRef">-</div><div class="fx">산출</div><div class="val" id="fVal"></div>
   </div>
 
-  <div class="strip">
+  <div class="strip" id="strip">
     <div id="kpis" class="kpis"></div>
     <div class="panel"><h3>대분류별 구성비</h3><div id="cats"></div></div>
     <div class="panel"><h3>월별 계획</h3><div id="months"></div></div>
   </div>
+  <div class="strip-grip" id="stripGrip" title="끌어서 요약 높이 조절 · 더블클릭 = 처음 높이"></div>
 
   <div class="toolbar">
     <input class="search" id="search" placeholder="계정 검색 (Ctrl+F)">
     <div id="chips" class="chips"></div>
+    <div id="tblState" class="tblstate"></div>
+    <button class="btn sm strip-btn" id="stripBtn"></button>
   </div>
 
   <div class="tblwrap" id="tbl"></div>
@@ -127,6 +137,22 @@
   </div>
 </div>
 
+<input class="cell-ed" id="cellEd" autocomplete="off" spellcheck="false" hidden>
+<div class="ctx" id="ctx" hidden></div>
+<div class="fpop" id="fpop" hidden></div>
+<div class="calc" id="calc" tabindex="-1" hidden>
+  <div class="ck-h"><b>🧮 계산기</b><span class="ck-tip">표의 금액 칸을 누르면 입력</span><button id="ckClose" title="닫기">✕</button></div>
+  <div class="ck-tape" id="ckTape"></div>
+  <div class="ck-disp"><div class="ck-expr" id="ckExpr"></div><div class="ck-val" id="ckVal">0</div><div class="ck-kor" id="ckKor"></div></div>
+  <div class="ck-keys">
+    <button data-ck="C" class="fn">C</button><button data-ck="CE" class="fn">CE</button><button data-ck="←" class="fn">←</button><button data-ck="÷" class="op">÷</button>
+    <button data-ck="7">7</button><button data-ck="8">8</button><button data-ck="9">9</button><button data-ck="×" class="op">×</button>
+    <button data-ck="4">4</button><button data-ck="5">5</button><button data-ck="6">6</button><button data-ck="−" class="op">−</button>
+    <button data-ck="1">1</button><button data-ck="2">2</button><button data-ck="3">3</button><button data-ck="+" class="op">+</button>
+    <button data-ck="±" class="fn">±</button><button data-ck="0">0</button><button data-ck="00">00</button><button data-ck="=" class="eq">=</button>
+    <button data-ck="%" class="fn">%</button><button data-ck="." class="fn">.</button><button id="ckClr" class="fn" title="계산 기록 지우기">기록 ✕</button><button id="ckCopy" class="fn" title="결과 복사 (Ctrl+C)">복사</button>
+  </div>
+</div>
 <div id="modal"></div>
 <div class="toast" id="toast"></div>
 
