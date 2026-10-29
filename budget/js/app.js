@@ -3187,7 +3187,11 @@
       if (sum12(r.plan) && xForecast(r) > sum12(r.plan)) fc++;
     });
     var cl = CMP[XU.cmp], d = act - cmp, un = Object.keys(XL.C.un).length, al = X.alerts.filter(function (a) { return a.state !== "정상"; }).length;
-    $("kpis").innerHTML = !M ? '<div class="kpi"><div class="k-label">집행</div><div class="k-value">-</div><div class="k-sub">아직 반영한 더존 자료가 없습니다 — [더존 자료 읽기]</div></div>' : [
+    var nx = rows.filter(function (r) { return sum12(r.plan); }).length;
+    $("kpis").innerHTML = !M ? [
+      '<div class="kpi kpi-plan"><div class="k-label">연간 계획 · ' + esc(XL.base.label) + '</div><div class="k-value">' + u(yp, true) + "<small>" + unitName() + '</small></div><div class="k-sub">계획 있는 계정 ' + nx + " / " + rows.length + "</div></div>",
+      '<div class="kpi"><div class="k-label">집행</div><div class="k-value">-</div><div class="k-sub">아직 반영한 더존 자료가 없습니다 — <button class="btn sm" data-act="xRead">더존 자료 읽기</button></div></div>'
+    ].join("") : [
       '<div class="kpi kpi-plan"><div class="k-label">1~' + U + '월 집행 누계</div><div class="k-value">' + u(act, true) + "<small>" + unitName() + '</small></div><div class="k-sub">연간 계획 ' + u(yp, true) + " 의 " + (yp ? (act / yp * 100).toFixed(1) : "-") + "%</div></div>",
       '<div class="kpi"><div class="k-label">누계 ' + cl + ' 대비</div><div class="k-value ' + (d > 0 ? "up" : d < 0 ? "down" : "") + '">' + (cmp ? (d >= 0 ? "+" : "−") + Math.abs(d / cmp * 100).toFixed(1) + "%" : "-") + '</div><div class="k-sub">' + cl + " " + u(cmp, true) + " · " + (d >= 0 ? "초과 " : "절감 ") + u(Math.abs(d), true) + "</div></div>",
       '<div class="kpi"><div class="k-label">' + M + '월 집행</div><div class="k-value">' + u(ma, true) + "<small>" + unitName() + '</small></div><div class="k-sub">' + M + "월 " + cl + " " + u(mc, true) + " · " + (mc ? (ma >= mc ? "+" : "−") + Math.abs((ma - mc) / mc * 100).toFixed(1) + "%" : "") + "</div></div>",
@@ -3230,7 +3234,8 @@
   function xCell(o, k, U, M) {
     var c = k.charAt(0), m = parseInt(k.slice(1), 10);
     var cumC = sum12(o.cmp, U), cumA = sum12(o.act, U), yp = sum12(o.plan);
-    if (k === "rate") return { v: yp ? sum12(o.act, M || U) / yp : NaN, pct: true };
+    if (!M && /^(at|ca|dt|cd|cr)$/.test(k)) return { v: null };
+    if (k === "rate") return { v: yp && M ? sum12(o.act, M) / yp : NaN, pct: true };
     if (k === "yp") return { v: yp };
     if (k === "left") return { v: yp - cumA };
     if (k === "fc") return { v: o.fc, warn: yp && o.fc > yp };
@@ -3251,8 +3256,9 @@
   function renderXTable(rows, U, M) {
     var el = $("tblX"), ks = xKeys(), sub = XU.view === "all" ? 3 : 1, cum = XU.agg === "cum", starts = {}, seenB = {};
     ks.forEach(function (k) { var b = /^[cad]\d/.test(k) ? k.slice(1) : /t$/.test(k) ? "t" : k === "cc" ? "c" : k; if (!seenB[b]) { seenB[b] = 1; if (/^[cad]\d|t$|^cc$/.test(k)) starts[k] = 1; } });
-    if (!X || !M) {
-      el.innerHTML = '<div class="empty"><b>아직 반영한 더존 자료가 없습니다.</b><br>더존에서 받은 <b>분개장</b>과 <b>재무제표(손익)</b> 파일을 <code>(연결한 폴더)\\' + xPath().replace("/", "\\") + "\\</code> 에 넣고<br>[더존 자료 읽기]를 누르세요. 파일 이름에 월이 들어가면 됩니다 (예: 분개장_09월.xls · 손익_09월.xls)." +
+    if (!rows.length) {
+      el.innerHTML = '<div class="empty"><b>계정이 없습니다.</b><br>[분류 관리]에서 분류를 만들거나 [사업비 계획]에서 계정을 추가하세요.<br><br>아직 반영한 더존 자료가 없다면 ' +
+        '더존에서 받은 <b>분개장</b>과 <b>재무제표(손익)</b> 파일을 <code>(연결한 폴더)\\' + xPath().replace("/", "\\") + "\\</code> 에 넣고<br>[더존 자료 읽기]를 누르세요." +
         '<br><br><button class="btn primary" data-act="xRead">더존 자료 읽기</button></div>';
       return;
     }
@@ -3274,7 +3280,7 @@
     if (cum) ks.forEach(function (k) { if (k !== "yp") h.push('<th data-k="' + k + '"' + (starts[k] ? ' class="mstart"' : "") + ">" + (k === "cc" || k === "ca" ? xKeyName(k) + "<br><small>1~" + U + "월</small>" : xKeyName(k)) + mark(k) + "</th>"); });
     else if (sub > 1) {
       for (var m = 1; m <= 12; m++) h.push('<th class="mh mstart' + (m > M ? " fut" : "") + '" colspan="3">' + m + "월</th>");
-      h.push('<th class="mh mstart" colspan="3">누계 (1~' + M + '월)</th><th rowspan="2" data-k="rate">집행률' + mark("rate") + "</th></tr><tr>");
+      h.push('<th class="mh mstart" colspan="3">' + (M ? "누계 (1~" + M + "월)" : "연간 (집행 반영 전)") + '</th><th rowspan="2" data-k="rate">집행률' + mark("rate") + "</th></tr><tr>");
       ks.forEach(function (k) { if (k !== "rate") h.push('<th class="sub' + (starts[k] ? " mstart" : "") + '" data-k="' + k + '">' + xKeyName(k) + mark(k) + "</th>"); });
     } else ks.forEach(function (k) { h.push('<th data-k="' + k + '"' + (starts[k] ? ' class="mstart"' : "") + ">" + (/^[cad]\d/.test(k) ? k.slice(1) + "월" : xKeyName(k) + (/t$/.test(k) ? "<br><small>누계</small>" : "")) + mark(k) + "</th>"); });
     h.push("</tr></thead><tbody>");
@@ -3902,7 +3908,7 @@
   /* ---------- 집행 표 클릭 · 우클릭 ---------- */
   function xScopeOf(td) {
     var k = td.getAttribute("data-k"), tr = td.closest("tr"), M = X.month, U = xUpto();
-    if (!k || !/^a\d|^at$|^ca$/.test(k)) return null;
+    if (!M || !k || !/^a\d|^at$|^ca$/.test(k)) return null;
     var months = /^a\d/.test(k) ? [+k.slice(1)] : range(XU.agg === "cum" ? U : M);
     if (/^a\d/.test(k) && months[0] > M) return null;
     var ids, title;
@@ -3975,7 +3981,7 @@
     var r = xRows(true).filter(function (x) { return x.id === id; })[0], M = X.month;
     if (!r) return;
     $("fRef").textContent = r.name;
-    $("fVal").innerHTML = "1~" + M + "월 집행 <em>" + u(sum12(r.act, M), true) + "</em> / " + CMP[XU.cmp] + " " + u(sum12(r.cmp, M), true) + " · 연간 계획 " + u(sum12(r.plan), true) + " · 연말 예상 " + u(xForecast(r), true) + " " + unitName() +
+    $("fVal").innerHTML = !M ? "연간 계획 <em>" + u(sum12(r.plan), true) + "</em> " + unitName() + " · 집행은 아직 반영 전 (더존 자료 읽기)" : "1~" + M + "월 집행 <em>" + u(sum12(r.act, M), true) + "</em> / " + CMP[XU.cmp] + " " + u(sum12(r.cmp, M), true) + " · 연간 계획 " + u(sum12(r.plan), true) + " · 연말 예상 " + u(xForecast(r), true) + " " + unitName() +
       (rowAlerts(id).length ? '<span class="w">지난 달 수정 ' + rowAlerts(id).length + "건</span>" : "");
     $("stSel").textContent = "선택: " + r.l1 + " › " + rowLabel(r);
   }
