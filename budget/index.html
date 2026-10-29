@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>사업비 관리 프로그램</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="app" id="app">
+  <div class="title">
+    <b>사업비 관리 프로그램</b><span class="file" id="fileName"></span>
+    <span class="saved" id="saveState"><span class="dot"></span><span id="saveText">폴더 연결 전</span></span>
+  </div>
+
+  <div class="rtabs" id="rtabs">
+    <a data-tab="file">파일</a><a data-tab="plan" class="on">계획</a><a data-tab="help">도움말</a>
+  </div>
+
+  <div class="ribbon" id="rb-file" hidden>
+    <div class="rgrp"><div class="items">
+      <button class="rb" data-act="newYear"><span class="ic">＋</span>새 연도<br>만들기</button>
+      <button class="rb" data-act="reload"><span class="ic">↻</span>다시<br>불러오기</button>
+      <button class="rb" data-act="export"><span class="ic">⇧</span>보고용<br>엑셀</button>
+    </div><div class="gname">연도 파일</div></div>
+    <div class="rgrp"><div class="items">
+      <button class="rb" data-act="changeFolder"><span class="ic">▣</span>데이터 폴더<br>바꾸기</button>
+      <div class="rinfo" id="folderInfo">-</div>
+    </div><div class="gname">데이터 폴더</div></div>
+  </div>
+
+  <div class="ribbon" id="rb-plan">
+    <div class="rgrp"><div class="items">
+      <button class="rb" data-act="importPrev"><span class="ic">⇩</span>전년 실적<br>가져오기</button>
+      <button class="rb" data-act="export"><span class="ic">⇧</span>보고용<br>엑셀</button>
+    </div><div class="gname">데이터</div></div>
+    <div class="rgrp"><div class="items">
+      <button class="rb" data-act="addAcc"><span class="ic">＋</span>계정 추가</button>
+      <button class="rb" data-act="editAcc"><span class="ic">✎</span>계정 수정</button>
+      <button class="rb" data-act="delAcc"><span class="ic">－</span>계정 삭제</button>
+      <button class="rb strong" data-act="openPlan"><span class="ic">▦</span>산출 입력</button>
+    </div><div class="gname">계정</div></div>
+    <div class="rgrp"><div class="items">
+      <div class="rsel">
+        <label>연도 <select id="selYear"></select></label>
+        <label>표시 단위 <select id="selDisp"></select></label>
+      </div>
+      <div class="rsel">
+        <label>반올림 <select id="selRnd"></select></label>
+        <label>방식 <select id="selMode"></select></label>
+      </div>
+    </div><div class="gname">설정</div></div>
+    <div class="rgrp"><div class="items">
+      <button class="rb" data-act="toggleAll"><span class="ic">⊟</span><span id="foldText">모두 접기</span></button>
+      <button class="rb" data-act="onlyWarn" id="btnWarn"><span class="ic">⚠</span>확인 필요만</button>
+    </div><div class="gname">보기</div></div>
+    <div class="rgrp"><div class="items">
+      <button class="rb" data-act="undo" id="btnUndo"><span class="ic">↶</span>실행 취소</button>
+      <button class="rb" data-act="redo" id="btnRedo"><span class="ic">↷</span>다시 실행</button>
+    </div><div class="gname">편집</div></div>
+  </div>
+
+  <div class="ribbon help" id="rb-help" hidden>
+    <div class="helptext">
+      <b>계정 줄 클릭</b> = 선택 · <b>더블클릭 / Enter / 계획액 클릭</b> = 산출 입력 · <b>↑↓</b> = 줄 이동 · <b>Ctrl+Z / Ctrl+Y</b> = 실행 취소 / 다시 실행 · <b>Ctrl+F</b> = 계정 검색<br>
+      금액은 항상 <b>원 단위</b>로 입력합니다. 표시 단위는 보기용입니다. 월별 금액은 반올림 단위로 맞추고, <b>확정 계획액 = 월별 금액의 합</b>입니다.<br>
+      바뀔 때마다 <b>data\사업비계획_연도.xlsx</b>에 자동 저장되고, 이전 파일은 <b>backup</b> 폴더에 30분마다 보관됩니다(연도별 최근 30개).
+    </div>
+  </div>
+
+  <div class="fbar">
+    <div class="ref" id="fRef">-</div><div class="fx">산출</div><div class="val" id="fVal"></div>
+  </div>
+
+  <div class="strip">
+    <div id="kpis" class="kpis"></div>
+    <div class="panel"><h3>대분류별 구성비</h3><div id="cats"></div></div>
+    <div class="panel"><h3>월별 계획</h3><div id="months"></div></div>
+  </div>
+
+  <div class="toolbar">
+    <input class="search" id="search" placeholder="계정 검색 (Ctrl+F)">
+    <div id="chips" class="chips"></div>
+  </div>
+
+  <div class="tblwrap" id="tbl"></div>
+
+  <div class="sheets">
+    <a class="on">사업비 계획</a>
+    <a class="soon" data-soon="실적 입력">실적 입력</a>
+    <a class="soon" data-soon="계획 대비 실적">계획 대비 실적</a>
+    <a class="soon" data-soon="수입 관리">수입 관리</a>
+    <a class="soon" data-soon="대시보드">대시보드</a>
+  </div>
+  <div class="status">
+    <span id="stState">준비</span><span id="stCount"></span>
+    <div class="r"><span id="stSel"></span><span id="stSum"></span></div>
+  </div>
+</div>
+
+<!-- 처음 화면: 데이터 폴더 연결 -->
+<div class="cover" id="cover" hidden>
+  <div class="cover-box">
+    <div class="cover-brand">사업비 관리 프로그램</div>
+    <div class="cover-title" id="coverTitle">데이터 폴더를 연결하세요</div>
+    <div class="cover-text" id="coverText"></div>
+    <div class="cover-btns" id="coverBtns"></div>
+    <div class="cover-foot">데이터는 연결한 폴더 안의 <b>data</b> 폴더에 엑셀 파일로 저장되고, <b>backup</b> 폴더에 이전 파일이 보관됩니다.</div>
+  </div>
+</div>
+
+<div id="modal"></div>
+<div class="toast" id="toast"></div>
+
+<script src="vendor/xlsx.full.min.js"></script>
+<script src="js/calc.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
