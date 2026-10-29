@@ -14,7 +14,7 @@
   </div>
 
   <div class="rtabs" id="rtabs">
-    <a data-tab="file">파일</a><a data-tab="plan" class="on">계획</a><a data-tab="help">도움말</a>
+    <a data-tab="file">파일</a><a data-tab="plan" class="on">계획</a><a data-tab="set">설정</a><a data-tab="help">도움말</a>
   </div>
 
   <div class="ribbon" id="rb-file" hidden>
@@ -39,6 +39,7 @@
       <button class="rb" data-act="editAcc"><span class="ic">✎</span>계정 수정</button>
       <button class="rb" data-act="delAcc"><span class="ic">－</span>계정 삭제</button>
       <button class="rb strong" data-act="openPlan"><span class="ic">▦</span>산출 입력</button>
+      <button class="rb" data-act="catMgr"><span class="ic">☰</span>분류 관리</button>
     </div><div class="gname">계정</div></div>
     <div class="rgrp"><div class="items">
       <div class="rsel">
@@ -60,9 +61,17 @@
     </div><div class="gname">편집</div></div>
   </div>
 
+  <div class="ribbon" id="rb-set" hidden>
+    <div class="rgrp"><div class="items">
+      <button class="rb strong" data-act="catMgr"><span class="ic">☰</span>분류 관리</button>
+      <div class="rinfo">대분류 · 중분류 · 소분류(계정)와 순번을 관리합니다.<br>모든 연도가 같이 쓰며 <b>data\기준정보.xlsx</b> 에 저장됩니다.</div>
+    </div><div class="gname">분류</div></div>
+  </div>
+
   <div class="ribbon help" id="rb-help" hidden>
     <div class="helptext">
-      <b>계정 줄 클릭</b> = 선택 · <b>더블클릭 / Enter / 계획액 클릭</b> = 산출 입력 · <b>↑↓</b> = 줄 이동 · <b>Ctrl+Z / Ctrl+Y</b> = 실행 취소 / 다시 실행 · <b>Ctrl+F</b> = 계정 검색<br>
+      <b>계정 줄 클릭</b> = 선택 · <b>더블클릭 / Enter / 계획액 클릭</b> = 산출 입력 · <b>⋮⋮ 끌기</b> = 순서 바꾸기 (같은 중분류 안) · <b>↑↓</b> = 줄 이동 · <b>Ctrl+Z / Ctrl+Y</b> = 실행 취소 / 다시 실행 · <b>Ctrl+F</b> = 계정 검색<br>
+      계정 분류와 순번은 <b>설정 › 분류 관리</b>에서 바꿉니다. 모든 연도가 같이 쓰며 <b>data\기준정보.xlsx</b> 에 저장됩니다.<br>
       금액은 항상 <b>원 단위</b>로 입력합니다. 표시 단위는 보기용입니다. 월별 금액은 반올림 단위로 맞추고, <b>확정 계획액 = 월별 금액의 합</b>입니다.<br>
       바뀔 때마다 <b>data\사업비계획_연도.xlsx</b>에 자동 저장되고, 이전 파일은 <b>backup</b> 폴더에 30분마다 보관됩니다(연도별 최근 30개).
     </div>

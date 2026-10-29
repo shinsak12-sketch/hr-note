@@ -28,6 +28,10 @@
     return q * unit;
   }
 
+  function blankPlan() {
+    return { prev: 0, meth: "", a: 0, b: 0, c: 0, split: "균등", sv: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], memo: "" };
+  }
+
   function blankRow(acc) {
     return {
       code: acc.code, l1: acc.l1 || "", l2: acc.l2 || "", l3: acc.l3 || "",
@@ -128,7 +132,7 @@
 
   root.Calc = {
     METHODS: METHODS, SPLITS: SPLITS, RND_UNITS: RND_UNITS, RND_MODES: RND_MODES, DISP_UNITS: DISP_UNITS,
-    num: num, roundTo: roundTo, blankRow: blankRow, baseAmount: baseAmount, compute: compute,
+    num: num, roundTo: roundTo, blankPlan: blankPlan, blankRow: blankRow, baseAmount: baseAmount, compute: compute,
     basisText: basisText, fmtUnit: fmtUnit, fmtPct: fmtPct, fmtWon: fmtWon, groupRows: groupRows
   };
 })(this);
