@@ -9,12 +9,12 @@
 <body>
 <div class="app" id="app">
   <div class="title">
-    <svg class="mascot" id="mascot" viewBox="0 0 13 10" shape-rendering="crispEdges" aria-hidden="true"><g class="m-body"><rect x="3" y="0" width="2" height="1"/><rect x="8" y="0" width="2" height="1"/><rect x="2" y="1" width="9" height="5"/><rect x="0" y="3" width="2" height="2"/><rect x="11" y="3" width="2" height="2"/><rect x="3" y="6" width="1" height="2" class="m-leg"/><rect x="5" y="6" width="1" height="2" class="m-leg2"/><rect x="7" y="6" width="1" height="2" class="m-leg"/><rect x="9" y="6" width="1" height="2" class="m-leg2"/></g><g class="m-eye"><rect x="4" y="2" width="1" height="2"/><rect x="8" y="2" width="1" height="2"/></g><rect class="m-coin" x="6" y="4" width="1" height="1"/></svg><b>사업비 관리 프로그램</b><span class="file" id="fileName"></span><span class="lockpill" id="lockPill" hidden></span>
+    <svg class="mascot" id="mascot" viewBox="0 0 13 10" shape-rendering="crispEdges" aria-hidden="true"><g class="m-body"><rect x="3" y="0" width="2" height="1"/><rect x="8" y="0" width="2" height="1"/><rect x="2" y="1" width="9" height="5"/><rect x="0" y="3" width="2" height="2"/><rect x="11" y="3" width="2" height="2"/><rect x="3" y="6" width="1" height="2" class="m-leg"/><rect x="5" y="6" width="1" height="2" class="m-leg2"/><rect x="7" y="6" width="1" height="2" class="m-leg"/><rect x="9" y="6" width="1" height="2" class="m-leg2"/></g><g class="m-eye"><rect x="4" y="2" width="1" height="2"/><rect x="8" y="2" width="1" height="2"/></g><rect class="m-coin" x="6" y="4" width="1" height="1"/></svg><b>사업비 관리 프로그램</b><span class="file" id="fileName"></span><span class="lockpill" id="lockPill" hidden></span><span class="lockpill closed exec-only" id="execPill"></span>
     <span class="saved" id="saveState"><span class="dot"></span><span id="saveText">폴더 연결 전</span></span>
   </div>
 
   <div class="rtabs" id="rtabs">
-    <a data-tab="file">파일</a><a data-tab="plan" class="on">계획</a><a data-tab="set">설정</a><a data-tab="help">도움말</a>
+    <a data-tab="file">파일</a><a data-tab="plan" class="on">계획</a><a data-tab="exec">집행</a><a data-tab="set">설정</a><a data-tab="help">도움말</a>
   </div>
 
   <div class="ribbons">
@@ -35,6 +35,8 @@
   <div class="ribbon" id="rb-plan">
     <div class="rgrp"><div class="items">
       <button class="rb" data-act="importPrev"><span class="ic">⇩</span>전년 실적<br>가져오기</button>
+      <button class="rb" data-act="planTplDown" title="계획 전체를 엑셀 양식으로 내려받기"><span class="ic">⤓</span>계획 양식<br>다운</button>
+      <button class="rb" data-act="planTplUp" title="고친 계획 양식을 올려 한 번에 반영 (미리보기 후 적용)"><span class="ic">⤒</span>계획 양식<br>업로드</button>
       <button class="rb" data-act="export"><span class="ic">⇧</span>보고용<br>엑셀</button>
     </div><div class="gname">데이터</div></div>
     <div class="rgrp"><div class="items">
@@ -71,6 +73,21 @@
     </div><div class="gname">편집</div></div>
   </div>
 
+  <div class="ribbon" id="rb-exec" hidden>
+    <div class="rgrp"><div class="items">
+      <button class="rb strong" data-act="xRead" title="더존원본\연도 폴더의 분개장 · 재무제표(손익)를 읽어 반영"><span class="ic">⟳</span>더존 자료<br>읽기</button>
+      <button class="rb alert" data-act="xAlerts"><span class="ic">⚠</span>지난 달<br>수정 <em id="xAlertN" hidden></em></button>
+      <button class="rb" data-act="xMemos"><span class="ic">✎</span>메모<br>모아보기</button>
+      <button class="rb" data-act="xSearch"><span class="ic">⌕</span>분개장<br>검색</button>
+      <button class="rb" data-act="xLog"><span class="ic">≡</span>반영 기록</button>
+    </div><div class="gname">더존 자료</div></div>
+    <div class="rgrp"><div class="items"><div class="mstat" id="xMstat"></div></div><div class="gname">월별 반영</div></div>
+    <div class="rgrp"><div class="items">
+      <div class="rsel"><label>표시 단위 <select id="selDispX"></select></label></div>
+      <button class="rb" data-act="catMgr"><span class="ic">☰</span>분류 관리</button>
+    </div><div class="gname">설정</div></div>
+  </div>
+
   <div class="ribbon" id="rb-set" hidden>
     <div class="rgrp"><div class="items">
       <button class="rb strong" data-act="catMgr"><span class="ic">☰</span>분류 관리</button>
@@ -99,8 +116,8 @@
 
   <div class="strip" id="strip">
     <div id="kpis" class="kpis"></div>
-    <div class="panel"><h3>대분류별 구성비</h3><div id="cats"></div></div>
-    <div class="panel"><h3>월별 계획</h3><div id="months"></div></div>
+    <div class="panel"><h3 id="stripH1">대분류별 구성비</h3><div id="cats"></div></div>
+    <div class="panel"><h3 id="stripH2">월별 계획</h3><div id="months"></div></div>
   </div>
   <div class="strip-grip" id="stripGrip" title="끌어서 요약 높이 조절 · 더블클릭 = 처음 높이"></div>
 
@@ -109,17 +126,24 @@
     <select class="navsel" id="navT" title="대분류"></select><span class="navsep">›</span>
     <select class="navsel" id="navM" title="중분류"></select><span class="navsep">›</span>
     <select class="navsel" id="navS" title="소분류"></select>
-    <button class="chip warn" id="btnWarnChip" hidden></button>
-    <div id="tblState" class="tblstate"></div>
+    <button class="chip warn plan-only" id="btnWarnChip" hidden></button>
+    <div class="xtools exec-only" id="xTools">
+      <div class="seg vseg2"><button data-xv="all">전체</button><button data-xv="act">집행만</button><button data-xv="plan">계획만</button><button data-xv="diff">증감만</button></div>
+      <div class="seg vseg2"><button data-xa="month">월별</button><button data-xa="cum">누계</button></div>
+      <label class="tsel">기준 <select class="navsel" id="xUpto"></select></label>
+      <label class="tsel">비교 <select class="navsel" id="xCmp"><option value="plan">계획</option><option value="prev">전년 같은 달</option><option value="avg">올해 월평균</option></select></label>
+      <span id="xQuick" class="xquick"></span>
+    </div>
+    <div id="tblState" class="tblstate plan-only"></div>
     <button class="btn sm strip-btn" id="stripBtn"></button>
   </div>
 
   <div class="tblwrap" id="tbl"></div>
+  <div class="tblwrap" id="tblX"></div>
 
   <div class="sheets">
-    <a class="on">사업비 계획</a>
-    <a class="soon" data-soon="실적 입력">실적 입력</a>
-    <a class="soon" data-soon="계획 대비 실적">계획 대비 실적</a>
+    <a class="on" data-sheet="plan">사업비 계획</a>
+    <a data-sheet="exec">집행</a>
     <a class="soon" data-soon="수입 관리">수입 관리</a>
     <a class="soon" data-soon="대시보드">대시보드</a>
   </div>
@@ -143,6 +167,9 @@
 
 <input class="cell-ed" id="cellEd" autocomplete="off" spellcheck="false" hidden>
 <div class="ctx" id="ctx" hidden></div>
+<div class="memo-ed" id="memoEd" hidden></div>
+<div class="memo-tip" id="memoTip" hidden></div>
+<div class="vch-pop" id="vchPop" hidden></div>
 <div class="fpop" id="fpop" hidden></div>
 <div class="calc" id="calc" tabindex="-1" hidden>
   <div class="ck-h"><b>🧮 계산기</b><span class="ck-tip">표의 금액 칸을 누르면 입력</span><button id="ckClose" title="닫기">✕</button></div>

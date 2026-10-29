@@ -74,7 +74,12 @@
   function useHandle(h) { dir = h; }
   function folderName() { return dir ? dir.name : ""; }
   function connected() { return !!dir; }
-  function sub(name) { return dir.getDirectoryHandle(name, { create: true }); }
+  // 하위 폴더 (예: "더존원본/2026") — 없으면 만듦
+  function sub(path) {
+    return String(path).split("/").filter(Boolean).reduce(function (p, name) {
+      return p.then(function (d) { return d.getDirectoryHandle(name, { create: true }); });
+    }, Promise.resolve(dir));
+  }
 
   function entries(folder) {
     return sub(folder).then(function (d) {
@@ -89,6 +94,22 @@
       return step();
     });
   }
+
+  // 폴더 안 엑셀 파일 목록 [{name, size, mtime}]
+  function listFiles(path) {
+    return sub(path).then(function (d) {
+      var out = [], it = d.values();
+      function step() {
+        return it.next().then(function (r) {
+          if (r.done) return out;
+          if (r.value.kind !== "file" || !/\.(xlsx?|xlsm)$/i.test(r.value.name) || /^~\$/.test(r.value.name)) return step();
+          return r.value.getFile().then(function (f) { out.push({ name: f.name, size: f.size, mtime: f.lastModified }); return step(); });
+        });
+      }
+      return step();
+    });
+  }
+  function readPath(path, name) { return readFile(path, name); }
 
   function listYears() {
     var re = new RegExp("^" + PREFIX + "(\\d{4})\\.xlsx$");
@@ -202,14 +223,15 @@
       var byV = {}, snaps = {};
       rowsOf(wb, "버전내용").forEach(function (r) { var v = Calc.num(r["버전"]); (byV[v] = byV[v] || []).push(r); });
       Object.keys(byV).forEach(function (v) { snaps[v] = parseCat(byV[v]).cat; });
-      return { cat: p.cat, ver: { list: list, snaps: snaps }, legacy: p.legacy };
+      var exclude = rowsOf(wb, "제외과목").map(function (r) { return { code: str(r["더존코드"]), name: str(r["더존과목"]) }; }).filter(function (d) { return d.code || d.name; });
+      return { cat: p.cat, ver: { list: list, snaps: snaps }, exclude: exclude, legacy: p.legacy };
     }, function (e) {
       if (e && e.name === "NotFoundError") return null;
       throw e;
     });
   }
 
-  function masterWorkbook(cat, ver) {
+  function masterWorkbook(cat, ver, exclude) {
     var wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, sheet([CAT_HEAD].concat(catRows(cat)), [7, 14, 7, 20, 7, 16, 9, 22, 6, 7, 7, 7]), "분류");
     var list = ver && ver.list || [];
@@ -217,14 +239,15 @@
     var all = [["버전"].concat(CAT_HEAD)];
     list.forEach(function (x) { var c = ver.snaps[x.v]; if (c) catRows(c).forEach(function (r) { all.push([x.v].concat(r)); }); });
     XLSX.utils.book_append_sheet(wb, sheet(all, [6, 7, 14, 7, 20, 7, 16, 9, 22, 6, 7, 7, 7]), "버전내용");
+    XLSX.utils.book_append_sheet(wb, sheet([["더존코드", "더존과목", "설명"]].concat((exclude || []).map(function (d) { return [d.code, d.name, "집행에 넣지 않는 판관비 과목"]; })), [10, 26, 30]), "제외과목");
     XLSX.utils.book_append_sheet(wb, sheet([["항목", "값"], ["저장시각", stamp()], ["프로그램", "사업비 관리 프로그램"], ["형식버전", FORMAT_VER],
       ["설명", "대분류 · 중분류 · 소분류(선택)와 순번, 더존 과목 연결입니다. 한 줄 = 더존 과목 하나. ID 열은 연도별 계획 파일과 연결되므로 바꾸지 마세요."],
       ["버전", "분류를 저장할 때마다 '버전' 시트에 기록되고, 그때의 분류 전체가 '버전내용' 시트에 남습니다."]], [10, 80]), "정보");
     return wb;
   }
 
-  function saveMaster(cat, ver) {
-    var bytes = toBytes(masterWorkbook(cat, ver));
+  function saveMaster(cat, ver, exclude) {
+    var bytes = toBytes(masterWorkbook(cat, ver, exclude));
     return backupIfDue(MASTER).then(function () { return writeFile("data", MASTER, bytes); });
   }
 
@@ -411,6 +434,144 @@
   }
   function roundLabel(n) { return n === 0 ? "원안" : n + "차 변경"; }
 
+  /* ---------- 집행 (data\\집행_연도.xlsx + 집행_연도_내역.xlsx) ---------- */
+  function execName(y) { return "집행_" + y + ".xlsx"; }
+  function execLinesName(y) { return "집행_" + y + "_내역.xlsx"; }
+  var LINE_HEAD = ["일자", "번호", "계정코드", "계정과목", "차변", "대변", "적요", "거래처", "결의", "PJT"];
+  function lineRow(l) { return [l.d, l.no, l.code, l.name, l.amt > 0 ? l.amt : 0, l.amt < 0 ? -l.amt : 0, l.memo, l.ptn, l.gj, l.pjt]; }
+  function lineOf(r) {
+    var d = str(r["일자"]);
+    return { d: d, m: parseInt(d.slice(5, 7), 10) || 0, no: str(r["번호"]), code: str(r["계정코드"]), name: str(r["계정과목"]), amt: Calc.num(r["차변"]) - Calc.num(r["대변"]),
+      memo: str(r["적요"]), ptn: str(r["거래처"]), gj: str(r["결의"]), pjt: str(r["PJT"]) };
+  }
+  // 결과: X {year, month, src, files, alerts, memos, problems, log, lines} | null
+  function loadExec(year) {
+    return readFile("data", execName(year)).then(function (buf) {
+      var wb = XLSX.read(buf, { type: "array" }), info = {};
+      rowsOf(wb, "정보").forEach(function (r) { info[str(r["항목"])] = r["값"]; });
+      var j = function (v) { try { return JSON.parse(str(v) || "null"); } catch (e) { return null; } };
+      var X = {
+        year: year, month: Calc.num(info["반영월"]), at: str(info["반영일시"]), src: { jn: str(info["분개장"]), pl: str(info["손익"]) },
+        files: rowsOf(wb, "파일").map(function (r) { return { name: str(r["파일"]), type: str(r["종류"]), month: Calc.num(r["월"]), size: Calc.num(r["크기"]), mtime: Calc.num(r["수정시각"]), at: str(r["반영일시"]) }; }),
+        alerts: rowsOf(wb, "지난달수정").map(function (r) {
+          return { id: str(r["ID"]), at: str(r["일시"]), file: str(r["파일"]), m: Calc.num(r["월"]), leaf: str(r["계정ID"]), path: str(r["계정"]), before: Calc.num(r["이전"]), after: Calc.num(r["이번"]),
+            changes: j(r["바뀐전표"]) || [], state: str(r["상태"]) || "미처리", doneAt: str(r["처리일시"]), reason: str(r["사유"]) };
+        }),
+        memos: {}, problems: rowsOf(wb, "문제").map(function (r) { return { at: str(r["일시"]), file: str(r["파일"]), text: str(r["내용"]) }; }),
+        log: rowsOf(wb, "기록").map(function (r) { return { t: str(r["시각"]), m: str(r["내용"]) }; }), lines: []
+      };
+      rowsOf(wb, "메모").forEach(function (r) { X.memos[str(r["대상"])] = { text: str(r["메모"]), at: str(r["일시"]), label: str(r["위치"]) }; });
+      return readFile("data", execLinesName(year)).then(function (b2) {
+        X.lines = rowsOf(XLSX.read(b2, { type: "array" }), "내역").map(lineOf);
+        return X;
+      }, function () { return X; });
+    }, function (e) { if (e && e.name === "NotFoundError") return null; throw e; });
+  }
+  // actRows: [{id,l1,l2,l3,m:[12]}] — 보기용 (집행은 내역과 분류로 늘 다시 계산)
+  function saveExec(X, actRows, linesChanged) {
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, sheet([["항목", "값"], ["연도", X.year], ["반영월", X.month], ["반영일시", X.at], ["분개장", X.src.jn], ["손익", X.src.pl], ["저장시각", stamp()],
+      ["설명", "집행 금액은 더존 분개장(판관비 줄: 차변 − 대변)에서 계산합니다. 원본 파일은 더존원본 폴더에 그대로 있습니다."]], [12, 60]), "정보");
+    var ah = ["ID", "대분류", "중분류", "소분류"];
+    for (var i = 1; i <= 12; i++) ah.push(i + "월");
+    ah.push("누계");
+    XLSX.utils.book_append_sheet(wb, sheet([ah].concat(actRows.map(function (r) { return [r.id, r.l1, r.l2, r.l3].concat(r.m).concat([r.m.reduce(function (a, b) { return a + b; }, 0)]); })),
+      [8, 12, 18, 14].concat(new Array(13).fill(13)), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]), "집행");
+    XLSX.utils.book_append_sheet(wb, sheet([["파일", "종류", "월", "크기", "수정시각", "반영일시"]].concat(X.files.map(function (f) { return [f.name, f.type, f.month, f.size, f.mtime, f.at]; })), [26, 10, 5, 10, 16, 20]), "파일");
+    XLSX.utils.book_append_sheet(wb, sheet([["ID", "일시", "파일", "월", "계정ID", "계정", "이전", "이번", "차이", "바뀐전표", "상태", "처리일시", "사유"]].concat(X.alerts.map(function (a) {
+      return [a.id, a.at, a.file, a.m, a.leaf, a.path, a.before, a.after, a.after - a.before, JSON.stringify(a.changes), a.state, a.doneAt, a.reason];
+    })), [8, 20, 20, 5, 8, 30, 14, 14, 14, 50, 8, 20, 30], [6, 7, 8]), "지난달수정");
+    XLSX.utils.book_append_sheet(wb, sheet([["대상", "위치", "메모", "일시"]].concat(Object.keys(X.memos).map(function (k) { var m = X.memos[k]; return [k, m.label || "", m.text, m.at]; })), [30, 30, 60, 20]), "메모");
+    XLSX.utils.book_append_sheet(wb, sheet([["일시", "파일", "내용"]].concat(X.problems.map(function (p) { return [p.at, p.file, p.text]; })), [20, 24, 80]), "문제");
+    XLSX.utils.book_append_sheet(wb, sheet([["시각", "내용"]].concat(X.log.slice(-2000).map(function (l) { return [l.t, l.m]; })), [20, 80]), "기록");
+    var name = execName(X.year), job = backupIfDue(name).then(function () { return writeFile("data", name, toBytes(wb)); });
+    if (linesChanged) job = job.then(function () {
+      var wl = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wl, sheet([LINE_HEAD].concat(X.lines.map(lineRow)), [11, 6, 8, 22, 13, 13, 30, 18, 16, 12], [4, 5]), "내역");
+      return backupIfDue(execLinesName(X.year)).then(function () { return writeFile("data", execLinesName(X.year), toBytes(wl)); });
+    });
+    return job.then(function () { return stamp(); });
+  }
+
+  /* ---------- 더존 원데이터 읽기 (분개장 · 재무제표 손익) ---------- */
+  function cellStr(v) { return String(v === undefined || v === null ? "" : v).trim(); }
+  function sp(v) { return cellStr(v).replace(/\s+/g, ""); }
+  // 파일 종류: "jn"(분개장) | "pl"(손익) | ""
+  function detectKind(aoa) {
+    for (var r = 0; r < Math.min(6, aoa.length); r++) {
+      var row = (aoa[r] || []).map(sp);
+      if (row.filter(function (v) { return v === "계정과목"; }).length >= 2) return { kind: "jn", head: r };
+      if (row[0] === "과목" && row.some(function (v) { return /^\d{1,2}월$/.test(v); })) return { kind: "pl", head: r };
+    }
+    return { kind: "", head: -1 };
+  }
+  function monthFromName(name) {
+    var m = /(\d{1,2})\s*월/.exec(name) || /20\d{2}[-_.]?(\d{2})(?!\d)/.exec(name) || /(?:^|[^\d])(\d{2})(?:[^\d]|$)/.exec(name.replace(/20\d{2}/, ""));
+    var n = m ? parseInt(m[1], 10) : 0;
+    return n >= 1 && n <= 12 ? n : 0;
+  }
+  function parseDz(v) { var m = /^\[(\d+)\]\s*(.*)$/.exec(cellStr(v)); return m ? { code: m[1], name: m[2].trim() } : null; }
+  function ymd(v) {
+    if (typeof v === "number") { var d = XLSX.SSF.parse_date_code(v); return d ? d.y + "-" + ("0" + d.m).slice(-2) + "-" + ("0" + d.d).slice(-2) : ""; }
+    var m = /(\d{4})\D(\d{1,2})\D(\d{1,2})/.exec(cellStr(v));
+    return m ? m[1] + "-" + ("0" + m[2]).slice(-2) + "-" + ("0" + m[3]).slice(-2) : "";
+  }
+  // 분개장: 판관비(8로 시작) 줄만 남기고, 합계 확인용 숫자도 같이
+  function parseJournal(aoa, head) {
+    var h = (aoa[head] || []).map(sp), idx = function (label, nth) { var c = -1; for (var i = 0; i < h.length; i++) if (h[i] === label && nth-- === 0) { c = i; break; } return c; };
+    var C = { d: idx("년/월/일", 0), no: idx("번호", 0), dr: idx("금액", 0), drA: idx("계정과목", 0), crA: idx("계정과목", 1), cr: idx("금액", 1), memo: idx("적요", 0), ptn: idx("거래처명", 0), gd: idx("년/월/일", 1), gn: idx("번호", 1), pjt: idx("PJT명", 0) };
+    if (C.d < 0) C.d = 0; if (C.no < 0) C.no = 1;
+    var out = { lines: [], all: [], drSum: 0, crSum: 0, totDr: null, totCr: null, minD: "", maxD: "", rows: 0, vouchers: {} };
+    for (var r = head + 1; r < aoa.length; r++) {
+      var row = aoa[r] || [];
+      if (sp(row[0]) === "합계") { out.totDr = Calc.num(row[C.dr]); out.totCr = Calc.num(row[C.cr]); break; }
+      var d = ymd(row[C.d]);
+      if (!d) continue;
+      out.rows++;
+      var dr = Calc.num(row[C.dr]), cr = Calc.num(row[C.cr]), a = parseDz(row[C.drA]) || parseDz(row[C.crA]);
+      out.drSum += dr; out.crSum += cr;
+      if (!out.minD || d < out.minD) out.minD = d;
+      if (d > out.maxD) out.maxD = d;
+      out.vouchers[d + "#" + cellStr(row[C.no])] = 1;
+      var l = { d: d, m: parseInt(d.slice(5, 7), 10), no: cellStr(row[C.no]), code: a ? a.code : "", name: a ? a.name : cellStr(row[C.drA] || row[C.crA]),
+        amt: parseDz(row[C.drA]) ? dr : -cr, memo: cellStr(row[C.memo]), ptn: cellStr(row[C.ptn]), gj: (ymd(row[C.gd]) + " " + cellStr(row[C.gn])).trim(), pjt: cellStr(row[C.pjt]) };
+      out.all.push(l);
+      if (/^8/.test(l.code)) out.lines.push(l);
+    }
+    out.vouchers = Object.keys(out.vouchers).length;
+    return out;
+  }
+  // 손익: 판관비 구간 과목별 월 금액 + 판관비 합계 줄
+  function parsePL(aoa, head) {
+    var h = (aoa[head] || []).map(sp), months = {};
+    h.forEach(function (v, i) { var m = /^(\d{1,2})월$/.exec(v); if (m) months[i] = parseInt(m[1], 10); });
+    var out = { total: new Array(12).fill(0), items: {}, upto: 0, has: false };
+    Object.keys(months).forEach(function (i) { out.upto = Math.max(out.upto, months[i]); });
+    var inSga = false;
+    for (var r = head + 1; r < aoa.length; r++) {
+      var row = aoa[r] || [], name = sp(row[0]);
+      if (!name) continue;
+      var sec = /^[ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]/.test(name);
+      if (sec) { inSga = /판매관리비/.test(name); if (inSga) { out.has = true; Object.keys(months).forEach(function (i) { out.total[months[i] - 1] = Calc.num(row[i]); }); } continue; }
+      if (!inSga) continue;
+      var m = new Array(12).fill(0);
+      Object.keys(months).forEach(function (i) { m[months[i] - 1] = Calc.num(row[i]); });
+      out.items[name] = m;
+    }
+    return out;
+  }
+  // 더존 파일 하나 읽기 → {name, kind, month, jn|pl}
+  function readDouzone(path, f) {
+    return readFile(path, f.name).then(function (buf) {
+      var wb = XLSX.read(buf, { type: "array", cellDates: false });
+      var ws = wb.Sheets[wb.SheetNames[0]], aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "", raw: true });
+      var k = detectKind(aoa), res = { name: f.name, size: f.size, mtime: f.mtime, kind: k.kind, month: monthFromName(f.name) };
+      if (k.kind === "jn") { res.jn = parseJournal(aoa, k.head); if (!res.month && res.jn.maxD) res.month = parseInt(res.jn.maxD.slice(5, 7), 10); }
+      else if (k.kind === "pl") { res.pl = parsePL(aoa, k.head); if (!res.month) res.month = res.pl.upto; }
+      return res;
+    });
+  }
+
   /* ---------- 백업 ---------- */
   function backupIfDue(name, force) {
     var now = Date.now();
@@ -510,6 +671,7 @@
     supported: supported, restore: restore, grant: grant, pick: pick, useHandle: useHandle, folderName: folderName, connected: connected,
     listYears: listYears, load: load, save: save, loadMaster: loadMaster, saveMaster: saveMaster,
     fileName: fileName, MASTER: MASTER, exportReport: exportReport, readAnyFile: readAnyFile, stamp: stamp,
-    downloadTemplate: downloadTemplate, parseTemplate: parseTemplate, roundLabel: roundLabel, writeBook: writeBook
+    downloadTemplate: downloadTemplate, parseTemplate: parseTemplate, roundLabel: roundLabel, writeBook: writeBook,
+    listFiles: listFiles, readPath: readPath, readDouzone: readDouzone, loadExec: loadExec, saveExec: saveExec, execName: execName, download: download
   };
 })(this);

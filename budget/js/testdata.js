@@ -95,12 +95,13 @@
     return o;
   }
 
-  // 더존 손익 원데이터 양식 (과목 | 계 | 1월 … 12월). upto: 몇 월까지
-  function profitLoss(list, year, upto) {
+  // 더존 손익 원데이터 양식 (과목 | 계 | 1월 … 12월). upto: 몇 월까지. amounts: {과목명: [12]} 를 주면 그 금액으로
+  function profitLoss(list, year, upto, amounts) {
     upto = upto || 12;
     var head = ["과  목", "계"];
     for (var i = 1; i <= upto; i++) head.push(i + "월");
-    var lines = list.map(function (it) { return { name: it.name, m: months(it, year).slice(0, upto) }; });
+    var seen = {}, lines = [];
+    list.forEach(function (it) { if (seen[it.name]) return; seen[it.name] = 1; lines.push({ name: it.name, m: (amounts ? amounts[it.name] || new Array(12).fill(0) : months(it, year)).slice(0, upto) }); });
     var sum = function (rows) { var t = new Array(upto).fill(0); rows.forEach(function (r) { r.forEach(function (v, i) { t[i] += v; }); }); return t; };
     var sga = sum(lines.map(function (l) { return l.m; }));
     var rr = rng(hash("rev" + year));
@@ -123,5 +124,76 @@
     return aoa;
   }
 
-  root.TestData = { items: items, months: months, byLeaf: byLeaf, profitLoss: profitLoss };
+  /* 분개장 더미 (더존 분개장 출력 양식). asOf: 1월 ~ 몇 월까지 누계
+     9월 파일부터는 '지난 달 수정' 테스트용으로 7월 전표 2건이 바뀜 (경조금 추가 · 시외출장비 금액 수정) */
+  var MEMO = {
+    "경조금": ["직원 부친상 조의금", "직원 결혼 축의금", "임원 모친상 조화", "직원 자녀 결혼 축의금", "협력사 대표 부친상 조화"],
+    "출장": ["지점 현장 조사 출장", "본점 회의 참석 출장", "교육 참석 출장", "손해사정 현장 확인"],
+    "식대": ["팀 야근 식대", "주간 회의 식대", "현장 직원 식대"],
+    "접대": ["협력사 미팅 식대", "보험사 담당자 미팅", "고객사 간담회"],
+    "통신": ["월 통신 요금", "휴대폰 요금", "인터넷 회선 요금"],
+    "임차": ["월 임차료", "관리비"],
+    "": ["월 정기 지급", "청구서 지급", "카드 사용분", "구매 대금"]
+  };
+  var PTN = ["○○상사", "△△식당", "□□꽃집", "한빛통신", "대한렌탈", "미래문구", "직원", "-", "서울빌딩관리", "푸른여행사"];
+  function memoFor(name, r) {
+    var k = /경조/.test(name) ? "경조금" : /출장|교통/.test(name) ? "출장" : /식대/.test(name) ? "식대" : /접대/.test(name) ? "접대" : /통신|FAX|핸드폰|BIZRING/.test(name) ? "통신" : /임차/.test(name) ? "임차" : "";
+    var a = MEMO[k]; return a[Math.floor(r() * a.length)];
+  }
+  function journal(list, year, asOf) {
+    var rows = [], noByDate = {}, amounts = {};
+    var put = function (d, dr, drA, cr, crA, memo, ptn) {
+      noByDate[d] = (noByDate[d] || 0) + 1;
+      var no = noByDate[d], gj = [d, String(no + 90)];
+      rows.push([d, String(no), dr, drA, "", 0, memo, "", ptn, gj[0], gj[1], "", ""]);
+      rows.push([d, String(no), 0, "", crA, cr, "", "", "", gj[0], gj[1], "", ""]);
+    };
+    var day = function (m, r) { var dd = 1 + Math.floor(r() * 27); return year + "/" + ("0" + m).slice(-2) + "/" + ("0" + dd).slice(-2); };
+    var seen = {};
+    list.forEach(function (it) {
+      if (seen[it.name] || !it.code) return;
+      seen[it.name] = 1;
+      var mm = months(it, year), acct = "[" + it.code + "]" + it.name, flat = pattern(it.name) === "flat", r = rng(hash("j" + year + it.name));
+      amounts[it.name] = new Array(12).fill(0);
+      for (var m = 1; m <= asOf; m++) {
+        var total = mm[m - 1], n = flat ? 1 : 1 + Math.floor(r() * 5), left = total;
+        for (var i = 0; i < n; i++) {
+          var v = i === n - 1 ? left : Math.round(total / n * (0.6 + 0.8 * r()) / 1000) * 1000;
+          if (i < n - 1 && Math.abs(v) > Math.abs(left)) v = Math.round(left / 2 / 10) * 10;
+          left -= v;
+          if (!v) continue;
+          put(day(m, r), v, acct, v, r() < 0.7 ? "[25300]미지급금" : "[10301]보통예금", memoFor(it.name, r), PTN[Math.floor(r() * PTN.length)]);
+          amounts[it.name][m - 1] += v;
+        }
+      }
+    });
+    // 지난 달 수정 테스트 (9월 파일부터)
+    if (asOf >= 9) {
+      var gyeong = list.filter(function (x) { return /경조금/.test(x.name) && x.code; })[0];
+      if (gyeong) { put(year + "/07/28", 500000, "[" + gyeong.code + "]" + gyeong.name, 500000, "[25300]미지급금", "직원 모친상 조의금 (누락분 추가)", "-"); amounts[gyeong.name][6] += 500000; }
+      var trip = list.filter(function (x) { return /시외출장비/.test(x.name) && x.code; })[0];
+      if (trip) {
+        for (var k = 0; k < rows.length; k += 2) {
+          if (rows[k][3] === "[" + trip.code + "]" + trip.name && rows[k][0].slice(5, 7) === "07" && rows[k][2] > 230000) {
+            rows[k][2] -= 230000; rows[k + 1][5] -= 230000; rows[k][6] += " (금액 정정)"; amounts[trip.name][6] -= 230000; break;
+          }
+        }
+      }
+    }
+    // 판관비 아닌 전표 (예수금 · 보통예금)
+    var rr = rng(hash("etc" + year));
+    for (var m2 = 1; m2 <= asOf; m2++) for (var e = 0; e < 25; e++) {
+      var v2 = Math.round((1e5 + 4e6 * rr()) / 10) * 10;
+      put(day(m2, rr), v2, "[25400]예수금", v2, "[10301]보통예금", e % 5 ? "" : "원천세 납부", "-");
+    }
+    rows.sort(function (a, b) { return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : (+a[1] - +b[1]) || (a[2] ? -1 : 1); });
+    var dr = 0, cr = 0;
+    rows.forEach(function (x) { dr += x[2]; cr += x[5]; });
+    var aoa = [["구 분[기표]", "구 분[기표]", "차     변", "차     변", "대    변", "대    변", "적요", "거래처", "거래처", "구 분[결의]", "구 분[결의]", "PJT", "PJT"],
+      ["년/월/일", "번호", "금액", "계정과목", "계정과목", "금액", "적요", "코드", "거래처명", "년/월/일", "번호", "코드", "PJT명"]].concat(rows);
+    aoa.push(["합계", "", dr, "", "", cr, "", "", "", "", "", "", ""]);
+    return { aoa: aoa, amounts: amounts };
+  }
+
+  root.TestData = { items: items, months: months, byLeaf: byLeaf, profitLoss: profitLoss, journal: journal };
 })(this);
