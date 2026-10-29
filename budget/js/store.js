@@ -667,11 +667,16 @@
     });
   }
 
+  // 파일 지우기 (없으면 그냥 넘어감)
+  function removeFile(path, name) {
+    return sub(path).then(function (d) { return d.removeEntry(name); }).catch(function () { return null; });
+  }
+
   root.Store = {
     supported: supported, restore: restore, grant: grant, pick: pick, useHandle: useHandle, folderName: folderName, connected: connected,
     listYears: listYears, load: load, save: save, loadMaster: loadMaster, saveMaster: saveMaster,
     fileName: fileName, MASTER: MASTER, exportReport: exportReport, readAnyFile: readAnyFile, stamp: stamp,
     downloadTemplate: downloadTemplate, parseTemplate: parseTemplate, roundLabel: roundLabel, writeBook: writeBook,
-    listFiles: listFiles, readPath: readPath, readDouzone: readDouzone, loadExec: loadExec, saveExec: saveExec, execName: execName, download: download
+    listFiles: listFiles, readPath: readPath, readDouzone: readDouzone, loadExec: loadExec, saveExec: saveExec, execName: execName, download: download, removeFile: removeFile
   };
 })(this);

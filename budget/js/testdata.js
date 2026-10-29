@@ -125,7 +125,7 @@
   }
 
   /* 분개장 더미 (더존 분개장 출력 양식). asOf: 1월 ~ 몇 월까지 누계
-     9월 파일부터는 '지난 달 수정' 테스트용으로 7월 전표 2건이 바뀜 (경조금 추가 · 시외출장비 금액 수정) */
+     4월 파일부터는 '지난 달 수정' 테스트용으로 3월 전표 2건이 바뀜 (경조금 추가 · 시외출장비 금액 수정) */
   var MEMO = {
     "경조금": ["직원 부친상 조의금", "직원 결혼 축의금", "임원 모친상 조화", "직원 자녀 결혼 축의금", "협력사 대표 부친상 조화"],
     "출장": ["지점 현장 조사 출장", "본점 회의 참석 출장", "교육 참석 출장", "손해사정 현장 확인"],
@@ -167,15 +167,15 @@
         }
       }
     });
-    // 지난 달 수정 테스트 (9월 파일부터)
-    if (asOf >= 9) {
+    // 지난 달 수정 테스트 (4월 파일부터)
+    if (asOf >= 4) {
       var gyeong = list.filter(function (x) { return /경조금/.test(x.name) && x.code; })[0];
-      if (gyeong) { put(year + "/07/28", 500000, "[" + gyeong.code + "]" + gyeong.name, 500000, "[25300]미지급금", "직원 모친상 조의금 (누락분 추가)", "-"); amounts[gyeong.name][6] += 500000; }
+      if (gyeong) { put(year + "/03/28", 500000, "[" + gyeong.code + "]" + gyeong.name, 500000, "[25300]미지급금", "직원 모친상 조의금 (누락분 추가)", "-"); amounts[gyeong.name][2] += 500000; }
       var trip = list.filter(function (x) { return /시외출장비/.test(x.name) && x.code; })[0];
       if (trip) {
         for (var k = 0; k < rows.length; k += 2) {
-          if (rows[k][3] === "[" + trip.code + "]" + trip.name && rows[k][0].slice(5, 7) === "07" && rows[k][2] > 230000) {
-            rows[k][2] -= 230000; rows[k + 1][5] -= 230000; rows[k][6] += " (금액 정정)"; amounts[trip.name][6] -= 230000; break;
+          if (rows[k][3] === "[" + trip.code + "]" + trip.name && rows[k][0].slice(5, 7) === "03" && rows[k][2] > 230000) {
+            rows[k][2] -= 230000; rows[k + 1][5] -= 230000; rows[k][6] += " (금액 정정)"; amounts[trip.name][2] -= 230000; break;
           }
         }
       }

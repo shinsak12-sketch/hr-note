@@ -2937,7 +2937,7 @@
         hideCover();
         var last = 0;
         try { last = parseInt(localStorage.getItem("budget.lastYear"), 10); } catch (e) { last = 0; }
-        return loadYear(S.years.indexOf(last) >= 0 ? last : S.years[S.years.length - 1]);
+        return loadYear(S.years.indexOf(last) >= 0 ? last : S.years[S.years.length - 1]).then(function () { if (S.year) setMode("exec"); }); // 켜면 집행 화면부터
       });
     }).catch(function (e) {
       toast("폴더를 읽지 못했습니다: " + (e && e.message || e), true, 6000);
@@ -2956,11 +2956,33 @@
       body: '<div class="mdl-pad msg">테스트용 <b>가짜 금액</b>으로 아래를 만듭니다.<br>' +
         "• <b>data\\" + Store.fileName(2026) + "</b> — 2026년 계획 (전년 실적 = 2025년 더미, <b>원안 마감 + 1차 변경 마감</b>)<br>" +
         "• <b>더존원본\\" + TEST_PL + "</b> — 더존 손익 원데이터 양식 (판관비 · 매출 · 영업외 · 법인세, 2026년 1~12월)<br>" +
-        "• <b>더존원본\\2026\\</b> 분개장 · 손익 <b>8월 · 9월</b> — 집행 화면 [더존 자료 읽기] 테스트용 (9월 파일엔 7월 전표 2건이 바뀌어 있어 ‘지난 달 수정’이 뜸)<br><br>" +
-        "그다음 <b>2027년 새 연도</b>를 만들고 <b>[전년 실적 가져오기]</b>로 위 손익 파일을 고르면 전년 실적 · 월별(작년처럼)까지 들어갑니다." +
+        "• <b>더존원본\\2026\\</b> 분개장 · 손익 <b>3월 · 4월</b> — 집행은 <b>3월까지 반영</b>해 둠 (메모 2개 포함)<br>" +
+        "&nbsp;&nbsp;[더존 자료 읽기]를 누르면 4월 파일이 들어가고, 4월 파일엔 3월 전표 2건이 바뀌어 있어 ‘지난 달 수정’이 뜸<br><br>" +
+        "2027년 새 연도를 만들면 2026년 실적(1~3월 집행 + 4~12월 계획)으로 시작합니다. 빈 계획으로 만들고 <b>[전년 실적 가져오기]</b>로 위 손익 파일을 넣어 볼 수도 있습니다." +
         (has ? '<br><br><span class="em">이미 2026년 파일이 있습니다. 덮어씁니다 (이전 파일은 backup 폴더에 보관).</span>' : "") + "</div>",
       okText: has ? "덮어쓰고 만들기" : "만들기",
       onOk: function () { flushSave().then(makeTest2026); }
+    });
+  }
+  // 테스트: 3월 파일까지 집행에 반영해 둠 (4월 파일은 [더존 자료 읽기]로 직접 반영해 보기)
+  function testExecTo3() {
+    var path = "더존원본/2026";
+    return Store.listFiles(path).then(function (files) {
+      var pick = function (n) { return files.filter(function (f) { return f.name === n; })[0]; };
+      var fj = pick("분개장_03월.xls"), fp = pick("손익_03월.xls");
+      return Promise.all([Store.readDouzone(path, fj), Store.readDouzone(path, fp)]);
+    }).then(function (r) {
+      var jn = r[0], pl = r[1], now = Store.stamp();
+      X = blankX(2026); PREVX = null; XU.upto = 0; XU.sel = null;
+      X.lines = jn.jn.lines; XJN = { name: jn.name, all: jn.jn.all };
+      X.month = 3; X.at = now; X.src = { jn: jn.name, pl: pl.name };
+      X.files = [jn, pl].map(function (f) { return { name: f.name, type: f.kind, month: f.month, size: f.size, mtime: f.mtime, at: now }; });
+      var ids = {};
+      eachLeaf(S.cat, function (t, m, s, lf) { if (!ids.gy && /경조금/.test(lf.name)) ids.gy = lf.id; if (!ids.pay && lf.name === "직원급여") ids.pay = lf.id; });
+      if (ids.pay) X.memos["c|" + ids.pay + "|3"] = { text: "3월 성과급 일부 선지급 (경리 확인)", at: now.slice(0, 16), label: "직원급여 › 직원급여 3월" };
+      if (ids.gy) X.memos["c|" + ids.gy + "|2"] = { text: "2월 조의금 2건", at: now.slice(0, 16), label: "복리후생비 › 경조금 2월" };
+      xLog("반영: 3월까지 (" + jn.name + " + " + pl.name + ") · 테스트 데이터");
+      return Store.saveExec(X, xRows(true).map(function (q) { return { id: q.id, l1: q.l1, l2: q.l2, l3: q.l3, m: q.act }; }), true);
     });
   }
   function makeTest2026() {
@@ -3012,21 +3034,24 @@
       .then(function () { return Store.save(S); })
       .then(function () { return Store.writeBook("더존원본", TEST_PL, wb, "biff8"); })
       .then(function () {
-        // 집행 테스트용: 8월 · 9월 분개장 + 손익 (9월 파일에는 7월 전표 2건이 바뀌어 있음 → 지난 달 수정)
+        // 집행 테스트용: 3월 · 4월 분개장 + 손익 (4월 파일에는 3월 전표 2건이 바뀌어 있음 → 지난 달 수정)
         var book = function (aoa) { var w = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(w, XLSX.utils.aoa_to_sheet(aoa), "Sheet1_1"); return w; };
-        return [8, 9].reduce(function (p, m) {
+        // 지난 판 테스트 데이터(8월 · 9월 파일)가 남아 있으면 그쪽이 최신으로 읽히므로 지움
+        var old = ["분개장_08월.xls", "손익_08월.xls", "분개장_09월.xls", "손익_09월.xls"];
+        return old.reduce(function (p, n) { return p.then(function () { return Store.removeFile("더존원본/2026", n); }); }, Promise.resolve()).then(function () { return [3, 4].reduce(function (p, m) {
           return p.then(function () {
             var j = TestData.journal(list, 2026, m), mm = ("0" + m).slice(-2);
             return Store.writeBook("더존원본/2026", "분개장_" + mm + "월.xls", book(j.aoa), "biff8")
               .then(function () { return Store.writeBook("더존원본/2026", "손익_" + mm + "월.xls", book(TestData.profitLoss(list, 2026, m, j.amounts)), "biff8"); });
           });
-        }, Promise.resolve());
+        }, Promise.resolve()); });
       })
+      .then(function () { return testExecTo3(); })
       .then(function () { return Store.listYears(); })
       .then(function (ys) {
-        S.years = ys; fillYearSelect(); keepYearLock(); renderAll();
+        S.years = ys; fillYearSelect(); keepYearLock(); setMode("exec"); renderAll();
         setSave("ok", "자동 저장됨 " + Store.stamp().slice(11, 16));
-        toast("2026년 테스트 데이터를 만들었습니다 — 2027년 새 연도를 만들어 [전년 실적 가져오기]로 더존원본\\" + TEST_PL + " 을 넣어 보세요", false, 7000);
+        toast("2026년 테스트 데이터를 만들었습니다 — 집행은 3월까지 반영돼 있고, [더존 자료 읽기]를 누르면 4월 파일이 들어갑니다 (3월 수정 2건)", false, 7000);
       }).catch(function (e) { toast("테스트 데이터를 만들지 못했습니다: " + (e && e.message || e), true, 6000); });
   }
 
@@ -3341,6 +3366,9 @@
     if (!shown) h.push('<div class="empty">조건에 맞는 계정이 없습니다.</div>');
     var top = el.scrollTop, left = el.scrollLeft;
     el.innerHTML = h.join("");
+    // 머리글 2줄: 아랫줄(계획 · 집행 · 증감)은 윗줄 바로 밑에 고정 (안 하면 스크롤할 때 윗줄 위로 올라가 집행률 칸과 어긋남)
+    var hr = el.querySelectorAll("thead tr");
+    if (hr.length > 1) { var h1 = hr[0].getBoundingClientRect().height; hr[1].querySelectorAll("th").forEach(function (th) { th.style.top = h1 + "px"; }); }
     el.scrollTop = top; el.scrollLeft = left;
     xFreeze();
   }
