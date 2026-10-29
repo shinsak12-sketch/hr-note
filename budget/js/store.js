@@ -1,6 +1,6 @@
 /* 데이터 폴더 연결 + 엑셀 파일 읽기/쓰기 + 백업
-   data\기준정보.xlsx        : 분류(대·중·소) — 모든 연도 공통
-   data\사업비계획_연도.xlsx  : 연도별 계획 (계정은 기준정보의 ID 로 연결) */
+   data\기준정보.xlsx        : 분류(대·중·소) + 더존 과목 연결 + 버전 이력 — 모든 연도 공통
+   data\사업비계획_연도.xlsx  : 연도별 계획 (계정은 기준정보의 ID 로 연결) + 마감 · 변경 차수 */
 (function (root) {
   "use strict";
 
@@ -9,7 +9,7 @@
   var BACKUP_EVERY_MS = 30 * 60000;  // 같은 파일은 30분에 한 번만 백업
   var PREFIX = "사업비계획_";
   var MASTER = "기준정보.xlsx";
-  var FORMAT_VER = 2;
+  var FORMAT_VER = 3;
 
   var dir = null;
   var lastBackup = {};
@@ -140,54 +140,144 @@
   }
   function toBytes(wb) { return new Uint8Array(XLSX.write(wb, { type: "array", bookType: "xlsx" })); }
 
-  /* ---------- 기준정보 (분류) ----------
-     분류 트리: [{id, name, kids:[{id, name, kids:[{id, name, erp, use}]}]}] — 배열 순서가 곧 순번 */
+  /* ---------- 기준정보 (분류 + 더존 연결 + 버전 이력) ----------
+     분류 트리: [{id, name, kids:[{id, name, use, dz, kids:[{id, name, use, dz}]}]}] — 배열 순서가 곧 순번
+     소분류가 없는 중분류는 그 자체가 계정, 소분류가 있으면 소분류가 계정. dz = 연결된 더존 과목 [{code, name}] */
+  var CAT_HEAD = ["대순번", "대분류", "중순번", "중분류", "소순번", "소분류", "더존코드", "더존과목", "사용", "대ID", "중ID", "소ID"];
+
+  function catRows(cat) {
+    var out = [];
+    function put(ti, t, mi, m, si, s, lf) {
+      var base = [ti + 1, t.name, m ? mi + 1 : "", m ? m.name : "", s ? si + 1 : "", s ? s.name : ""];
+      var tail = [lf ? (lf.use === false ? "N" : "Y") : "", t.id, m ? m.id : "", s ? s.id : ""];
+      var dz = lf && lf.dz && lf.dz.length ? lf.dz : [null];
+      dz.forEach(function (d) { out.push(base.concat([d ? d.code || "" : "", d ? d.name || "" : ""]).concat(tail)); });
+    }
+    cat.forEach(function (t, ti) {
+      if (!t.kids.length) put(ti, t, 0, null, 0, null, null);
+      t.kids.forEach(function (m, mi) {
+        if (!m.kids || !m.kids.length) put(ti, t, mi, m, 0, null, m);
+        else m.kids.forEach(function (x, si) { put(ti, t, mi, m, si, x, x); });
+      });
+    });
+    return out;
+  }
+
+  // 표 → 분류 트리. 이전 형식(형식버전 2: ID · ERP코드, 소분류 필수)도 읽음
+  function parseCat(rows) {
+    rows = rows.slice().sort(function (a, b) {
+      return (Calc.num(a["대순번"]) - Calc.num(b["대순번"])) || (Calc.num(a["중순번"]) - Calc.num(b["중순번"])) || (Calc.num(a["소순번"]) - Calc.num(b["소순번"]));
+    });
+    var legacy = rows.length && rows[0]["소ID"] === undefined;
+    var cat = [], tops = {}, mids = {}, subs = {};
+    rows.forEach(function (r) {
+      var t = str(r["대분류"]), m = str(r["중분류"]), s = str(r["소분류"]);
+      if (!t) return;
+      if (!tops[t]) { tops[t] = { id: legacy ? "" : str(r["대ID"]), name: t, kids: [] }; cat.push(tops[t]); }
+      if (!m) return;
+      var mk = t + "\u0001" + m;
+      if (!mids[mk]) { mids[mk] = { id: legacy ? "" : str(r["중ID"]), name: m, use: true, dz: [], kids: [] }; tops[t].kids.push(mids[mk]); }
+      var mid = mids[mk], leaf = mid;
+      if (s) {
+        var sk = mk + "\u0001" + s;
+        if (!subs[sk]) { subs[sk] = { id: legacy ? str(r["ID"]) : str(r["소ID"]), name: s, use: true, dz: [] }; mid.kids.push(subs[sk]); }
+        leaf = subs[sk];
+      }
+      leaf.use = str(r["사용"]) !== "N";
+      var code = legacy ? str(r["ERP코드"]) : str(r["더존코드"]), name = legacy ? "" : str(r["더존과목"]);
+      if ((code || name) && !leaf.dz.some(function (d) { return d.code === code && d.name === name; })) leaf.dz.push({ code: code, name: name });
+    });
+    return { cat: cat, legacy: legacy };
+  }
+
+  // 결과: {cat, ver:{list:[{v,t,kind,sum,memo}], snaps:{v: cat}}, legacy} | null (파일 없음)
   function loadMaster() {
     return readFile("data", MASTER).then(function (buf) {
       var wb = XLSX.read(buf, { type: "array" });
-      var rows = rowsOf(wb, "분류");
-      rows.sort(function (a, b) {
-        return (Calc.num(a["대순번"]) - Calc.num(b["대순번"])) || (Calc.num(a["중순번"]) - Calc.num(b["중순번"])) || (Calc.num(a["소순번"]) - Calc.num(b["소순번"]));
-      });
-      var cat = [], tops = {}, mids = {};
-      rows.forEach(function (r) {
-        var t = str(r["대분류"]), m = str(r["중분류"]), s = str(r["소분류"]);
-        if (!t) return;
-        if (!tops[t]) { tops[t] = { id: "", name: t, kids: [] }; cat.push(tops[t]); }
-        if (!m) return;
-        var mk = t + "\u0001" + m;
-        if (!mids[mk]) { mids[mk] = { id: "", name: m, kids: [] }; tops[t].kids.push(mids[mk]); }
-        if (!s) return;
-        mids[mk].kids.push({ id: str(r["ID"]), name: s, erp: str(r["ERP코드"]), use: str(r["사용"]) !== "N" });
-      });
-      return cat;
+      var p = parseCat(rowsOf(wb, "분류"));
+      var list = rowsOf(wb, "버전").map(function (r) {
+        return { v: Calc.num(r["버전"]), t: str(r["일시"]), kind: str(r["구분"]), sum: str(r["요약"]), memo: str(r["메모"]) };
+      }).filter(function (x) { return x.v > 0; });
+      var byV = {}, snaps = {};
+      rowsOf(wb, "버전내용").forEach(function (r) { var v = Calc.num(r["버전"]); (byV[v] = byV[v] || []).push(r); });
+      Object.keys(byV).forEach(function (v) { snaps[v] = parseCat(byV[v]).cat; });
+      return { cat: p.cat, ver: { list: list, snaps: snaps }, legacy: p.legacy };
     }, function (e) {
       if (e && e.name === "NotFoundError") return null;
       throw e;
     });
   }
 
-  function masterWorkbook(cat) {
+  function masterWorkbook(cat, ver) {
     var wb = XLSX.utils.book_new();
-    var aoa = [["대순번", "대분류", "중순번", "중분류", "소순번", "소분류", "ERP코드", "사용", "ID"]];
-    cat.forEach(function (t, ti) {
-      if (!t.kids.length) aoa.push([ti + 1, t.name, "", "", "", "", "", "", ""]);
-      t.kids.forEach(function (m, mi) {
-        if (!m.kids.length) aoa.push([ti + 1, t.name, mi + 1, m.name, "", "", "", "", ""]);
-        m.kids.forEach(function (s, si) {
-          aoa.push([ti + 1, t.name, mi + 1, m.name, si + 1, s.name, s.erp || "", s.use === false ? "N" : "Y", s.id]);
-        });
-      });
-    });
-    XLSX.utils.book_append_sheet(wb, sheet(aoa, [7, 14, 7, 14, 7, 20, 10, 6, 8]), "분류");
+    XLSX.utils.book_append_sheet(wb, sheet([CAT_HEAD].concat(catRows(cat)), [7, 14, 7, 20, 7, 16, 9, 22, 6, 7, 7, 7]), "분류");
+    var list = ver && ver.list || [];
+    XLSX.utils.book_append_sheet(wb, sheet([["버전", "일시", "구분", "요약", "메모"]].concat(list.map(function (x) { return [x.v, x.t, x.kind, x.sum, x.memo]; })), [6, 20, 14, 40, 40]), "버전");
+    var all = [["버전"].concat(CAT_HEAD)];
+    list.forEach(function (x) { var c = ver.snaps[x.v]; if (c) catRows(c).forEach(function (r) { all.push([x.v].concat(r)); }); });
+    XLSX.utils.book_append_sheet(wb, sheet(all, [6, 7, 14, 7, 20, 7, 16, 9, 22, 6, 7, 7, 7]), "버전내용");
     XLSX.utils.book_append_sheet(wb, sheet([["항목", "값"], ["저장시각", stamp()], ["프로그램", "사업비 관리 프로그램"], ["형식버전", FORMAT_VER],
-      ["설명", "대·중·소 분류와 순번입니다. 순번 숫자로 정렬되며, ID는 연도별 계획 파일과 연결되므로 바꾸지 마세요."]], [10, 70]), "정보");
+      ["설명", "대분류 · 중분류 · 소분류(선택)와 순번, 더존 과목 연결입니다. 한 줄 = 더존 과목 하나. ID 열은 연도별 계획 파일과 연결되므로 바꾸지 마세요."],
+      ["버전", "분류를 저장할 때마다 '버전' 시트에 기록되고, 그때의 분류 전체가 '버전내용' 시트에 남습니다."]], [10, 80]), "정보");
     return wb;
   }
 
-  function saveMaster(cat) {
-    var bytes = toBytes(masterWorkbook(cat));
+  function saveMaster(cat, ver) {
+    var bytes = toBytes(masterWorkbook(cat, ver));
     return backupIfDue(MASTER).then(function () { return writeFile("data", MASTER, bytes); });
+  }
+
+  /* ---------- 분류 양식 (다운 / 업로드) ---------- */
+  var TPL_HEAD = ["대분류", "중분류", "소분류", "더존코드", "더존과목명", "사용"];
+  function templateWorkbook(cat) {
+    var wb = XLSX.utils.book_new(), aoa = [TPL_HEAD];
+    catRows(cat).forEach(function (r) { aoa.push([r[1], r[3], r[5], r[6], r[7], r[8]]); });
+    var ws = sheet(aoa, [14, 24, 16, 10, 26, 6]);
+    ws["!autofilter"] = { ref: "A1:F" + aoa.length };
+    XLSX.utils.book_append_sheet(wb, ws, "분류");
+    XLSX.utils.book_append_sheet(wb, sheet([["작성 방법"],
+      ["• 한 줄 = 더존 과목 하나입니다. 한 칸(중분류 또는 소분류)에 더존 과목이 여러 개면 같은 분류를 여러 줄 적습니다."],
+      ["• 소분류는 선택입니다. 비워 두면 중분류가 계정이 되고, 적으면 소분류가 계정이 됩니다."],
+      ["• 더존 과목은 계정(가장 아래 칸)에 연결합니다. 소분류가 있는 중분류에는 소분류 없이 더존 과목을 적을 수 없습니다."],
+      ["• 순서(순번)는 줄 순서대로 정해집니다. 엑셀에서 줄을 옮기면 순서가 바뀝니다."],
+      ["• 대분류 · 중분류 칸을 비우면 위 줄과 같은 것으로 봅니다 (셀 병합해도 됨)."],
+      ["• 더존 과목이 없는 줄도 됩니다 (계획만 세우는 칸). 같은 더존 과목(코드나 이름)이 두 군데 있으면 올릴 수 없습니다."],
+      ["• 사용: Y 또는 비움 = 사용, N = 사용 안 함 (계획 표에서 숨김)."],
+      ["• 업로드하면 바로 바뀌지 않고, 바뀌는 내용을 먼저 보여줍니다. 확인 후 [적용] → [저장] 하면 새 버전이 됩니다."]], [100]), "안내");
+    return wb;
+  }
+  function downloadTemplate(cat, name) { download(templateWorkbook(cat), name); return name; }
+
+  // 업로드한 양식 → {cat, errors:[...], rows: 읽은 줄 수}
+  function parseTemplate(sheets) {
+    var errors = [], sh = sheets.filter(function (x) { return x.name === "분류"; })[0] || sheets[0];
+    var aoa = sh ? sh.aoa : [], head = -1, col = {};
+    for (var r = 0; r < Math.min(15, aoa.length) && head < 0; r++) {
+      var row = (aoa[r] || []).map(function (v) { return str(v).replace(/\s+/g, ""); });
+      if (row.indexOf("대분류") >= 0 && row.indexOf("중분류") >= 0) {
+        head = r;
+        TPL_HEAD.forEach(function (h) { col[h] = row.indexOf(h); });
+        if (col["더존과목명"] < 0) col["더존과목명"] = row.indexOf("더존과목");
+      }
+    }
+    if (head < 0) return { cat: [], errors: ["'대분류' · '중분류' 머리글이 있는 줄을 찾지 못했습니다. [양식 다운]으로 받은 파일을 쓰세요."], rows: 0 };
+    var get = function (row, h) { return col[h] >= 0 ? str(row[col[h]]) : ""; };
+    var lastT = "", lastM = "", list = [], n = 0;
+    aoa.slice(head + 1).forEach(function (row, i) {
+      row = row || [];
+      var t = get(row, "대분류"), m = get(row, "중분류"), s = get(row, "소분류"), code = get(row, "더존코드"), name = get(row, "더존과목명"), use = get(row, "사용").toUpperCase();
+      if (!t && !m && !s && !code && !name) return;
+      n++;
+      if (!t) t = lastT;
+      if (!m && (s || code || name)) m = lastM;
+      if (!t) { errors.push((head + i + 2) + "번째 줄: 대분류가 없습니다"); return; }
+      if (t !== lastT) lastM = "";
+      lastT = t; if (m) lastM = m;
+      list.push({ "대분류": t, "중분류": m, "소분류": s, "더존코드": code.replace(/^\[|\]$/g, ""), "더존과목": name, "사용": use === "N" ? "N" : "Y", "대순번": list.length, "중순번": 0, "소순번": 0, "소ID": "" });
+    });
+    // 줄 순서 = 순번
+    var cat = parseCat(list).cat;
+    return { cat: cat, errors: errors, rows: n };
   }
 
   /* ---------- 연도 계획 ---------- */
@@ -202,10 +292,11 @@
     e.split = Calc.SPLITS.indexOf(str(p["분할"])) >= 0 ? str(p["분할"]) : "균등";
     for (var i = 0; i < 12; i++) e.sv[i] = Calc.num(p["분할" + (i + 1) + "월"]);
     e.memo = str(p["메모"]);
+    if (str(p["계획외"]) === "Y") e.out = true;
     return e;
   }
 
-  // 결과: {year, settings, plan:{ID:입력값}, legacy:[{code,l1,l2,l3,entry}]|null, log, savedAt}
+  // 결과: {year, settings, plan:{ID:입력값}, legacy:[{code,l1,l2,l3,entry}]|null, lock, log, savedAt}
   function load(year) {
     return readFile("data", fileName(year)).then(function (buf) {
       var wb = XLSX.read(buf, { type: "array" });
@@ -223,6 +314,22 @@
           return { code: code, l1: str(a["대분류"]), l2: str(a["중분류"]), l3: str(a["소분류"]), entry: byCode[code] ? planOf(byCode[code]) : Calc.blankPlan() };
         });
       }
+      // 계획 마감 · 변경 차수
+      var rounds = rowsOf(wb, "차수").map(function (r) {
+        return { n: Calc.num(r["차수"]), closedAt: str(r["마감일시"]), openedAt: str(r["변경시작"]), reason: str(r["사유"]), total: Calc.num(r["합계"]), snap: {} };
+      });
+      rowsOf(wb, "마감본").forEach(function (r) {
+        var rd = rounds.filter(function (x) { return x.n === Calc.num(r["차수"]); })[0];
+        if (!rd) return;
+        var e = planOf(r);
+        e.l1 = str(r["대분류"]); e.l2 = str(r["중분류"]); e.l3 = str(r["소분류"]);
+        e.plan = Calc.num(r["확정계획액"]);
+        e.months = [];
+        for (var i = 1; i <= 12; i++) e.months.push(Calc.num(r[i + "월"]));
+        rd.snap[str(r["ID"])] = e;
+      });
+      var last = rounds[rounds.length - 1];
+      var lock = { state: !last ? "draft" : last.closedAt ? "closed" : "open", rounds: rounds };
       var log = rowsOf(wb, "이력").map(function (r) { return { t: str(r["시각"]), m: str(r["내용"]) }; });
       return {
         year: year,
@@ -231,42 +338,67 @@
           rndUnit: Calc.RND_UNITS[info["반올림단위"]] ? info["반올림단위"] : "천원",
           rndMode: Calc.RND_MODES.indexOf(info["반올림방식"]) >= 0 ? info["반올림방식"] : "반올림"
         },
-        plan: plan, legacy: legacy, log: log, savedAt: str(info["저장시각"])
+        plan: plan, legacy: legacy, lock: lock, log: log, savedAt: str(info["저장시각"])
       };
     });
   }
 
-  // state.rows: 화면 순서대로 [{id,l1,l2,l3,erp, ...입력값}]
+  var PLAN_HEAD = (function () {
+    var h = ["ID", "대분류", "중분류", "소분류", "더존코드", "전년실적", "산출방식", "증감률", "금액단가", "인원수량", "개월", "분할"];
+    for (var i = 1; i <= 12; i++) h.push("분할" + i + "월");
+    return h.concat(["메모", "계획외", "사용"]);
+  })();
+  function planCells(id, l1, l2, l3, dz, e, use) {
+    var isPct = e.meth === "%증감";
+    return [id, l1, l2, l3, dz, e.prev, e.meth, isPct ? e.a : "", isPct ? "" : e.a, e.b || "", e.c || "", e.split]
+      .concat(e.sv.map(function (v) { return v || ""; })).concat([e.memo, e.out ? "Y" : "", use === false ? "N" : "Y"]);
+  }
+
+  // state.allRows: 분류 순서대로 모든 계정(사용 안 함 포함) [{id,l1,l2,l3,dz,use, ...입력값}]
+  // state.rows: 계획 표에 보이는 계정 (사용 중)
   function buildWorkbook(state) {
     var wb = XLSX.utils.book_new();
-    var s = state.settings, rows = state.rows;
+    var s = state.settings, rows = state.rows, all = state.allRows || rows, lock = state.lock || { state: "draft", rounds: [] };
+    var stName = { draft: "작성 중", closed: "마감", open: "변경 중" }[lock.state];
     XLSX.utils.book_append_sheet(wb, sheet([
       ["항목", "값"], ["연도", state.year], ["저장시각", stamp()], ["프로그램", "사업비 관리 프로그램"],
       ["형식버전", FORMAT_VER], ["표시단위", s.dispUnit], ["반올림단위", s.rndUnit], ["반올림방식", s.rndMode],
-      ["계정 수", rows.length], ["설명", "계정 분류와 순번은 기준정보.xlsx 에 있습니다. ID 열은 바꾸지 마세요."]
+      ["계정 수", rows.length], ["계획 상태", stName + (lock.rounds.length ? " (" + roundLabel(lock.rounds[lock.rounds.length - 1].n) + ")" : "")],
+      ["설명", "계정 분류와 순번은 기준정보.xlsx 에 있습니다. ID 열은 바꾸지 마세요. 마감본 시트는 마감할 때의 계획 그대로입니다."]
     ], [12, 60]), "정보");
 
-    var ph = ["ID", "대분류", "중분류", "소분류", "ERP코드", "전년실적", "산출방식", "증감률", "금액단가", "인원수량", "개월", "분할"];
-    for (var i = 1; i <= 12; i++) ph.push("분할" + i + "월");
-    ph.push("메모");
-    XLSX.utils.book_append_sheet(wb, sheet([ph].concat(rows.map(function (r) {
-      var isPct = r.meth === "%증감";
-      return [r.id, r.l1, r.l2, r.l3, r.erp, r.prev, r.meth, isPct ? r.a : "", isPct ? "" : r.a, r.b || "", r.c || "", r.split]
-        .concat(r.sv.map(function (v) { return v || ""; })).concat([r.memo]);
-    })), [8, 12, 12, 18, 9, 14, 10, 8, 14, 8, 6, 6].concat(new Array(12).fill(10)).concat([24]), [5, 8]), "계획");
+    var dzText = function (r) { return (r.dz || []).map(function (d) { return d.code || d.name; }).join(","); };
+    XLSX.utils.book_append_sheet(wb, sheet([PLAN_HEAD].concat(all.map(function (r) {
+      return planCells(r.id, r.l1, r.l2, r.l3, dzText(r), r, r.use);
+    })), [8, 12, 16, 14, 12, 14, 10, 8, 14, 8, 6, 6].concat(new Array(12).fill(10)).concat([24, 6, 5]), [5, 8]), "계획");
 
-    var mh = ["대분류", "중분류", "소분류", "ERP코드", "전년실적", "확정계획액", "증감률"];
-    for (i = 1; i <= 12; i++) mh.push(i + "월");
-    mh.push("산출근거", "메모");
+    var mh = ["대분류", "중분류", "소분류", "더존코드", "전년실적", "확정계획액", "증감률"];
+    for (var i = 1; i <= 12; i++) mh.push(i + "월");
+    mh.push("산출근거", "메모", "계획외");
     XLSX.utils.book_append_sheet(wb, sheet([mh].concat(rows.map(function (r) {
       var c = Calc.compute(r, s);
-      return [r.l1, r.l2, r.l3, r.erp, r.prev, c.plan, isFinite(c.yoy) ? Math.round(c.yoy * 10000) / 10000 : ""]
-        .concat(c.months).concat([Calc.basisText(r, s), r.memo]);
-    })), [12, 12, 18, 9, 14, 14, 8].concat(new Array(12).fill(12)).concat([34, 24]), [4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]), "월별계획");
+      return [r.l1, r.l2, r.l3, dzText(r), r.prev, c.plan, isFinite(c.yoy) ? Math.round(c.yoy * 10000) / 10000 : ""]
+        .concat(c.months).concat([Calc.basisText(r, s), r.memo, r.out ? "Y" : ""]);
+    })), [12, 16, 14, 12, 14, 14, 8].concat(new Array(12).fill(12)).concat([34, 24, 6]), [4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]), "월별계획");
+
+    XLSX.utils.book_append_sheet(wb, sheet([["차수", "구분", "마감일시", "변경시작", "사유", "합계"]].concat(lock.rounds.map(function (r) {
+      return [r.n, roundLabel(r.n), r.closedAt, r.openedAt, r.reason, r.total];
+    })), [6, 10, 20, 20, 40, 16], [5]), "차수");
+    var sh = ["차수", "확정계획액"];
+    for (i = 1; i <= 12; i++) sh.push(i + "월");
+    var snapRows = [sh.concat(PLAN_HEAD)];
+    lock.rounds.forEach(function (rd) {
+      Object.keys(rd.snap).forEach(function (id) {
+        var e = rd.snap[id];
+        snapRows.push([rd.n, e.plan].concat(e.months).concat(planCells(id, e.l1, e.l2, e.l3, "", e, true)));
+      });
+    });
+    XLSX.utils.book_append_sheet(wb, sheet(snapRows, [6, 14].concat(new Array(12).fill(12)).concat([8, 12, 16, 14]), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 19]), "마감본");
 
     XLSX.utils.book_append_sheet(wb, sheet([["시각", "내용"]].concat(state.log.slice(-2000).map(function (l) { return [l.t, l.m]; })), [20, 80]), "이력");
     return wb;
   }
+  function roundLabel(n) { return n === 0 ? "원안" : n + "차 변경"; }
 
   /* ---------- 백업 ---------- */
   function backupIfDue(name, force) {
@@ -298,7 +430,7 @@
   /* ---------- 보고용 내보내기 (다운로드) ---------- */
   function exportReport(state) {
     var s = state.settings, wb = XLSX.utils.book_new();
-    var head = ["구분", "중분류", "계정", (state.year - 1) + "년 실적", state.year + "년 계획", "증감액", "증감률"];
+    var head = ["대분류", "중분류", "소분류", (state.year - 1) + "년 실적", state.year + "년 계획", "증감액", "증감률"];
     for (var i = 1; i <= 12; i++) head.push(i + "월");
     head.push("산출근거", "메모");
     var aoa = [[state.year + "년 사업비 계획 (단위: 원)"], [], head];
@@ -334,6 +466,11 @@
     ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 8 } }];
     XLSX.utils.book_append_sheet(wb, ws, "사업비계획");
     var name = "사업비계획_" + state.year + "_보고용_" + stamp(null, true).slice(0, 8) + ".xlsx";
+    download(wb, name);
+    return name;
+  }
+
+  function download(wb, name) {
     var blob = new Blob([toBytes(wb)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -341,7 +478,6 @@
     document.body.appendChild(a);
     a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
-    return name;
   }
 
   /* ---------- 다른 엑셀 읽기 (전년 실적 가져오기) ---------- */
@@ -357,6 +493,7 @@
   root.Store = {
     supported: supported, restore: restore, grant: grant, pick: pick, useHandle: useHandle, folderName: folderName,
     listYears: listYears, load: load, save: save, loadMaster: loadMaster, saveMaster: saveMaster,
-    fileName: fileName, MASTER: MASTER, exportReport: exportReport, readAnyFile: readAnyFile, stamp: stamp
+    fileName: fileName, MASTER: MASTER, exportReport: exportReport, readAnyFile: readAnyFile, stamp: stamp,
+    downloadTemplate: downloadTemplate, parseTemplate: parseTemplate, roundLabel: roundLabel
   };
 })(this);
