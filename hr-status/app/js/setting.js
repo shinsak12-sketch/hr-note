@@ -328,6 +328,21 @@ var Setting = (function () {
   }
   function firstDay(d) { return d ? d.slice(0, 8) + "01" : ""; }
 
+  /* ── 백업 복원 ── */
+  function restoreDlg() {
+    M.backups().then(function (list) {
+      U.modal('<h3>백업에서 되돌리기</h3><p>backup 폴더의 기준정보 파일입니다. 고른 파일로 설정(기준값 · 분류 기준 · 메모)을 되돌립니다. 지금 파일은 먼저 <b>기준정보_되돌리기전_…</b> 으로 보관됩니다.</p>' +
+        (list.length ? '<div class="list"><table class="tbl"><thead><tr><th>시각</th><th>종류</th><th class="n">조직</th><th class="n">직급</th><th class="n">직무</th><th class="n">분류 기준 · 줄</th><th></th></tr></thead><tbody>' + list.map(function (b) {
+          var n = b.name, k = /업데이트전/.test(n) ? "프로그램 업데이트 직전" : /변환전/.test(n) ? "형식 변환 직전" : /되돌리기전/.test(n) ? "되돌리기 직전" : /일별/.test(n) ? "그날 첫 저장 전" : "30분 자동", c = b.cnt, st = b.stamp;
+          var when = st.length >= 8 ? st.slice(0, 4) + "." + st.slice(4, 6) + "." + st.slice(6, 8) + (st.slice(8) !== "0000" ? " " + st.slice(8, 10) + ":" + st.slice(10, 12) : "") : "-";
+          return '<tr title="' + esc(n) + '"><td class="mono">' + when + "</td><td>" + k + "</td>" + (c ? '<td class="n">' + c.org + '</td><td class="n">' + c.grd + '</td><td class="n">' + c.job + '</td><td class="n">' + c.sets + " · " + c.rows + "</td>" : '<td colspan="4" class="fs">읽지 못함</td>') +
+            '<td><button class="btn sm" data-rs="' + esc(n) + '"' + (c && (c.org || c.sets) ? "" : ' title="비어 있는 백업"') + ">이걸로 되돌리기</button></td></tr>"; }).join("") + "</tbody></table></div>" : "<p>아직 백업이 없습니다.</p>") +
+        '<div class="foot"><button class="btn" data-x>닫기</button></div>', function (ov, close) {
+          U.$$("[data-rs]", ov).forEach(function (b) { b.onclick = function () { var n = b.dataset.rs; close(); U.confirmBox("되돌리기", "<b>" + esc(n) + "</b> 으로 되돌립니다. 지금 파일은 보관됩니다.", "되돌리기", true, function () { App.restoreFrom(n); }); }; });
+        }, "wide");
+    });
+  }
+
   /* ── 이벤트 ── */
   function onClick(e) {
     if (App.view !== "setting") return;
@@ -337,6 +352,7 @@ var Setting = (function () {
     if ((t = e.target.closest("[data-act='undo']"))) { App.undo(); return; }
     if ((t = e.target.closest("[data-act='redo']"))) { App.redo(); return; }
     if ((t = e.target.closest("[data-act='reload']"))) { App.reload(); return; }
+    if ((t = e.target.closest("[data-act='restore']"))) { restoreDlg(); return; }
     if ((t = e.target.closest("[data-act='exportMaster']"))) { U.download(M.exportMaster(), "기준정보_" + U.stamp() + ".xlsx"); U.toast("기준값을 엑셀로 내려받았습니다"); return; }
     if (tabNow === "classify") return;
     if ((t = e.target.closest("[data-tw]"))) { e.stopPropagation(); open[t.dataset.tw] = !open[t.dataset.tw]; render(); return; }

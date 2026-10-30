@@ -2,6 +2,7 @@
 var M = (function () {
   var P_ROSTER = "백데이터/설정/직원명부", P_ORDERS = "백데이터/설정/발령검색", P_ORGLIST = "백데이터/설정/조직목록",
     P_DATA = "data", P_BACKUP = "backup", MASTER = "기준정보.xlsx";
+  var APP_VER = "0.1.1";
   var LVN = { 0: "레벨 미정", 1: "회사", 2: "본부", 3: "부서·파트", 4: "센터" };
   var LVCOL = { "소속6": 1, "소속5": 2, "소속4": 3, "소속3": 4 };
   var PRIVATE = /주민|생년월일|성명|이름|전화|휴대|주소|메일|계좌/;
@@ -313,7 +314,7 @@ var M = (function () {
   }
   function fromWorkbook(wb) {
     var info = {}; readSheet(wb, "정보").forEach(function (r) { info[r["항목"]] = r["값"]; });
-    var raw = { fmt: +info["형식"] || 1, sheets: {} };
+    var raw = { fmt: +info["형식"] || 1, sheets: {}, ver: String(info["프로그램버전"] || "0.1") };
     KNOWN.forEach(function (n) { raw.sheets[n] = readSheet(wb, n); });
     var mg = Migrate.run(raw);
     if (!mg.ok) return { newer: true, from: mg.from };
@@ -345,7 +346,7 @@ var M = (function () {
     });
     st.log = sh["기록"].map(function (r) { return { t: str(r["시각"]), m: str(r["내용"]) }; });
     var keep = {}; wb.SheetNames.forEach(function (n) { if (KNOWN.indexOf(n) < 0) keep[n] = wb.Sheets[n]; });
-    return { state: st, extra: keep, migrated: mg.changed, from: mg.from };
+    return { state: st, extra: keep, migrated: mg.changed, from: mg.from, ver: raw.ver };
   }
   var KNOWN_COLS = {
     "조직": ["ID", "레벨", "상위ID", "소속코드", "순번", "폐지"], "직급": ["ID", "순번", "폐지"], "직무": ["ID", "순번", "폐지"],
@@ -361,7 +362,7 @@ var M = (function () {
   function toWorkbook() {
     var wb = XLSX.utils.book_new();
     function add(n, aoa, w) { XLSX.utils.book_append_sheet(wb, sheet(aoa, w), n); }
-    add("정보", [["항목", "값"], ["형식", Migrate.FMT], ["저장", new Date().toLocaleString("ko-KR")], ["프로그램", "인력현황 관리 0.1"]], [10, 24]);
+    add("정보", [["항목", "값"], ["형식", Migrate.FMT], ["저장", new Date().toLocaleString("ko-KR")], ["프로그램", "인력현황 관리"], ["프로그램버전", APP_VER]], [12, 24]);
     S.org.forEach(function (o, i) { o.ord = i + 1; });
     add("조직", withExtra("조직", KNOWN_COLS["조직"], S.org.map(function (o) { return [o.id, o.lv, o.p || "", o.code || "", o.ord, o.dead ? "Y" : ""]; }), S.org), [8, 6, 8, 10, 6, 6]);
     var vr = []; S.org.forEach(function (o) { o.v.forEach(function (v) { vr.push([o.id, v.n, v.nm, v.from, v.to, v.src, v.note]); }); });
@@ -383,28 +384,74 @@ var M = (function () {
     Object.keys(extra).forEach(function (n) { XLSX.utils.book_append_sheet(wb, extra[n], n); });
     return new Uint8Array(XLSX.write(wb, { type: "array", bookType: "xlsx" }));
   }
+  /* ── 불러오기 · 저장 (데이터 보호) ──
+     1) 프로그램 버전이 바뀌어 처음 열 때: 원본을 backup\기준정보_업데이트전_v옛버전_날짜.xlsx 로 먼저 복사
+     2) 형식 변환이 필요할 때: backup\기준정보_변환전_v번호_날짜.xlsx 로 먼저 복사
+     3) 하루 첫 저장 때: backup\기준정보_일별_날짜.xlsx (지우지 않음) · 30분마다: backup\기준정보_날짜_시각.xlsx (최근 30개)
+     4) 저장 직후 다시 읽어 확인 · 이상하면 직전 파일로 되돌림
+     5) 조직 · 직급 · 직무 · 분류 기준이 갑자기 0개가 되면 저장을 멈추고 물어봄 */
+  var lastGood = null, loadedCnt = null, allowShrink = false, lastBackup = 0, dayDone = "";
+  function counts(st) { st = st || S; var rows = 0; st.sets.forEach(function (x) { rows += x.rows.length; }); return { org: st.org.length, grd: st.grd.length, job: st.job.length, sets: st.sets.length, rows: rows, memo: Object.keys(st.memo).length }; }
   async function load() {
     var buf = await Store.read(P_DATA, MASTER);
-    if (!buf) { S = blankState(); extra = {}; touch(); return { fresh: true }; }
+    if (!buf) { S = blankState(); extra = {}; touch(); lastGood = null; loadedCnt = counts(); return { fresh: true }; }
     var wb = XLSX.read(buf, { type: "array", cellDates: true }), r = fromWorkbook(wb);
     if (r.newer) { newer = true; return { newer: true, from: r.from }; }
-    if (r.migrated) await Store.write(P_BACKUP, "기준정보_변환전_v" + r.from + "_" + U.stamp() + ".xlsx", new Uint8Array(buf));
-    S = r.state; extra = r.extra; touch();
-    return { migrated: r.migrated, from: r.from };
+    var bytes = new Uint8Array(buf), upd = r.ver !== APP_VER;
+    if (upd) await Store.write(P_BACKUP, "기준정보_업데이트전_v" + r.ver + "_" + U.stamp() + ".xlsx", bytes);
+    if (r.migrated) await Store.write(P_BACKUP, "기준정보_변환전_v" + r.from + "_" + U.stamp() + ".xlsx", bytes);
+    S = r.state; extra = r.extra; touch(); lastGood = bytes; loadedCnt = counts();
+    return { migrated: r.migrated, from: r.from, updated: upd ? r.ver : null };
   }
-  var lastBackup = 0;
+  function shrunk() {
+    if (allowShrink || !loadedCnt) return null; var c = counts(), bad = [];
+    [["org", "조직"], ["grd", "직급"], ["job", "직무"], ["sets", "분류 기준"]].forEach(function (k) { if (loadedCnt[k[0]] > 0 && c[k[0]] === 0) bad.push(k[1] + " " + loadedCnt[k[0]] + "개 → 0개"); });
+    if (loadedCnt.rows >= 10 && c.rows < loadedCnt.rows * 0.5) bad.push("분류 줄 " + loadedCnt.rows + "개 → " + c.rows + "개");
+    return bad.length ? bad : null;
+  }
   async function save() {
     if (newer) throw new Error("새 버전 프로그램으로 저장된 파일이라 이 프로그램으로는 저장하지 않습니다");
-    if (Date.now() - lastBackup > 30 * 60 * 1000) {
-      var ok = await Store.copy(P_DATA, MASTER, P_BACKUP, "기준정보_" + U.stamp() + ".xlsx");
-      lastBackup = Date.now();
-      if (ok) await prune();
+    var sh = shrunk(); if (sh) { var e = new Error("SHRINK"); e.detail = sh; throw e; }
+    var day = U.today().replace(/-/g, "");
+    if (dayDone !== day && lastGood) {
+      var dn = "기준정보_일별_" + day + ".xlsx", have = await Store.list(P_BACKUP);
+      if (have.indexOf(dn) < 0) await Store.write(P_BACKUP, dn, lastGood);
+      dayDone = day;
     }
-    await Store.write(P_DATA, MASTER, toWorkbook());
+    if (Date.now() - lastBackup > 30 * 60 * 1000 && lastGood) {
+      await Store.write(P_BACKUP, "기준정보_" + U.stamp() + ".xlsx", lastGood); lastBackup = Date.now(); await prune();
+    }
+    var bytes = toWorkbook(), want = counts();
+    await Store.write(P_DATA, MASTER, bytes);
+    /* 다시 읽어 확인 */
+    try {
+      var back = await Store.read(P_DATA, MASTER), chk = fromWorkbook(XLSX.read(back, { type: "array", cellDates: true })), got = counts(chk.state);
+      if (got.org !== want.org || got.grd !== want.grd || got.job !== want.job || got.sets !== want.sets || got.rows !== want.rows) throw new Error("저장 확인 불일치");
+    } catch (err) {
+      if (lastGood) await Store.write(P_DATA, MASTER, lastGood);
+      throw new Error("저장한 파일을 다시 읽어 보니 내용이 맞지 않아 직전 파일로 되돌렸습니다 (" + (err.message || err) + ")");
+    }
+    lastGood = bytes; loadedCnt = want; allowShrink = false;
   }
   async function prune() {
     var b = (await Store.list(P_BACKUP)).filter(function (n) { return /^기준정보_\d{8}_\d{4}\.xlsx$/.test(n); }).sort();
     for (var i = 0; i < b.length - 30; i++) await Store.remove(P_BACKUP, b[i]);
+  }
+  async function backups() {
+    var names = (await Store.list(P_BACKUP)).filter(function (n) { return /^기준정보_.*\.xlsx$/.test(n); }), out = [];
+    for (var i = 0; i < names.length; i++) {
+      var n = names[i], m = /(\d{8})(?:_(\d{4}))?\.xlsx$/.exec(n), st = m ? m[1] + (m[2] || "0000") : "0", c = null;
+      try { var r = fromWorkbook(XLSX.read(await Store.read(P_BACKUP, n), { type: "array", cellDates: true })); if (!r.newer) c = counts(r.state); } catch (e) { }
+      out.push({ name: n, stamp: st, cnt: c });
+    }
+    return out.sort(function (a, b) { return a.stamp < b.stamp ? 1 : a.stamp > b.stamp ? -1 : 0; });
+  }
+  async function restore(name) {
+    var buf = await Store.read(P_BACKUP, name); if (!buf) throw new Error("백업 파일을 읽지 못했습니다");
+    var r = fromWorkbook(XLSX.read(buf, { type: "array", cellDates: true })); if (r.newer) throw new Error("새 버전 프로그램 형식이라 되돌릴 수 없습니다");
+    var cur = await Store.read(P_DATA, MASTER); if (cur) await Store.write(P_BACKUP, "기준정보_되돌리기전_" + U.stamp() + ".xlsx", new Uint8Array(cur));
+    await Store.write(P_DATA, MASTER, new Uint8Array(buf));
+    return load();
   }
   function log(m) { S.log.push({ t: new Date().toLocaleString("ko-KR"), m: m }); if (S.log.length > 2000) S.log.shift(); }
 
@@ -425,7 +472,7 @@ var M = (function () {
     ctype: ctype, cval: cval, attr: attr, cardOk: cardOk, fltOk: fltOk, hit: hit, typeName: typeName, cardLabel: cardLabel, valLabel: valLabel, fltLabel: fltLabel,
     isPar: isPar, kidsIdx: kidsIdx, ancIdx: ancIdx, assign: assign, clearCache: clearCache,
     readOrgList: readOrgList, autoSetup: autoSetup, defaultSets: defaultSets, scanUnmatched: scanUnmatched,
-    load: load, save: save, log: log, begin: begin, undo: undo, redo: redo, exportMaster: exportMaster,
+    load: load, save: save, log: log, backups: backups, restore: restore, counts: counts, APP_VER: APP_VER, allowShrink: function () { allowShrink = true; }, begin: begin, undo: undo, redo: redo, exportMaster: exportMaster,
     reset: function () { FILES = []; MONTHS = []; SNAP = {}; }
   };
 })();

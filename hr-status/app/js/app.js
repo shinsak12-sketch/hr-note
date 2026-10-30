@@ -21,6 +21,13 @@ var App = (function () {
       if (pending) scheduleSave();
     } catch (e) {
       saving = false; failed = true; pending = true;
+      if (e.message === "SHRINK") {
+        setSave("error", "저장 멈춤 — 확인 필요");
+        U.modal('<h3>저장을 멈췄습니다</h3><div class="warnbox bad"><span class="wi">⛔</span><div><b>설정 데이터가 갑자기 많이 줄었습니다</b><ul>' + e.detail.map(function (d) { return "<li>" + U.esc(d) + "</li>"; }).join("") +
+          '</ul></div></div><p>직접 지운 게 맞으면 [그대로 저장], 아니면 Ctrl+Z 로 되돌리거나 설정 › ⟲ 백업 복원을 쓰세요. 저장 전 파일은 그대로 있습니다.</p><div class="foot"><button class="btn" data-x>저장하지 않음</button><button class="btn danger" id="ok">그대로 저장</button></div>',
+          function (ov, close) { ov.querySelector("#ok").onclick = function () { close(); M.allowShrink(); doSave(); }; });
+        return;
+      }
       setSave("error", "저장 실패 — 눌러서 다시 저장");
       U.toast("저장하지 못했습니다. 엑셀로 data\\기준정보.xlsx 를 열어 두었다면 닫고 제목 줄의 빨간 표시를 누르세요. (" + (e.message || e) + ")", true, 7000);
     }
@@ -92,6 +99,8 @@ var App = (function () {
       await Store.ensure([M.P_ROSTER, M.P_ORDERS, M.P_ORGLIST, M.P_ORGLIST + "/보관", M.P_DATA, M.P_BACKUP]);
       var ld = await M.load();
       if (ld.newer) U.toast("data\\기준정보.xlsx 가 더 새 버전 프로그램으로 저장되어 있습니다. 보기만 하고 저장하지 않습니다. 새 버전 프로그램을 쓰세요.", true, 9000);
+      if (ld.updated) M.log("프로그램 " + ld.updated + " → " + M.APP_VER + " 업데이트 · 원본 backup 보관");
+      if (ld.updated) U.toast("프로그램이 " + M.APP_VER + " 로 바뀌었습니다. 기존 기준정보는 backup\\기준정보_업데이트전_v" + ld.updated + "_… 로 먼저 보관했습니다.", false, 6000);
       if (ld.migrated) U.toast("이전 형식(v" + ld.from + ") 기준정보를 새 형식으로 바꿨습니다. 원본은 backup 폴더에 있습니다.", false, 6000);
       M.reset();
       var r = await M.loadAll(function (d, n) { setSave("busy", "직원명부 읽는 중 " + d + "/" + n); });
@@ -149,6 +158,10 @@ var App = (function () {
     });
   }
 
-  return { start: start, change: change, render: render, go: go, scheduleSave: scheduleSave, undo: undo, redo: redo, reload: reload, unmatched: unmatched, help: help, get view() { return view; } };
+  async function restoreFrom(name) {
+    try { var r = await M.restore(name); M.clearCache(); M.touch(); unmatched(true); render(); setSave("ok", "백업에서 되돌림"); U.toast(name + " 으로 되돌렸습니다 (지금 파일은 backup\\기준정보_되돌리기전_… 로 보관)", false, 6000); }
+    catch (e) { U.toast(e.message || e, true, 6000); }
+  }
+  return { restoreFrom: restoreFrom, start: start, change: change, render: render, go: go, scheduleSave: scheduleSave, undo: undo, redo: redo, reload: reload, unmatched: unmatched, help: help, get view() { return view; } };
 })();
 document.addEventListener("DOMContentLoaded", App.start);
