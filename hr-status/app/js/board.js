@@ -22,7 +22,7 @@ var Board = (function () {
   function mkey(ri, m) { return cv.set + "|" + S().rows[ri].id + "|" + m; }
 
   function condDesc(i) {
-    var rows = S().rows, parts = [];
+    var rows = M.rowsAt(S(), cv.asof), parts = [];
     M.ancIdx(rows, i).forEach(function (a) { if (rows[a].cards.length) parts.push("<b>" + esc(rows[a].nm) + "</b> 조건"); });
     var g = {}; rows[i].cards.forEach(function (c) { var k = M.ctype(c.c); (g[k] = g[k] || []).push(M.cardLabel(c.c) + (Object.keys(c.f || {}).length ? "(" + M.fltLabel(c.f) + ")" : "")); });
     for (var k in g) parts.push(M.typeName(k) + " " + esc(g[k].join(" 또는 ")));
@@ -303,7 +303,7 @@ var Board = (function () {
     document.addEventListener("click", function (e) {
       var t;
       if (fp && !e.target.closest(".fpop") && !e.target.closest("[data-fcol]")) { fp.remove(); fp = null; }
-      if (mpk && !e.target.closest(".mpk") && !e.target.closest(".pick")) { mpk.remove(); mpk = null; }
+      if (mpk && !e.target.closest(".mpk") && !e.target.closest(".pick,[data-mpk]")) { mpk.remove(); mpk = null; }
       if (cm && !e.target.closest(".cmenu")) { cm.remove(); cm = null; }
       if (mp && !e.target.closest(".mpop")) { mp.remove(); mp = null; }
       if (!onView()) return;

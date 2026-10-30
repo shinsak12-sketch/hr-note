@@ -2,7 +2,7 @@
 var M = (function () {
   var P_ROSTER = "백데이터/설정/직원명부", P_ORDERS = "백데이터/설정/발령검색", P_ORGLIST = "백데이터/설정/조직목록",
     P_DATA = "data", P_BACKUP = "backup", P_MERGE = "백데이터/통합", MERGE = "직원명부_통합.dat", OMERGE = "발령검색_통합.dat", MASTER = "기준정보.xlsx";
-  var APP_VER = "0.1.5";
+  var APP_VER = "0.1.6";
   var LVN = { 0: "레벨 미정", 1: "회사", 2: "본부", 3: "부서·파트", 4: "센터" };
   var LVCOL = { "소속6": 1, "소속5": 2, "소속4": 3, "소속3": 4 };
   var PRIVATE = /주민|생년월일|성명|이름|전화|휴대|주소|메일|계좌/;
@@ -13,7 +13,7 @@ var M = (function () {
   var S = blankState(), extra = {}, rev = 1, setRev = 1, newer = false;
 
   /* ── 엔터티 도우미 ── */
-  function nid(k) { S.seq[k] = (S.seq[k] || 0) + 1; return { o: "O", g: "G", j: "J", s: "S", r: "R" }[k] + ("000" + S.seq[k]).slice(-4); }
+  function nid(k) { S.seq[k] = (S.seq[k] || 0) + 1; return { o: "O", g: "G", j: "J", s: "S", r: "R", v: "V" }[k] + ("000" + S.seq[k]).slice(-4); }
   function cur(e) { return e.v[0]; }
   function nm(e) { return e ? cur(e).nm : "(없음)"; }
   function list(kind) { return S[kind]; }
@@ -78,7 +78,8 @@ var M = (function () {
       });
       var low = o["소속"];
       if (!U.blank(low) && !chain.some(function (c) { return c.nm === low; })) chain.push({ lv: Math.min(4, (chain.length ? chain[chain.length - 1].lv : 0) + 1), nm: low });
-      return { sb: o["사번"], nm: o["성명"] || "", org: low, chain: chain, gnm: o["직급"] || "", gcd: o["직급코드"] || "", job: o["직무"] || "", pos: o["직책"] || "", row: o, r: -1 };
+      var path = chain.filter(function (c) { return c.lv > 1; }).map(function (c) { return c.nm; }).join(" › ");
+      return { sb: o["사번"], nm: o["성명"] || "", org: low, chain: chain, path: path, gnm: o["직급"] || "", gcd: o["직급코드"] || "", job: o["직무"] || "", pos: o["직책"] || "", row: o, r: -1 };
     });
     return { headers: H.filter(Boolean), persons: out };
   }
@@ -275,6 +276,7 @@ var M = (function () {
     if (t === "grd") return p.gid === v;
     if (t === "job") return p.jid === v;
     if (t === "per") return p.sb === v;
+    if (t === "pth") return p.path === v || p.path.indexOf(v + " › ") === 0;
     if (t.slice(0, 4) === "col:") return (p.row[t.slice(4)] || "") === v;
     return false;
   }
@@ -286,11 +288,12 @@ var M = (function () {
     for (var k in g) if (!g[k].some(function (c) { return hit(c, p); })) return false;
     return true;
   }
-  function typeName(t) { return t === "org" ? "조직" : t === "grd" ? "직급" : t === "job" ? "직무" : t === "per" ? "사람" : t.slice(0, 4) === "col:" ? t.slice(4) : t; }
+  function typeName(t) { return t === "org" ? "조직" : t === "grd" ? "직급" : t === "job" ? "직무" : t === "per" ? "사람" : t === "pth" ? "명부 소속" : t.slice(0, 4) === "col:" ? t.slice(4) : t; }
   function cardLabel(c) {
     var t = ctype(c), v = cval(c);
     if (t === "org") return nm(byId("org", v)); if (t === "grd") return nm(byId("grd", v)); if (t === "job") return nm(byId("job", v));
     if (t === "per") { var l = latestFile(), s = l && SNAP[l.name], p = s && s.persons.filter(function (x) { return x.sb === v; })[0]; return (p ? p.nm + " " : "") + "(" + v + ")"; }
+    if (t === "pth") { var sg = v.split(" › "); return sg[sg.length - 1] + (sg.length > 1 ? " · " + sg[sg.length - 2] : ""); }
     return v || "(빈칸)";
   }
   function valLabel(k, v) { if (k === "grd") return nm(byId("grd", v)); if (k === "job") return nm(byId("job", v)); return v || "(빈칸)"; }
@@ -304,9 +307,39 @@ var M = (function () {
   function ancIdx(rows, i) { var a = [], d = rows[i].d; for (var j = i - 1; j >= 0 && d > 0; j--) if (rows[j].d < d) { a.unshift(j); d = rows[j].d; } return a; }
   var CACHE = {};
   function clearCache() { CACHE = {}; }
+  /* ── 기간별 바구니: 줄은 하나, 기간마다 담긴 카드가 다름 (set.pv = [{id, from, cards:{줄ID:[카드]}}]) ── */
+  function verAt(set, m) {
+    if (!set.pv || !set.pv.length) return null;
+    var v = null; set.pv.forEach(function (x) { if (x.from <= m && (!v || x.from > v.from)) v = x; });
+    return v;
+  }
+  function verRange(set, v) {
+    var nx = null; set.pv.forEach(function (x) { if (x.from > v.from && (!nx || x.from < nx)) nx = x.from; });
+    return { from: v.from, to: nx ? U.ym(nx, -1) : null, months: MONTHS.filter(function (m) { return m >= v.from && (!nx || m < nx); }) };
+  }
+  function rowsAt(set, m) {
+    if (!set.pv || !set.pv.length) return set.rows;
+    var v = verAt(set, m);
+    return set.rows.map(function (r) { return { id: r.id, nm: r.nm, d: r.d, pr: r.pr, rest: r.rest, cards: v ? v.cards[r.id] || [] : [] }; });
+  }
+  /* 그 달들 명부에 나온 소속 경로 (윗부분 포함) · n = 마지막 달 인원 */
+  function pathsIn(months) {
+    var out = {}, last = months[months.length - 1];
+    months.forEach(function (m) {
+      var sn = snap(m); if (!sn) return;
+      sn.persons.forEach(function (p) {
+        var seg = p.path ? p.path.split(" › ") : [];
+        for (var i = 1; i <= seg.length; i++) {
+          var k = seg.slice(0, i).join(" › "), o = out[k] = out[k] || { path: k, depth: i, n: 0, first: m, last: m };
+          if (m < o.first) o.first = m; if (m > o.last) o.last = m; if (m === last) o.n++;
+        }
+      });
+    });
+    return Object.keys(out).map(function (k) { return out[k]; });
+  }
   function assign(set, m) {
     var key = set.id + "|" + m + "|" + rev + "|" + setRev; if (CACHE[key]) return CACHE[key];
-    var rows = set.rows, n = rows.length, res = { row: {}, dup: {}, un: [], who: {}, why: {}, total: 0, dupN: 0 }, leaves = [];
+    var rows = rowsAt(set, m), n = rows.length, res = { row: {}, dup: {}, un: [], who: {}, why: {}, total: 0, dupN: 0 }, leaves = [], byPath = !!(set.pv && set.pv.length);
     for (var i = 0; i < n; i++) { res.row[rows[i].id] = 0; res.who[rows[i].id] = []; if (!isPar(rows, i)) leaves.push(i); }
     var sn = snap(m); if (!sn) return (CACHE[key] = res);
     var anc = {}; leaves.forEach(function (i) { anc[i] = ancIdx(rows, i); });
@@ -319,14 +352,14 @@ var M = (function () {
       for (a = 0; a < pri.length; a++) if (leafOk(pri[a], p)) { h = pri[a]; break; }
       if (h === null) { var ms = nor.filter(function (i) { return leafOk(i, p); }); if (ms.length) { h = ms[0]; if (ms.length > 1) { res.dupN++; ms.forEach(function (i) { res.dup[rows[i].id] = (res.dup[rows[i].id] || 0) + 1; }); } } }
       if (h === null) for (a = 0; a < rest.length; a++) if (ancOk(rest[a], p)) { h = rest[a]; break; }
-      if (h === null) { res.un.push(p); res.why[p.sb] = whyOut(rows, leaves, anc, p); return; }
+      if (h === null) { res.un.push(p); res.why[p.sb] = whyOut(rows, leaves, anc, p, byPath); return; }
       res.row[rows[h].id]++; res.who[rows[h].id].push(p);
     });
     for (i = n - 1; i >= 0; i--) if (isPar(rows, i)) { var s = 0, w = []; kidsIdx(rows, i).forEach(function (j) { s += res.row[rows[j].id]; w = w.concat(res.who[rows[j].id]); }); res.row[rows[i].id] = s; res.who[rows[i].id] = w; }
     return (CACHE[key] = res);
   }
-  function whyOut(rows, leaves, anc, p) {
-    if (!p.oids.length) return "조직 '" + p.org + "' 이 기준값에 없음 (미매칭)";
+  function whyOut(rows, leaves, anc, p, byPath) {
+    if (!byPath && !p.oids.length) return "조직 '" + p.org + "' 이 기준값에 없음 (미매칭)";
     for (var x = 0; x < leaves.length; x++) {
       var i = leaves[x], r = rows[i];
       for (var y = 0; y < r.cards.length; y++) {
@@ -509,7 +542,7 @@ var M = (function () {
   }
 
   /* ── 저장 · 불러오기 (data\기준정보.xlsx) ── */
-  var KNOWN = ["정보", "조직", "조직버전", "직급", "직급버전", "직무", "직무버전", "분류기준", "분류줄", "메모", "설정", "기록"];
+  var KNOWN = ["정보", "조직", "조직버전", "직급", "직급버전", "직무", "직무버전", "분류기준", "분류줄", "분류기간", "메모", "설정", "기록"];
   function readSheet(wb, name) {
     var ws = wb.Sheets[name]; if (!ws) return [];
     var aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: "" }); if (!aoa.length) return [];
@@ -541,7 +574,14 @@ var M = (function () {
       var cards = []; try { cards = JSON.parse(r["카드"] || "[]"); } catch (e) { cards = []; }
       s.rows.push({ id: str(r["줄ID"]), nm: str(r["이름"]), d: +r["단계"] || 0, pr: str(r["우선"]) === "Y" ? 1 : 0, rest: str(r["나머지"]) === "Y" ? 1 : 0, cards: cards });
     });
-    st.sets = Object.keys(sets).map(function (k) { return sets[k]; }).sort(function (a, b) { return a.ord - b.ord; });
+    (sh["분류기간"] || []).forEach(function (r) {
+      var s = sets[str(r["기준ID"])]; if (!s) return; s.pv = s.pv || [];
+      var vid = str(r["기간ID"]), v = s.pv.filter(function (x) { return x.id === vid; })[0];
+      if (!v) { v = { id: vid, from: str(r["시작월"]), cards: {} }; s.pv.push(v); }
+      var rid = str(r["줄ID"]); if (!rid) return;
+      try { v.cards[rid] = JSON.parse(r["카드"] || "[]"); } catch (e) { v.cards[rid] = []; }
+    });
+    st.sets = Object.keys(sets).map(function (k) { var x = sets[k]; if (x.pv) x.pv.sort(function (a, b) { return a.from < b.from ? -1 : 1; }); return x; }).sort(function (a, b) { return a.ord - b.ord; });
     sh["메모"].forEach(function (r) { if (str(r["키"])) st.memo[str(r["키"])] = String(r["내용"]); });
     sh["설정"].forEach(function (r) {
       var k = str(r["키"]), v = r["값"];
@@ -582,6 +622,8 @@ var M = (function () {
     add("분류기준", withExtra("분류기준", KNOWN_COLS["분류기준"], S.sets.map(function (s, i) { return [s.id, s.nm, i + 1, s.from || "", s.to || "", s.unit || "m"]; }), S.sets), [8, 24, 6, 9, 9, 6]);
     var rr = []; S.sets.forEach(function (s) { s.rows.forEach(function (r, i) { rr.push([s.id, r.id, i + 1, r.d, r.nm, r.pr ? "Y" : "", r.rest ? "Y" : "", JSON.stringify(r.cards)]); }); });
     add("분류줄", [["기준ID", "줄ID", "순번", "단계", "이름", "우선", "나머지", "카드"]].concat(rr), [8, 8, 6, 6, 24, 6, 6, 60]);
+    var pr = []; S.sets.forEach(function (s) { (s.pv || []).forEach(function (v) { pr.push([s.id, v.id, v.from, "", ""]); Object.keys(v.cards).forEach(function (rid) { if (v.cards[rid].length && s.rows.some(function (r) { return r.id === rid; })) pr.push([s.id, v.id, v.from, rid, JSON.stringify(v.cards[rid])]); }); }); });
+    add("분류기간", [["기준ID", "기간ID", "시작월", "줄ID", "카드"]].concat(pr), [8, 8, 9, 8, 60]);
     add("메모", [["키", "내용"]].concat(Object.keys(S.memo).map(function (k) { return [k, S.memo[k]]; })), [30, 50]);
     add("설정", [["키", "값"], ["카드종류", JSON.stringify(S.cols)], ["번호", JSON.stringify(S.seq)], ["조직목록해시", S.orgListHash]], [14, 60]);
     add("기록", [["시각", "내용"]].concat(S.log.slice(-2000).map(function (l) { return [l.t, l.m]; })), [18, 80]);
@@ -674,7 +716,7 @@ var M = (function () {
     nid: nid, nm: nm, list: list, byId: byId, kids: kids, path: path, desc: desc, touch: touch, bump: bump, R: R,
     findOrg: findOrg, findGrd: findGrd, findJob: findJob, scanFiles: scanFiles, loadAll: loadAll, issues: issues, issueCount: issueCount, latestFile: latestFile, snap: snap, fileOfMonth: fileOfMonth,
     ctype: ctype, cval: cval, attr: attr, cardOk: cardOk, fltOk: fltOk, hit: hit, typeName: typeName, cardLabel: cardLabel, valLabel: valLabel, fltLabel: fltLabel,
-    isPar: isPar, kidsIdx: kidsIdx, ancIdx: ancIdx, assign: assign, clearCache: clearCache,
+    isPar: isPar, kidsIdx: kidsIdx, ancIdx: ancIdx, assign: assign, clearCache: clearCache, verAt: verAt, verRange: verRange, rowsAt: rowsAt, pathsIn: pathsIn,
     readOrgList: readOrgList, autoSetup: autoSetup, defaultSets: defaultSets, scanUnmatched: scanUnmatched,
     load: load, save: save, log: log, backups: backups, restore: restore, counts: counts, APP_VER: APP_VER, allowShrink: function () { allowShrink = true; }, begin: begin, undo: undo, redo: redo, exportMaster: exportMaster,
     reset: function () { FILES = []; MONTHS = []; SNAP = {}; }

@@ -112,7 +112,7 @@ var Setting = (function () {
   function liveLv(lv, keep) { return M.S.org.filter(function (x) { return x.lv === lv && (!x.dead || x.id === keep); }); }
   function impact(o) { var past = o.v.slice(1).map(function (v) { return v.nm; }).filter(function (n, i, a) { return n !== M.nm(o) && a.indexOf(n) === i; });
     return "<ul><li>현재 인원 <b>" + (HC.o[o.id] || 0) + "명</b> · 하위 조직 " + M.desc(o) + "개</li><li>버전 " + o.v.length + "개" + (past.length ? " · 옛 이름 " + esc(past.join(", ")) : "") + "</li><li>이 조직을 쓰는 분류 기준 카드 " + usedCards("org:" + o.id) + "개</li></ul>"; }
-  function usedCards(c) { var n = 0; M.S.sets.forEach(function (s) { s.rows.forEach(function (r) { r.cards.forEach(function (x) { if (x.c === c) n++; }); }); }); return n; }
+  function usedCards(c) { var n = 0; M.S.sets.forEach(function (s) { s.rows.forEach(function (r) { r.cards.forEach(function (x) { if (x.c === c) n++; }); }); (s.pv || []).forEach(function (v) { Object.keys(v.cards).forEach(function (k) { v.cards[k].forEach(function (x) { if (x.c === c) n++; }); }); }); }); return n; }
 
   function orgAdd(par, lv) {
     lv = par ? par.lv + 1 : (lv || 1);
@@ -191,7 +191,7 @@ var Setting = (function () {
         };
       });
   }
-  function dropCards(c) { M.S.sets.forEach(function (s) { s.rows.forEach(function (r) { r.cards = r.cards.filter(function (x) { return x.c !== c; }); }); }); }
+  function dropCards(c) { M.S.sets.forEach(function (s) { s.rows.forEach(function (r) { r.cards = r.cards.filter(function (x) { return x.c !== c; }); }); (s.pv || []).forEach(function (v) { Object.keys(v.cards).forEach(function (k) { v.cards[k] = v.cards[k].filter(function (x) { return x.c !== c; }); }); }); }); }
   function orgMenu(o, x, y) {
     var nx = o.lv && o.lv < 4 ? M.LVN[o.lv + 1] : "";
     U.menu(x, y, '<span class="lv lv' + o.lv + '">' + (o.lv ? "L" + o.lv : "?") + "</span>" + esc(M.nm(o)), [

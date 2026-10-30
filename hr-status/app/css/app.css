@@ -346,7 +346,7 @@ button.stat{cursor:pointer}
 .ptabs button i{width:18px;height:4px;border-radius:2px;opacity:.5}
 .ptabs button.on{background:var(--surf);color:var(--ink);font-weight:700}.ptabs button.on i{opacity:1}
 .ptabs .addtab{flex:0 0 auto;color:var(--g);border:1px dashed var(--grid2);border-bottom:0}
-.t-org{background:var(--c1)}.t-job{background:var(--c2)}.t-grd{background:var(--c3)}.t-ext{background:var(--c6)}.t-per{background:var(--c5)}
+.t-org{background:var(--c1)}.t-job{background:var(--c2)}.t-grd{background:var(--c3)}.t-ext{background:var(--c6)}.t-pth{background:#217346}.t-per{background:var(--c5)}
 .pbody{padding:10px;background:var(--surf);border-radius:0 0 10px 10px;max-height:calc(100vh - 260px);overflow:auto}
 .ptools{display:flex;gap:6px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
 .ptools .inp{flex:1;min-width:110px}
@@ -364,6 +364,7 @@ button.stat{cursor:pointer}
 .chip.grd{background:var(--c3b);border-color:#F0D3A8}.chip.grd .dot{background:var(--c3)}
 .chip.per{background:var(--c5b);border-color:#D2D8E1}.chip.per .dot{background:var(--c5)}
 .chip.ext{background:var(--c6b);border-color:#F1C3D6}.chip.ext .dot{background:var(--c6)}
+.chip.pth{background:#E9F5EE;border-color:#B9DEC8}.chip.pth .dot{background:#217346}
 .chip .lvt{font-size:9.5px;font-weight:700;color:var(--c1)}
 .chip .flt{font-size:10.5px;padding:0 5px;border-radius:4px;background:#fff;border:1px solid var(--grid2);color:var(--ink2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chip .un{position:absolute;top:-7px;right:-6px;min-width:17px;height:16px;padding:0 4px;border-radius:8px;background:var(--bad);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
@@ -434,3 +435,10 @@ button.stat{cursor:pointer}
 .src{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:9px;background:#EEF0F3;color:var(--ink2);box-shadow:0 1px 0 var(--hi) inset}
 .src.s코드{background:#E3F3EA;color:var(--ok)}.src.s발령{background:#E6EEFB;color:#1F4E9C}.src.s명부{background:var(--warn-bg);color:var(--warn)}
 .fpop .fi.sg{border-bottom:1px dashed #EEE}
+.vbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:-4px 0 10px;background:#fff;padding:8px 10px;border-radius:10px;box-shadow:0 0 0 1px var(--line);font-size:12px}
+.vbar b{color:var(--g);margin-right:4px}
+.vchip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;border:1px solid var(--grid2);background:linear-gradient(180deg,#fff,#F4F5F7);box-shadow:0 1px 0 var(--hi) inset,0 2px 4px -1px var(--sh2);font:inherit;font-family:var(--mono);cursor:pointer;transition:transform .12s,box-shadow .15s}
+.vchip:hover{box-shadow:0 1px 0 var(--hi) inset,0 4px 10px -3px var(--sh)}.vchip:active{transform:translateY(1px)}
+.vchip span{font-family:inherit;font-size:10px;background:#E6E9EE;border-radius:6px;padding:0 5px;color:var(--ink2)}
+.vchip.on{border-color:var(--g);background:var(--g3);color:#14532D;box-shadow:0 1px 3px rgba(0,0,0,.12) inset}.vchip.on span{background:var(--g);color:#fff}
+.vchip em{font-style:normal;font-size:10px;background:var(--bad);color:#fff;border-radius:8px;padding:0 5px}.vchip i{font-style:normal;color:var(--ok);font-size:11px}
