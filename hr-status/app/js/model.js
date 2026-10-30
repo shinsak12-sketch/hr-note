@@ -1,8 +1,8 @@
 /* 자료 모델: 기준값(조직 · 직급 · 직무 버전) · 분류 기준 · 직원명부 스냅샷 · 집계 */
 var M = (function () {
   var P_ROSTER = "백데이터/설정/직원명부", P_ORDERS = "백데이터/설정/발령검색", P_ORGLIST = "백데이터/설정/조직목록",
-    P_DATA = "data", P_BACKUP = "backup", P_CACHE = "cache/직원명부", MASTER = "기준정보.xlsx";
-  var APP_VER = "0.1.3";
+    P_DATA = "data", P_BACKUP = "backup", P_MERGE = "백데이터/통합", MERGE = "직원명부_통합.dat", MASTER = "기준정보.xlsx";
+  var APP_VER = "0.1.4";
   var LVN = { 0: "레벨 미정", 1: "회사", 2: "본부", 3: "부서·파트", 4: "센터" };
   var LVCOL = { "소속6": 1, "소속5": 2, "소속4": 3, "소속3": 4 };
   var PRIVATE = /주민|생년월일|성명|이름|전화|휴대|주소|메일|계좌/;
@@ -84,8 +84,8 @@ var M = (function () {
   }
   function parseRoster(buf) { return buildPersons(rosterTable(buf)); }
 
-  /* ── 캐시: cache\직원명부\<원본 이름>.dat · 원본 크기 · 수정 시각이 같으면 엑셀을 다시 풀지 않음 ── */
-  var CACHE_FMT = 1;
+  /* ── 통합파일: 백데이터\통합\직원명부_통합.dat (여러 명부를 한 파일로, 압축) ── */
+  var MERGE_FMT = 1, MINFO = null;
   async function gz(str) {
     if (!window.CompressionStream) return new TextEncoder().encode(str);
     return new Uint8Array(await new Response(new Blob([str]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer());
@@ -95,16 +95,29 @@ var M = (function () {
     if (b[0] === 0x1f && b[1] === 0x8b) return await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
     return new TextDecoder().decode(b);
   }
-  async function cacheGet(f, st) {
-    try {
-      var b = await Store.read(P_CACHE, f.name + ".dat"); if (!b) return null;
-      var c = JSON.parse(await gunz(b));
-      return c.fmt === CACHE_FMT && c.size === st.size && c.mt === st.mt ? c : null;
-    } catch (e) { return null; }
+  async function readMerge() {
+    var b = await Store.read(P_MERGE, MERGE); if (!b) return null;
+    try { var m = JSON.parse(await gunz(b)); if (m.fmt !== MERGE_FMT || !m.files) throw 0; m.bytes = b.byteLength; return m; }
+    catch (e) { return { bad: true }; }
   }
-  async function cachePut(f, st, body) {
-    try { body.fmt = CACHE_FMT; body.size = st.size; body.mt = st.mt; await Store.write(P_CACHE, f.name + ".dat", await gz(JSON.stringify(body))); } catch (e) { }
+  /* 지금 읽혀 있는 명부 전부를 통합파일 하나로 */
+  async function buildMerge() {
+    var files = {}, n = 0;
+    FILES.forEach(function (f) {
+      var s = SNAP[f.name]; if (!s) return;
+      var H = s.headers; n++;
+      files[f.name] = { size: s.size, mt: s.mt, h: H, d: s.persons.map(function (p) { return H.map(function (h) { var v = p.row[h]; return v == null ? "" : v; }); }) };
+    });
+    if (!n) throw new Error("읽어 둔 직원명부가 없습니다");
+    var at = U.today() + " " + U.stamp().slice(9, 11) + ":" + U.stamp().slice(11, 13);
+    var bytes = await gz(JSON.stringify({ fmt: MERGE_FMT, at: at, app: APP_VER, files: files }));
+    await Store.write(P_MERGE, MERGE, bytes);
+    var chk = await readMerge(); /* 다시 읽어 확인 */
+    if (!chk || chk.bad || Object.keys(chk.files).length !== n) throw new Error("통합파일을 다시 읽어 확인하지 못했습니다");
+    MINFO = { at: at, n: n, bytes: bytes.byteLength, fresh: [], gone: [], bad: false };
+    return MINFO;
   }
+  async function dropMerge() { await Store.remove(P_MERGE, MERGE); MINFO = null; }
   /* 백데이터 점검 결과: 인식 못 한 파일 · 읽기 실패 · 빠진 달 · 조직 목록 없음 */
   var ISSUES = { skip: [], err: [], gaps: [], dup: [], orgList: true, orders: [] };
   function validDate(d) { if (!d) return false; var m = +d.slice(5, 7), dd = +d.slice(8, 10); return m >= 1 && m <= 12 && dd >= 1 && dd <= 31; }
@@ -133,35 +146,34 @@ var M = (function () {
     return byM;
   }
   async function loadAll(progress) {
-    await scanFiles(); var done = 0, errs = [], all = FILES.slice(), fresh = 0;
+    await scanFiles(); var done = 0, errs = [], all = FILES.slice(), fresh = [];
     var st = await Store.info(P_ROSTER);
+    if (progress) progress(0, all.length, "통합파일 확인 중");
+    var mg = await readMerge(), mf = mg && !mg.bad ? mg.files : {};
     for (var i = 0; i < all.length; i++) {
-      var f = all[i];
+      var f = all[i], s0 = st[f.name] || { size: -1, mt: -1 };
       if (!SNAP[f.name]) {
-        var s0 = st[f.name] || { size: -1, mt: -1 }, c = await cacheGet(f, s0);
+        var t = mf[f.name];
         try {
-          if (!c) {
-            fresh++;
+          if (!t || t.size !== s0.size || t.mt !== s0.mt) {
+            fresh.push(f.name);
             var b = await Store.read(P_ROSTER, f.name); if (!b) throw new Error("파일을 열 수 없음 (다른 프로그램에서 쓰는 중인지 확인)");
-            c = rosterTable(b); if (!c.d.length) throw new Error("사번이 있는 줄이 하나도 없음");
-            await cachePut(f, s0, c);
+            t = rosterTable(b); if (!t.d.length) throw new Error("사번이 있는 줄이 하나도 없음");
           }
-          var p = buildPersons(c);
-          SNAP[f.name] = { file: f, persons: p.persons, headers: p.headers, r: -1 };
+          var p = buildPersons(t);
+          SNAP[f.name] = { file: f, persons: p.persons, headers: p.headers, size: s0.size, mt: s0.mt, r: -1 };
         } catch (e) { errs.push({ name: f.name, why: e.message || String(e) }); }
       }
-      done++; if (progress) progress(done, all.length, fresh);
+      done++; if (progress && (fresh.length || done === all.length)) progress(done, all.length, fresh.length ? "원본 " + fresh.length + "개" : "");
     }
-    /* 원본이 없어진 캐시는 지움 */
-    var keep = {}; all.forEach(function (f) { keep[f.name + ".dat"] = 1; });
-    var cl = await Store.list(P_CACHE); for (var j = 0; j < cl.length; j++) if (!keep[cl[j]]) await Store.remove(P_CACHE, cl[j]);
+    MINFO = mg ? (mg.bad ? { bad: true, fresh: fresh, gone: [] } : { at: mg.at, n: Object.keys(mf).length, bytes: mg.bytes, fresh: fresh, gone: Object.keys(mf).filter(function (n) { return !st[n]; }), bad: false }) : null;
     /* 읽지 못한 파일은 월 목록에서 뺌 (그달이 0명으로 나오지 않게) */
     FILES = FILES.filter(function (f) { return SNAP[f.name]; });
     var byM = monthsOf(); ISSUES.err = errs;
     var on = await Store.list(P_ORGLIST); ISSUES.orgList = on.some(function (n) { return /^조직\s*목록\.xls/i.test(n); });
     var od = await Store.list(P_ORDERS); ISSUES.orders = od.filter(function (n) { return !/\.xls[xm]?$/i.test(n) || !validDate(rosterDate(n)); }).map(function (n) { return { name: n, why: !/\.xls[xm]?$/i.test(n) ? "엑셀 파일이 아님" : "파일 이름에 8자리 날짜가 없음" }; });
     var last = latestFile(); HEADERS = last && SNAP[last.name] ? SNAP[last.name].headers : [];
-    return { files: FILES.length, months: MONTHS.length, errs: errs, byM: byM, fresh: fresh };
+    return { files: FILES.length, months: MONTHS.length, errs: errs, byM: byM, fresh: fresh.length, merged: mg && !mg.bad ? Object.keys(mf).length : 0 };
   }
   function issues() { return ISSUES; }
   function issueCount() { return ISSUES.skip.length + ISSUES.err.length + ISSUES.gaps.length + ISSUES.orders.length + (ISSUES.orgList ? 0 : 1); }
@@ -536,7 +548,7 @@ var M = (function () {
   function exportMaster() { return toWorkbook(); }
 
   return {
-    P_ROSTER: P_ROSTER, P_ORDERS: P_ORDERS, P_ORGLIST: P_ORGLIST, P_DATA: P_DATA, P_BACKUP: P_BACKUP, LVN: LVN, PRIVATE: PRIVATE,
+    P_ROSTER: P_ROSTER, P_ORDERS: P_ORDERS, P_ORGLIST: P_ORGLIST, P_DATA: P_DATA, P_BACKUP: P_BACKUP, P_MERGE: P_MERGE, MERGE: MERGE, buildMerge: buildMerge, dropMerge: dropMerge, get MINFO() { return MINFO; }, LVN: LVN, PRIVATE: PRIVATE,
     get S() { return S; }, get FILES() { return FILES; }, get MONTHS() { return MONTHS; }, get HEADERS() { return HEADERS; }, get newer() { return newer; },
     nid: nid, nm: nm, list: list, byId: byId, kids: kids, path: path, desc: desc, touch: touch, bump: bump, R: R,
     findOrg: findOrg, findGrd: findGrd, findJob: findJob, scanFiles: scanFiles, loadAll: loadAll, issues: issues, issueCount: issueCount, latestFile: latestFile, snap: snap, fileOfMonth: fileOfMonth,

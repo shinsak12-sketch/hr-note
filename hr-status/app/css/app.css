@@ -306,6 +306,17 @@ table.rt{border-collapse:separate;border-spacing:0;min-width:100%;font-size:12.5
 .mmh{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}
 .tblw2{overflow:auto;flex:1}
 .mmh .srch{width:190px}
+.mgw{max-width:860px;margin:0 auto;background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 0 0 1px var(--line),0 10px 24px -16px var(--sh)}
+.mgcards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mgc{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:10px;background:var(--surf);box-shadow:0 1px 3px var(--sh2) inset;animation:mgIn .3s both}
+.mgc:nth-child(2){animation-delay:.05s}.mgc:nth-child(3){animation-delay:.1s}
+.mgc span{font-size:11.5px;color:var(--ink2)}.mgc b{font-size:20px}.mgc em{font-style:normal;font-size:11.5px;color:var(--mute)}
+.mgc.ok b{color:var(--ok)}.mgc.bad b{color:var(--bad)}.mgc.warn b{color:var(--warn)}
+@keyframes mgIn{from{opacity:0;transform:translateY(6px)}}
+.mgp{color:var(--ink2);line-height:1.75;margin:14px 2px}
+.mgb{display:flex;gap:8px}.mgb .btn{padding:8px 16px}
+.mgl{margin-top:14px;padding:10px 12px;border-radius:8px;background:var(--surf);display:flex;flex-wrap:wrap;gap:4px 12px;max-height:220px;overflow:auto}
+.mgl .fsub{width:100%;font-weight:700;font-size:12px;margin-bottom:2px}
 .mmbulk{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:0 12px;max-height:0;overflow:hidden;background:var(--g3);border-bottom:1px solid transparent;transition:max-height .2s,padding .2s}
 .mmbulk.on{max-height:60px;padding:7px 12px;border-bottom-color:var(--g4);box-shadow:0 2px 4px -2px rgba(0,0,0,.12) inset}
 .mmbulk b{color:#14532D;margin-right:4px}
@@ -416,3 +427,4 @@ button.stat{cursor:pointer}
 .mcard{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 0 0 1px var(--line),0 8px 18px -14px var(--sh);display:flex;flex-direction:column;gap:4px}
 .mcard span{color:var(--mute);font-size:11.5px}.mcard b{font-size:22px}.mcard small{color:var(--ink2)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.hp{margin-top:12px;font-size:12px;line-height:1.6;max-height:42vh;overflow:auto}.hp .ul{margin:4px 0 10px;padding-left:18px}

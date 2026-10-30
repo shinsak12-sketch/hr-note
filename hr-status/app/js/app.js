@@ -62,6 +62,7 @@ var App = (function () {
     else if (view === "setting") Setting.render();
     else renderMain();
     var mm = unmatchedCount(); $("#mmN").textContent = mm ? mm : "";
+    var mi = M.MINFO; $("#mgN").textContent = !M.FILES.length ? "" : !mi || mi.bad ? "!" : mi.fresh.length ? mi.fresh.length : "";
   }
   function unmatchedCount() { return UNMATCHED ? UNMATCHED.length : 0; }
   function renderMain() {
@@ -81,7 +82,15 @@ var App = (function () {
       ["Ctrl + F", "줄 찾기 (Enter = 다음)"], ["Ctrl + PageUp / Down", "시트 넘기기"], ["Ctrl + Z / Y", "설정 · 분류 기준 실행 취소 · 다시 실행 (최근 100번)"],
       ["Ctrl + S", "바로 저장"], ["Esc", "선택 · 팝업 닫기"], ["F1", "이 도움말"]
     ].map(function (k) { return "<kbd>" + k[0] + "</kbd><span>" + k[1] + "</span>"; }).join("") +
-      '</div><p class="fs">자료: <b>백데이터\\설정\\직원명부\\직원명부_YYYYMMDD.xlsx</b> (날짜 = 기준일, 달마다 가장 늦은 날짜 파일을 그달 말 인원으로 씀) · <b>조직목록\\조직 목록.xlsx</b> · <b>발령검색\\발령검색_YYYYMMDD.xlsx</b> (인력현황 다음 단계에서 사용)</p>' +
+      '</div><div class="hp"><b>자료 넣는 곳</b><ul class="ul">' +
+      '<li><b>백데이터\\설정\\직원명부</b> — 파일 이름에 날짜 8자리 (예: 직원명부_20261030.xlsx) · 달마다 가장 늦은 날짜 파일을 그달 말 인원으로 씀 · 첫 시트 위 10줄 안에 사번 · 소속 머리글</li>' +
+      '<li><b>백데이터\\설정\\조직목록\\조직 목록.xlsx</b> — 바뀌면 보관 폴더에 날짜 붙여 자동 보관</li>' +
+      '<li><b>백데이터\\설정\\발령검색</b> — 발령검색_YYYYMMDD.xlsx (인력현황 다음 단계에서 씀)</li>' +
+      '<li>인식 못 한 파일 · 빠진 달은 제목 줄 노란 <b>⚠ 백데이터 확인</b> 칩으로 알려 줌</li></ul>' +
+      '<b>빨리 열기</b><ul class="ul"><li>설정 › <b>명부 통합</b> › [통합파일 만들기] → 다음부터 통합파일 1개 + 새로 넣은 명부만 읽음 (백데이터\\통합)</li><li>새 명부가 몇 달 쌓이면 [다시 만들기]</li></ul>' +
+      '<b>업데이트</b><ul class="ul"><li>프로그램을 닫고 새 <b>인력현황.html · app 폴더</b>만 덮어쓰기 — 백데이터 · data · backup 은 건드리지 않음</li>' +
+      '<li>열면 기존 data\\기준정보.xlsx 를 backup 에 먼저 복사 · 이상하면 설정 › ⟲ 백업 복원</li>' +
+      '<li>설정은 data\\기준정보.xlsx 에 자동 저장 · 저장 때마다 다시 읽어 확인 · 30분마다 / 하루 첫 저장 전 backup</li></ul></div>' +
       '<div class="foot"><button class="btn" data-x>닫기</button></div>');
   }
 
@@ -92,6 +101,13 @@ var App = (function () {
     btns.forEach(function (x) { var e = document.createElement("button"); e.className = "btn " + (x.primary ? "pri big" : "big"); e.textContent = x.label; e.onclick = x.fn; b.appendChild(e); });
   }
   function askFolder() { Store.pick().then(openFolder, function (e) { if (e && e.name !== "AbortError") U.toast("폴더를 연결하지 못했습니다: " + (e.message || e), true); }); }
+  function prog(d, n, t) { setSave("busy", d ? "직원명부 " + d + "/" + n + (t ? " · " + t : "") : t || "직원명부 확인 중"); }
+  /* 통합파일 안내: 없으면 만들라고, 새 명부가 많으면 다시 만들라고 */
+  function mergeHint(r) {
+    var mi = M.MINFO;
+    if (mi && mi.bad) { U.toast("백데이터\\통합\\" + M.MERGE + " 를 읽지 못해 원본에서 읽었습니다. 설정 › 명부 통합에서 다시 만드세요.", true, 8000); return; }
+    if (!mi && M.FILES.length >= 6) U.toast("직원명부 " + M.FILES.length + "개를 원본에서 읽었습니다. 설정 › 명부 통합 › [통합파일 만들기] 를 하면 다음부터 빨리 열립니다.", false, 8000);
+  }
   async function openFolder() {
     $("#cover").hidden = true; $("#folderName").textContent = "📁 " + Store.name();
     try {
@@ -103,7 +119,7 @@ var App = (function () {
       if (ld.updated) U.toast("프로그램이 " + M.APP_VER + " 로 바뀌었습니다. 기존 기준정보는 backup\\기준정보_업데이트전_v" + ld.updated + "_… 로 먼저 보관했습니다.", false, 6000);
       if (ld.migrated) U.toast("이전 형식(v" + ld.from + ") 기준정보를 새 형식으로 바꿨습니다. 원본은 backup 폴더에 있습니다.", false, 6000);
       M.reset();
-      var r = await M.loadAll(function (d, n, f) { setSave("busy", "직원명부 읽는 중 " + d + "/" + n + (f ? " · 새 파일 " + f + "개" : "")); });
+      var r = await M.loadAll(prog);
       fileChip(!(ld.fresh || !M.S.org.length));
       var ol = await M.readOrgList();
       ready = true;
@@ -112,13 +128,14 @@ var App = (function () {
       if (ld.fresh || !M.S.org.length) {
         go("setting"); Setting.tab("org");
         if (!M.FILES.length) U.toast("백데이터\\설정\\직원명부 폴더에 직원명부_20261030.xlsx 같은 파일을 넣고 ↻ 다시 읽기를 누르세요", false, 9000);
-        else Setting.firstRun();
+        else { Setting.firstRun(); mergeHint(r); }
         return;
       }
       unmatched(true);
       var v = "board"; try { v = localStorage.getItem("hrs.view") || "board"; } catch (e) { }
       go(v === "help" ? "board" : v);
-      U.toast("직원명부 " + r.files + "개 · " + r.months + "개월 읽음" + (r.fresh ? " · 새 파일 " + r.fresh + "개는 cache 폴더에 저장 (다음부터 빠르게 열림)" : ""), false, r.fresh ? 6000 : 3000);
+      U.toast("직원명부 " + r.files + "개 · " + r.months + "개월 읽음" + (r.merged ? " (통합파일 " + (r.files - r.fresh) + " + 원본 " + r.fresh + ")" : ""));
+      mergeHint(r);
     } catch (e) {
       setSave("error", "오류"); U.toast("폴더를 읽지 못했습니다: " + (e.message || e), true, 9000); console.error(e);
     }
@@ -126,10 +143,11 @@ var App = (function () {
   async function reload() {
     if (!ready) return;
     M.reset(); M.clearCache(); M.touch();
-    var r = await M.loadAll(function (d, n, f) { setSave("busy", "직원명부 읽는 중 " + d + "/" + n + (f ? " · 새 파일 " + f + "개" : "")); });
+    var r = await M.loadAll(prog);
     var ol = await M.readOrgList(); if (ol.list.changed) scheduleSave();
     setSave("ok", "다시 읽음"); unmatched(true); render(); fileChip(true);
-    if (!M.issueCount()) U.toast("백데이터를 다시 읽었습니다 · 직원명부 " + r.files + "개 · 문제 없음");
+    if (M.MINFO && M.MINFO.bad) mergeHint(r);
+    else if (!M.issueCount()) U.toast("백데이터를 다시 읽었습니다 · 직원명부 " + r.files + "개" + (r.merged ? " (통합파일 " + (r.files - r.fresh) + " + 원본 " + r.fresh + ")" : "") + " · 문제 없음");
   }
 
   /* ── 백데이터 점검 알림 ── */
