@@ -3596,7 +3596,19 @@
     if (act === "coins") {
       $("eggCoins").innerHTML = range(12).map(function (i) { return '<i style="left:' + (8 + Math.random() * 84).toFixed(0) + "%;animation-delay:" + (Math.random() * 0.8).toFixed(2) + 's">💰</i>'; }).join("");
     } else $("eggCoins").innerHTML = "";
-    eggTimer = setTimeout(function () { box.classList.add("bye"); eggTimer = setTimeout(function () { box.hidden = true; box.className = "egg"; }, 700); }, 5200);
+    eggTimer = setTimeout(eggHide, 5200);
+    if (!box.dataset.b) {
+      box.dataset.b = 1;
+      box.addEventListener("click", function (e) { if (!e.target.closest("#eggBody")) eggHide(); }); // 빈 바탕을 누르면 바로 들어감 (캐릭터는 한 번 더)
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !box.hidden) eggHide(); });
+    }
+  }
+  function eggHide() {
+    var box = $("egg");
+    if (box.hidden || box.classList.contains("bye")) return;
+    clearTimeout(eggTimer);
+    box.classList.add("bye");
+    eggTimer = setTimeout(function () { box.hidden = true; box.className = "egg"; }, 450);
   }
 
   /* ---------- 매월 첫 실행: 지난 달 더존 자료가 아직이면 안내 (그 달에 한 번) ---------- */

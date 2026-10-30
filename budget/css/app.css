@@ -898,7 +898,9 @@ select.itsel.pinned{border-color:var(--pri);color:var(--pri);font-weight:700}
 .egg.coins .egg-svg{animation:egg-jump .6s .5s 2 ease-in-out}
 .egg-coins{position:absolute;inset:0;overflow:hidden;pointer-events:none}
 .egg-coins i{position:absolute;top:-40px;font-size:26px;font-style:normal;animation:egg-coin 2.2s ease-in forwards}
-.egg.bye .egg-body{animation:egg-out .7s ease-in forwards}
+.egg.bye .egg-body{animation:egg-out .45s ease-in forwards}
+.egg.on{pointer-events:auto;cursor:pointer}
+.egg.bye{pointer-events:none}
 .egg .m-leg,.egg .m-leg2{animation:m-walk .35s infinite steps(2)}
 @keyframes egg-in{0%{transform:translateY(60vh) scale(.3);opacity:0}100%{transform:none;opacity:1}}
 @keyframes egg-out{to{transform:translateY(-40vh) scale(.4);opacity:0}}
