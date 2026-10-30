@@ -3932,9 +3932,9 @@
     });
     return best;
   }
-  // X.lines → {acts: {id:[12]}, un: {code:{code,name,m:[12],n}}, ex: [12], items: {id: {항목ID|_rest: [12]}}}
+  // X.lines → {acts: {id:[12]}, cnt: {id:[12] 전표 건수}, un: {code:{code,name,m:[12],n}}, ex: [12], items: {id: {항목ID|_rest: [12]}}}
   function xCompute() {
-    var ix = dzIndex(), acts = {}, un = {}, ex = new Array(12).fill(0), base = planBase(), imap = {}, iacts = {};
+    var ix = dzIndex(), acts = {}, cnt = {}, un = {}, ex = new Array(12).fill(0), base = planBase(), imap = {}, iacts = {}, icnt = {};
     (X ? X.lines : []).forEach(function (l) {
       var mi = l.m - 1;
       if (mi < 0 || mi > 11) return;
@@ -3942,14 +3942,15 @@
       var id = ix.leaf(l);
       if (id) {
         (acts[id] = acts[id] || new Array(12).fill(0))[mi] += l.amt;
+        (cnt[id] = cnt[id] || new Array(12).fill(0))[mi]++;
         var its = imap[id] || (imap[id] = itemsOf(id, base));
-        if (its.length) { var iid = lineItem(l, id, its) || "_rest", o = iacts[id] = iacts[id] || {}; (o[iid] = o[iid] || new Array(12).fill(0))[mi] += l.amt; }
+        if (its.length) { var iid = lineItem(l, id, its) || "_rest", o = iacts[id] = iacts[id] || {}, oc = icnt[id] = icnt[id] || {}; (o[iid] = o[iid] || new Array(12).fill(0))[mi] += l.amt; (oc[iid] = oc[iid] || new Array(12).fill(0))[mi]++; }
         return;
       }
       var k = l.code || l.name, u = un[k] = un[k] || { code: l.code, name: l.name, m: new Array(12).fill(0), n: 0 };
       u.m[mi] += l.amt; u.n++;
     });
-    return { acts: acts, un: un, ex: ex, items: iacts };
+    return { acts: acts, cnt: cnt, un: un, ex: ex, items: iacts, icnt: icnt };
   }
   // 계획 월 금액: 마지막 마감본(최종 변경안), 마감 전이면 지금 계획
   function planBase() { var lc = lastClosed(); return lc ? { label: roundLabel(lc.n), snap: lc.snap } : { label: "작성 중 계획", snap: null }; }
@@ -3968,7 +3969,7 @@
       if (lf.use === false && !sum12(act) && !all) return;
       var plan = planMonthsOf(lf.id, base), avg = M ? sum12(act, M) / M : 0;
       var cmp = XU.cmp === "prev" ? (p.pm && p.pm.length === 12 ? p.pm.slice() : new Array(12).fill(0)) : XU.cmp === "avg" ? new Array(12).fill(Math.round(avg)) : plan;
-      out.push({ id: lf.id, l1: t.name, l2: m.name, l3: s ? s.name : "", name: lf.name, dz: lf.dz, out: !!p.out, plan: plan, act: act, cmp: cmp, memo: p.memo, items: itemsOf(lf.id, base), itemActs: C.items[lf.id] || {} });
+      out.push({ id: lf.id, l1: t.name, l2: m.name, l3: s ? s.name : "", name: lf.name, dz: lf.dz, out: !!p.out, plan: plan, act: act, n: C.cnt[lf.id] || new Array(12).fill(0), cmp: cmp, memo: p.memo, items: itemsOf(lf.id, base), itemActs: C.items[lf.id] || {}, itemCnt: C.icnt[lf.id] || {} });
     });
     XL = { C: C, base: base, M: M };
     return out;
@@ -4176,8 +4177,8 @@
       groups[gi[r.l1]].rows.push(r);
     });
     var agg = function (list) {
-      var o = { plan: new Array(12).fill(0), act: new Array(12).fill(0), cmp: new Array(12).fill(0), fc: 0 };
-      list.forEach(function (r) { for (var i = 0; i < 12; i++) { o.plan[i] += r.plan[i]; o.act[i] += r.act[i]; o.cmp[i] += r.cmp[i]; } o.fc += r.fc; });
+      var o = { plan: new Array(12).fill(0), act: new Array(12).fill(0), cmp: new Array(12).fill(0), n: new Array(12).fill(0), fc: 0 };
+      list.forEach(function (r) { for (var i = 0; i < 12; i++) { o.plan[i] += r.plan[i]; o.act[i] += r.act[i]; o.cmp[i] += r.cmp[i]; o.n[i] += r.n[i]; } o.fc += r.fc; });
       return o;
     };
     var sk = XU.sort && XU.sort.k, sd = XU.sort ? XU.sort.dir : 1, sv = function (o) { var c = xCell(o, sk, U, M); return c.v === null || isNaN(c.v) ? NaN : c.v; };
@@ -4215,13 +4216,15 @@
       if (starts[k]) cls += " mstart";
       if (c.act) {
         cls += " lnk";
+        var nt = cntTxt(o, c.ms);
         if (row) {
           var mk = X.memos[memoKeyOf(o.id, c.b)];
           if (mk) cls += " hasmemo";
           if (HLM && c.ms && c.ms.some(function (m) { return HLM[o.id + "|" + m]; })) cls += " hlmark";
           if (c.ms && rowAlerts(o.id).some(function (a) { return c.ms.indexOf(a.m) >= 0; })) cls += " chgd";
-          return '<td class="' + cls + '" data-k="' + k + '"' + (mk ? ' data-memo="' + esc(mk.text) + '"' : "") + ">" + txt + "</td>";
+          return '<td class="' + cls + '" data-k="' + k + '"' + (mk ? ' data-memo="' + esc("[" + nt + "] " + mk.text) + '"' : ' title="' + nt + ' · 누르면 내역"') + ">" + txt + "</td>";
         }
+        return '<td class="' + cls + '" data-k="' + k + '" title="' + nt + '">' + txt + "</td>";
       }
       if (c.warn) { cls += " r1"; txt += " ⚠"; }
       if (k === "rate" && !isNaN(c.v) && M) {
@@ -4278,16 +4281,22 @@
     xFreeze();
   }
   // 확정 항목 줄 (계정 아래): 항목마다 계획 · 집행 + 나머지
+  // 집행 칸 툴팁: 전표 건수 (한 달이면 그 달, 여러 달이면 기간)
+  function cntTxt(o, ms) {
+    if (!o.n || !ms || !ms.length) return "전표 0건";
+    var t = 0; ms.forEach(function (m) { t += o.n[m - 1] || 0; });
+    return "전표 " + t.toLocaleString() + "건" + (ms.length > 1 ? " (" + ms[0] + "~" + ms[ms.length - 1] + "월)" : " (" + ms[0] + "월)");
+  }
   function itemSubs(r) {
     var M = X ? X.month : 0, z = new Array(12).fill(0), out = [], ip = new Array(12).fill(0);
     r.items.forEach(function (it) {
       var pl = Calc.itemMonths(it), ac = r.itemActs[it.id] || z;
       pl.forEach(function (v, i) { ip[i] += v; });
-      var o = { id: r.id, iid: it.id, name: it.name, tag: itemTag(it, r), plan: pl, act: ac, cmp: XU.cmp === "plan" ? pl : z };
+      var o = { id: r.id, iid: it.id, name: it.name, tag: itemTag(it, r), plan: pl, act: ac, n: r.itemCnt[it.id] || z, cmp: XU.cmp === "plan" ? pl : z };
       o.fc = xForecast(o); o.judge = itemJudge(pl, ac, M);
       out.push(o);
     });
-    var rp = r.plan.map(function (v, i) { return v - ip[i]; }), ra = r.itemActs._rest || z, ro = { id: r.id, iid: "_rest", name: "나머지", tag: "확정 항목 외", plan: rp, act: ra, cmp: XU.cmp === "plan" ? rp : z };
+    var rp = r.plan.map(function (v, i) { return v - ip[i]; }), ra = r.itemActs._rest || z, ro = { id: r.id, iid: "_rest", name: "나머지", tag: "확정 항목 외", plan: rp, act: ra, n: r.itemCnt._rest || z, cmp: XU.cmp === "plan" ? rp : z };
     ro.fc = xForecast(ro);
     out.push(ro);
     return out;
