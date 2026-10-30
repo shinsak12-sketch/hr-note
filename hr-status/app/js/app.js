@@ -104,7 +104,7 @@ var App = (function () {
       if (ld.migrated) U.toast("이전 형식(v" + ld.from + ") 기준정보를 새 형식으로 바꿨습니다. 원본은 backup 폴더에 있습니다.", false, 6000);
       M.reset();
       var r = await M.loadAll(function (d, n) { setSave("busy", "직원명부 읽는 중 " + d + "/" + n); });
-      if (r.errs.length) U.toast("읽지 못한 파일 " + r.errs.length + "개: " + r.errs[0], true, 8000);
+      fileChip(!(ld.fresh || !M.S.org.length));
       var ol = await M.readOrgList();
       ready = true;
       setSave(M.newer ? "error" : "ok", M.newer ? "읽기 전용 (새 형식)" : "불러옴");
@@ -128,11 +128,32 @@ var App = (function () {
     M.reset(); M.clearCache(); M.touch();
     var r = await M.loadAll(function (d, n) { setSave("busy", "직원명부 읽는 중 " + d + "/" + n); });
     var ol = await M.readOrgList(); if (ol.list.changed) scheduleSave();
-    setSave("ok", "다시 읽음"); unmatched(true); render();
-    U.toast("백데이터를 다시 읽었습니다 · 직원명부 " + r.files + "개" + (r.errs.length ? " · 읽지 못한 파일 " + r.errs.length + "개" : ""));
+    setSave("ok", "다시 읽음"); unmatched(true); render(); fileChip(true);
+    if (!M.issueCount()) U.toast("백데이터를 다시 읽었습니다 · 직원명부 " + r.files + "개 · 문제 없음");
+  }
+
+  /* ── 백데이터 점검 알림 ── */
+  function fileChip(popup) {
+    var n = M.issueCount(), el = $("#fileChip");
+    el.hidden = !n; el.innerHTML = "⚠ 백데이터 확인 " + n;
+    if (n && (popup !== false)) fileIssues();
+  }
+  function fileIssues() {
+    var I = M.issues(), h = "";
+    function sec(title, rows, tip) { if (!rows.length) return ""; return '<div class="isec"><h4>' + title + ' <span class="badb">' + rows.length + "</span></h4>" + (tip ? '<p class="fs">' + tip + "</p>" : "") + '<table class="tbl"><tbody>' + rows.join("") + "</tbody></table></div>"; }
+    h += sec("인식하지 못한 직원명부 파일", I.skip.map(function (x) { return '<tr><td class="mono">' + U.esc(x.name) + '</td><td class="why">' + U.esc(x.why) + "</td></tr>"; }), "파일 이름에 날짜 8자리(예: 직원명부_20261030.xlsx 또는 20261030.xlsx)를 넣어 주세요.");
+    h += sec("읽다가 실패한 직원명부 파일", I.err.map(function (x) { return '<tr><td class="mono">' + U.esc(x.name) + '</td><td class="why">' + U.esc(x.why) + "</td></tr>"; }), "첫 시트 위쪽 10줄 안에 '사번' · '소속' 머리글이 있어야 합니다. 엑셀로 열어 둔 파일이면 닫고 ↻ 다시 읽기.");
+    h += sec("직원명부가 빠진 달", I.gaps.map(function (m) { return '<tr><td class="mono">' + U.fmtM(m) + '</td><td class="why">이 달 파일이 없어 인력현황 표에 이 달 열이 나오지 않습니다</td></tr>'; }), "첫 달과 마지막 달 사이에서 파일이 없는 달입니다.");
+    h += sec("같은 달에 파일이 여러 개", I.dup.map(function (d) { return '<tr><td class="mono">' + U.fmtM(d.m) + "</td><td>" + d.names.map(U.esc).join("<br>") + '</td><td class="fs">사용: ' + U.esc(d.used) + "</td></tr>"; }), "그달 가장 늦은 날짜 파일을 씁니다. 맞으면 그대로 두어도 됩니다.");
+    if (!I.orgList) h += '<div class="isec"><h4>조직 목록 없음</h4><p class="fs">백데이터\\설정\\조직목록 에 <b>조직 목록.xlsx</b> 가 없습니다. 없어도 쓸 수는 있지만 소속코드 · 시작일을 못 가져옵니다.</p></div>';
+    h += sec("인식하지 못한 발령검색 파일", I.orders.map(function (x) { return '<tr><td class="mono">' + U.esc(x.name) + '</td><td class="why">' + U.esc(x.why) + "</td></tr>"; }), "");
+    if (!h) { U.toast("백데이터 문제 없음 · 직원명부 " + M.FILES.length + "개"); return; }
+    U.modal("<h3>백데이터 확인 필요</h3><p>아래 파일은 인력현황에 반영되지 않았습니다. 고친 뒤 [↻ 다시 읽기]를 누르세요.</p>" + h +
+      '<div class="foot"><button class="btn" data-x>닫기</button><button class="btn pri" id="rl">↻ 다시 읽기</button></div>', function (ov, close) { ov.querySelector("#rl").onclick = function () { close(); reload(); }; }, "wide");
   }
 
   function start() {
+    $("#fileChip").addEventListener("click", fileIssues);
     U.$$("[data-go]").forEach(function (a) { a.addEventListener("click", function (e) { e.preventDefault(); go(a.dataset.go); }); });
     $("#saved").addEventListener("click", function () { if (ready) doSave(); });
     document.addEventListener("keydown", function (e) {

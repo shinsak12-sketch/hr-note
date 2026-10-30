@@ -2,7 +2,7 @@
 var M = (function () {
   var P_ROSTER = "백데이터/설정/직원명부", P_ORDERS = "백데이터/설정/발령검색", P_ORGLIST = "백데이터/설정/조직목록",
     P_DATA = "data", P_BACKUP = "backup", MASTER = "기준정보.xlsx";
-  var APP_VER = "0.1.1";
+  var APP_VER = "0.1.2";
   var LVN = { 0: "레벨 미정", 1: "회사", 2: "본부", 3: "부서·파트", 4: "센터" };
   var LVCOL = { "소속6": 1, "소속5": 2, "소속4": 3, "소속3": 4 };
   var PRIVATE = /주민|생년월일|성명|이름|전화|휴대|주소|메일|계좌/;
@@ -73,27 +73,56 @@ var M = (function () {
     }
     return { headers: H.filter(Boolean), persons: out };
   }
+  /* 백데이터 점검 결과: 인식 못 한 파일 · 읽기 실패 · 빠진 달 · 조직 목록 없음 */
+  var ISSUES = { skip: [], err: [], gaps: [], dup: [], orgList: true, orders: [] };
+  function validDate(d) { if (!d) return false; var m = +d.slice(5, 7), dd = +d.slice(8, 10); return m >= 1 && m <= 12 && dd >= 1 && dd <= 31; }
   async function scanFiles() {
-    var names = await Store.list(P_ROSTER);
-    FILES = names.filter(function (n) { return /\.xls[xm]?$/i.test(n) && rosterDate(n); }).map(function (n) { var d = rosterDate(n); return { name: n, date: d, m: d.slice(0, 7) }; })
-      .sort(function (a, b) { return a.date < b.date ? -1 : 1; });
-    var byM = {}; FILES.forEach(function (f) { byM[f.m] = f; });
+    var names = await Store.list(P_ROSTER), skip = [];
+    FILES = [];
+    names.forEach(function (n) {
+      if (/^\.|^desktop\.ini$|^thumbs\.db$/i.test(n)) return;
+      if (!/\.xls[xm]?$/i.test(n)) { skip.push({ name: n, why: "엑셀 파일(.xlsx · .xls)이 아님" }); return; }
+      var d = rosterDate(n);
+      if (!d) { skip.push({ name: n, why: "파일 이름에 8자리 날짜(예: 20261030)가 없음" }); return; }
+      if (!validDate(d)) { skip.push({ name: n, why: "날짜 '" + d + "' 가 올바르지 않음" }); return; }
+      FILES.push({ name: n, date: d, m: d.slice(0, 7) });
+    });
+    FILES.sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+    ISSUES.skip = skip;
+    return { files: FILES };
+  }
+  function monthsOf() {
+    var byM = {}, dup = {};
+    FILES.forEach(function (f) { if (byM[f.m]) (dup[f.m] = dup[f.m] || [byM[f.m].name]).push(f.name); byM[f.m] = f; });
     MONTHS = Object.keys(byM).sort();
-    return { files: FILES, byM: byM };
+    var gaps = []; if (MONTHS.length) for (var m = MONTHS[0]; m < MONTHS[MONTHS.length - 1]; m = U.ym(m, 1)) if (!byM[m]) gaps.push(m);
+    ISSUES.gaps = gaps;
+    ISSUES.dup = Object.keys(dup).map(function (m) { return { m: m, names: dup[m], used: byM[m].name }; });
+    return byM;
   }
   async function loadAll(progress) {
-    var sc = await scanFiles(), done = 0, errs = [];
-    for (var i = 0; i < FILES.length; i++) {
-      var f = FILES[i];
+    await scanFiles(); var done = 0, errs = [], all = FILES.slice();
+    for (var i = 0; i < all.length; i++) {
+      var f = all[i];
       if (!SNAP[f.name]) {
-        try { var b = await Store.read(P_ROSTER, f.name); var p = parseRoster(b, f.date); SNAP[f.name] = { file: f, persons: p.persons, headers: p.headers, r: -1 }; }
-        catch (e) { errs.push(f.name + ": " + (e.message || e)); }
+        try {
+          var b = await Store.read(P_ROSTER, f.name); var p = parseRoster(b, f.date);
+          if (!p.persons.length) throw new Error("사번이 있는 줄이 하나도 없음");
+          SNAP[f.name] = { file: f, persons: p.persons, headers: p.headers, r: -1 };
+        } catch (e) { errs.push({ name: f.name, why: e.message || String(e) }); }
       }
-      done++; if (progress) progress(done, FILES.length);
+      done++; if (progress) progress(done, all.length);
     }
+    /* 읽지 못한 파일은 월 목록에서 뺌 (그달이 0명으로 나오지 않게) */
+    FILES = FILES.filter(function (f) { return SNAP[f.name]; });
+    var byM = monthsOf(); ISSUES.err = errs;
+    var on = await Store.list(P_ORGLIST); ISSUES.orgList = on.some(function (n) { return /^조직\s*목록\.xls/i.test(n); });
+    var od = await Store.list(P_ORDERS); ISSUES.orders = od.filter(function (n) { return !/\.xls[xm]?$/i.test(n) || !validDate(rosterDate(n)); }).map(function (n) { return { name: n, why: !/\.xls[xm]?$/i.test(n) ? "엑셀 파일이 아님" : "파일 이름에 8자리 날짜가 없음" }; });
     var last = latestFile(); HEADERS = last && SNAP[last.name] ? SNAP[last.name].headers : [];
-    return { files: FILES.length, months: MONTHS.length, errs: errs, byM: sc.byM };
+    return { files: FILES.length, months: MONTHS.length, errs: errs, byM: byM };
   }
+  function issues() { return ISSUES; }
+  function issueCount() { return ISSUES.skip.length + ISSUES.err.length + ISSUES.gaps.length + ISSUES.orders.length + (ISSUES.orgList ? 0 : 1); }
   function latestFile() { return FILES.length ? FILES[FILES.length - 1] : null; }
   function fileOfMonth(m) { var f = null; FILES.forEach(function (x) { if (x.m === m) f = x; }); return f; }
   function snap(m) {
@@ -468,7 +497,7 @@ var M = (function () {
     P_ROSTER: P_ROSTER, P_ORDERS: P_ORDERS, P_ORGLIST: P_ORGLIST, P_DATA: P_DATA, P_BACKUP: P_BACKUP, LVN: LVN, PRIVATE: PRIVATE,
     get S() { return S; }, get FILES() { return FILES; }, get MONTHS() { return MONTHS; }, get HEADERS() { return HEADERS; }, get newer() { return newer; },
     nid: nid, nm: nm, list: list, byId: byId, kids: kids, path: path, desc: desc, touch: touch, bump: bump, R: R,
-    findOrg: findOrg, findGrd: findGrd, findJob: findJob, scanFiles: scanFiles, loadAll: loadAll, latestFile: latestFile, snap: snap, fileOfMonth: fileOfMonth,
+    findOrg: findOrg, findGrd: findGrd, findJob: findJob, scanFiles: scanFiles, loadAll: loadAll, issues: issues, issueCount: issueCount, latestFile: latestFile, snap: snap, fileOfMonth: fileOfMonth,
     ctype: ctype, cval: cval, attr: attr, cardOk: cardOk, fltOk: fltOk, hit: hit, typeName: typeName, cardLabel: cardLabel, valLabel: valLabel, fltLabel: fltLabel,
     isPar: isPar, kidsIdx: kidsIdx, ancIdx: ancIdx, assign: assign, clearCache: clearCache,
     readOrgList: readOrgList, autoSetup: autoSetup, defaultSets: defaultSets, scanUnmatched: scanUnmatched,
