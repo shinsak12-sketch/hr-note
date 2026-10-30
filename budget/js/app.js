@@ -26,7 +26,7 @@
   };
   var UI = { sel: null, collapsed: {}, nav: { t: "", m: "", s: "" }, onlyWarn: false, search: "", cell: null, sort: null, filters: {}, freeze: "acc", multi: {}, pagg: "month", cols: {}, hide: {}, itemOpen: {} };
   var undoStack = [], redoStack = [];
-  var saveTimer = null, saving = false, savePending = false, saveFailed = false, masterDirty = false;
+  var saveTimer = null, savePending = false, masterDirty = false;
   var seq = 0; // 새 ID 번호
   var yearLocks = {}; // {연도: {계정 ID: true}} — 올해 이후 마감된 연도에서 금액이 있는 계정
 
@@ -296,15 +296,32 @@
   function unitName() { return S.settings.dispUnit; }
 
   /* ---------- 변경 · 실행 취소 · 자동 저장 ---------- */
-  function snapshot() { return JSON.stringify({ cat: S.cat, plan: S.plan, settings: S.settings, fmt: S.fmt }); }
-  function restoreSnap(s) { var o = JSON.parse(s); S.cat = o.cat; S.plan = o.plan; S.settings = o.settings; S.fmt = o.fmt || {}; masterDirty = true; }
-
+  /* 실행 취소 · 다시 실행 — 계획과 집행(메모 · 서식 · 정상 처리 · 확정 항목 지정 · 줄 순서) 같이, 연도마다 최근 100번
+     기록 하나 = {s: 그 전 상태, label: 무엇을, t: 언제}. 더존 자료 반영은 되돌리지 않음 (지난 달 수정은 ID 로 상태만 되돌림) */
+  function snapshot() {
+    var x = X && X.year === S.year ? { memos: X.memos, pins: X.pins, rules: X.rules, fmt: X.fmt, al: X.alerts.map(function (a) { return [a.id, a.state, a.doneAt, a.reason]; }) } : null;
+    return JSON.stringify({ cat: S.cat, plan: S.plan, settings: S.settings, fmt: S.fmt, x: x });
+  }
+  function restoreSnap(s0) {
+    var o = JSON.parse(s0);
+    if (JSON.stringify(o.cat) !== JSON.stringify(S.cat)) masterDirty = true;
+    S.cat = o.cat; S.plan = o.plan; S.settings = o.settings; S.fmt = o.fmt || {};
+    if (o.x && X && X.year === S.year) {
+      X.memos = o.x.memos || {}; X.pins = o.x.pins || {}; X.rules = o.x.rules || []; X.fmt = o.x.fmt || {};
+      var st = {}; (o.x.al || []).forEach(function (a) { st[a[0]] = a; });
+      X.alerts.forEach(function (a) { var q = st[a.id]; if (q) { a.state = q[1]; a.doneAt = q[2]; a.reason = q[3]; } });
+      xSave(false);
+    }
+  }
+  function pushUndo(label) {
+    undoStack.push({ s: snapshot(), label: label || "변경", t: Store.stamp().slice(5, 16) });
+    if (undoStack.length > 100) undoStack.shift();
+    redoStack = [];
+  }
   // opts.master: 분류(기준정보)도 바뀌는 변경 → 분류 버전 기록 (opts.verKind, opts.verMemo)
   function change(fn, logMsg, opts) {
     opts = opts || {};
-    undoStack.push(snapshot());
-    if (undoStack.length > 100) undoStack.shift();
-    redoStack = [];
+    pushUndo(logMsg);
     fn();
     if (opts.master) { masterDirty = true; addVersion(opts.verKind || "계획 화면", opts.verMemo !== undefined ? opts.verMemo : logMsg); }
     if (logMsg) addLog(logMsg);
@@ -312,59 +329,189 @@
     renderAll();
     scheduleSave();
   }
-  function undo() {
-    if (!undoStack.length) return;
-    redoStack.push(snapshot());
-    restoreSnap(undoStack.pop());
-    addVersion("계획 화면", "실행 취소");
-    addLog("실행 취소");
-    deriveRows(); renderAll(); scheduleSave(); toast("실행 취소했습니다");
+  // 집행 쪽 변경 (되돌릴 수 있게)
+  function xChange(fn, logMsg) {
+    pushUndo(logMsg);
+    fn();
+    if (logMsg) xLog(logMsg);
+    xSave(false);
+    renderAll();
+    renderUndo();
   }
-  function redo() {
-    if (!redoStack.length) return;
-    undoStack.push(snapshot());
-    restoreSnap(redoStack.pop());
-    addVersion("계획 화면", "다시 실행");
-    addLog("다시 실행");
-    deriveRows(); renderAll(); scheduleSave(); toast("다시 실행했습니다");
+  function stepUndo(from, to, verb) {
+    var e = from.pop();
+    to.push({ s: snapshot(), label: e.label, t: e.t });
+    restoreSnap(e.s);
+    return e;
   }
-  function clearUndo() { undoStack = []; redoStack = []; }
+  function undo(n) {
+    n = Math.min(n || 1, undoStack.length);
+    if (!n) return;
+    var last;
+    for (var i = 0; i < n; i++) last = stepUndo(undoStack, redoStack);
+    if (masterDirty) addVersion("계획 화면", "실행 취소");
+    addLog("실행 취소" + (n > 1 ? " " + n + "번" : "") + ": " + last.label);
+    deriveRows(); renderAll(); scheduleSave(); renderUndo();
+    toast("실행 취소" + (n > 1 ? " " + n + "번" : "") + ": " + last.label);
+  }
+  function redo(n) {
+    n = Math.min(n || 1, redoStack.length);
+    if (!n) return;
+    var last;
+    for (var i = 0; i < n; i++) last = stepUndo(redoStack, undoStack);
+    if (masterDirty) addVersion("계획 화면", "다시 실행");
+    addLog("다시 실행" + (n > 1 ? " " + n + "번" : "") + ": " + last.label);
+    deriveRows(); renderAll(); scheduleSave(); renderUndo();
+    toast("다시 실행" + (n > 1 ? " " + n + "번" : "") + ": " + last.label);
+  }
+  function renderUndo() {
+    ["btnUndo", "btnUndoX"].forEach(function (k) { var b = document.getElementById(k); if (b) { b.disabled = !undoStack.length; b.title = undoStack.length ? "실행 취소: " + undoStack[undoStack.length - 1].label + " (Ctrl+Z)" : "실행 취소할 것이 없습니다"; } });
+    ["btnRedo", "btnRedoX"].forEach(function (k) { var b = document.getElementById(k); if (b) { b.disabled = !redoStack.length; b.title = redoStack.length ? "다시 실행: " + redoStack[redoStack.length - 1].label + " (Ctrl+Y)" : "다시 실행할 것이 없습니다"; } });
+  }
+  // 기록 목록: 줄을 누르면 그 시점까지 한 번에
+  function undoList(which) {
+    var redoMode = which === "redo";
+    var draw = function () {
+      var list = (redoMode ? redoStack : undoStack).slice().reverse();
+      $("ulBody").innerHTML = list.length ? '<div class="ul-list">' + list.map(function (e, i) {
+        return '<div class="ul-i" data-ul="' + (i + 1) + '"><span class="ul-n">' + (i + 1) + '</span><span class="ul-t">' + esc(e.t) + "</span>" + esc(e.label) + "</div>";
+      }).join("") + "</div>" : '<div class="cm-empty">' + (redoMode ? "다시 실행할 것이 없습니다" : "실행 취소할 것이 없습니다") + "</div>";
+      dlg.el.querySelectorAll("[data-ulm]").forEach(function (b) { b.classList.toggle("on", (b.getAttribute("data-ulm") === "redo") === redoMode); });
+    };
+    openDialog({ title: "실행 취소 기록", key: "undolist", crumb: (S.year || "") + "년 · 최근 100번 · 연도를 바꾸거나 계획을 마감하면 기록이 비워집니다", width: 620, okText: null, cancelText: "닫기", enterOk: false,
+      body: '<div class="ov-tools"><div class="seg vseg2"><button data-ulm="undo">실행 취소 (' + undoStack.length + ')</button><button data-ulm="redo">다시 실행 (' + redoStack.length + ')</button></div><span class="mute">줄을 누르면 위에서부터 그 줄까지 한 번에 되돌립니다</span></div><div class="mdl-pad ul-wrap" id="ulBody"></div>' });
+    dlg.el.addEventListener("click", function (e) {
+      var m = e.target.closest("[data-ulm]");
+      if (m) { redoMode = m.getAttribute("data-ulm") === "redo"; draw(); return; }
+      var it = e.target.closest("[data-ul]");
+      if (!it) return;
+      var n = +it.getAttribute("data-ul");
+      closeDialog();
+      if (redoMode) redo(n); else undo(n);
+    });
+    dlg.el.addEventListener("mouseover", function (e) {
+      var it = e.target.closest("[data-ul]");
+      dlg.el.querySelectorAll(".ul-i").forEach(function (x) { x.classList.toggle("upto", !!it && +x.getAttribute("data-ul") <= +it.getAttribute("data-ul")); });
+    });
+    draw();
+  }
+  function clearUndo() { undoStack = []; redoStack = []; renderUndo(); }
   function addLog(m) {
     S.log.push({ t: Store.stamp(), m: m });
     if (S.log.length > 2000) S.log.shift();
   }
 
+  /* ---------- 저장 ----------
+     1) 고치면 바로 (0.7초 모아서) 2) 5분마다 (열린 모든 연도) 3) [💾 저장] · Ctrl+S = 바로
+     저장할 내용은 부르는 순간 고정되고, 같은 파일 쓰기는 차례대로 (Store) → 연도를 바꿔도 엉뚱한 연도에 저장되지 않음
+     파일마다 상태(SVS)를 두고, 실패하면 제목 줄 표시를 눌러 다시 (밖에서 바뀜 · 권한 · 보기 전용은 따로 안내) */
+  var SVS = {}, AUTO_EVERY = 5 * 60000;
   function scheduleSave() {
     if (!S.year && !masterDirty) return;
     savePending = true;
-    setSave("saving", "저장 대기…");
+    renderSave();
     clearTimeout(saveTimer);
     saveTimer = setTimeout(doSave, 700);
     renderOthers();
   }
+  // 지금 칸의 계획(+분류)을 저장 — 내용은 지금 이 순간 것으로
   function doSave() {
     clearTimeout(saveTimer);
-    if (saving) { saveTimer = setTimeout(doSave, 300); return Promise.resolve(); }
-    saving = true; savePending = false;
-    setSave("saving", "저장 중…");
-    var wasMaster = masterDirty, st = S;
-    masterDirty = false;
-    var job = (wasMaster ? Store.saveMaster(st.cat, st.ver, st.exclude) : Promise.resolve())
-      .then(function () { return st.year ? Store.save(st) : Store.stamp(); });
-    return job.then(function (t) {
-      saving = false; saveFailed = false;
-      setSave("ok", "자동 저장됨 " + t.slice(11, 16));
-      if (savePending) scheduleSave();
-    }, function (e) {
-      saving = false; saveFailed = true; savePending = true;
-      if (wasMaster) masterDirty = true;
-      setSave("error", "저장 실패 — 클릭해서 다시 저장");
-      toast("저장하지 못했습니다. 엑셀에서 data 폴더의 파일을 열어 두었다면 닫은 뒤 다시 저장하세요. (" + (e && e.name || e) + ")", true, 6000);
+    var st = S, wasMaster = masterDirty, jobs = [];
+    savePending = false; masterDirty = false;
+    if (wasMaster) jobs.push(svRun(Store.MASTER, function () { return Store.saveMaster(st.cat, st.ver, st.exclude); }, function () { masterDirty = true; scheduleSave(); }));
+    if (st.year) jobs.push(svRun(Store.fileName(st.year), function () { return Store.save(st); }, function () { return withYear(st.year, function () { scheduleSave(); }); }));
+    renderSave();
+    return Promise.all(jobs);
+  }
+  // 파일 하나 저장 + 상태 (retry: 다시 저장할 때 부를 것)
+  function svRun(name, fn, retry) {
+    var sv = SVS[name] = SVS[name] || {};
+    sv.st = "saving"; sv.retry = retry;
+    renderSave();
+    var job;
+    try { job = fn(); } catch (e) { job = Promise.reject(e); }
+    return job.then(function () { sv.st = "ok"; sv.at = Store.stamp(); sv.err = null; renderSave(); return true; },
+      function (e) { sv.st = "err"; sv.err = e; renderSave(); svFail(name, e); return false; });
+  }
+  function svFail(name, e) {
+    var n = e && e.name;
+    if (n === "ReadOnly") return;
+    if (n === "ExternalChange") { if (!dlg) externalDialog(name, e); return; }
+    if (n === "NotAllowedError" || n === "SecurityError") { toast("폴더 사용 허용이 풀렸습니다 — 제목 줄의 빨간 표시를 눌러 다시 허용하세요", true, 7000); return; }
+    toast("data\\" + name + " 을(를) 저장하지 못했습니다. 엑셀에서 열어 두었다면 닫고 제목 줄의 빨간 표시를 누르세요 (" + (n || e) + ")", true, 7000);
+  }
+  // 프로그램 밖에서 data 파일이 바뀜 → 다시 불러오기 / 덮어쓰기
+  function externalDialog(name, e) {
+    var at = e && e.at ? Store.stamp(new Date(e.at)).slice(5, 16) : "";
+    openDialog({
+      title: "파일이 프로그램 밖에서 바뀌었습니다", key: "external", width: 560, danger: true, okText: "덮어쓰기 (프로그램 내용으로 저장)", cancelText: "나중에",
+      body: '<div class="mdl-pad msg"><b>data\\' + esc(name) + "</b> 이(가) " + (at ? at + " 에 " : "") + "프로그램이 아닌 곳(엑셀 등)에서 바뀌었습니다.<br>그대로 저장하면 밖에서 고친 내용이 지워집니다.<br><br>" +
+        "• <b>다시 불러오기</b>: 밖에서 고친 파일을 읽어 옵니다 (프로그램에서 아직 저장 안 된 것은 버림)<br>• <b>덮어쓰기</b>: 지금 프로그램 내용으로 저장합니다 (밖에서 고친 파일은 backup 폴더에 남김)</div>",
+      extra: '<button class="btn" id="exReload">다시 불러오기</button>',
+      onOk: function () { var sv = SVS[name]; Store.acceptExternal(name).then(function () { if (sv && sv.retry) sv.retry(); }); toast("덮어써서 저장합니다"); }
+    });
+    $("exReload").addEventListener("click", function () {
+      closeDialog();
+      SVS[name] = { st: "ok", at: Store.stamp() };
+      Store.acceptExternal(name).then(function () {
+        if (name === Store.MASTER) return Store.loadMaster().then(function (mst) { if (mst) { S.cat = mst.cat; S.ver = mst.ver; S.exclude = mst.exclude || []; ensureIds(S.cat); } return loadYear(S.year); });
+        var m = /(\d{4})/.exec(name), y = m ? +m[1] : S.year;
+        return withYear(y, function () { savePending = false; clearTimeout(saveTimer); return /^집행/.test(name) ? (delete XQ[y], loadExecFor(y)) : loadYear(y); });
+      }).then(function () { renderSave(); toast("밖에서 바뀐 파일을 다시 읽었습니다"); });
     });
   }
+  // 그 연도를 띄운 칸에서 실행 (없으면 지금 칸)
+  function withYear(y, fn) { var p = PANES.filter(function (q) { return (q === ACT ? S.year : q.year) === y; })[0]; return withPane(p || ACT, fn); }
+  // 기다리는 것 · 쓰는 중인 것 모두 끝날 때까지
   function flushSave() {
-    if (savePending || saving) return doSave();
-    return Promise.resolve();
+    var a = savePending || masterDirty ? doSave() : null, b = xFlush();
+    return Promise.all([a, b]).then(function () { return Store.idle(); });
+  }
+  // 저장 버튼 · Ctrl+S · 5분마다: 열린 모든 연도의 계획 · 집행 + 분류
+  function saveAll(why) {
+    if (Store.readOnly()) { if (why === "button") toast("다른 창에서 열려 있어 이 창은 보기 전용입니다", true, 4000); return Promise.resolve(false); }
+    if (!Store.connected()) return Promise.resolve(false);
+    var done = {}, jobs = [];
+    masterDirty = masterDirty || why === "button";
+    PANES.forEach(function (p) {
+      withPane(p, function () {
+        if (!S.year && !masterDirty) return;
+        if (S.year && done[S.year]) return;
+        done[S.year] = 1;
+        jobs.push(doSave());
+        if (X && X.year === S.year && (X.month || X.lines.length || Object.keys(X.memos).length)) { xSave(false, true); jobs.push(xFlush()); }
+      });
+    });
+    return Promise.all(jobs).then(function () { return Store.idle(); }).then(function () {
+      var bad = Object.keys(SVS).filter(function (k) { return SVS[k].st === "err"; });
+      if (why === "button") toast(bad.length ? "저장하지 못한 파일이 있습니다: " + bad.join(", ") : "저장했습니다 " + Store.stamp().slice(11, 16), !!bad.length, bad.length ? 6000 : 2000);
+      return !bad.length;
+    });
+  }
+  function hasUnsaved() { return savePending || masterDirty || Object.keys(XQ).length > 0 || Object.keys(SVS).some(function (k) { return SVS[k].st === "saving" || SVS[k].st === "err"; }); }
+  // 다시 저장: 실패한 파일 모두 (권한이 풀렸으면 먼저 허용)
+  function retrySaves() {
+    var bad = Object.keys(SVS).filter(function (k) { return SVS[k].st === "err"; });
+    var perm = bad.some(function (k) { var n = SVS[k].err && SVS[k].err.name; return n === "NotAllowedError" || n === "SecurityError"; });
+    var ext = bad.filter(function (k) { return SVS[k].err && SVS[k].err.name === "ExternalChange"; })[0];
+    if (ext) { externalDialog(ext, SVS[ext].err); return; }
+    (perm ? Store.grant() : Promise.resolve(true)).then(function (ok) {
+      if (!ok) { toast("허용되지 않았습니다", true); return; }
+      bad.forEach(function (k) { if (SVS[k].retry) SVS[k].retry(); });
+    });
+  }
+  function renderSave() {
+    var ks = Object.keys(SVS), bad = ks.filter(function (k) { return SVS[k].st === "err"; }), busy = savePending || Object.keys(XQ).length || ks.some(function (k) { return SVS[k].st === "saving"; });
+    var last = ks.map(function (k) { return SVS[k].at || ""; }).sort().pop();
+    if (Store.readOnly()) setSave("off", "보기 전용 — 다른 창에서 열려 있음");
+    else if (bad.length) {
+      var e0 = SVS[bad[0]].err || {}, why = e0.name === "ExternalChange" ? "밖에서 바뀜" : e0.name === "NotAllowedError" || e0.name === "SecurityError" ? "권한 필요" : "저장 실패";
+      setSave("error", why + " (" + bad.map(function (k) { return k.replace(/\.xlsx$/, ""); }).join(", ") + ") — 눌러서 다시");
+    } else if (busy) setSave("saving", "저장 중…");
+    else if (last) setSave("ok", "저장됨 " + last.slice(11, 16));
+    else if (Store.connected()) setSave("ok", "자동 저장 켜짐");
+    $("saveState").title = ks.length ? ks.map(function (k) { var v = SVS[k]; return k + " : " + (v.st === "ok" ? "저장됨 " + (v.at || "").slice(11, 19) : v.st === "saving" ? "저장 중" : "실패 — " + ((v.err && (v.err.message || v.err.name)) || "")); }).join("\n") : "";
   }
   function setSave(kind, text) {
     var el = $("saveState");
@@ -374,6 +521,30 @@
     // 제목 줄 캐릭터: 저장 중엔 바쁘게, 실패하면 고개 흔들기
     $("app").classList.toggle("saving", kind === "saving");
     $("app").classList.toggle("save-error", kind === "error");
+  }
+
+  /* 화면 전체 자료를 새로 띄우기 전에 (연도 바꾸기 · 다시 불러오기 · 새 연도 · 테스트 데이터 · 폴더 바꾸기)
+     저장 안 된 것이 있으면 묻기: 저장하고 계속 / 저장 안 하고 계속 / 취소 */
+  function askSave(next, what) {
+    if (!hasUnsaved()) return flushSave().then(next);
+    return new Promise(function (res) {
+      var choice = null;
+      openDialog({
+        title: "지금까지 작업을 저장할까요?", key: "asksave", width: 520, okText: "저장하고 계속",
+        body: '<div class="mdl-pad msg">' + esc(what || "다른 자료를 불러옵니다") + ".<br>아직 저장되지 않은 작업이 있습니다.</div>",
+        extra: '<button class="btn danger" id="asNo">저장 안 하고 계속</button>',
+        onOk: function () { choice = "save"; },
+        onClose: function () {
+          if (choice === "save") flushSave().then(function () {
+            if (Object.keys(SVS).some(function (k) { return SVS[k].st === "err"; })) { toast("저장하지 못해 멈췄습니다 — 제목 줄 표시를 확인하세요", true, 5000); return res(); }
+            res(next());
+          });
+          else if (choice === "drop") { clearTimeout(saveTimer); savePending = false; masterDirty = false; XQ = {}; clearTimeout(xTimer); Object.keys(SVS).forEach(function (k) { if (SVS[k].st === "err") SVS[k] = { st: "ok", at: SVS[k].at }; }); renderSave(); res(next()); }
+          else res();
+        }
+      });
+      $("asNo").addEventListener("click", function () { choice = "drop"; closeDialog(); });
+    });
   }
 
   /* ---------- 계산 결과 묶음 ---------- */
@@ -426,8 +597,7 @@
     if (MODE === "exec") { renderExec(); renderNav(LAST); renderLock(); paneHead(); $("fileName").textContent = S.year ? "— " + Store.execName(S.year) : ""; return; }
     renderTable(LAST); renderSummary(LAST); renderNav(LAST); renderBars(); renderStatus(LAST); renderLock(); renderTools(); paneHead();
     $("fileName").textContent = S.year ? "— " + Store.fileName(S.year) : "";
-    $("btnUndo").disabled = !undoStack.length;
-    $("btnRedo").disabled = !redoStack.length;
+    renderUndo();
     $("btnWarn").classList.toggle("on", UI.onlyWarn);
     $("pAgg").querySelectorAll("[data-pa]").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-pa") === UI.pagg); });
     var anyOpen = LAST.groups.some(function (g) { return !UI.collapsed[g.name]; });
@@ -597,6 +767,9 @@
       return '<td class="num' + (k === "before" ? " c-before" : "") + '" data-k="' + k + '">' + u(groupVal(g, k)) + "</td>";
     };
     var shown = 0, filtered = filtering(), noDrag = filtered || !!UI.sort;
+    var t0 = R.tot;
+    h.push('<tr class="total ttop"><td class="c-acc" data-k="acc">합계' + (filtered ? ' <span class="cnt">(전체 기준)</span>' : "") + "</td>" +
+      cols.map(function (k) { return grpCell({ name: "", prev: t0.prev, plan: t0.plan, before: t0.before, m: t0.m }, k); }).join("") + "</tr>");
     var groups = R.groups.slice();
     if (UI.sort) groups.sort(function (a, b) { return sd * cmpVal(groupVal(a, sk), groupVal(b, sk)); });
     groups.forEach(function (g) {
@@ -634,13 +807,11 @@
         }
       });
     });
-    var t = R.tot;
-    h.push('<tr class="total"><td class="c-acc" data-k="acc">합계' + (filtered ? ' <span class="cnt">(전체 기준)</span>' : "") + "</td>" +
-      cols.map(function (k) { return grpCell({ name: "", prev: t.prev, plan: t.plan, before: t.before, m: t.m }, k); }).join("") + "</tr>");
     h.push("</tbody></table>");
     if (!shown && filtered) h.push('<div class="empty">조건에 맞는 계정이 없습니다.</div>');
     var top = el.scrollTop, left = el.scrollLeft;
     el.innerHTML = h.join("");
+    stickTotal(el);
     fmtPaint(el, S.fmt, "plan");
     applyFreeze();
     markCell();
@@ -681,38 +852,27 @@
       '<span class="vlegend" title="증감률 칸 색">변동 <i class="v1"></i>±10% <i class="v2"></i>±30%</span>';
   }
 
+  /* 요약 띠 (2줄) — 그래프는 나중에 대시보드로. 계정 이름을 누르면 그 계정으로, 확인 필요를 누르면 걸러보기 */
+  function sumSeg(label, html) { return '<span class="sg"><em>' + label + "</em>" + html + "</span>"; }
+  function sumAcc(r, d, base) { return '<a class="sa" data-sel="' + esc(r.id) + '" title="' + esc(r.l1 + " › " + rowLabel(r)) + '">' + esc(r.name) + '</a> <b class="' + (d > 0 ? "upc" : "dnc") + '">' + (base ? pctTxt(d / base, true) : "") + "</b> <small>(" + dTxt(d) + ")</small>"; }
   function renderSummary(R) {
-    var t = R.tot, y = S.year, d = t.plan - t.prev, n = S.rows.length - R.outs, done = n - R.missing;
-    var yoy = t.prev ? t.plan / t.prev - 1 : NaN;
-    var maxI = 0;
-    t.m.forEach(function (v, i) { if (v > t.m[maxI]) maxI = i; });
-    var lc = lastClosed(), sub;
-    if (R.base) { var dd = t.plan - t.before; sub = roundLabel(R.base.n) + " " + u(t.before, true) + " · " + (dd >= 0 ? "+" : "") + u(dd, true); }
-    else if (isClosed()) sub = roundLabel(lc.n) + " 마감 · " + lc.closedAt.slice(0, 10);
-    else sub = ((y || 1) - 1) + "년 실적 " + u(t.prev, true);
-    $("kpis").innerHTML = [
-      '<div class="kpi kpi-plan"><div class="k-label">' + (y || "") + '년 계획 총액</div><div class="k-value">' + u(t.plan, true) + "<small>" + unitName() + '</small></div><div class="k-sub">' + sub + "</div></div>",
-      '<div class="kpi"><div class="k-label">전년 대비</div><div class="k-value ' + (yoy > 0 ? "up" : yoy < 0 ? "down" : "") + '">' + (Calc.fmtPct(yoy) || "-") + '</div><div class="k-sub">증감액 ' + (d >= 0 ? "+" : "") + u(d, true) + " " + unitName() + "</div></div>",
-      '<div class="kpi"><div class="k-label">입력 완료</div><div class="k-value">' + done + " / " + n + '<small>계정</small></div><div class="k-prog"><i style="width:' + (n ? done / n * 100 : 0).toFixed(1) + '%"></i></div><div class="k-sub">' +
-        (R.missing ? R.missing + "개 계정 입력 필요" : "모두 입력됨") + (R.checks ? " · 분할 확인 " + R.checks : "") + (R.outs ? " · 계획 외 " + R.outs : "") + (R.base ? " · 변경 " + R.changed : "") + "</div></div>",
-      '<div class="kpi"><div class="k-label">가장 큰 달</div><div class="k-value">' + (t.plan ? (maxI + 1) + "월" : "-") + '</div><div class="k-sub">' + (t.plan ? u(t.m[maxI], true) + " " + unitName() + " (월평균 " + u(t.plan / 12, true) + ")" : "") + "</div></div>"
-    ].join("");
+    var t = R.tot, y = S.year, d = t.plan - t.prev, n = S.rows.length - R.outs, done = n - R.missing, lc = lastClosed(), o0 = S.lock.rounds.length ? S.lock.rounds[0] : null;
+    if (!y) { $("kpis").innerHTML = ""; return; }
+    var st = isClosed() ? "🔒 " + roundLabel(lc.n) + " 마감 (" + lc.closedAt.slice(5, 10) + ")" : isChanging() ? "✎ " + roundLabel(curRound().n) + " 중" : "작성 중 (마감 전)";
+    var vsOrig = o0 && o0.total !== undefined ? t.plan - o0.total : null;
+    var isum = 0, icnt = 0; S.rows.forEach(function (r) { if (r.items.length && r._c && !r._c.missing) { icnt += r.items.length; isum += r._c.itemSum || 0; } });
+    var ch = S.rows.filter(function (r) { return !r.out && r._c && !r._c.missing; }).map(function (r) { return { r: r, d: r._c.plan - Calc.num(r.prev), b: Calc.num(r.prev) }; });
+    var ups = ch.filter(function (x) { return x.d > 0; }).sort(function (a, b) { return b.d - a.d; }).slice(0, 3), dns = ch.filter(function (x) { return x.d < 0; }).sort(function (a, b) { return a.d - b.d; }).slice(0, 3);
+    var w = R.missing + R.checks;
+    $("kpis").innerHTML = '<div class="sl">' +
+      sumSeg(y + "년 계획", "<b class=\"big\">" + u(t.plan, true) + "</b> · 전년 실적 대비 <b class=\"" + (d > 0 ? "upc" : d < 0 ? "dnc" : "") + "\">" + (t.prev ? pctTxt(d / t.prev, true) : "-") + "</b> <small>(" + dTxt(d) + ")</small>") +
+      sumSeg("상태", esc(st) + (vsOrig !== null && Math.round(vsOrig) ? " · 원안 대비 <b>" + (o0.total ? pctTxt(vsOrig / o0.total, true) : "") + "</b> <small>(" + dTxt(vsOrig) + ")</small>" : "")) +
+      (icnt ? sumSeg("확정 항목", icnt + "개 · " + u(isum, true)) : "") + '<span class="su">단위: ' + unitName() + "</span></div>" +
+      '<div class="sl">' + sumSeg("입력", "완료 <b>" + done + " / " + n + "</b>" + (w ? ' · <a class="sa warn" data-sw="warn">확인 필요 ' + w + "</a>" : " · 확인 필요 없음") + (R.outs ? " · 계획 외 " + R.outs : "") + (R.base ? " · 변경 " + R.changed : "")) +
+      sumSeg("많이 늘어난 계정", ups.length ? ups.map(function (x) { return sumAcc(x.r, x.d, x.b); }).join(" · ") : "-") +
+      sumSeg("많이 줄어든 계정", dns.length ? dns.map(function (x) { return sumAcc(x.r, x.d, x.b); }).join(" · ") : "-") + "</div>";
   }
-
-  function renderBars() {
-    var R = LAST, mx = 0;
-    var gs = R.groups.slice().sort(function (a, b) { return b.plan - a.plan; });
-    gs.forEach(function (g) { if (g.plan > mx) mx = g.plan; });
-    $("cats").innerHTML = gs.slice(0, 6).map(function (g) {
-      var share = R.tot.plan ? g.plan / R.tot.plan * 100 : 0;
-      return '<div class="cat" title="' + esc(g.name) + " " + u(g.plan, true) + unitName() + '"><span class="cat-n">' + esc(g.name) +
-        '</span><span class="cat-bar"><i style="width:' + (mx ? g.plan / mx * 100 : 0).toFixed(1) + '%"></i></span><span class="cat-v">' + share.toFixed(1) + "%</span></div>";
-    }).join("") + (gs.length > 6 ? '<div class="cat"><span class="cat-n">외 ' + (gs.length - 6) + "개</span></div>" : "");
-    var mm = Math.max.apply(null, R.tot.m.concat([1]));
-    $("months").innerHTML = '<div class="mbars">' + R.tot.m.map(function (v, i) {
-      return '<div class="mb" title="' + (i + 1) + "월 " + u(v, true) + unitName() + '"><i style="height:' + (Math.max(0, v) / mm * 100).toFixed(1) + '%"></i><span>' + (i + 1) + "</span></div>";
-    }).join("") + "</div>";
-  }
+  function renderBars() { /* 그래프는 대시보드로 옮김 */ }
 
   // 탐색바: 대분류 · 중분류 · 소분류 드롭다운 (위 칸을 고르면 아래 칸 목록이 좁혀짐)
   function renderNav(R) {
@@ -796,7 +956,7 @@
     winFrame(dlg.el, ".mdl-head", o.key || o.cls || String(o.title).replace(/[\d,.\s]+/g, "").slice(0, 16), function () { if (dlg && dlg.onResize) dlg.onResize(); });
     m.querySelectorAll("[data-x]").forEach(function (b) { b.addEventListener("click", closeDialog); });
     var ok = m.querySelector("[data-ok]");
-    if (ok) ok.addEventListener("click", function () { if (!dlg.onOk || dlg.onOk() !== false) closeDialog(); });
+    if (ok) ok.addEventListener("click", function () { if (!dlg.onOk || dlg.onOk() !== false) { if (dlg) dlg._ok = true; closeDialog(); } });
     var first = m.querySelector("input:not([type=radio]):not([type=checkbox]):not([type=file]),select");
     if (first && o.focus !== false) setTimeout(function () { first.focus(); if (first.select) first.select(); }, 30);
     return dlg;
@@ -854,6 +1014,8 @@
   }
   function closeDialog() {
     if (!dlg) return;
+    // 고친 것이 있으면 버릴지 묻기 (확인 버튼으로 닫을 때는 묻지 않음)
+    if (dlg.confirmClose && !dlg._ok && dlg.confirmClose() && !window.confirm("고친 내용이 있습니다. 저장하지 않고 닫을까요?")) return;
     var cb = dlg.onClose;
     dlg = null;
     $("modal").innerHTML = "";
@@ -1172,6 +1334,8 @@
     });
     build();
     buildItems();
+    var init0 = JSON.stringify(d);
+    dlg.confirmClose = function () { if (ro) return false; readAll($("pLeft")); return JSON.stringify(d) !== init0; };
     $("pItems").addEventListener("click", function (e) {
       if (ro) return;
       var del = e.target.closest("[data-del]");
@@ -1191,7 +1355,7 @@
     });
     var clr = $("pClear");
     if (clr) clr.addEventListener("click", function () {
-      closeDialog();
+      dlg._ok = true; closeDialog();
       change(function () { var b = Calc.blankPlan(); b.prev = r.prev; setPlan(r.id, b); }, rowLabel(r) + " 산출 입력 지움");
       toast("입력을 지웠습니다 (Ctrl+Z 로 되돌리기)");
     });
@@ -1523,7 +1687,7 @@
       if (ctl && k.toLowerCase() === "z") { e.preventDefault(); undo(); return; }
       if (ctl && k.toLowerCase() === "y") { e.preventDefault(); redo(); return; }
       if (ctl && k.toLowerCase() === "f") { e.preventDefault(); $("search").focus(); $("search").select(); return; }
-      if (ctl && k.toLowerCase() === "s") { e.preventDefault(); doSave(); return; }
+      if (ctl && k.toLowerCase() === "s") { e.preventDefault(); saveAll("button"); return; }
       if (k === "ArrowDown" || k === "ArrowUp") { e.preventDefault(); moveCell(0, k === "ArrowDown" ? 1 : -1); }
       else if (k === "ArrowLeft" || k === "ArrowRight") { e.preventDefault(); moveCell(k === "ArrowLeft" ? -1 : 1, 0); }
       else if (k === "Tab") { e.preventDefault(); moveCell(e.shiftKey ? -1 : 1, 0); }
@@ -1871,7 +2035,7 @@
     var strip = $("strip"), keep = function () { if (main) try { localStorage.setItem("budget.strip", JSON.stringify(st)); } catch (e) { /* 저장소 막힘 */ } };
     var apply = function () {
       pane.classList.toggle("strip-shut", st.shut);
-      strip.style.height = !st.shut && st.h ? st.h + "px" : "";
+      strip.style.height = !st.shut && st.h ? Math.min(st.h, 110) + "px" : "";
       pane.style.setProperty("--barH", (st.h ? Math.max(18, st.h - 34) : 54) + "px");
       pane.querySelector("#stripBtn").textContent = st.shut ? "▾ 요약 펴기" : "▴ 요약 접기";
     };
@@ -1879,7 +2043,7 @@
     sb.addEventListener("click", function () { st.shut = !st.shut; keep(); apply(); });
     var grip = $("stripGrip"), y0 = 0, h0 = 0, on = false;
     grip.addEventListener("mousedown", function (e) { if (st.shut) return; on = true; y0 = e.clientY; h0 = strip.offsetHeight; e.preventDefault(); document.body.classList.add("resizing"); });
-    document.addEventListener("mousemove", function (e) { if (!on) return; st.h = Math.max(46, Math.min(260, h0 + e.clientY - y0)); apply(); });
+    document.addEventListener("mousemove", function (e) { if (!on) return; st.h = Math.max(40, Math.min(110, h0 + e.clientY - y0)); apply(); });
     document.addEventListener("mouseup", function () { if (on) { on = false; document.body.classList.remove("resizing"); keep(); } });
     grip.addEventListener("dblclick", function () { st.h = 0; keep(); apply(); });
     apply();
@@ -1997,7 +2161,7 @@
     var scr = MODE === "exec" ? "exec" : "plan", ks = FS && FS.scr === scr ? fmtKeys() : [];
     if (!ks.length) { toast("먼저 서식을 바꿀 칸을 누르거나 끌어서 고르세요"); return; }
     if (scr === "exec" && !X) return;
-    var map = scr === "plan" ? clone(S.fmt || {}) : X.fmt;
+    var map = clone((scr === "plan" ? S.fmt : X.fmt) || {});
     var all = ks.every(function (k) { return map[k] && map[k][prop]; });
     ks.forEach(function (k) {
       var f = map[k] || {};
@@ -2008,16 +2172,49 @@
     });
     var what = { b: "굵게", i: "기울임", u: "밑줄", fs: "글씨 크기", fg: "글씨색", bg: "배경색", clear: "서식 지우기" }[prop] + " · " + ks.length + "칸";
     if (scr === "plan") change(function () { S.fmt = map; }, "서식: " + what);
-    else { xLog("서식: " + what); xSave(false); renderAll(); }
+    else xChange(function () { X.fmt = map; }, "서식 (집행): " + what);
   }
-  var FMT_COLORS = ["", "#FFF2B3", "#FDE7E5", "#FAD2CF", "#E6F4EA", "#CEEAD6", "#E8F0FE", "#D2E3FC", "#F3E8FD", "#FEEFC3", "#F1F3F4", "#DADCE0", "#D93025", "#E37400", "#188038", "#1A73E8", "#9334E6", "#202124", "#5F6368", "#B31412"];
+  // 색상표: 회색 6단계 + 10가지 색 × 밝기 5단계 + 최근 쓴 색 + 직접 고르기
+  var FMT_GRAY = ["#FFFFFF", "#F1F3F4", "#DADCE0", "#9AA0A6", "#5F6368", "#000000"];
+  var FMT_HUES = [
+    ["빨강", ["#FDE7E5", "#F6AEA9", "#EA4335", "#C5221F", "#8C1D18"]], ["주황", ["#FEEFE3", "#FBC68F", "#FA7B17", "#D56E0C", "#9C4A00"]],
+    ["노랑", ["#FEF7E0", "#FDE293", "#FBBC04", "#F29900", "#B06000"]], ["연두", ["#F1F8E1", "#D2E9A6", "#9BCB4C", "#6E9E2E", "#47701C"]],
+    ["초록", ["#E6F4EA", "#A8DAB5", "#34A853", "#188038", "#0D652D"]], ["청록", ["#E4F7FB", "#A1E4F0", "#24C1E0", "#129EAF", "#007B83"]],
+    ["하늘", ["#E8F0FE", "#AECBFA", "#4285F4", "#1967D2", "#174EA6"]], ["파랑", ["#E8EAF6", "#9FA8DA", "#3F51B5", "#283593", "#1A237E"]],
+    ["보라", ["#F3E8FD", "#D7AEFB", "#A142F4", "#8430CE", "#681DA8"]], ["분홍", ["#FDE7F3", "#FDCFE8", "#F439A0", "#C92786", "#9C166B"]]
+  ];
+  function fmtLast(prop, v) {
+    var k = "budget.fmtLast." + prop;
+    try { if (v !== undefined) localStorage.setItem(k, v); return localStorage.getItem(k) || (prop === "bg" ? "#FEF7E0" : "#EA4335"); } catch (e) { return prop === "bg" ? "#FEF7E0" : "#EA4335"; }
+  }
+  function fmtRecent(c) {
+    var a = [];
+    try { a = JSON.parse(localStorage.getItem("budget.fmtRecent") || "[]") || []; } catch (e) { a = []; }
+    if (c) { a = [c].concat(a.filter(function (x) { return x !== c; })).slice(0, 10); try { localStorage.setItem("budget.fmtRecent", JSON.stringify(a)); } catch (e) { /* 저장소 막힘 */ } }
+    return a;
+  }
+  function fmtPick(prop, c) {
+    if (c) { fmtLast(prop, c); fmtRecent(c); }
+    document.querySelectorAll('[data-fmt="' + prop + '"] i').forEach(function (i) { i.style.background = fmtLast(prop); });
+    fmtApply(prop, c);
+  }
   function fmtPalette(prop, x, y) {
-    var el = $("fpop");
-    el.innerHTML = '<div class="fp-h">' + (prop === "bg" ? "배경색" : "글씨색") + '</div><div class="fpal">' + FMT_COLORS.map(function (c) {
-      return '<button class="sw' + (c ? "" : " none") + '" data-sw="' + c + '" style="' + (c ? "background:" + c : "") + '" title="' + (c ? c : "없음") + '">' + (c ? "" : "✕") + "</button>";
-    }).join("") + "</div>";
+    var el = $("fpop"), sw = function (c, t) { return '<button class="sw" data-sw="' + c + '" style="background:' + c + '" title="' + (t || c) + '"></button>'; };
+    var rec = fmtRecent();
+    el.innerHTML = '<div class="fp-h">' + (prop === "bg" ? "배경색" : "글씨색") + '</div><div class="fpal-top"><button class="sw none" data-sw="" title="없음 (기본)">✕ 없음</button>' + sw("#FFFFFF", "흰색") + sw("#000000", "검정") + "</div>" +
+      '<div class="fpal-lb">회색</div><div class="fpal g6">' + FMT_GRAY.map(function (c) { return sw(c); }).join("") + "</div>" +
+      '<div class="fpal-lb">색 (위 = 연함 → 아래 = 진함)</div><div class="fpal g10">' + [0, 1, 2, 3, 4].map(function (lv) { return FMT_HUES.map(function (h) { return sw(h[1][lv], h[0] + " " + (lv + 1) + "단계 " + h[1][lv]); }).join(""); }).join("") + "</div>" +
+      (rec.length ? '<div class="fpal-lb">최근 쓴 색</div><div class="fpal g10">' + rec.map(function (c) { return sw(c); }).join("") + "</div>" : "") +
+      '<div class="fpal-lb">직접 고르기</div><div class="fpal-c"><input type="color" id="fpCol" value="' + fmtLast(prop) + '"><input class="inp plain" id="fpHex" value="' + fmtLast(prop) + '" placeholder="#RRGGBB"><button class="btn sm primary" id="fpHexOk">적용</button></div>';
     el._sw = prop; el._cv = null;
     place(el, x, y);
+    $("fpCol").addEventListener("input", function () { $("fpHex").value = this.value.toUpperCase(); });
+    $("fpHexOk").addEventListener("click", function () {
+      var v = $("fpHex").value.trim();
+      if (!/^#?[0-9a-f]{6}$/i.test(v)) { toast("#RRGGBB 형식으로 넣으세요 (예: #1E7B4F)", true); return; }
+      if (v[0] !== "#") v = "#" + v;
+      el._sw = null; closeCtx(); fmtPick(prop, v.toUpperCase());
+    });
   }
   function bindFmt() {
     var down = function (e, tblId) {
@@ -2050,11 +2247,13 @@
       var b = e.target.closest("[data-fmt]");
       if (!b || b.tagName === "SELECT") return;
       var f = b.getAttribute("data-fmt");
-      if (f === "fg" || f === "bg") { var r = b.getBoundingClientRect(); fmtPalette(f, r.left, r.bottom + 2); return; }
+      if (f === "fgm" || f === "bgm") { var r = b.getBoundingClientRect(); fmtPalette(f.slice(0, 2), r.left - 30, r.bottom + 2); return; }
+      if (f === "fg" || f === "bg") { fmtPick(f, fmtLast(f)); return; }
       fmtApply(f);
     });
     document.addEventListener("change", function (e) { var sl = e.target.closest && e.target.closest("select[data-fmt]"); if (sl) { fmtApply("fs", +sl.value || 0); sl.value = ""; } });
-    $("fpop").addEventListener("click", function (e) { var sw = e.target.closest("[data-sw]"), el = $("fpop"); if (!sw || !el._sw) return; var p = el._sw; el._sw = null; closeCtx(); fmtApply(p, sw.getAttribute("data-sw")); });
+    $("fpop").addEventListener("click", function (e) { var sw = e.target.closest("[data-sw]"), el = $("fpop"); if (!sw || !el._sw) return; var p = el._sw; el._sw = null; closeCtx(); fmtPick(p, sw.getAttribute("data-sw")); });
+    ["fg", "bg"].forEach(function (p) { document.querySelectorAll('[data-fmt="' + p + '"] i').forEach(function (i) { i.style.background = fmtLast(p); }); });
   }
 
   /* ---------- 표 열 순서 · 숨기기 (머리글 끌기 · 우클릭) — 보기(월별 · 분기 · 반기 · 누계)마다 기억 ---------- */
@@ -2871,8 +3070,8 @@
 
   /* ---------- 연도 ---------- */
   function fillYearSelect() {
-    $("selYear").innerHTML = S.years.map(function (y) { return '<option value="' + y + '"' + (y === S.year ? " selected" : "") + ">" + y + "년</option>"; }).join("") +
-      '<option value="new">＋ 새 연도…</option>';
+    var h = S.years.map(function (y) { return '<option value="' + y + '"' + (y === S.year ? " selected" : "") + ">" + y + "년</option>"; }).join("") + '<option value="new">＋ 새 연도…</option>';
+    $("selYear").innerHTML = h; $("selYearX").innerHTML = h;
   }
 
   // 0.1 판 파일(코드로 연결)을 분류 ID 로 옮김. 분류에 없으면 새로 만듦
@@ -2910,9 +3109,16 @@
     return moved;
   }
 
+  // 켰을 때 상태: 이번에 처음 여는 연도 파일은 읽기 전에 그대로 보관 (켰을 때로 되돌리기)
+  var START = { files: {}, at: "" };
+  function keepStart(names) {
+    var todo = names.filter(function (n) { return !(n in START.files); });
+    todo.forEach(function (n) { START.files[n] = null; });
+    return Promise.all(todo.map(function (n) { return Store.readRaw(n).then(function (b) { START.files[n] = b; }); }));
+  }
   function loadYear(y) {
     var me = ACT;
-    return Store.load(y).then(function (st) { return withPane(me, function () { return loadYearApply(y, st); }); }, function (e) {
+    return keepStart([Store.fileName(y), Store.execName(y), Store.execLinesName(y)]).then(function () { return Store.load(y); }).then(function (st) { return withPane(me, function () { return loadYearApply(y, st); }); }, function (e) {
       toast(y + "년 파일을 읽지 못했습니다: " + (e && e.message || e), true, 6000);
     });
   }
@@ -2934,7 +3140,7 @@
       syncSettingSelects();
       fillYearSelect();
       renderAll();
-      setSave("ok", st.savedAt ? "마지막 저장 " + st.savedAt.slice(5, 16) : "불러옴");
+      if (Store.readOnly() || Object.keys(SVS).length) renderSave(); else setSave("ok", st.savedAt ? "마지막 저장 " + st.savedAt.slice(5, 16) : "불러옴");
       loadExecFor(y);
       if (st.legacy) {
         addLog("0.1 판 파일을 새 형식(분류 ID)으로 바꿈");
@@ -2956,7 +3162,7 @@
       renderOthers();
     }); });
   }
-  function switchYear(y) { var me = ACT; return flushSave().then(function () { return withPane(me, function () { detachS(); return loadYear(y); }); }).then(function () { savePanes(); }); }
+  function switchYear(y) { var me = ACT; return askSave(function () { return withPane(me, function () { detachS(); return loadYear(y); }); }, y + "년을 불러옵니다").then(function () { savePanes(); fillYearSelect(); paneHead(); }); }
 
   /* 새 연도: 전년 '실적'(집행)을 전년 실적으로 가져옴 (전년 계획을 복사하지 않음)
      집행이 연중이면 연말 예상(1~M월 집행 + 남은 달 계획) 또는 있는 달만 */
@@ -3008,7 +3214,8 @@
         if (!(y >= 2000 && y <= 2100)) { $("nyErr").textContent = "2000 ~ 2100 사이 연도를 넣으세요."; return false; }
         if (S.years.indexOf(y) >= 0) { $("nyErr").textContent = y + "년 파일이 이미 있습니다. 연도 목록에서 고르세요."; return false; }
         if (m === "act" && (!info || info.y0 !== y - 1 || !info.M)) { $("nyErr").textContent = (y - 1) + "년 집행 자료가 없습니다."; return false; }
-        createYear(y, m, m === "act" ? { info: info, how: how } : null);
+        var base0 = m === "act" ? { info: info, how: how } : null;
+        setTimeout(function () { askSave(function () { createYear(y, m, base0); }, y + "년 파일을 만듭니다"); }, 0);
       }
     });
     $("nyYear").addEventListener("change", load);
@@ -3047,7 +3254,7 @@
       return (m ? Store.saveMaster(S.cat, S.ver, S.exclude) : Promise.resolve()).then(function () { return Store.save(S); });
     }).then(function () { return Store.listYears(); }).then(function (ys) {
       S.years = ys; fillYearSelect(); syncSettingSelects(); loadExecFor(y); setMode("plan"); renderAll();
-      setSave("ok", "자동 저장됨 " + Store.stamp().slice(11, 16));
+      renderSave();
       toast(y + "년 파일을 만들었습니다 — data\\" + Store.fileName(y) + (base ? " · 전년 실적을 넣었습니다. 산출 방식은 [일괄 적용]으로 한 번에 넣을 수 있습니다" : ""), false, 5000);
       if (!leafCount(S.cat)) setTimeout(catDialog, 300);
       BUSY--; savePanes(); renderOthers();
@@ -3357,9 +3564,66 @@
     });
   }
 
+  /* ---------- 켰을 때로 되돌리기: 이번에 켰을 때(처음 연) 파일 그대로 — 지금 파일은 backup 에 먼저 남김 ---------- */
+  function restoreStart() {
+    var names = Object.keys(START.files).filter(function (n) { return START.files[n]; });
+    if (!names.length) { toast("되돌릴 것이 없습니다"); return; }
+    if (Store.readOnly()) { toast("보기 전용 창에서는 되돌릴 수 없습니다", true); return; }
+    openDialog({
+      title: "켰을 때로 되돌리기", key: "restore", width: 600, danger: true, okText: "되돌리기",
+      body: '<div class="mdl-pad msg">이번에 프로그램을 켰을 때(<b>' + esc(START.at.slice(5, 16)) + "</b> 부터 처음 연 시점)의 파일로 되돌립니다.<br><br>" +
+        names.map(function (n) { return "• data\\" + esc(n); }).join("<br>") +
+        '<br><br>지금 파일은 먼저 <b>backup</b> 폴더에 남깁니다. 실행 취소 기록은 비워집니다.<br><span class="mute">켜고 나서 새로 만든 파일(새 연도 등)은 그대로 둡니다.</span></div>',
+      onOk: function () {
+        BUSY++;
+        clearTimeout(saveTimer); savePending = false; masterDirty = false; XQ = {}; clearTimeout(xTimer);
+        Store.idle().then(function () {
+          return names.reduce(function (p, n) { return p.then(function () { return Store.writeRaw(n, START.files[n]); }); }, Promise.resolve());
+        }).then(function () { return Store.loadMaster(); }).then(function (mst) {
+          if (mst) { S.cat = mst.cat; S.ver = mst.ver; S.exclude = mst.exclude || []; ensureIds(S.cat); }
+          YD = {};
+          return PANES.reduce(function (p, q) { return p.then(function () { return withPane(q, function () { var y = S.year; if (!y) return; S.year = null; return loadYear(y); }); }); }, Promise.resolve());
+        }).then(function () {
+          SVS = {}; BUSY--; renderAll(); renderOthers(); renderSave();
+          toast("켰을 때 상태로 되돌렸습니다 (지금 것은 backup 폴더에)", false, 5000);
+        }).catch(function (e) { BUSY--; toast("되돌리지 못했습니다: " + (e && (e.message || e.name) || e), true, 6000); });
+      }
+    });
+  }
+
+  /* ---------- 같은 프로그램 창이 둘이면: 나중 창은 보기 전용 (서로 덮어쓰지 않게) ----------
+     localStorage 에 '쓰는 창' 표시를 2초마다 새로 고침. 5초 넘게 소식 없으면 끝난 창으로 봄 */
+  var WIN_ID = Math.random().toString(36).slice(2), ownTimer = null, autoTimer = null;
+  function owner() { try { return JSON.parse(localStorage.getItem("budget.owner") || "null"); } catch (e) { return null; } }
+  function claimOwner() { try { localStorage.setItem("budget.owner", JSON.stringify({ id: WIN_ID, ts: Date.now() })); } catch (e) { /* 저장소 막힘 */ } }
+  function startOwner() {
+    var o = owner();
+    if (o && o.id !== WIN_ID && Date.now() - o.ts < 5000) setReadOnly(true); else { claimOwner(); setReadOnly(false); }
+    clearInterval(ownTimer);
+    ownTimer = setInterval(function () {
+      var cur = owner();
+      if (!Store.readOnly()) { if (cur && cur.id !== WIN_ID && Date.now() - cur.ts < 5000) setReadOnly(true); else claimOwner(); }
+      else if (!cur || Date.now() - cur.ts > 5000) { claimOwner(); setReadOnly(false); toast("다른 창이 닫혀서 이 창에서 저장할 수 있게 됐습니다 — [다시 불러오기]로 최신 내용을 읽으세요", false, 6000); }
+    }, 2000);
+    window.addEventListener("pagehide", function () { var cur = owner(); if (cur && cur.id === WIN_ID) try { localStorage.removeItem("budget.owner"); } catch (e) { /* 저장소 막힘 */ } });
+  }
+  function setReadOnly(b) {
+    Store.setReadOnly(b);
+    $("roBanner").hidden = !b;
+    document.body.classList.toggle("readonly", b);
+    renderSave();
+  }
+  function takeOwner() {
+    claimOwner(); setReadOnly(false);
+    toast("이 창에서 저장합니다. 다른 창은 보기 전용이 됩니다 — 최신 내용을 읽으려면 [다시 불러오기]", false, 6000);
+  }
   function openFolder() {
+    startOwner();
+    clearInterval(autoTimer);
+    autoTimer = setInterval(function () { if (!dlg && !BUSY) saveAll("auto"); }, AUTO_EVERY);
     $("folderInfo").innerHTML = "연결된 폴더: <b>" + esc(Store.folderName()) + "</b><br>data · backup 폴더를 사용합니다";
-    return Promise.all([Store.loadMaster(), Store.listYears()]).then(function (res) {
+    START.at = START.at || Store.stamp();
+    return keepStart([Store.MASTER]).then(function () { return Promise.all([Store.loadMaster(), Store.listYears()]); }).then(function (res) {
       var mst = res[0];
       masterDirty = false;
       if (mst) {
@@ -3412,7 +3676,7 @@
         "2027년 새 연도를 만들면 2026년 실적(1~3월 집행 + 4~12월 계획)으로 시작합니다. 빈 계획으로 만들고 <b>[전년 실적 가져오기]</b>로 위 손익 파일을 넣어 볼 수도 있습니다." +
         (has ? '<br><br><span class="em">이미 2026년 파일이 있습니다. 덮어씁니다 (이전 파일은 backup 폴더에 보관).</span>' : "") + "</div>",
       okText: has ? "덮어쓰고 만들기" : "만들기",
-      onOk: function () { flushSave().then(makeTest2026); }
+      onOk: function () { setTimeout(function () { askSave(makeTest2026, "2026년 테스트 데이터를 만듭니다"); }, 0); }
     });
   }
   // 테스트: 3월 파일까지 집행에 반영해 둠 (4월 파일은 [더존 자료 읽기]로 직접 반영해 보기)
@@ -3524,7 +3788,7 @@
       .then(function () { return Store.listYears(); })
       .then(function (ys) {
         S.years = ys; fillYearSelect(); keepYearLock(); setMode("exec"); renderAll();
-        setSave("ok", "자동 저장됨 " + Store.stamp().slice(11, 16));
+        renderSave();
         toast("2026년 테스트 데이터를 만들었습니다 — 집행은 3월까지 반영돼 있고, [더존 자료 읽기]를 누르면 4월 파일이 들어갑니다 (3월 수정 2건)", false, 7000);
         BUSY--; savePanes(); renderOthers();
       }).catch(function (e) { BUSY--; toast("테스트 데이터를 만들지 못했습니다: " + (e && e.message || e), true, 6000); });
@@ -3538,27 +3802,32 @@
   var MODE = "plan";
   var X = null, PREVX = null, XJN = null; // XJN: 반영한 분개장 전체 줄 (전표 전체 보기용, 필요할 때 읽음)
   var XU = { view: "all", agg: "month", cmp: "plan", upto: 0, sort: null, quick: "", freeze: "acc", sel: null, cols: {}, hide: {}, itemOpen: {} };
-  var xTimer = null, xLinesDirty = false, XL = null, xJob = null;
+  var xTimer = null, XL = null;
   function ensureX() { if (!X || X.year !== S.year) { X = blankX(S.year); XJN = null; } return X; }
   function blankX(y) { return { year: y, month: 0, at: "", src: { jn: "", pl: "" }, files: [], alerts: [], memos: {}, problems: [], log: [], lines: [], pins: {}, rules: [], fmt: {} }; }
   function xPath(y) { return "더존원본/" + (y || S.year); }
   function xLog(m) { X.log.push({ t: Store.stamp(), m: m }); if (X.log.length > 2000) X.log.shift(); }
-  function xSave(lines) {
-    if (lines) xLinesDirty = true;
+  // 집행 저장: 연도마다 기다리는 내용(XQ)을 두고 0.5초 모아서. 내용(X · 보기용 집행 표)은 부르는 순간 것으로 고정
+  var XQ = {};
+  function xSave(lines, now) {
+    if (!X || !X.year) return;
+    var q = XQ[X.year] = XQ[X.year] || { lines: false };
+    q.X = X; q.lines = q.lines || !!lines;
+    q.rows = xRows(true).map(function (r) { return { id: r.id, l1: r.l1, l2: r.l2, l3: r.l3, m: r.act }; });
     clearTimeout(xTimer);
-    setSave("saving", "저장 대기…");
-    xJob = function () {
-      xJob = null;
-      var rows = xRows(true).map(function (r) { return { id: r.id, l1: r.l1, l2: r.l2, l3: r.l3, m: r.act }; }), ld = xLinesDirty, xs = X;
-      xLinesDirty = false;
-      Store.saveExec(xs, rows, ld).then(function (t) { setSave("ok", "자동 저장됨 " + t.slice(11, 16)); },
-        function (e) { xLinesDirty = xLinesDirty || ld; setSave("error", "저장 실패"); toast("집행 자료를 저장하지 못했습니다 (" + (e && e.name || e) + ")", true, 6000); });
-    };
-    xTimer = setTimeout(function () { if (xJob) xJob(); }, 500);
+    renderSave();
+    if (!now) xTimer = setTimeout(xFlush, 500);
     renderOthers();
   }
-  // 칸을 바꾸기 전에: 기다리던 집행 저장을 지금 (그 칸 자료로)
-  function xFlush() { if (xJob) { clearTimeout(xTimer); xJob(); } }
+  function xFlush() {
+    clearTimeout(xTimer);
+    var ys = Object.keys(XQ);
+    if (!ys.length) return Promise.resolve();
+    return Promise.all(ys.map(function (y) {
+      var q = XQ[y]; delete XQ[y];
+      return svRun(Store.execName(y), function () { return Store.saveExec(q.X, q.rows, q.lines); }, function () { if (!XQ[y]) XQ[y] = q; else XQ[y].lines = XQ[y].lines || q.lines; xFlush(); });
+    }));
+  }
 
   // 더존 코드 · 과목명 → 계정 ID (분류의 더존 연결)
   function dzIndex() {
@@ -3718,42 +3987,33 @@
   }
 
   function renderXStrip(rows, U) {
-    var M = X ? X.month : 0, act = 0, cmp = 0, yp = 0, ma = 0, mc = 0, over = 0, outs = 0, fc = 0;
+    var M = X ? X.month : 0, sm = function (a, f, t) { var v = 0; for (var i = f; i <= t; i++) v += a[i - 1] || 0; return v; };
+    var yp = 0, pa = 0, pp = 0, ma = 0, mp = 0, prevM = 0, prevOk = 0, fc = 0, over = 0, un = Object.keys(XL.C.un).length, al = X.alerts.filter(function (a) { return a.state !== "정상"; }).length, judged = 0;
     rows.forEach(function (r) {
-      act += sum12(r.act, U); cmp += sum12(r.cmp, U); yp += sum12(r.plan);
-      if (M) { ma += r.act[M - 1]; mc += r.cmp[M - 1]; }
-      if (sum12(r.act, U) > sum12(r.cmp, U)) over++;
-      if (r.out && sum12(r.act)) outs++;
-      if (sum12(r.plan) && xForecast(r) > sum12(r.plan)) fc++;
+      yp += sum12(r.plan); fc += xForecast(r);
+      if (!M) return;
+      pa += sm(r.act, 1, M); pp += sm(r.plan, 1, M); ma += r.act[M - 1]; mp += r.plan[M - 1];
+      var pm = planFor(r.id).pm; if (pm && pm.length === 12) { prevM += pm[M - 1]; prevOk++; }
+      if (sm(r.act, 1, M) - sm(r.plan, 1, M) > 0) over++;
+      if (r.items.length) itemSubs(r).forEach(function (o) { if (o.judge) judged++; });
     });
-    var cl = CMP[XU.cmp], d = act - cmp, un = Object.keys(XL.C.un).length, al = X.alerts.filter(function (a) { return a.state !== "정상"; }).length;
-    var nx = rows.filter(function (r) { return sum12(r.plan); }).length;
-    $("kpis").innerHTML = !M ? [
-      '<div class="kpi kpi-plan"><div class="k-label">연간 계획 · ' + esc(XL.base.label) + '</div><div class="k-value">' + u(yp, true) + "<small>" + unitName() + '</small></div><div class="k-sub">계획 있는 계정 ' + nx + " / " + rows.length + "</div></div>",
-      '<div class="kpi"><div class="k-label">집행</div><div class="k-value">-</div><div class="k-sub">아직 반영한 더존 자료가 없습니다 — <button class="btn sm" data-act="xRead">더존 자료 읽기</button></div></div>'
-    ].join("") : [
-      '<div class="kpi kpi-plan"><div class="k-label">1~' + U + '월 집행 누계</div><div class="k-value">' + u(act, true) + "<small>" + unitName() + '</small></div><div class="k-sub">연간 계획 ' + u(yp, true) + " 의 " + (yp ? (act / yp * 100).toFixed(1) : "-") + "%</div></div>",
-      '<div class="kpi"><div class="k-label">누계 ' + cl + ' 대비</div><div class="k-value ' + (d > 0 ? "up" : d < 0 ? "down" : "") + '">' + (cmp ? (d >= 0 ? "+" : "−") + Math.abs(d / cmp * 100).toFixed(1) + "%" : "-") + '</div><div class="k-sub">' + cl + " " + u(cmp, true) + " · " + (d >= 0 ? "초과 " : "절감 ") + u(Math.abs(d), true) + "</div></div>",
-      '<div class="kpi"><div class="k-label">' + M + '월 집행</div><div class="k-value">' + u(ma, true) + "<small>" + unitName() + '</small></div><div class="k-sub">' + M + "월 " + cl + " " + u(mc, true) + " · " + (mc ? (ma >= mc ? "+" : "−") + Math.abs((ma - mc) / mc * 100).toFixed(1) + "%" : "") + "</div></div>",
-      '<div class="kpi"><div class="k-label">확인할 것</div><div class="k-value" style="color:var(--up)">' + (over + al + un + fc) + '</div><div class="k-sub">초과 ' + over + " · 연말 초과 예상 " + fc + " · 수정 알림 " + al + " · 미연결 " + un + (outs ? " · 계획 외 " + outs : "") + "</div></div>"
-    ].join("");
-    // 대분류별 집행률
-    var g = {}, order = [];
-    rows.forEach(function (r) { if (!g[r.l1]) { g[r.l1] = { a: 0, p: 0 }; order.push(r.l1); } g[r.l1].a += sum12(r.act, U); g[r.l1].p += sum12(r.plan); });
-    order.sort(function (a, b) { return g[b].a - g[a].a; });
-    $("stripH1").textContent = "대분류별 집행률 (연간 계획 대비)";
-    $("cats").innerHTML = order.slice(0, 6).map(function (n) {
-      var r = g[n].p ? g[n].a / g[n].p : 0;
-      return '<div class="cat" title="' + esc(n) + " " + u(g[n].a, true) + " / " + u(g[n].p, true) + '"><span class="cat-n">' + esc(n) + '</span><span class="cat-bar"><i style="width:' + Math.min(100, r * 100).toFixed(1) + "%" + (r > U / 12 + 0.05 ? ";background:#E8776B" : "") + '"></i></span><span class="cat-v">' + (r * 100).toFixed(1) + "%</span></div>";
-    }).join("") + (order.length > 6 ? '<div class="cat"><span class="cat-n">외 ' + (order.length - 6) + "개</span></div>" : "");
-    var am = new Array(12).fill(0), pm = new Array(12).fill(0);
-    rows.forEach(function (r) { for (var i = 0; i < 12; i++) { am[i] += r.act[i]; pm[i] += r.cmp[i]; } });
-    var mx = Math.max.apply(null, am.concat(pm).concat([1]));
-    $("stripH2").textContent = "월별 집행 (막대) · " + cl + " (선)";
-    $("months").innerHTML = '<div class="mbars xbars">' + am.map(function (v, i) {
-      var none = i >= M;
-      return '<div class="mb" title="' + (i + 1) + "월 집행 " + u(v, true) + " / " + cl + " " + u(pm[i], true) + '"><i class="' + (none ? "none" : v > pm[i] ? "over" : "") + '" style="height:' + ((none ? pm[i] : Math.max(0, v)) / mx * 100).toFixed(1) + '%"></i><s style="bottom:calc(' + (pm[i] / mx * 100).toFixed(1) + '% + 11px)"></s><span>' + (i + 1) + "</span></div>";
-    }).join("") + "</div>";
+    if (!M) {
+      $("kpis").innerHTML = '<div class="sl">' + sumSeg("연간 계획", "<b class=\"big\">" + u(yp, true) + "</b> · " + esc(XL.base.label) + " 기준 · 계획 있는 계정 " + rows.filter(function (r) { return sum12(r.plan); }).length + " / " + rows.length) + '<span class="su">단위: ' + unitName() + "</span></div>" +
+        '<div class="sl">' + sumSeg("집행", '아직 반영한 더존 자료가 없습니다 <button class="btn sm" data-act="xRead">더존 자료 읽기</button>') + "</div>";
+      return;
+    }
+    var d = pa - pp, rate = yp ? pa / yp : NaN, pace = M / 12, dm = ma - mp;
+    var tops = rows.map(function (r) { return { r: r, d: r.act[M - 1] - r.plan[M - 1], b: r.plan[M - 1] }; }).filter(function (x) { return x.d > 0; }).sort(function (a, b) { return b.d - a.d; }).slice(0, 3);
+    var paceTxt = !isFinite(rate) ? "" : rate > pace + 0.05 ? '<b class="upc">빠름</b>' : rate < pace - 0.05 ? '<b class="dnc">느림</b>' : "적정";
+    var chips = [["over", "초과 " + over], ["warn", "지난 달 수정 " + al]].map(function (c) { return '<a class="sa warn" data-sq="' + c[0] + '">' + c[1] + "</a>"; }).join(" · ") + (judged ? " · 항목 판정 " + judged : "") + (un ? ' · <a class="sa warn" data-act="xRead">미연결 ' + un + "</a>" : "");
+    $("kpis").innerHTML = '<div class="sl"><span class="sh">누계 1~' + M + "월</span>" +
+      sumSeg("집행", "<b class=\"big\">" + u(pa, true) + "</b> · 계획 " + u(pp, true) + " · 계획 대비 <b class=\"" + (d > 0 ? "upc" : d < 0 ? "dnc" : "") + "\">" + (pp ? pctTxt(d / pp, true) : "-") + "</b> <small>(" + (d > 0 ? "초과 " : d < 0 ? "절감 " : "") + u(Math.abs(d), true) + ")</small>") +
+      sumSeg("연간 집행률", "<b>" + pctTxt(rate) + "</b> · 시간 " + pctTxt(pace) + " 지남 → " + paceTxt) +
+      sumSeg("연말 예상", "<b>" + u(fc, true) + "</b> · 연간 계획 " + u(yp, true) + (fc > yp ? ' · <b class="upc">초과 예상 ' + u(fc - yp, true) + "</b>" : " · 계획 안")) + '<span class="su">단위: ' + unitName() + "</span></div>" +
+      '<div class="sl"><span class="sh">이번 달 ' + M + "월</span>" +
+      sumSeg("집행", "<b class=\"big\">" + u(ma, true) + "</b> · 계획 대비 <b class=\"" + (dm > 0 ? "upc" : dm < 0 ? "dnc" : "") + "\">" + (mp ? pctTxt(dm / mp, true) : "-") + "</b> <small>(" + dTxt(dm) + ")</small>" + (prevOk && prevM ? " · 전년 " + M + "월 대비 <b>" + pctTxt(ma / prevM - 1, true) + "</b>" : "")) +
+      sumSeg("많이 넘은 계정", tops.length ? tops.map(function (x) { return sumAcc(x.r, x.d, x.b); }).join(" · ") : "없음") +
+      sumSeg("확인할 것", chips) + "</div>";
   }
 
   /* ---------- 집행 표 열 (묶음 단위) ----------
@@ -3869,6 +4129,7 @@
     var ks = xKeys(), starts = {};
     blocks.forEach(function (b) { if (isTri(b) && !cum) starts[xKey(subs[0], b)] = 1; else starts[b] = 1; });
     if (sk) groups.sort(function (a, b) { return sd * cmpVal(sv(agg(a.rows)), sv(agg(b.rows))); });
+    var totalRow = function () { var tot = agg(rows.filter(xVisible)); return '<tr class="total ttop"><td class="c-acc" data-k="acc">합계</td>' + ks.map(function (k) { return cellHtml(tot, k, false); }).join("") + "</tr>"; };
     var cellHtml = function (o, k, row) {
       var c = xCell(o, k, U, M), cls = "num", txt;
       if (c.v === null) return '<td class="num fut' + (starts[k] ? " mstart" : "") + '" data-k="' + k + '"></td>';
@@ -3887,10 +4148,14 @@
         }
       }
       if (c.warn) { cls += " r1"; txt += " ⚠"; }
-      if (k === "rate" && !isNaN(c.v) && M) cls += c.v > M / 12 + 0.05 ? " r1" : "";
+      if (k === "rate" && !isNaN(c.v) && M) {
+        var hot = c.v > M / 12 + 0.05;
+        return '<td class="' + cls + ' ratec" data-k="rate" title="연간 계획 대비 집행 ' + txt + " · 시간 " + Math.round(M / 12 * 100) + '% 지남"><div class="rbar"><i class="' + (hot ? "hot" : "") + '" style="width:' + Math.max(0, Math.min(100, c.v * 100)).toFixed(1) + '%"></i><s style="left:' + (M / 12 * 100).toFixed(1) + '%"></s></div><span>' + txt + "</span></td>";
+      }
       return '<td class="' + cls + '" data-k="' + k + '">' + txt + "</td>";
     };
     var shown = 0;
+    h.push(totalRow());
     groups.forEach(function (g) {
       var list = g.rows.filter(xVisible);
       if (!list.length) return;
@@ -3924,14 +4189,14 @@
         h.push('<tr class="acc unl"><td class="c-acc"><span class="l3">' + esc(dzText(x)) + '</span><span class="cnt">' + x.n + "줄</span></td>" + ks.map(function (kk) { var c = xCell(o, kk, U, M); return '<td class="num">' + (c.act && c.v !== null ? u(c.v) : "") + "</td>"; }).join("") + "</tr>");
       });
     }
-    var tot = agg(rows.filter(xVisible));
-    h.push('<tr class="total"><td class="c-acc" data-k="acc">합계</td>' + ks.map(function (k) { return cellHtml(tot, k, false); }).join("") + "</tr></tbody></table>");
+    h.push("</tbody></table>");
     if (!shown) h.push('<div class="empty">조건에 맞는 계정이 없습니다.</div>');
     var top = el.scrollTop, left = el.scrollLeft;
     el.innerHTML = h.join("");
     // 머리글 2줄: 아랫줄(계획 · 집행 · 증감)은 윗줄 바로 밑에 고정 (안 하면 스크롤할 때 윗줄 위로 올라가 집행률 칸과 어긋남)
     var hr = el.querySelectorAll("thead tr");
     if (hr.length > 1) { var h1 = hr[0].getBoundingClientRect().height; hr[1].querySelectorAll("th").forEach(function (th) { th.style.top = h1 + "px"; }); }
+    stickTotal(el);
     el.scrollTop = top; el.scrollLeft = left;
     fmtPaint(el, X.fmt, "exec");
     xFreeze();
@@ -3966,6 +4231,13 @@
     }
     if (planY && actY && mt(pm.filter(function (m) { return m <= M; })) !== mt(am)) return { k: "시기 차이", cls: "infof", t: "계획 " + mt(pm.filter(function (m) { return m <= M; })) + " → 집행 " + mt(am) + " (금액은 비슷)" };
     return null;
+  }
+  // 합계 줄을 머리글 바로 밑에 고정
+  function stickTotal(el) {
+    var tr = el.querySelector("tr.total.ttop"), th = el.querySelector("thead");
+    if (!tr || !th) return;
+    var hh = th.getBoundingClientRect().height;
+    tr.querySelectorAll("td").forEach(function (td) { td.style.top = hh + "px"; });
   }
   // 칸 메모 키: 월 = c|ID|월번호, 분기 · 반기 · 누계 = c|ID|q2 · h1 · t (예전 0 = 누계)
   function memoKeyOf(id, b) { return "c|" + id + "|" + (/^m\d/.test(b) ? b.slice(1) : b === "t" && X && X.memos["c|" + id + "|0"] ? "0" : b); }
@@ -4308,12 +4580,17 @@
         var h = findLeaf(id); pts.push({ k: "큰 단건", sev: l.amt, id: id, ms: [l.m], li: X.lines.indexOf(l), t: (h ? leafPath(h) : "") + " " + l.m + "월 — " + (l.memo || "(적요 없음)") + " " + u(l.amt, true) + " (그 달의 " + Math.round(l.amt / t * 100) + "%)" });
       }
     });
-    var seen = {};
-    lines.forEach(function (a, i) {
-      for (var j = i + 1; j < lines.length; j++) {
-        var b = lines[j];
-        if (a.amt !== b.amt || a.code !== b.code || (a.ptn || "") !== (b.ptn || "") || (a.no === b.no && a.d === b.d) || a.amt < cfg.min) continue;
-        if (Math.abs(new Date(a.d) - new Date(b.d)) <= 7 * 864e5 && !seen[i]) { seen[i] = 1; var id2 = ix.leaf(a), h2 = findLeaf(id2); pts.push({ k: "중복 의심", sev: a.amt, id: id2, ms: [a.m, b.m], t: (h2 ? leafPath(h2) : "") + " — " + a.d.slice(5) + " · " + b.d.slice(5) + " 같은 금액 " + u(a.amt, true) + (a.ptn ? " · " + a.ptn : "") }); }
+    // 중복 의심: 같은 계정 코드 · 금액 · 거래처끼리 묶고, 묶음 안에서 7일 안 (전표가 많아도 빠르게)
+    var dg = {};
+    lines.forEach(function (l) { if (l.amt >= cfg.min) (dg[l.code + "|" + l.amt + "|" + (l.ptn || "")] = dg[l.code + "|" + l.amt + "|" + (l.ptn || "")] || []).push(l); });
+    Object.keys(dg).forEach(function (k) {
+      var g = dg[k];
+      if (g.length < 2) return;
+      g.sort(function (x, y) { return x.d < y.d ? -1 : x.d > y.d ? 1 : 0; });
+      for (var i = 1; i < g.length; i++) {
+        var a = g[i - 1], b = g[i];
+        if (a.no === b.no && a.d === b.d) continue;
+        if (Math.abs(new Date(a.d) - new Date(b.d)) <= 7 * 864e5) { var id2 = ix.leaf(a), h2 = findLeaf(id2); pts.push({ k: "중복 의심", sev: a.amt, id: id2, ms: [a.m, b.m], t: (h2 ? leafPath(h2) : "") + " — " + a.d.slice(5) + " · " + b.d.slice(5) + " 같은 금액 " + u(a.amt, true) + (a.ptn ? " · " + a.ptn : "") }); break; }
       }
     });
     itemPoints(sc.ids, done, P, M).forEach(function (p) { pts.push(p); });
@@ -4498,8 +4775,8 @@
     ["file", "plan", "exec", "set", "help"].forEach(function (t) { $("rb-" + t).hidden = t !== tab; });
     UI.cell = null; markCell();
     $("fRef").textContent = "-"; $("fVal").innerHTML = ""; $("stSel").textContent = "";
-    if (m === "exec") { $("stripH1").textContent = ""; renderAll(); if (XU.sel) xFbar(XU.sel); else $("fVal").innerHTML = '<span class="mute">집행 칸을 누르면 내역 · 우클릭하면 메모</span>'; }
-    else { $("stripH1").textContent = "대분류별 구성비"; $("stripH2").textContent = "월별 계획"; renderAll(); }
+    if (m === "exec") { renderAll(); if (XU.sel) xFbar(XU.sel); else $("fVal").innerHTML = '<span class="mute">집행 칸을 누르면 내역 · 우클릭하면 메모</span>'; }
+    else renderAll();
   }
 
   /* ---------- 더존 자료 읽기: 파일 확인 → 미연결 → 지난 달 수정 → 대조 검증 · 반영 ---------- */
@@ -4766,12 +5043,16 @@
     var usual = others.length ? oth / others.length * scope.months.length : 0, diff = act - plan;
     var V = { group: "line", sort: "amt-", q: "" };
     // 중복 의심: 같은 금액 · 같은 거래처 · 같은 계정 · 7일 안
-    var dup = {};
-    lines.forEach(function (a, i) {
-      lines.forEach(function (b, j) {
-        if (j <= i || a.amt !== b.amt || a.code !== b.code || (a.ptn || "") !== (b.ptn || "") || a.no === b.no && a.d === b.d) return;
-        if (Math.abs(new Date(a.d) - new Date(b.d)) <= 7 * 864e5) { dup[i] = 1; dup[j] = 1; }
-      });
+    var dup = {}, dg = {};
+    lines.forEach(function (l, i) { var k = l.code + "|" + l.amt + "|" + (l.ptn || ""); (dg[k] = dg[k] || []).push(i); });
+    Object.keys(dg).forEach(function (k) {
+      var g = dg[k];
+      if (g.length < 2) return;
+      g.sort(function (x, y) { return lines[x].d < lines[y].d ? -1 : lines[x].d > lines[y].d ? 1 : 0; });
+      for (var q = 1; q < g.length; q++) {
+        var a = lines[g[q - 1]], b = lines[g[q]];
+        if (!(a.no === b.no && a.d === b.d) && Math.abs(new Date(a.d) - new Date(b.d)) <= 7 * 864e5) { dup[g[q - 1]] = 1; dup[g[q]] = 1; }
+      }
     });
     lines.forEach(function (l, i) { l._i = i; });
     function head() {
@@ -4864,13 +5145,12 @@
       var l = lines[+sl.getAttribute("data-il")], v = sl.value, key = lineKey(l);
       if ($("dtRule") && $("dtRule").checked && v) {
         var mm = (l.memo || "").replace(/\s*\(.*\)\s*$/, "").trim();
-        if (!mm) { toast("적요가 없어 규칙을 만들 수 없습니다 — 이 전표만 지정합니다"); X.pins[key] = v; }
-        else { X.rules.push({ leaf: scope.ids[0], item: v, memo: mm, ptn: "", at: Store.stamp() }); delete X.pins[key]; xLog("확정 항목 규칙: 적요 '" + mm + "' → " + itName(v === "rest" ? null : v)); toast("규칙 저장: 적요에 '" + mm + "' → " + itName(v === "rest" ? null : v)); }
+        if (!mm) { toast("적요가 없어 규칙을 만들 수 없습니다 — 이 전표만 지정합니다"); xChange(function () { X.pins[key] = v; }, "확정 항목 지정: " + l.d + " #" + l.no + " → " + itName(v === "rest" ? null : v)); }
+        else { xChange(function () { X.rules.push({ leaf: scope.ids[0], item: v, memo: mm, ptn: "", at: Store.stamp() }); delete X.pins[key]; }, "확정 항목 규칙: 적요 '" + mm + "' → " + itName(v === "rest" ? null : v)); toast("규칙 저장: 적요에 '" + mm + "' → " + itName(v === "rest" ? null : v)); }
       } else {
-        if (v) X.pins[key] = v; else delete X.pins[key];
-        xLog("확정 항목 지정: " + l.d + " #" + l.no + " " + Calc.fmtWon(l.amt) + "원 → " + (v ? itName(v === "rest" ? null : v) : "자동"));
+        xChange(function () { if (v) X.pins[key] = v; else delete X.pins[key]; }, "확정 항목 지정: " + l.d + " #" + l.no + " " + Calc.fmtWon(l.amt) + "원 → " + (v ? itName(v === "rest" ? null : v) : "자동"));
       }
-      xSave(false); renderAll(); draw();
+      draw();
     });
     $("dtList").addEventListener("dblclick", function (e) {
       var tr = e.target.closest("tr[data-li]");
@@ -4921,11 +5201,12 @@
     $("meNo").addEventListener("click", close);
     $("meOk").addEventListener("click", function () {
       var t = $("meText").value.trim();
-      if (t) X.memos[key] = { text: t, at: Store.stamp().slice(0, 16), label: label }; else delete X.memos[key];
-      xLog("메모 " + (t ? "저장" : "지움") + ": " + label);
-      close(); xSave(false); renderAll(); if (after) after();
+      close();
+      if ((cur ? cur.text : "") === t) return;
+      xChange(function () { if (t) X.memos[key] = { text: t, at: Store.stamp().slice(0, 16), label: label }; else delete X.memos[key]; }, "메모 " + (t ? "저장" : "지움") + ": " + label);
+      if (after) after();
     });
-    if (cur) $("meDel").addEventListener("click", function () { delete X.memos[key]; xLog("메모 지움: " + label); close(); xSave(false); renderAll(); if (after) after(); });
+    if (cur) $("meDel").addEventListener("click", function () { close(); xChange(function () { delete X.memos[key]; }, "메모 지움: " + label); if (after) after(); });
     $("meText").addEventListener("keydown", function (e) { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) $("meOk").click(); if (e.key === "Escape") { e.stopPropagation(); close(); } });
   }
   function bindMemoTip() {
@@ -4993,9 +5274,8 @@
           '<div class="vh-btns"><span style="flex:1"></span><button class="btn" id="alDetail">' + a.m + '월 내역 보기</button><button class="btn primary" id="alOk">정상 처리</button></div>');
       var ok = $("alOk");
       if (ok) ok.addEventListener("click", function () {
-        a.state = "정상"; a.doneAt = Store.stamp(); a.reason = $("alReason").value.trim();
-        xLog("지난 달 수정 정상 처리: " + a.m + "월 " + a.path + (a.reason ? " — " + a.reason : ""));
-        xSave(false); renderAll();
+        var rs = $("alReason").value.trim();
+        xChange(function () { a.state = "정상"; a.doneAt = Store.stamp(); a.reason = rs; }, "지난 달 수정 정상 처리: " + a.m + "월 " + a.path + (rs ? " — " + rs : ""));
         var nx = list.filter(function (x) { return x.state !== "정상"; })[0];
         if (nx) sel = nx.id;
         draw();
@@ -5153,7 +5433,7 @@
       else if (a === "colreset") colReset("exec");
       else if (a === "memo" || a === "unmemo") {
         var key = memoKeyOf(x.id, x.sc.blk);
-        if (a === "unmemo") { delete X.memos[key]; xSave(false); renderAll(); return; }
+        if (a === "unmemo") { xChange(function () { delete X.memos[key]; }, "메모 지움: " + x.sc.title); return; }
         memoEdit(key, x.sc.title + " 집행", x.x, x.y);
       }
     });
@@ -5210,7 +5490,7 @@
     if (p === ACT) return;
     if (editing) commitEdit($("cellEd").value, 0, 0);
     if (savePending) doSave();
-    xFlush();
+    if (Object.keys(XQ).length) xFlush();
     closeCtx(); $("cellEd").hidden = true;
     ctxOut(); ctxIn(p);
     refreshChrome();
@@ -5227,7 +5507,7 @@
     }
     fillYearSelect(); syncSettingSelects(); renderLock();
     $("fileName").textContent = S.year ? "— " + (MODE === "exec" ? Store.execName(S.year) : Store.fileName(S.year)) : "";
-    $("btnUndo").disabled = !undoStack.length; $("btnRedo").disabled = !redoStack.length;
+    renderUndo();
     if (MODE === "exec") { ensureX(); var rows = xRows(false); xStatus(rows, X.month); if (XU.sel) xFbar(XU.sel); else { $("fRef").textContent = "-"; $("fVal").innerHTML = '<span class="mute">집행 칸을 누르면 내역 · 우클릭하면 메모</span>'; $("stSel").textContent = ""; } $("execPill").textContent = "계획 기준: " + XL.base.label; }
     else { LAST = computeAll(); renderStatus(LAST); }
   }
@@ -5353,6 +5633,13 @@
     $("tbl").addEventListener("mousedown", function (e) { fmtDown(e, "tbl"); });
     $("tblX").addEventListener("mousedown", function (e) { fmtDown(e, "tblX"); });
     initStrip();
+    $("kpis").addEventListener("click", function (e) {
+      var a = e.target.closest("[data-sel]");
+      if (a) { var id = a.getAttribute("data-sel"); if (MODE === "exec") { XU.sel = id; renderAll(); var tr = $("tblX").querySelector('tr.acc[data-id="' + id + '"]'); if (tr) tr.scrollIntoView({ block: "center" }); xFbar(id); } else { UI.nav = { t: "", m: "", s: "" }; renderAll(); select(id, true); } return; }
+      if (e.target.closest('[data-sw="warn"]')) { UI.onlyWarn = !UI.onlyWarn; renderAll(); return; }
+      var q = e.target.closest("[data-sq]");
+      if (q) { XU.quick = XU.quick === q.getAttribute("data-sq") ? "" : q.getAttribute("data-sq"); renderAll(); }
+    });
     var me = CUR;
     // 칸 머리: 연도 · 선택 연동 · 닫기
     me.querySelector(".pane-year").addEventListener("change", function () { var v = parseInt(this.value, 10); if (v && v !== S.year) switchYear(v); });
@@ -5485,16 +5772,16 @@
 
   /* ---------- 이벤트 ---------- */
   function act(name) {
-    var needYear = ["importPrev", "export", "addAcc", "editAcc", "delAcc", "openPlan", "toggleAll", "onlyWarn", "undo", "redo", "reload", "lockPlan", "openChange", "cancelChange", "rounds", "bulk", "planTplDown", "planTplUp"];
+    var needYear = ["importPrev", "export", "addAcc", "editAcc", "delAcc", "openPlan", "toggleAll", "onlyWarn", "undo", "redo", "undoList", "redoList", "reload", "lockPlan", "openChange", "cancelChange", "rounds", "bulk", "planTplDown", "planTplUp"];
     if (needYear.indexOf(name) >= 0 && !S.year) { toast("먼저 데이터 폴더를 연결하고 연도를 여세요"); return; }
     switch (name) {
       case "newYear": return Store.connected() ? newYearDialog() : toast("먼저 데이터 폴더를 연결하세요");
-      case "reload": return flushSave().then(function () { return Store.loadMaster(); }).then(function (mst) {
+      case "reload": return askSave(function () { return Store.loadMaster().then(function (mst) {
         if (mst) { S.cat = mst.cat; S.ver = mst.ver; S.exclude = mst.exclude || []; ensureIds(S.cat); }
         return loadYear(S.year);
-      }).then(function () { toast("파일에서 다시 불러왔습니다"); });
+      }).then(function () { toast("파일에서 다시 불러왔습니다"); }); }, "파일에서 다시 불러옵니다");
       case "export": Store.exportReport(S); return toast("보고용 엑셀을 내려받았습니다");
-      case "changeFolder": return flushSave().then(askFolder);
+      case "changeFolder": return askSave(askFolder, "다른 데이터 폴더로 바꿉니다");
       case "catMgr": return catDialog();
       case "verHist": return verDialog();
       case "lockPlan": return closePlan();
@@ -5512,6 +5799,9 @@
       case "calc": return calcToggle();
       case "ribbonReset": return ribbonReset();
       case "testData": return testDataDialog();
+      case "saveAll": return saveAll("button");
+      case "restoreStart": return restoreStart();
+      case "takeOwner": return takeOwner();
       case "manual": return manualDialog();
       case "xRead": return xRead();
       case "xAlerts": return alertsDialog();
@@ -5525,6 +5815,8 @@
       case "onlyWarn": UI.onlyWarn = !UI.onlyWarn; return renderAll();
       case "undo": return undo();
       case "redo": return redo();
+      case "undoList": return undoList("undo");
+      case "redoList": return undoList("redo");
     }
   }
 
@@ -5543,7 +5835,7 @@
       var soon = e.target.closest("[data-soon]");
       if (soon) { toast("'" + soon.getAttribute("data-soon") + "' 화면은 다음 단계에서 만듭니다"); return; }
       if (e.target.closest("#btnWarnChip")) { UI.onlyWarn = !UI.onlyWarn; renderAll(); return; }
-      if (e.target.closest("#saveState") && saveFailed) { doSave(); return; }
+      if (e.target.closest("#saveState") && Object.keys(SVS).some(function (k) { return SVS[k].st === "err"; })) { retrySaves(); return; }
     });
 
     $("cellEd").addEventListener("dblclick", function () { if (!editing) startEdit(false); });
@@ -5574,10 +5866,13 @@
     });
     $("fpop").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); filterApply($("fpop").getAttribute("data-k")); } });
     document.addEventListener("mousedown", function (e) { if (!e.target.closest("#ctx,#fpop")) closeCtx(); });
-    $("selYear").addEventListener("change", function () {
-      var v = this.value;
-      if (v === "new") { fillYearSelect(); newYearDialog(); return; }
-      switchYear(parseInt(v, 10));
+    ["selYear", "selYearX"].forEach(function (k) {
+      $(k).addEventListener("change", function () {
+        var v = this.value;
+        fillYearSelect();
+        if (v === "new") { newYearDialog(); return; }
+        switchYear(parseInt(v, 10));
+      });
     });
     [["selDisp", "dispUnit", "표시 단위"], ["selDispX", "dispUnit", "표시 단위"], ["selRnd", "rndUnit", "반올림 단위"], ["selMode", "rndMode", "반올림 방식"]].forEach(function (x) {
       $(x[0]).addEventListener("change", function () {
@@ -5603,8 +5898,11 @@
       if (!$("cover").hidden) return;
       if (e.target.closest && e.target.closest("#memoEd")) return;
       if ((e.ctrlKey || e.metaKey) && /^[biu]$/i.test(e.key) && FS && !/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) { e.preventDefault(); fmtApply(e.key.toLowerCase()); return; }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); saveAll("button"); return; }
       if (MODE === "exec") {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") { e.preventDefault(); $("search").focus(); $("search").select(); }
+        if ((e.ctrlKey || e.metaKey) && !/INPUT|SELECT|TEXTAREA/.test(e.target.tagName) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(); return; }
+        if ((e.ctrlKey || e.metaKey) && !/INPUT|SELECT|TEXTAREA/.test(e.target.tagName) && e.key.toLowerCase() === "y") { e.preventDefault(); redo(); return; }
         if (e.key === "Escape" && FS) { FS = null; fmtRepaint(); }
         if (e.key === "Escape") { closeCtx(); $("memoEd").hidden = true; }
         return;
@@ -5614,7 +5912,7 @@
       if ((e.ctrlKey || e.metaKey) && k === "z" && !inField) { e.preventDefault(); undo(); return; }
       if ((e.ctrlKey || e.metaKey) && k === "y" && !inField) { e.preventDefault(); redo(); return; }
       if ((e.ctrlKey || e.metaKey) && k === "f") { e.preventDefault(); $("search").focus(); $("search").select(); return; }
-      if ((e.ctrlKey || e.metaKey) && k === "s") { e.preventDefault(); doSave(); return; }
+
       if (inField) { if (e.key === "Escape" && e.target.id === "search") { e.target.value = ""; UI.search = ""; renderAll(); e.target.blur(); } return; }
       if (e.key === "Escape") { closeCtx(); if (Object.keys(UI.multi).length) { UI.multi = {}; renderAll(); } else if (UI.cell) { UI.cell = null; markCell(); } return; }
       if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); moveCell(0, e.key === "ArrowDown" ? 1 : -1); }
@@ -5625,7 +5923,7 @@
     });
 
     window.addEventListener("beforeunload", function (e) {
-      if (savePending || saving) { doSave(); e.preventDefault(); e.returnValue = ""; }
+      if (hasUnsaved()) { doSave(); xFlush(); e.preventDefault(); e.returnValue = ""; }
     });
   }
 

@@ -121,17 +121,42 @@
 
   function fileName(y) { return PREFIX + y + ".xlsx"; }
 
-  function readFile(folder, name) {
+  /* 읽고 쓴 data 파일의 수정 시각을 기억 → 저장 직전에 프로그램 밖에서 바뀌었는지 확인 (바뀌었으면 ExternalChange 오류로 멈춤)
+     READONLY: 같은 프로그램이 다른 창에 열려 있으면 이 창은 파일에 쓰지 않음 */
+  var KNOWN = {}, READONLY = false;
+  function readFile(folder, name, noTrack) {
     return sub(folder).then(function (d) { return d.getFileHandle(name); })
       .then(function (fh) { return fh.getFile(); })
-      .then(function (f) { return f.arrayBuffer(); });
+      .then(function (f) { if (folder === "data" && !noTrack) KNOWN[name] = f.lastModified; return f.arrayBuffer(); });
   }
-
+  // 같은 파일 쓰기는 부른 차례대로 (앞 저장이 늦게 끝나 새 내용을 덮는 일이 없게)
+  var WQ = {};
   function writeFile(folder, name, data) {
-    return sub(folder).then(function (d) { return d.getFileHandle(name, { create: true }); })
-      .then(function (fh) { return fh.createWritable(); })
-      .then(function (w) { return w.write(data).then(function () { return w.close(); }); });
+    if (READONLY) return Promise.reject({ name: "ReadOnly", message: "다른 창에서 열려 있어 이 창은 보기 전용입니다" });
+    var key = folder + "/" + name, prev = WQ[key] || Promise.resolve();
+    var job = prev.catch(function () { /* 앞 저장 실패와 상관없이 */ }).then(function () { return writeNow(folder, name, data); });
+    WQ[key] = job.catch(function () { /* 다음 차례는 계속 */ });
+    return job;
   }
+  function idle() { return Promise.all(Object.keys(WQ).map(function (k) { return WQ[k]; })); }
+  function writeNow(folder, name, data) {
+    return sub(folder).then(function (d) {
+      var check = folder !== "data" ? Promise.resolve() : d.getFileHandle(name).then(function (fh) { return fh.getFile(); }).then(function (f) {
+        if (KNOWN[name] !== undefined && f.lastModified !== KNOWN[name]) throw { name: "ExternalChange", file: name, at: f.lastModified, message: name + " 파일이 프로그램 밖에서 바뀌었습니다" };
+      }, function (e) { if (e && e.name === "ExternalChange") throw e; /* 파일 없음 → 새로 만듦 */ });
+      return check.then(function () { return d.getFileHandle(name, { create: true }); })
+        .then(function (fh) {
+          return fh.createWritable().then(function (w) { return w.write(data).then(function () { return w.close(); }); })
+            .then(function () { return folder === "data" ? fh.getFile().then(function (f) { KNOWN[name] = f.lastModified; }) : null; });
+        });
+    });
+  }
+  // 밖에서 바뀐 파일을 그대로 덮어쓰기로 했을 때: 지금 시각을 아는 것으로
+  function acceptExternal(name) {
+    return sub("data").then(function (d) { return d.getFileHandle(name); }).then(function (fh) { return fh.getFile(); }).then(function (f) { KNOWN[name] = f.lastModified; }, function () { delete KNOWN[name]; });
+  }
+  function setReadOnly(b) { READONLY = !!b; }
+  function readOnly() { return READONLY; }
 
   /* ---------- 공통 ---------- */
   function rowsOf(wb, sheet) {
@@ -539,12 +564,15 @@
     XLSX.utils.book_append_sheet(wb, sheet([["전표", "항목ID"]].concat(Object.keys(X.pins || {}).map(function (k) { return [k, X.pins[k]]; })), [60, 10]), "항목지정");
     XLSX.utils.book_append_sheet(wb, sheet([["계정ID", "항목ID", "적요", "거래처", "일시"]].concat((X.rules || []).map(function (r) { return [r.leaf, r.item, r.memo, r.ptn, r.at]; })), [8, 10, 30, 20, 20]), "항목규칙");
     XLSX.utils.book_append_sheet(wb, sheet([["시각", "내용"]].concat(X.log.slice(-2000).map(function (l) { return [l.t, l.m]; })), [20, 80]), "기록");
-    var name = execName(X.year), job = backupIfDue(name).then(function () { return writeFile("data", name, toBytes(wb)); });
-    if (linesChanged) job = job.then(function () {
+    // 부른 순간의 내용으로 고정 (나중에 X 가 바뀌어도 이 저장은 이 내용)
+    var name = execName(X.year), bytes = toBytes(wb), lname = execLinesName(X.year), lbytes = null;
+    if (linesChanged) {
       var wl = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wl, sheet([LINE_HEAD].concat(X.lines.map(lineRow)), [11, 6, 8, 22, 13, 13, 30, 18, 16, 12], [4, 5]), "내역");
-      return backupIfDue(execLinesName(X.year)).then(function () { return writeFile("data", execLinesName(X.year), toBytes(wl)); });
-    });
+      lbytes = toBytes(wl);
+    }
+    var job = backupIfDue(name).then(function () { return writeFile("data", name, bytes); });
+    if (lbytes) job = job.then(function () { return backupIfDue(lname).then(function () { return writeFile("data", lname, lbytes); }); });
     return job.then(function () { return stamp(); });
   }
 
@@ -632,7 +660,7 @@
     var now = Date.now();
     if (!force && lastBackup[name] && now - lastBackup[name] < BACKUP_EVERY_MS) return Promise.resolve(false);
     var base = name.replace(/\.xlsx$/, "");
-    return readFile("data", name).then(function (buf) {
+    return readFile("data", name, true).then(function (buf) {
       return writeFile("backup", base + "_" + stamp(null, true) + ".xlsx", buf).then(function () {
         lastBackup[name] = now;
         return prune(base + "_").then(function () { return true; });
@@ -727,11 +755,16 @@
     return sub(path).then(function (d) { return d.removeEntry(name); }).catch(function () { return null; });
   }
 
+  // 켰을 때 상태 보관 · 되돌리기용 (data 폴더 파일 그대로)
+  function readRaw(name) { return readFile("data", name, true).catch(function () { return null; }); }
+  function writeRaw(name, buf) { return backupIfDue(name, true).then(function () { return acceptExternal(name); }).then(function () { return writeFile("data", name, buf); }); }
+
   root.Store = {
     supported: supported, restore: restore, grant: grant, pick: pick, useHandle: useHandle, folderName: folderName, connected: connected,
     listYears: listYears, load: load, save: save, loadMaster: loadMaster, saveMaster: saveMaster,
     fileName: fileName, MASTER: MASTER, exportReport: exportReport, readAnyFile: readAnyFile, stamp: stamp,
     downloadTemplate: downloadTemplate, parseTemplate: parseTemplate, roundLabel: roundLabel, writeBook: writeBook,
-    listFiles: listFiles, readPath: readPath, readDouzone: readDouzone, loadExec: loadExec, saveExec: saveExec, execName: execName, download: download, removeFile: removeFile
+    listFiles: listFiles, readPath: readPath, readDouzone: readDouzone, loadExec: loadExec, saveExec: saveExec, execName: execName, download: download, removeFile: removeFile,
+    acceptExternal: acceptExternal, setReadOnly: setReadOnly, idle: idle, readOnly: readOnly, readRaw: readRaw, writeRaw: writeRaw, execLinesName: execLinesName
   };
 })(this);

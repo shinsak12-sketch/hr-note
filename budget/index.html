@@ -11,8 +11,10 @@
   <div class="title">
     <svg class="mascot" id="mascot" viewBox="0 0 13 10" shape-rendering="crispEdges" aria-hidden="true"><g class="m-body"><rect x="3" y="0" width="2" height="1"/><rect x="8" y="0" width="2" height="1"/><rect x="2" y="1" width="9" height="5"/><rect x="0" y="3" width="2" height="2"/><rect x="11" y="3" width="2" height="2"/><rect x="3" y="6" width="1" height="2" class="m-leg"/><rect x="5" y="6" width="1" height="2" class="m-leg2"/><rect x="7" y="6" width="1" height="2" class="m-leg"/><rect x="9" y="6" width="1" height="2" class="m-leg2"/></g><g class="m-eye"><rect x="4" y="2" width="1" height="2"/><rect x="8" y="2" width="1" height="2"/></g><rect class="m-coin" x="6" y="4" width="1" height="1"/></svg><b>사업비 관리 프로그램</b><span class="file" id="fileName"></span><span class="lockpill" id="lockPill" hidden></span><span class="lockpill closed exec-only" id="execPill"></span>
     <span class="saved" id="saveState"><span class="dot"></span><span id="saveText">폴더 연결 전</span></span>
+    <button class="savebtn" data-act="saveAll" title="지금 바로 저장 (Ctrl+S) — 열려 있는 모든 연도 · 분류">💾 저장</button>
   </div>
 
+  <div class="robanner" id="roBanner" hidden>⚠ 이 프로그램이 다른 창(탭)에서 이미 열려 있어 <b>이 창은 보기 전용</b>입니다. 여기서 고친 것은 저장되지 않습니다. <button class="btn sm" data-act="takeOwner">이 창에서 저장하기</button></div>
   <div class="rtabs" id="rtabs">
     <a data-tab="file">파일</a><a data-tab="exec">집행</a><a data-tab="plan" class="on">계획</a><a data-tab="set">설정</a><a data-tab="help">도움말</a>
     <div class="splitctl" id="splitCtl" title="화면 분할 — 칸마다 다른 화면 · 연도를 띄움"><span>화면</span><button data-split="1" title="1칸">▯</button><button data-split="lr" title="좌우 2칸">◫</button><button data-split="tb" title="상하 2칸">⊟</button><button data-split="4" title="4칸">⊞</button></div>
@@ -24,6 +26,7 @@
     <div class="rgrp"><div class="items">
       <button class="rb" data-act="newYear"><span class="ic">＋</span>새 연도<br>만들기</button>
       <button class="rb" data-act="reload"><span class="ic">↻</span>다시<br>불러오기</button>
+      <button class="rb" data-act="restoreStart" title="이번에 켰을 때(처음 연 시점)의 파일로 되돌리기 — 지금 파일은 backup 에 남김"><span class="ic">⏮</span>켰을 때로<br>되돌리기</button>
       <button class="rb" data-act="export"><span class="ic">⇧</span>보고용<br>엑셀</button>
     </div><div class="gname">연도 파일</div></div>
     <div class="rgrp"><div class="items">
@@ -71,11 +74,11 @@
     <div class="rgrp"><div class="items fmt-items">
       <div class="fmt-row"><button class="fb" data-fmt="b" title="굵게 (Ctrl+B)"><b>가</b></button><button class="fb" data-fmt="i" title="기울임 (Ctrl+I)"><i>가</i></button><button class="fb" data-fmt="u" title="밑줄 (Ctrl+U)"><u>가</u></button>
         <select class="fsize" data-fmt="fs" title="글씨 크기"><option value="">크기</option><option value="0">기본</option><option value="10">10</option><option value="11">11</option><option value="13">13</option><option value="14">14</option><option value="16">16</option><option value="18">18</option></select></div>
-      <div class="fmt-row"><button class="fb fcol" data-fmt="fg" title="글씨색"><span>가</span><i style="background:#D93025"></i></button><button class="fb fcol" data-fmt="bg" title="배경색"><span>▤</span><i style="background:#FFF2B3"></i></button><button class="fb" data-fmt="clear" title="서식 지우기">✕ 지우기</button></div>
+      <div class="fmt-row"><span class="fsplit"><button class="fb fcol" data-fmt="fg" title="글씨색 — 마지막 색 바로 적용"><span>가</span><i></i></button><button class="fb fdrop" data-fmt="fgm" title="글씨색 고르기">▾</button></span><span class="fsplit"><button class="fb fcol" data-fmt="bg" title="배경색 — 마지막 색 바로 적용"><span>▤</span><i></i></button><button class="fb fdrop" data-fmt="bgm" title="배경색 고르기">▾</button></span><button class="fb" data-fmt="clear" title="서식 지우기">✕ 지우기</button></div>
     </div><div class="gname">서식</div></div>
     <div class="rgrp"><div class="items">
-      <button class="rb" data-act="undo" id="btnUndo"><span class="ic">↶</span>실행 취소</button>
-      <button class="rb" data-act="redo" id="btnRedo"><span class="ic">↷</span>다시 실행</button>
+      <div class="rbsplit"><button class="rb" data-act="undo" id="btnUndo"><span class="ic">↶</span>실행 취소</button><button class="rbdrop" data-act="undoList" title="실행 취소 기록 — 골라서 한 번에">▾ 기록</button></div>
+      <div class="rbsplit"><button class="rb" data-act="redo" id="btnRedo"><span class="ic">↷</span>다시 실행</button><button class="rbdrop" data-act="redoList" title="다시 실행 기록">▾ 기록</button></div>
     </div><div class="gname">편집</div></div>
   </div>
 
@@ -91,10 +94,14 @@
     <div class="rgrp"><div class="items fmt-items">
       <div class="fmt-row"><button class="fb" data-fmt="b" title="굵게 (Ctrl+B)"><b>가</b></button><button class="fb" data-fmt="i" title="기울임 (Ctrl+I)"><i>가</i></button><button class="fb" data-fmt="u" title="밑줄 (Ctrl+U)"><u>가</u></button>
         <select class="fsize" data-fmt="fs" title="글씨 크기"><option value="">크기</option><option value="0">기본</option><option value="10">10</option><option value="11">11</option><option value="13">13</option><option value="14">14</option><option value="16">16</option><option value="18">18</option></select></div>
-      <div class="fmt-row"><button class="fb fcol" data-fmt="fg" title="글씨색"><span>가</span><i style="background:#D93025"></i></button><button class="fb fcol" data-fmt="bg" title="배경색"><span>▤</span><i style="background:#FFF2B3"></i></button><button class="fb" data-fmt="clear" title="서식 지우기">✕ 지우기</button></div>
+      <div class="fmt-row"><span class="fsplit"><button class="fb fcol" data-fmt="fg" title="글씨색 — 마지막 색 바로 적용"><span>가</span><i></i></button><button class="fb fdrop" data-fmt="fgm" title="글씨색 고르기">▾</button></span><span class="fsplit"><button class="fb fcol" data-fmt="bg" title="배경색 — 마지막 색 바로 적용"><span>▤</span><i></i></button><button class="fb fdrop" data-fmt="bgm" title="배경색 고르기">▾</button></span><button class="fb" data-fmt="clear" title="서식 지우기">✕ 지우기</button></div>
     </div><div class="gname">서식</div></div>
     <div class="rgrp"><div class="items">
-      <div class="rsel"><label>표시 단위 <select id="selDispX"></select></label></div>
+      <div class="rbsplit"><button class="rb" data-act="undo" id="btnUndoX"><span class="ic">↶</span>실행 취소</button><button class="rbdrop" data-act="undoList" title="실행 취소 기록 — 골라서 한 번에">▾ 기록</button></div>
+      <div class="rbsplit"><button class="rb" data-act="redo" id="btnRedoX"><span class="ic">↷</span>다시 실행</button><button class="rbdrop" data-act="redoList" title="다시 실행 기록">▾ 기록</button></div>
+    </div><div class="gname">편집</div></div>
+    <div class="rgrp"><div class="items">
+      <div class="rsel"><label>연도 <select id="selYearX"></select></label><label>표시 단위 <select id="selDispX"></select></label></div>
       <button class="rb" data-act="catMgr"><span class="ic">☰</span>분류 관리</button>
     </div><div class="gname">설정</div></div>
   </div>
@@ -126,9 +133,7 @@
 
   <div class="panes" id="panes"><div class="pane on" id="paneMain">
   <div class="strip" id="strip">
-    <div id="kpis" class="kpis"></div>
-    <div class="panel"><h3 id="stripH1">대분류별 구성비</h3><div id="cats"></div></div>
-    <div class="panel"><h3 id="stripH2">월별 계획</h3><div id="months"></div></div>
+    <div id="kpis" class="sumlines"></div>
   </div>
   <div class="strip-grip" id="stripGrip" title="끌어서 요약 높이 조절 · 더블클릭 = 처음 높이"></div>
 
