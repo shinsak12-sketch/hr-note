@@ -9,7 +9,7 @@
   var BACKUP_EVERY_MS = 30 * 60000;  // 같은 파일은 30분에 한 번만 백업
   var PREFIX = "사업비계획_";
   var MASTER = "기준정보.xlsx";
-  var FORMAT_VER = 3;
+  var FORMAT_VER = 3;                // 파일 구조를 바꾸면 올림 → 옛 프로그램이 새 자료를 열면 막음 (자료 보호)
 
   var dir = null;
   var lastBackup = {};
@@ -73,6 +73,11 @@
   // 자동 점검용: 브라우저 내부 저장소(OPFS)를 폴더처럼 사용
   function useHandle(h) { dir = h; }
   function folderName() { return dir ? dir.name : ""; }
+  // 프로그램 폴더(index.html · js 가 있는 곳)를 잘못 고른 경우 — 업데이트 때 함께 지워질 수 있음
+  function isProgramFolder() {
+    if (!dir) return Promise.resolve(false);
+    return dir.getFileHandle("index.html").then(function () { return dir.getDirectoryHandle("js").then(function () { return true; }); }).catch(function () { return false; });
+  }
   function connected() { return !!dir; }
   // 하위 폴더 (예: "더존원본/2026") — 없으면 만듦
   function sub(path) {
@@ -258,9 +263,15 @@
   }
 
   // 결과: {cat, ver:{list:[{v,t,kind,sum,memo}], snaps:{v: cat}}, legacy} | null (파일 없음)
+  function newerCheck(wb, name) {
+    var v = 0;
+    rowsOf(wb, "정보").forEach(function (r) { if (str(r["항목"]) === "형식버전") v = Calc.num(r["값"]); });
+    if (v > FORMAT_VER) { var e = new Error(name + " 은(는) 더 새 프로그램으로 저장된 파일입니다 (형식 " + v + ", 이 프로그램은 " + FORMAT_VER + ")"); e.name = "NewerFormat"; throw e; }
+  }
   function loadMaster() {
     return readFile("data", MASTER).then(function (buf) {
       var wb = XLSX.read(buf, { type: "array" });
+      newerCheck(wb, MASTER);
       var p = parseCat(rowsOf(wb, "분류"));
       var list = rowsOf(wb, "버전").map(function (r) {
         return { v: Calc.num(r["버전"]), t: str(r["일시"]), kind: str(r["구분"]), sum: str(r["요약"]), memo: str(r["메모"]) };
@@ -375,6 +386,7 @@
   function load(year) {
     return readFile("data", fileName(year)).then(function (buf) {
       var wb = XLSX.read(buf, { type: "array" });
+      newerCheck(wb, fileName(year));
       var info = {};
       rowsOf(wb, "정보").forEach(function (r) { info[str(r["항목"])] = r["값"]; });
       var planRows = rowsOf(wb, "계획"), plan = {}, legacy = null;
@@ -760,7 +772,7 @@
   function writeRaw(name, buf) { return backupIfDue(name, true).then(function () { return acceptExternal(name); }).then(function () { return writeFile("data", name, buf); }); }
 
   root.Store = {
-    supported: supported, restore: restore, grant: grant, pick: pick, useHandle: useHandle, folderName: folderName, connected: connected,
+    supported: supported, restore: restore, grant: grant, pick: pick, useHandle: useHandle, folderName: folderName, isProgramFolder: isProgramFolder, connected: connected,
     listYears: listYears, load: load, save: save, loadMaster: loadMaster, saveMaster: saveMaster,
     fileName: fileName, MASTER: MASTER, exportReport: exportReport, readAnyFile: readAnyFile, stamp: stamp,
     downloadTemplate: downloadTemplate, parseTemplate: parseTemplate, roundLabel: roundLabel, writeBook: writeBook,

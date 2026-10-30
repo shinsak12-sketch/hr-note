@@ -3560,7 +3560,15 @@
   function hideCover() { $("cover").hidden = true; }
 
   function askFolder() {
-    Store.pick().then(openFolder, function (e) {
+    Store.pick().then(function () {
+      return Store.isProgramFolder().then(function (bad) {
+        if (!bad) return openFolder();
+        cover("프로그램 폴더를 고르셨습니다", "<code>" + esc(Store.folderName()) + "</code> 는 프로그램(<code>index.html</code>)이 들어 있는 폴더입니다.<br>프로그램을 새 버전으로 바꿀 때 이 폴더는 통째로 교체되므로, 자료는 <b>storage</b> 폴더(프로그램 폴더 옆)에 두세요.", [
+          { label: "storage 폴더 고르기", primary: true, fn: askFolder },
+          { label: "그래도 이 폴더 사용", fn: function () { hideCover(); openFolder(); } }
+        ]);
+      });
+    }, function (e) {
       if (e && e.name === "AbortError") return;
       toast("폴더를 연결하지 못했습니다: " + (e && e.message || e), true, 6000);
     });
@@ -3711,17 +3719,19 @@
         S.cat = baseCat(); S.ver = { list: [], snaps: {} };
         ensureIds(S.cat);
         addVersion("기본 탑재", "내부 자료 작성용 서식 + 더존 계정과목표 코드");
+        // 새 폴더: 기본 분류를 바로 기준정보.xlsx 로 저장 (안 하면 '저장할까요?'에서 안 함을 고를 때 분류 파일이 안 생김)
+        if (!Store.readOnly()) { masterDirty = true; doSave(); }
       }
       S.years = res[1];
       fillYearSelect();
       return loadYearLocks().then(function () {
         if (!S.years.length) {
           cover("아직 계획 파일이 없습니다", "연결한 폴더 <code>" + esc(Store.folderName()) + "</code> 의 data 폴더에 사업비 계획 파일이 없습니다.<br>" +
-            "분류는 " + (mst ? "기준정보.xlsx 의 분류" : "<b>기본 분류</b>(내부 자료 작성용 서식)") + " — " + esc(catCounts(S.cat)) + " 가 들어 있습니다.<br>새 연도를 만들어 시작하거나, <b>2026년 테스트 데이터</b>(가짜 금액, 마감 · 변경까지)로 둘러보세요.", [
+            "분류는 " + (mst ? "기준정보.xlsx 의 분류" : "<b>기본 분류</b>(내부 자료 작성용 서식)") + " — " + esc(catCounts(S.cat)) + " 가 들어 있습니다.<br>" + (HAS_TEST ? "새 연도를 만들어 시작하거나, <b>2026년 테스트 데이터</b>(가짜 금액, 마감 · 변경까지)로 둘러보세요." : "<b>[새 연도 만들기]</b>로 시작하세요. 전년 실적은 만들 때 더존 손익 파일로 넣을 수 있습니다."), [
             { label: "새 연도 만들기", primary: true, fn: function () { hideCover(); newYearDialog(); } },
-            { label: "2026년 테스트 데이터로 시작", fn: function () { hideCover(); makeTest2026(); } },
+            HAS_TEST ? { label: "2026년 테스트 데이터로 시작", fn: function () { hideCover(); makeTest2026(); } } : null,
             { label: "다른 폴더 고르기", fn: askFolder }
-          ]);
+          ].filter(Boolean));
           return;
         }
         hideCover();
@@ -3732,15 +3742,27 @@
         return loadYear(S.years.indexOf(last) >= 0 ? last : S.years[S.years.length - 1]).then(function () { if (S.year) setMode(PANE_SAVED && PANE_SAVED.panes && PANE_SAVED.panes.length > 1 && PANE_SAVED.panes[0].mode === "plan" ? "plan" : "exec"); restorePanes(); setTimeout(monthRemind, 800); }); // 켜면 집행 화면부터 (분할은 지난번 그대로)
       });
     }).catch(function (e) {
-      toast("폴더를 읽지 못했습니다: " + (e && e.message || e), true, 6000);
+      if (e && e.name === "NewerFormat") {
+        clearInterval(autoTimer); Store.setReadOnly(true);
+        cover("프로그램을 새 버전으로 바꿔 주세요", esc(e.message) + ".<br>지금 쓰는 프로그램이 자료보다 옛날 버전입니다. 자료를 지키기 위해 열지 않았습니다.<br>최신 <b>program</b> 폴더로 바꾼 뒤 다시 여세요. (자료 폴더는 그대로 두면 됩니다)", [
+          { label: "다른 폴더 고르기", fn: askFolder }
+        ]);
+        return;
+      }
+      cover("폴더를 읽지 못했습니다", esc(e && e.message || String(e)) + "<br>폴더를 옮겼거나 지웠다면 다시 골라 주세요.", [
+        { label: "폴더 다시 고르기", primary: true, fn: askFolder }
+      ]);
     });
   }
 
   /* ---------- 2026년 테스트(더미) 데이터 ----------
      2026년 계획(전년 = 2025 실적, 원안 마감 + 1차 변경 마감) + 더존 손익 원데이터 양식 더미(2026년 1~12월)
      → 2027년 새 연도를 만들고 [전년 실적 가져오기]로 그 파일을 넣어 보며 테스트 */
+  var APP_VER = "1.0"; // 프로그램 버전 (배포할 때마다 올림 · 설명서 · 첫 화면에 표시)
   var TEST_PL = "2026_손익_1-12월_테스트.xls";
+  var HAS_TEST = typeof TestData !== "undefined"; // 배포판에는 testdata.js 가 없음 → 테스트 기능 숨김
   function testDataDialog() {
+    if (!HAS_TEST) return;
     if (!Store.connected()) { toast("먼저 데이터 폴더를 연결하세요"); return; }
     var has = S.years.indexOf(2026) >= 0;
     openDialog({
@@ -5915,14 +5937,14 @@
 
   /* ---------- 사용 설명서 (js/help.js) ---------- */
   function manualDialog() {
-    var H = window.HELP || [], cur = 0, q = "";
+    var H = (window.HELP || []).map(function (sec) { return [sec[0], sec[1].filter(function (t) { return HAS_TEST || t.indexOf("@test ") !== 0; }).map(function (t) { return t.replace(/^@test /, ""); })]; }), cur = 0, q = "";
     var draw = function () {
       var hit = function (t) { return !q || t.replace(/<[^>]+>/g, "").toLowerCase().indexOf(q) >= 0; };
       $("mnToc").innerHTML = H.map(function (sec, i) { var n = sec[1].filter(hit).length; return '<div class="vi' + (i === cur ? " on" : "") + (q && !n ? " done" : "") + '" data-mn="' + i + '"><b>' + esc(sec[0]) + "</b>" + (q ? ' <span class="cnt">' + n + "</span>" : "") + "</div>"; }).join("");
       var list = q ? H.map(function (sec) { return [sec[0], sec[1].filter(hit)]; }).filter(function (x) { return x[1].length; }) : [H[cur]];
       $("mnBody").innerHTML = list.length ? list.map(function (sec) { return "<h3>" + esc(sec[0]) + "</h3><ul>" + sec[1].map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ul>"; }).join("") : '<div class="cm-empty">찾는 내용이 없습니다</div>';
     };
-    openDialog({ title: "사용 설명서", key: "manual", crumb: "도움말", width: 1000, okText: null, cancelText: "닫기", enterOk: false,
+    openDialog({ title: "사용 설명서 · v" + APP_VER, key: "manual", crumb: "도움말", width: 1000, okText: null, cancelText: "닫기", enterOk: false,
       body: '<div class="ov-tools"><input class="search" id="mnQ" placeholder="설명서에서 찾기 (예: 확정 항목 · 분할 · 서식)" style="width:320px"></div><div class="vh mn"><div class="vh-list" id="mnToc"></div><div class="vh-body mn-body" id="mnBody"></div></div>' });
     $("mnToc").addEventListener("click", function (e) { var it = e.target.closest("[data-mn]"); if (it) { cur = +it.getAttribute("data-mn"); q = ""; $("mnQ").value = ""; draw(); } });
     $("mnQ").addEventListener("input", function () { q = this.value.trim().toLowerCase(); draw(); });
@@ -6095,6 +6117,8 @@
     ACT = { el: pm, ui: UI, xu: XU, mode: MODE, fs: null, last: null, xl: null, year: null, data: null, link: true, strip: null };
     PANES = [ACT]; CUR = pm;
     initRibbons(); bindCalc(); bindExec(); bindFmt(); bindPane(); bindSplit();
+    if (!HAS_TEST) { var tb = document.getElementById("btnTestData"); if (tb) tb.remove(); }
+    var vb = document.getElementById("coverVer"); if (vb) vb.textContent = "v" + APP_VER;
     $("mascot").addEventListener("click", eggShow);
     $("eggBody").addEventListener("click", eggShow);
     syncSettingSelects();
@@ -6121,7 +6145,7 @@
         ]);
         return;
       }
-      cover("데이터 폴더를 연결하세요", "이 프로그램이 들어 있는 폴더(<code>index.html</code> 이 있는 폴더)를 고르세요.<br>그 안에 <b>data</b> 와 <b>backup</b> 폴더를 만들어 엑셀 파일로 저장합니다. 한 번 연결하면 다음부터는 자동으로 연결됩니다.", [
+      cover("데이터 폴더를 연결하세요", "프로그램 폴더 옆의 <b>storage</b> 폴더를 고르세요. (<code>program</code> 폴더가 아니라 <code>storage</code>)<br>그 안에 <b>data</b> · <b>backup</b> 폴더를 만들어 엑셀 파일로 저장하고, 더존 파일은 <b>더존원본</b> 폴더에 넣습니다.<br>프로그램을 새 버전으로 바꿀 때는 <b>program</b> 폴더만 교체하면 되고, storage 는 건드리지 않습니다. 한 번 연결하면 다음부터는 자동으로 연결됩니다.", [
         { label: "폴더 연결", primary: true, fn: askFolder }
       ]);
     });
