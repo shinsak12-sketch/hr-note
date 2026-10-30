@@ -849,6 +849,8 @@ select.itsel.pinned{border-color:var(--pri);color:var(--pri);font-weight:700}
 .plan tr.total.ttop td.c-acc{z-index:3}
 /* 집행률 칸 막대 */
 .plan td.ratec{min-width:96px;position:relative}
+.plan td.ratec.fz{position:sticky}
+.plan tr.total td.fz{z-index:3} /* 합계 줄은 칸마다 sticky 라 같은 층이면 지나가는 칸이 틀 고정 칸을 덮음 */ /* 틀 고정이면 sticky 유지 (relative 가 덮어써서 집행률만 밀려 가던 문제) */
 .plan td.ratec .rbar{position:absolute;left:5px;right:5px;top:50%;height:12px;margin-top:-6px;background:#EEF1F0;border-radius:2px;overflow:hidden}
 .plan td.ratec .rbar i{display:block;height:100%;background:#9CD0B3}
 .plan td.ratec .rbar i.hot{background:#F2A49C}
