@@ -306,7 +306,7 @@ table.rt{border-collapse:separate;border-spacing:0;min-width:100%;font-size:12.5
 .mmh{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}
 .tblw2{overflow:auto;flex:1}
 .mmh .srch{width:190px}
-.mgw{max-width:860px;margin:0 auto;background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 0 0 1px var(--line),0 10px 24px -16px var(--sh)}
+.mgw{max-width:980px;margin:0 auto;background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 0 0 1px var(--line),0 10px 24px -16px var(--sh)}
 .mgcards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .mgc{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:10px;background:var(--surf);box-shadow:0 1px 3px var(--sh2) inset;animation:mgIn .3s both}
 .mgc:nth-child(2){animation-delay:.05s}.mgc:nth-child(3){animation-delay:.1s}
@@ -428,3 +428,9 @@ button.stat{cursor:pointer}
 .mcard span{color:var(--mute);font-size:11.5px}.mcard b{font-size:22px}.mcard small{color:var(--ink2)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 .hp{margin-top:12px;font-size:12px;line-height:1.6;max-height:42vh;overflow:auto}.hp .ul{margin:4px 0 10px;padding-left:18px}
+.mgs{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}.mgs h3{margin:0 0 10px;font-size:14px;color:var(--g)}
+.mgs .mgb{margin-top:10px;align-items:center}.mgt{margin-top:12px;font-size:12px}.mgt td.bad{color:var(--bad);font-weight:700}
+.mgl.bad{background:var(--bad-bg);color:var(--bad)}
+.src{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:9px;background:#EEF0F3;color:var(--ink2);box-shadow:0 1px 0 var(--hi) inset}
+.src.s코드{background:#E3F3EA;color:var(--ok)}.src.s발령{background:#E6EEFB;color:#1F4E9C}.src.s명부{background:var(--warn-bg);color:var(--warn)}
+.fpop .fi.sg{border-bottom:1px dashed #EEE}

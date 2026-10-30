@@ -276,25 +276,34 @@ var Setting = (function () {
       { ic: "＋", t: (kind === "grd" ? "직급" : "직무") + " 추가", fn: function () { flatAdd(kind); } }]);
   }
 
-  /* ════ 명부 통합: 직원명부 여러 개를 파일 하나로 → 다음부터 통합파일 + 새 명부만 읽음 ════ */
-  function renderMerge(el) {
-    var mi = M.MINFO, F = M.FILES, fr = mi ? mi.fresh : F.map(function (f) { return f.name; });
+  /* ════ 통합파일: 직원명부 · 발령검색 여러 개를 각각 파일 하나로 → 다음부터 통합파일 + 새 파일만 읽음 ════ */
+  function mgSec(kind) {
+    var isO = kind === "ord", mi = isO ? M.OMINFO : M.MINFO, F = isO ? M.OFILES : M.FILES, fn = isO ? M.OMERGE : M.MERGE;
+    var fr = mi ? mi.fresh : F.map(function (f) { return f.name; }), ok = mi && !mi.bad, ttl = isO ? "발령검색" : "직원명부";
     var card = function (t, v, s, cls) { return '<div class="mgc' + (cls ? " " + cls : "") + '"><span>' + t + "</span><b>" + v + "</b><em>" + s + "</em></div>"; };
-    var h = '<div class="mgw"><div class="mgcards">' +
-      card("직원명부 폴더", F.length + "개", F.length ? U.fmtM(F[0].m) + " ~ " + U.fmtM(F[F.length - 1].m) : "파일 없음") +
-      (mi && !mi.bad ? card("통합파일", mi.n + "개", mi.at + " 만듦 · " + (mi.bytes / 1048576).toFixed(1) + "MB", "ok") : card("통합파일", mi && mi.bad ? "읽기 실패" : "없음", mi && mi.bad ? "다시 만들어야 함" : "아직 안 만듦", "bad")) +
-      card("이번에 원본에서 읽음", fr.length + "개", mi && !mi.bad ? (fr.length ? "통합파일에 없는 명부" : "모두 통합파일에서 읽음") : "통합파일이 없어 전부", fr.length && mi && !mi.bad ? "warn" : "") + "</div>" +
-      '<p class="mgp">열 때 <b>통합파일 1개 + 통합파일에 없는 명부</b>만 읽습니다. 새 명부를 넣고 몇 달 쌓이면 <b>[다시 만들기]</b>로 합쳐 두면 됩니다.<br>' +
-      '위치: <b>백데이터\\통합\\' + M.MERGE + '</b> · 원본 직원명부는 건드리지 않고 읽기만 합니다 · 이미 넣은 명부 파일을 고치면(크기 · 수정 시각이 달라지면) 그 파일은 자동으로 원본에서 다시 읽습니다.</p>' +
-      '<div class="mgb"><button class="btn pri" data-act="mgBuild"' + (F.length ? "" : " disabled") + ">" + (mi && !mi.bad ? "⟳ 통합파일 다시 만들기" + (fr.length ? " (원본 " + fr.length + "개 포함)" : "") : "⊕ 통합파일 만들기 (" + F.length + "개)") + "</button>" +
-      (mi ? '<button class="btn" data-act="mgDrop">통합파일 지우기</button>' : "") + "</div>";
-    if (mi && !mi.bad && fr.length) h += '<div class="mgl"><div class="fsub">통합파일에 없는 명부 ' + fr.length + "개 (새로 넣었거나 고친 파일)</div>" + fr.map(function (n) { return '<span class="mono">' + esc(n) + "</span>"; }).join("") + "</div>";
-    if (mi && mi.gone && mi.gone.length) h += '<div class="mgl"><div class="fsub">통합파일에는 있는데 폴더에 없는 명부 ' + mi.gone.length + "개 (안 씀 · 다시 만들면 빠짐)</div>" + mi.gone.map(function (n) { return '<span class="mono">' + esc(n) + "</span>"; }).join("") + "</div>";
-    el.innerHTML = h + "</div>";
+    var rng = isO ? (F.length ? F[0].y1 + " ~ " + F[F.length - 1].y2 + "년 · 발령 " + M.ORD.length.toLocaleString() + "건" : "파일 없음") : (F.length ? U.fmtM(F[0].m) + " ~ " + U.fmtM(F[F.length - 1].m) : "파일 없음");
+    var h = '<div class="mgs"><h3>' + ttl + '</h3><div class="mgcards">' + card(ttl + " 폴더", F.length + "개", rng) +
+      (ok ? card("통합파일", mi.n + "개", mi.at + " 만듦 · " + (mi.bytes / 1048576).toFixed(1) + "MB", "ok") : card("통합파일", mi && mi.bad ? "읽기 실패" : "없음", mi && mi.bad ? "다시 만들어야 함" : "아직 안 만듦", F.length ? "bad" : "")) +
+      card("이번에 원본에서 읽음", fr.length + "개", ok ? (fr.length ? "통합파일에 없는 파일" : "모두 통합파일에서 읽음") : "통합파일이 없어 전부", fr.length && ok ? "warn" : "") + "</div>" +
+      '<div class="mgb"><button class="btn pri" data-mg="build|' + kind + '"' + (F.length ? "" : " disabled") + ">" + (ok ? "⟳ 다시 만들기" + (fr.length ? " (원본 " + fr.length + "개 포함)" : "") : "⊕ 통합파일 만들기 (" + F.length + "개)") + "</button>" +
+      (mi ? '<button class="btn" data-mg="drop|' + kind + '">통합파일 지우기</button>' : "") + '<span class="fs">백데이터\\통합\\' + fn + "</span></div>";
+    if (isO && F.length) {
+      var gaps = M.issues().ordGaps;
+      h += '<table class="tbl mgt"><thead><tr><th>파일</th><th>기간 (이름)</th><th>실제 발령일</th><th class="n">발령</th><th class="n">겹쳐서 합친 건</th><th class="n">기간 밖</th></tr></thead><tbody>' +
+        F.map(function (f) { return '<tr><td class="mono">' + esc(f.name) + "</td><td>" + (f.y1 === f.y2 ? f.y1 + "년" : f.y1 + " ~ " + f.y2 + "년") + '</td><td class="mono">' + (f.min ? f.min.replace(/-/g, ".") + " ~ " + f.max.replace(/-/g, ".") : "-") + '</td><td class="n">' + f.n.toLocaleString() + '</td><td class="n">' + (f.dupN || "-") + '</td><td class="n' + (f.out ? " bad" : "") + '">' + (f.out || "-") + "</td></tr>"; }).join("") + "</tbody></table>" +
+        (gaps.length ? '<div class="mgl bad"><div class="fsub">직원명부 기간 중 발령검색이 없는 연도</div>' + gaps.map(function (y) { return "<span>" + y + "년</span>"; }).join("") + "</div>" : "");
+    }
+    if (ok && fr.length) h += '<div class="mgl"><div class="fsub">통합파일에 없는 파일 ' + fr.length + "개 (새로 넣었거나 고친 파일)</div>" + fr.map(function (n) { return '<span class="mono">' + esc(n) + "</span>"; }).join("") + "</div>";
+    if (mi && mi.gone && mi.gone.length) h += '<div class="mgl"><div class="fsub">통합파일에는 있는데 폴더에 없는 파일 ' + mi.gone.length + "개 (안 씀 · 다시 만들면 빠짐)</div>" + mi.gone.map(function (n) { return '<span class="mono">' + esc(n) + "</span>"; }).join("") + "</div>";
+    return h + "</div>";
   }
-  async function mgBuild(btn) {
+  function renderMerge(el) {
+    el.innerHTML = '<div class="mgw"><p class="mgp">열 때 <b>통합파일 1개 + 통합파일에 없는 파일</b>만 읽습니다. 새 파일이 몇 개 쌓이면 <b>[다시 만들기]</b>로 합쳐 두면 됩니다. 원본 파일은 건드리지 않고 읽기만 하며, 이미 넣은 파일을 고치면(크기 · 수정 시각이 달라지면) 그 파일은 자동으로 원본에서 다시 읽습니다.<br>' +
+      '발령검색 파일 이름: <b>_2425</b> = 2024~2025년 · <b>_24</b> = 2024년 · <b>_20261030</b> = 그해 1.1 ~ 10.30 누계 · 기간이 겹쳐도 같은 발령(사번 · 발령구분 · 발령시작일 · 발령후소속)은 하나로 합칩니다.</p>' + mgSec("roster") + mgSec("ord") + "</div>";
+  }
+  async function mgBuild(btn, kind) {
     btn.disabled = true; btn.textContent = "만드는 중…";
-    try { var r = await M.buildMerge(); App.render(); U.toast("통합파일을 만들었습니다 · 명부 " + r.n + "개 · " + (r.bytes / 1048576).toFixed(1) + "MB · 다음부터 이 파일로 빠르게 엽니다", false, 6000); }
+    try { var r = await M.buildMerge(kind); App.render(); U.toast((kind === "ord" ? "발령검색" : "직원명부") + " 통합파일을 만들었습니다 · " + r.n + "개 · " + (r.bytes / 1048576).toFixed(1) + "MB · 다음부터 이 파일로 빠르게 엽니다", false, 6000); }
     catch (e) { App.render(); U.toast("통합파일을 만들지 못했습니다: " + (e.message || e), true, 8000); }
   }
 
@@ -302,6 +311,7 @@ var Setting = (function () {
   var mmKind = "all", mmS = null, mmF = {}, mmQ = "", mmSel = {}, mmPick = {}, mmLastI = -1, mmPop = null;
   var MK = { org: "조직", grd: "직급", job: "직무" };
   function fdMap() { var o = {}; M.FILES.forEach(function (f) { o[f.name] = f.date; }); return o; }
+  function sugOf(u) { var id = tgt(u); return id ? (u.sugs || []).filter(function (g) { return g.id === id; })[0] || null : null; }
   function tgt(u) { return mmPick[u.k] !== undefined ? mmPick[u.k] : u.sug ? u.sug.id : ""; }
   function mmCols(fd) {
     return [
@@ -314,7 +324,8 @@ var Setting = (function () {
       { k: "nFiles", t: "명부 수", num: 1, v: function (u) { return u.nFiles; } },
       { k: "n", t: "인원", num: 1, v: function (u) { return u.n; } },
       { k: "tg", t: "연결 대상", v: function (u) { var id = tgt(u); return id ? M.nm(M.byId(u.kind, id)) : "(없음)"; } },
-      { k: "pct", t: "추천 %", num: 1, v: function (u) { return u.sug && tgt(u) === u.sug.id ? u.sug.pct : 0; } }];
+      { k: "src", t: "근거", v: function (u) { var g = sugOf(u); return g ? g.src : mmPick[u.k] !== undefined && tgt(u) ? "직접" : "없음"; } },
+      { k: "pct", t: "추천 %", num: 1, v: function (u) { var g = sugOf(u); return g ? g.pct : 0; } }];
   }
   /* 조건(구분 · 찾기 · 열 필터)을 거친 줄. skip = 이 열 필터는 빼고 */
   function mmRows(all, cols, skip) {
@@ -353,10 +364,12 @@ var Setting = (function () {
           "<td>" + MK[u.kind] + "</td><td>" + (u.kind === "org" ? '<span class="lv lv' + u.lv + '">L' + u.lv + "</span>" : "-") + "</td><td><b>" + esc(u.nm) + "</b>" + (u.code ? " <code>" + esc(u.code) + "</code>" : "") + "</td><td>" + esc(u.up || "-") +
           '</td><td class="mono">' + cols[4].v(u) + '</td><td class="mono">' + cols[5].v(u) + '</td><td class="n">' + u.nFiles + '</td><td class="n">' + u.n + "</td>" +
           '<td><button class="tgb' + (t ? "" : " none") + (mmPick[u.k] !== undefined ? " chg" : "") + '" data-mtg="' + i + '" title="' + esc(t ? (u.kind === "org" ? M.path(t) : M.nm(t)) : "") + '">' + (t ? "→ <b>" + esc(M.nm(t)) + "</b>" + (ps ? ' <span class="fs">' + esc(ps) + "</span>" : "") : "대상 고르기") + " ▾</button></td>" +
-          '<td class="n">' + (u.sug && id === u.sug.id ? u.sug.pct + "%" : mmPick[u.k] !== undefined && id ? '<span class="fs">직접</span>' : "-") + "</td>" +
+          (function () { var g = sugOf(u); return '<td>' + (g ? '<span class="src s' + g.src + '" title="' + esc(g.note || "") + (g.also ? " · " + g.also.join(" · ") + " 도 같은 곳" : "") + '">' + g.src + (g.also ? "+" : "") + "</span>" + (g.src === "발령" ? ' <span class="fs">' + g.m + "/" + g.n + "명 · " + esc((g.dt || "").replace(/-/g, ".")) + "</span>" : "") : mmPick[u.k] !== undefined && id ? '<span class="fs">직접</span>' : '<span class="fs">-</span>') + '</td><td class="n">' + (g ? g.pct + "%" : "-") + "</td>"; })() +
           '<td class="acts"><button class="btn sm pri" data-mdo="1|' + i + '"' + (t ? "" : ' disabled title="연결 대상을 먼저 고르세요"') + '>확정</button><button class="btn sm" data-mdo="2|' + i + '">폐지</button><button class="btn sm" data-mdo="3|' + i + '">신설</button></td></tr>';
-      }).join("") + (rows.length ? "" : '<tr><td colspan="12" class="fs" style="text-align:center;padding:20px">조건에 맞는 줄이 없습니다</td></tr>') + "</tbody></table></div>";
+      }).join("") + (rows.length ? "" : '<tr><td colspan="13" class="fs" style="text-align:center;padding:20px">조건에 맞는 줄이 없습니다</td></tr>') + "</tbody></table></div>";
+    var sc = el.querySelector(".tblw2"), sTop = sc ? sc.scrollTop : 0, pTop = el.scrollTop;
     el.innerHTML = h + "</div>";
+    var sc2 = el.querySelector(".tblw2"); if (sc2) sc2.scrollTop = sTop; el.scrollTop = pTop;
     var qi = el.querySelector("#mmq");
     if (qi) qi.oninput = function () { mmQ = qi.value; var p = qi.selectionStart; render(); var n = $("#mmq"); if (n) { n.focus(); n.setSelectionRange(p, p); } };
   }
@@ -398,9 +411,9 @@ var Setting = (function () {
     var lab = function (c) { return u.kind === "org" ? M.path(c) : M.nm(c) + (c.v[0].code ? " (" + c.v[0].code + ")" : ""); };
     var others = Object.keys(mmSel).filter(function (k) { return k !== u.k && k.split("|")[0] === u.kind; }).length;
     var p = mmPop = document.createElement("div"); p.className = "fpop mmpk";
-    p.innerHTML = '<div class="fh">' + esc(u.nm) + " → 연결 대상</div>" + (u.sug ? '<p class="fnote">추천: ' + esc(M.nm(M.byId(u.kind, u.sug.id))) + " (다음 명부에서 " + u.sug.pct + "%)</p>" : "") +
+    p.innerHTML = '<div class="fh">' + esc(u.nm) + " → 연결 대상</div>" + ((u.sugs || []).length ? '<div class="fsub">추천</div>' + u.sugs.map(function (g) { var c = M.byId(u.kind, g.id); return '<button class="fi sg' + (g.id === tgt(u) ? " on" : "") + '" data-c="' + g.id + '" data-v="' + esc(lab(c)) + '"><span class="src s' + g.src + '">' + g.src + "</span> " + esc(lab(c)) + '<span class="fnote" style="display:block;margin:2px 0 0">' + esc(g.note || "") + "</span></button>"; }).join("") + "<hr>" : "") +
       '<input class="fsrch" placeholder="' + MK[u.kind] + ' 이름 찾기"><div class="flist">' +
-      cands.map(function (c) { return '<button class="fi' + (c.id === tgt(u) ? " on" : "") + '" data-c="' + c.id + '" data-v="' + esc(lab(c)) + '">' + esc(lab(c)) + (c.dead ? ' <span class="fnote">폐지</span>' : "") + (u.sug && u.sug.id === c.id ? ' <span class="fnote">추천</span>' : "") + "</button>"; }).join("") + "</div>" +
+      cands.map(function (c) { return '<button class="fi' + (c.id === tgt(u) ? " on" : "") + '" data-c="' + c.id + '" data-v="' + esc(lab(c)) + '">' + esc(lab(c)) + (c.dead ? ' <span class="fnote">폐지</span>' : "") + "</button>"; }).join("") + "</div>" +
       (others && mmSel[u.k] ? '<label class="fc"><input type="checkbox" id="mmAllSel">선택한 ' + MK[u.kind] + " " + (others + 1) + "건 모두 이 대상으로</label>" : "") +
       '<div class="fft">' + (mmPick[u.k] !== undefined && u.sug ? '<button class="btn sm" data-reset>추천으로 되돌리기</button>' : "") + '<span style="flex:1"></span><button class="btn sm" data-fno>닫기</button></div>';
     mmPlace(p, btn);
@@ -507,8 +520,10 @@ var Setting = (function () {
     if ((t = e.target.closest("[data-act='reload']"))) { App.reload(); return; }
     if ((t = e.target.closest("[data-act='restore']"))) { restoreDlg(); return; }
     if ((t = e.target.closest("[data-act='exportMaster']"))) { U.download(M.exportMaster(), "기준정보_" + U.stamp() + ".xlsx"); U.toast("기준값을 엑셀로 내려받았습니다"); return; }
-    if ((t = e.target.closest("[data-act='mgBuild']"))) { mgBuild(t); return; }
-    if ((t = e.target.closest("[data-act='mgDrop']"))) { U.confirmBox("통합파일 지우기", "백데이터\\통합\\" + M.MERGE + " 를 지웁니다. 원본 직원명부는 그대로이고, 다음에 열 때 원본을 전부 다시 읽습니다.", "지우기", true, async function () { await M.dropMerge(); App.render(); U.toast("통합파일을 지웠습니다"); }); return; }
+    if ((t = e.target.closest("[data-mg]"))) { var mg = t.dataset.mg.split("|");
+      if (mg[0] === "build") mgBuild(t, mg[1]);
+      else U.confirmBox("통합파일 지우기", "백데이터\\통합\\" + (mg[1] === "ord" ? M.OMERGE : M.MERGE) + " 를 지웁니다. 원본 파일은 그대로이고, 다음에 열 때 원본을 전부 다시 읽습니다.", "지우기", true, async function () { await M.dropMerge(mg[1]); App.render(); U.toast("통합파일을 지웠습니다"); });
+      return; }
     if (tabNow === "classify") return;
     if ((t = e.target.closest("[data-tw]"))) { e.stopPropagation(); open[t.dataset.tw] = !open[t.dataset.tw]; render(); return; }
     if ((t = e.target.closest("[data-oid]"))) { selOrg = t.dataset.oid; render(); return; }

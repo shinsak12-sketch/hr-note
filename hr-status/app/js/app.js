@@ -62,7 +62,8 @@ var App = (function () {
     else if (view === "setting") Setting.render();
     else renderMain();
     var mm = unmatchedCount(); $("#mmN").textContent = mm ? mm : "";
-    var mi = M.MINFO; $("#mgN").textContent = !M.FILES.length ? "" : !mi || mi.bad ? "!" : mi.fresh.length ? mi.fresh.length : "";
+    var mi = M.MINFO, oi = M.OMINFO, mgn = function (i, F) { return !F.length ? 0 : !i || i.bad ? -1 : i.fresh.length; }, a1 = mgn(mi, M.FILES), a2 = mgn(oi, M.OFILES);
+    $("#mgN").textContent = a1 < 0 || a2 < 0 ? "!" : a1 + a2 ? a1 + a2 : "";
   }
   function unmatchedCount() { return UNMATCHED ? UNMATCHED.length : 0; }
   function renderMain() {
@@ -85,9 +86,9 @@ var App = (function () {
       '</div><div class="hp"><b>자료 넣는 곳</b><ul class="ul">' +
       '<li><b>백데이터\\설정\\직원명부</b> — 파일 이름에 날짜 8자리 (예: 직원명부_20261030.xlsx) · 달마다 가장 늦은 날짜 파일을 그달 말 인원으로 씀 · 첫 시트 위 10줄 안에 사번 · 소속 머리글</li>' +
       '<li><b>백데이터\\설정\\조직목록\\조직 목록.xlsx</b> — 바뀌면 보관 폴더에 날짜 붙여 자동 보관</li>' +
-      '<li><b>백데이터\\설정\\발령검색</b> — 발령검색_YYYYMMDD.xlsx (인력현황 다음 단계에서 씀)</li>' +
+      '<li><b>백데이터\\설정\\발령검색</b> — 발령검색_2425.xlsx = 2024~2025년 · 발령검색_24.xlsx = 2024년 · 발령검색_20261030.xlsx = 그해 1.1~10.30 누계 · 겹쳐도 같은 발령은 하나로 · 미매칭 추천에 씀</li>' +
       '<li>인식 못 한 파일 · 빠진 달은 제목 줄 노란 <b>⚠ 백데이터 확인</b> 칩으로 알려 줌</li></ul>' +
-      '<b>빨리 열기</b><ul class="ul"><li>설정 › <b>명부 통합</b> › [통합파일 만들기] → 다음부터 통합파일 1개 + 새로 넣은 명부만 읽음 (백데이터\\통합)</li><li>새 명부가 몇 달 쌓이면 [다시 만들기]</li></ul>' +
+      '<b>빨리 열기</b><ul class="ul"><li>설정 › <b>통합파일</b> › [통합파일 만들기] (직원명부 · 발령검색 따로) → 다음부터 통합파일 1개 + 새로 넣은 파일만 읽음 (백데이터\\통합)</li><li>새 파일이 몇 개 쌓이면 [다시 만들기]</li></ul>' +
       '<b>업데이트</b><ul class="ul"><li>프로그램을 닫고 새 <b>인력현황.html · app 폴더</b>만 덮어쓰기 — 백데이터 · data · backup 은 건드리지 않음</li>' +
       '<li>열면 기존 data\\기준정보.xlsx 를 backup 에 먼저 복사 · 이상하면 설정 › ⟲ 백업 복원</li>' +
       '<li>설정은 data\\기준정보.xlsx 에 자동 저장 · 저장 때마다 다시 읽어 확인 · 30분마다 / 하루 첫 저장 전 backup</li></ul></div>' +
@@ -105,8 +106,10 @@ var App = (function () {
   /* 통합파일 안내: 없으면 만들라고, 새 명부가 많으면 다시 만들라고 */
   function mergeHint(r) {
     var mi = M.MINFO;
-    if (mi && mi.bad) { U.toast("백데이터\\통합\\" + M.MERGE + " 를 읽지 못해 원본에서 읽었습니다. 설정 › 명부 통합에서 다시 만드세요.", true, 8000); return; }
-    if (!mi && M.FILES.length >= 6) U.toast("직원명부 " + M.FILES.length + "개를 원본에서 읽었습니다. 설정 › 명부 통합 › [통합파일 만들기] 를 하면 다음부터 빨리 열립니다.", false, 8000);
+    if (mi && mi.bad) { U.toast("백데이터\\통합\\" + M.MERGE + " 를 읽지 못해 원본에서 읽었습니다. 설정 › 통합파일에서 다시 만드세요.", true, 8000); return; }
+    var oi = M.OMINFO;
+    if (oi && oi.bad) { U.toast("백데이터\\통합\\" + M.OMERGE + " 를 읽지 못해 원본에서 읽었습니다. 설정 › 통합파일에서 다시 만드세요.", true, 8000); return; }
+    if ((!mi && M.FILES.length >= 6) || (!oi && M.OFILES.length >= 3)) U.toast("원본 파일을 전부 읽었습니다. 설정 › 통합파일 › [통합파일 만들기] 를 하면 다음부터 빨리 열립니다.", false, 8000);
   }
   async function openFolder() {
     $("#cover").hidden = true; $("#folderName").textContent = "📁 " + Store.name();
@@ -146,7 +149,7 @@ var App = (function () {
     var r = await M.loadAll(prog);
     var ol = await M.readOrgList(); if (ol.list.changed) scheduleSave();
     setSave("ok", "다시 읽음"); unmatched(true); render(); fileChip(true);
-    if (M.MINFO && M.MINFO.bad) mergeHint(r);
+    if ((M.MINFO && M.MINFO.bad) || (M.OMINFO && M.OMINFO.bad)) mergeHint(r);
     else if (!M.issueCount()) U.toast("백데이터를 다시 읽었습니다 · 직원명부 " + r.files + "개" + (r.merged ? " (통합파일 " + (r.files - r.fresh) + " + 원본 " + r.fresh + ")" : "") + " · 문제 없음");
   }
 
@@ -164,7 +167,8 @@ var App = (function () {
     h += sec("직원명부가 빠진 달", I.gaps.map(function (m) { return '<tr><td class="mono">' + U.fmtM(m) + '</td><td class="why">이 달 파일이 없어 인력현황 표에 이 달 열이 나오지 않습니다</td></tr>'; }), "첫 달과 마지막 달 사이에서 파일이 없는 달입니다.");
     h += sec("같은 달에 파일이 여러 개", I.dup.map(function (d) { return '<tr><td class="mono">' + U.fmtM(d.m) + "</td><td>" + d.names.map(U.esc).join("<br>") + '</td><td class="fs">사용: ' + U.esc(d.used) + "</td></tr>"; }), "그달 가장 늦은 날짜 파일을 씁니다. 맞으면 그대로 두어도 됩니다.");
     if (!I.orgList) h += '<div class="isec"><h4>조직 목록 없음</h4><p class="fs">백데이터\\설정\\조직목록 에 <b>조직 목록.xlsx</b> 가 없습니다. 없어도 쓸 수는 있지만 소속코드 · 시작일을 못 가져옵니다.</p></div>';
-    h += sec("인식하지 못한 발령검색 파일", I.orders.map(function (x) { return '<tr><td class="mono">' + U.esc(x.name) + '</td><td class="why">' + U.esc(x.why) + "</td></tr>"; }), "");
+    h += sec("인식하지 못한 발령검색 파일", I.orders.map(function (x) { return '<tr><td class="mono">' + U.esc(x.name) + '</td><td class="why">' + U.esc(x.why) + "</td></tr>"; }), "이름 예: 발령검색_2425.xlsx (2024~2025년) · 발령검색_24.xlsx (2024년) · 발령검색_20261030.xlsx (그해 누계). 첫 시트 위 10줄 안에 '사번' · '발령구분' 머리글.");
+    if (I.ordGaps.length) h += '<div class="isec"><h4>발령검색이 없는 연도 <span class="badb">' + I.ordGaps.length + '</span></h4><p class="fs">직원명부 기간 중 발령검색 파일이 덮지 않는 연도입니다. 미매칭 추천에 그 해 조직개편 · 이동이 빠집니다.</p><p>' + I.ordGaps.map(function (y) { return "<b>" + y + "년</b>"; }).join(" · ") + "</p></div>";
     if (!h) { U.toast("백데이터 문제 없음 · 직원명부 " + M.FILES.length + "개"); return; }
     U.modal("<h3>백데이터 확인 필요</h3><p>아래 파일은 인력현황에 반영되지 않았습니다. 고친 뒤 [↻ 다시 읽기]를 누르세요.</p>" + h +
       '<div class="foot"><button class="btn" data-x>닫기</button><button class="btn pri" id="rl">↻ 다시 읽기</button></div>', function (ov, close) { ov.querySelector("#rl").onclick = function () { close(); reload(); }; }, "wide");

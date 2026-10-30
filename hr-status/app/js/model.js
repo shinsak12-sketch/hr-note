@@ -1,8 +1,8 @@
 /* 자료 모델: 기준값(조직 · 직급 · 직무 버전) · 분류 기준 · 직원명부 스냅샷 · 집계 */
 var M = (function () {
   var P_ROSTER = "백데이터/설정/직원명부", P_ORDERS = "백데이터/설정/발령검색", P_ORGLIST = "백데이터/설정/조직목록",
-    P_DATA = "data", P_BACKUP = "backup", P_MERGE = "백데이터/통합", MERGE = "직원명부_통합.dat", MASTER = "기준정보.xlsx";
-  var APP_VER = "0.1.4";
+    P_DATA = "data", P_BACKUP = "backup", P_MERGE = "백데이터/통합", MERGE = "직원명부_통합.dat", OMERGE = "발령검색_통합.dat", MASTER = "기준정보.xlsx";
+  var APP_VER = "0.1.5";
   var LVN = { 0: "레벨 미정", 1: "회사", 2: "본부", 3: "부서·파트", 4: "센터" };
   var LVCOL = { "소속6": 1, "소속5": 2, "소속4": 3, "소속3": 4 };
   var PRIVATE = /주민|생년월일|성명|이름|전화|휴대|주소|메일|계좌/;
@@ -95,31 +95,103 @@ var M = (function () {
     if (b[0] === 0x1f && b[1] === 0x8b) return await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
     return new TextDecoder().decode(b);
   }
-  async function readMerge() {
-    var b = await Store.read(P_MERGE, MERGE); if (!b) return null;
+  async function readMerge(fn) {
+    var b = await Store.read(P_MERGE, fn || MERGE); if (!b) return null;
     try { var m = JSON.parse(await gunz(b)); if (m.fmt !== MERGE_FMT || !m.files) throw 0; m.bytes = b.byteLength; return m; }
     catch (e) { return { bad: true }; }
   }
-  /* 지금 읽혀 있는 명부 전부를 통합파일 하나로 */
-  async function buildMerge() {
-    var files = {}, n = 0;
-    FILES.forEach(function (f) {
-      var s = SNAP[f.name]; if (!s) return;
-      var H = s.headers; n++;
-      files[f.name] = { size: s.size, mt: s.mt, h: H, d: s.persons.map(function (p) { return H.map(function (h) { var v = p.row[h]; return v == null ? "" : v; }); }) };
-    });
-    if (!n) throw new Error("읽어 둔 직원명부가 없습니다");
+  function mergeInfo(mg, mf, fresh, st) { return mg ? (mg.bad ? { bad: true, fresh: fresh, gone: [] } : { at: mg.at, n: Object.keys(mf).length, bytes: mg.bytes, fresh: fresh, gone: Object.keys(mf).filter(function (n) { return !st[n]; }), bad: false }) : null; }
+  async function writeMerge(fn, files) {
+    var n = Object.keys(files).length; if (!n) throw new Error("읽어 둔 파일이 없습니다");
     var at = U.today() + " " + U.stamp().slice(9, 11) + ":" + U.stamp().slice(11, 13);
     var bytes = await gz(JSON.stringify({ fmt: MERGE_FMT, at: at, app: APP_VER, files: files }));
-    await Store.write(P_MERGE, MERGE, bytes);
-    var chk = await readMerge(); /* 다시 읽어 확인 */
+    await Store.write(P_MERGE, fn, bytes);
+    var chk = await readMerge(fn); /* 다시 읽어 확인 */
     if (!chk || chk.bad || Object.keys(chk.files).length !== n) throw new Error("통합파일을 다시 읽어 확인하지 못했습니다");
-    MINFO = { at: at, n: n, bytes: bytes.byteLength, fresh: [], gone: [], bad: false };
-    return MINFO;
+    return { at: at, n: n, bytes: bytes.byteLength, fresh: [], gone: [], bad: false };
   }
-  async function dropMerge() { await Store.remove(P_MERGE, MERGE); MINFO = null; }
+  /* 지금 읽혀 있는 명부 / 발령검색 전부를 통합파일 하나로 */
+  async function buildMerge(kind) {
+    var files = {};
+    if (kind === "ord") { OFILES.forEach(function (f) { var t = OTAB[f.name]; if (t) files[f.name] = t; }); OMINFO = await writeMerge(OMERGE, files); return OMINFO; }
+    FILES.forEach(function (f) {
+      var s = SNAP[f.name]; if (!s) return;
+      var H = s.headers;
+      files[f.name] = { size: s.size, mt: s.mt, h: H, d: s.persons.map(function (p) { return H.map(function (h) { var v = p.row[h]; return v == null ? "" : v; }); }) };
+    });
+    MINFO = await writeMerge(MERGE, files); return MINFO;
+  }
+  async function dropMerge(kind) { if (kind === "ord") { await Store.remove(P_MERGE, OMERGE); OMINFO = null; } else { await Store.remove(P_MERGE, MERGE); MINFO = null; } }
+
+  /* ── 발령검색: 파일 이름 _2425 = 2024~2025 · _2024 = 2024년 · _20261030 = 그해 1.1~10.30 누계 ── */
+  var ORD = [], OFILES = [], OTAB = {}, OMINFO = null, OIDX = null;
+  function ordersName(n) {
+    if (!/\.xls[xm]?$/i.test(n)) return { why: "엑셀 파일(.xlsx · .xls)이 아님" };
+    var b = n.replace(/\.xls[xm]?$/i, ""), m8 = /(\d{4})[-_.]?(\d{2})[-_.]?(\d{2})/.exec(b);
+    if (m8) { var d = m8[1] + "-" + m8[2] + "-" + m8[3]; if (!validDate(d)) return { why: "날짜 '" + d + "' 가 올바르지 않음" }; return { y1: +m8[1], y2: +m8[1], to: d }; }
+    var m4 = /(?:^|\D)(\d{4})(?:\D|$)/.exec(b);
+    if (m4) { var a = +m4[1].slice(0, 2), c = +m4[1].slice(2); if (c === (a + 1) % 100) return { y1: 2000 + a, y2: 2000 + c }; var y = +m4[1]; if (y >= 2000 && y <= 2099) return { y1: y, y2: y }; }
+    var m2 = /(?:^|\D)(\d{2})(?:\D|$)/.exec(b); if (m2) return { y1: 2000 + +m2[1], y2: 2000 + +m2[1] };
+    return { why: "파일 이름에 연도가 없음 (예: 발령검색_2425 · 발령검색_2024 · 발령검색_20261030)" };
+  }
+  function ordersTable(buf) {
+    var wb = XLSX.read(buf, { type: "array", cellDates: true });
+    var ws = wb.Sheets[wb.SheetNames[0]], aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: "" });
+    var hi = -1; for (var i = 0; i < Math.min(10, aoa.length); i++) { var hh = aoa[i].map(U.norm); if (hh.indexOf("사번") >= 0 && hh.indexOf("발령구분") >= 0) { hi = i; break; } }
+    if (hi < 0) throw new Error("머리글에 '사번' · '발령구분' 열이 없습니다");
+    var H = aoa[hi].map(U.norm), sbi = H.indexOf("사번"), d = [];
+    for (var r = hi + 1; r < aoa.length; r++) { var row = aoa[r]; if (!U.norm(row[sbi])) continue; d.push(H.map(function (h, k) { return !h ? "" : row[k] instanceof Date ? U.dateStr(row[k]) : U.norm(row[k]); })); }
+    return { h: H, d: d };
+  }
+  function ordRows(t) {
+    var at = {}; t.h.forEach(function (h, k) { if (h && at[h] === undefined) at[h] = k; });
+    var g = function (row, h) { return at[h] === undefined ? "" : row[at[h]]; };
+    return t.d.map(function (row) {
+      var dt = g(row, "발령시작일"); if (/^\d{8}$/.test(dt)) dt = dt.slice(0, 4) + "-" + dt.slice(4, 6) + "-" + dt.slice(6); dt = dt.replace(/[./]/g, "-").slice(0, 10);
+      return { sb: g(row, "사번"), nm: g(row, "성명"), typ: g(row, "발령구분"), dt: dt, bo: g(row, "발령전소속"), ao: g(row, "발령후소속"), bg: g(row, "발령전직급"), bgc: g(row, "발령전직급코드"), ag: g(row, "발령후직급"), agc: g(row, "발령후직급코드"), bj: g(row, "발령전직무"), aj: g(row, "발령후직무") };
+    });
+  }
+  async function loadOrders(progress) {
+    var names = await Store.list(P_ORDERS), st = await Store.info(P_ORDERS), bad = [], fresh = [], seen = {};
+    OFILES = []; OTAB = {}; ORD = []; OIDX = null;
+    var mg = names.length ? await readMerge(OMERGE) : null, mf = mg && !mg.bad ? mg.files : {};
+    names = names.filter(function (n) { return !/^\.|^desktop\.ini$|^thumbs\.db$/i.test(n); });
+    for (var i = 0; i < names.length; i++) {
+      var n = names[i], nm = ordersName(n); if (nm.why) { bad.push({ name: n, why: nm.why }); continue; }
+      var s0 = st[n] || { size: -1, mt: -1 }, t = mf[n];
+      try {
+        if (!t || t.size !== s0.size || t.mt !== s0.mt) {
+          fresh.push(n); if (progress) progress(0, 0, "발령검색 읽는 중 " + n);
+          var b = await Store.read(P_ORDERS, n); if (!b) throw new Error("파일을 열 수 없음 (다른 프로그램에서 쓰는 중인지 확인)");
+          t = ordersTable(b); t.size = s0.size; t.mt = s0.mt;
+        }
+        OTAB[n] = t;
+        var rs = ordRows(t), f = { name: n, y1: nm.y1, y2: nm.y2, n: rs.length, min: "", max: "", out: 0, dupN: 0 };
+        rs.forEach(function (r) {
+          if (r.dt) { if (!f.min || r.dt < f.min) f.min = r.dt; if (!f.max || r.dt > f.max) f.max = r.dt; var y = +r.dt.slice(0, 4); if (y < f.y1 || y > f.y2) f.out++; }
+          var k = r.sb + "|" + r.typ + "|" + r.dt + "|" + r.ao; if (seen[k]) { f.dupN++; return; } seen[k] = 1; ORD.push(r);
+        });
+        OFILES.push(f);
+      } catch (e) { bad.push({ name: n, why: e.message || String(e) }); }
+    }
+    ORD.sort(function (a, b) { return a.dt < b.dt ? -1 : a.dt > b.dt ? 1 : 0; });
+    OFILES.sort(function (a, b) { return a.y1 - b.y1 || (a.name < b.name ? -1 : 1); });
+    OMINFO = mergeInfo(mg, mf, fresh, st);
+    ISSUES.orders = bad;
+    /* 직원명부 기간 중 발령검색이 없는 연도 */
+    var gaps = [];
+    if (FILES.length && OFILES.length) for (var y = +FILES[0].date.slice(0, 4); y <= +FILES[FILES.length - 1].date.slice(0, 4); y++) if (!OFILES.some(function (f) { return y >= f.y1 && y <= f.y2; })) gaps.push(y);
+    ISSUES.ordGaps = gaps;
+    return { files: OFILES.length, rows: ORD.length, fresh: fresh.length };
+  }
+  function oidx() {
+    if (OIDX) return OIDX;
+    var sb = {}, bo = {}, bj = {}, bg = {};
+    ORD.forEach(function (r) { (sb[r.sb] = sb[r.sb] || []).push(r); if (r.bo) (bo[r.bo] = bo[r.bo] || []).push(r); if (r.bj) (bj[r.bj] = bj[r.bj] || []).push(r); if (r.bg) (bg[r.bg] = bg[r.bg] || []).push(r); });
+    return (OIDX = { sb: sb, bo: bo, bj: bj, bg: bg });
+  }
   /* 백데이터 점검 결과: 인식 못 한 파일 · 읽기 실패 · 빠진 달 · 조직 목록 없음 */
-  var ISSUES = { skip: [], err: [], gaps: [], dup: [], orgList: true, orders: [] };
+  var ISSUES = { skip: [], err: [], gaps: [], dup: [], orgList: true, orders: [], ordGaps: [] };
   function validDate(d) { if (!d) return false; var m = +d.slice(5, 7), dd = +d.slice(8, 10); return m >= 1 && m <= 12 && dd >= 1 && dd <= 31; }
   async function scanFiles() {
     var names = await Store.list(P_ROSTER), skip = [];
@@ -166,17 +238,17 @@ var M = (function () {
       }
       done++; if (progress && (fresh.length || done === all.length)) progress(done, all.length, fresh.length ? "원본 " + fresh.length + "개" : "");
     }
-    MINFO = mg ? (mg.bad ? { bad: true, fresh: fresh, gone: [] } : { at: mg.at, n: Object.keys(mf).length, bytes: mg.bytes, fresh: fresh, gone: Object.keys(mf).filter(function (n) { return !st[n]; }), bad: false }) : null;
+    MINFO = mergeInfo(mg, mf, fresh, st);
     /* 읽지 못한 파일은 월 목록에서 뺌 (그달이 0명으로 나오지 않게) */
     FILES = FILES.filter(function (f) { return SNAP[f.name]; });
     var byM = monthsOf(); ISSUES.err = errs;
     var on = await Store.list(P_ORGLIST); ISSUES.orgList = on.some(function (n) { return /^조직\s*목록\.xls/i.test(n); });
-    var od = await Store.list(P_ORDERS); ISSUES.orders = od.filter(function (n) { return !/\.xls[xm]?$/i.test(n) || !validDate(rosterDate(n)); }).map(function (n) { return { name: n, why: !/\.xls[xm]?$/i.test(n) ? "엑셀 파일이 아님" : "파일 이름에 8자리 날짜가 없음" }; });
+    var ord = await loadOrders(progress);
     var last = latestFile(); HEADERS = last && SNAP[last.name] ? SNAP[last.name].headers : [];
-    return { files: FILES.length, months: MONTHS.length, errs: errs, byM: byM, fresh: fresh.length, merged: mg && !mg.bad ? Object.keys(mf).length : 0 };
+    return { files: FILES.length, months: MONTHS.length, errs: errs, byM: byM, fresh: fresh.length, merged: mg && !mg.bad ? Object.keys(mf).length : 0, ord: ord };
   }
   function issues() { return ISSUES; }
-  function issueCount() { return ISSUES.skip.length + ISSUES.err.length + ISSUES.gaps.length + ISSUES.orders.length + (ISSUES.orgList ? 0 : 1); }
+  function issueCount() { return ISSUES.skip.length + ISSUES.err.length + ISSUES.gaps.length + ISSUES.orders.length + (ISSUES.ordGaps.length ? 1 : 0) + (ISSUES.orgList ? 0 : 1); }
   function latestFile() { return FILES.length ? FILES[FILES.length - 1] : null; }
   function fileOfMonth(m) { var f = null; FILES.forEach(function (x) { if (x.m === m) f = x; }); return f; }
   function snap(m) {
@@ -369,8 +441,57 @@ var M = (function () {
         if (p.job && !findJob(p.job, f.date)) { var jk = "job|" + p.job; var j = out[jk] = out[jk] || { kind: "job", k: jk, nm: p.job, files: {}, first: f.name, last: f.name, lastI: fi, sbs: {} }; j.files[f.name] = 1; j.last = f.name; if (fi > j.lastI) { j.sbs = {}; j.lastI = fi; } j.sbs[p.sb] = 1; }
       });
     });
-    var arr = Object.keys(out).map(function (k) { var u = out[k]; u.nFiles = Object.keys(u.files).length; u.n = Object.keys(u.sbs).length; u.sug = suggest(u, order); return u; });
+    var arr = Object.keys(out).map(function (k) { var u = out[k]; u.nFiles = Object.keys(u.files).length; u.n = Object.keys(u.sbs).length; u.sugs = suggestAll(u, order); u.sug = u.sugs[0] || null; return u; });
     return arr.sort(function (a, b) { return a.kind < b.kind ? -1 : a.kind > b.kind ? 1 : b.n - a.n; });
+  }
+  /* 추천 모음: 코드 일치 · 발령검색 · 다음 명부. 점수 높은 순 */
+  function suggestAll(u, order) {
+    var out = [], r = suggest(u, order), o = ordSuggest(u, order), c = codeSuggest(u);
+    if (c) out.push(c);
+    if (o) out.push(o);
+    if (r) { r.src = "명부"; r.note = "다음 명부(" + r.file + ")에서 " + r.pct + "%가 여기로"; out.push(r); }
+    var sc = function (x) { return x.src === "코드" ? 1000 : x.pct + (x.src === "발령" ? 10 : 0); };
+    out.sort(function (a, b) { return sc(b) - sc(a); });
+    var seen = {}; return out.filter(function (x) { if (seen[x.id]) { seen[x.id].also = (seen[x.id].also || []).concat(x.src); return false; } seen[x.id] = x; return true; });
+  }
+  /* 직급: 같은 직급코드가 기준값에 있으면 (기간 무시) */
+  function codeSuggest(u) {
+    if (u.kind !== "grd" || !u.code) return null;
+    var e = S.grd.filter(function (g) { return g.v.some(function (v) { return v.code && U.norm(v.code) === U.norm(u.code); }); })[0];
+    return e ? { id: e.id, pct: 100, src: "코드", note: "직급코드 " + u.code + " 가 같음" } : null;
+  }
+  function addD(d, n) { var t = new Date(d + "T00:00:00Z"); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); }
+  var NOMOVE = /휴직|퇴직|승진|단축|복직|해제|입사|채용|징계|겸직|대기/;
+  /* 발령검색: 그 이름 사람들이 사라질 즈음 조직개편 · 이동 · 직무변경으로 대부분 간 곳 */
+  function ordSuggest(u, order) {
+    if (!ORD.length) return null;
+    var I = oidx(), fl = order[u.lastI], nx = order[u.lastI + 1];
+    var lo = addD(fl.date, -45), hi = nx ? addD(nx.date, 45) : addD(fl.date, 90), per = {};
+    function consider(r, inWin) {
+      if (NOMOVE.test(r.typ)) return;
+      var from = u.kind === "org" ? r.bo : u.kind === "job" ? r.bj : r.bg, to = u.kind === "org" ? r.ao : u.kind === "job" ? r.aj : r.ag;
+      if (!to || to === from) return;
+      if (!inWin && from !== u.nm) return;
+      var id = null, d = r.dt || fl.date;
+      if (u.kind === "org") {
+        var e = byId("org", findOrg(to, d) || findOrg(to)); while (e && e.lv > u.lv && e.p) e = byId("org", e.p);
+        id = e && (e.lv === u.lv || e.lv === 0) ? e.id : null;
+      } else if (u.kind === "job") id = findJob(to, d) || findJob(to); else id = findGrd(to, u.kind === "grd" ? r.agc : "", d) || findGrd(to, r.agc);
+      if (!id) return;
+      var w = /조직개편/.test(r.typ) ? 2 : /직무변경/.test(r.typ) && u.kind === "job" ? 2 : 1, p0 = per[r.sb];
+      if (!p0 || w > p0.w || (w === p0.w && r.dt > p0.dt)) per[r.sb] = { id: id, w: w, dt: r.dt, typ: r.typ };
+    }
+    Object.keys(u.sbs).forEach(function (sb) { (I.sb[sb] || []).forEach(function (r) { if (r.dt > lo && r.dt <= hi) consider(r, true); }); });
+    var byName = u.kind === "org" ? I.bo : u.kind === "job" ? I.bj : I.bg;
+    (byName[u.nm] || []).forEach(function (r) { consider(r, false); });
+    var ps = Object.keys(per); if (!ps.length) return null;
+    var cnt = {}, tot = 0, dts = {}, typs = {};
+    ps.forEach(function (sb) { var x = per[sb]; cnt[x.id] = (cnt[x.id] || 0) + x.w; tot += x.w; });
+    var best = null; for (var k in cnt) if (!best || cnt[k] > cnt[best]) best = k;
+    var m = 0; ps.forEach(function (sb) { var x = per[sb]; if (x.id === best) { m++; dts[x.dt] = (dts[x.dt] || 0) + 1; typs[x.typ] = (typs[x.typ] || 0) + 1; } });
+    var top = function (o) { var b = null; for (var k in o) if (!b || o[k] > o[b]) b = k; return b; };
+    var dt = top(dts), ty = top(typs);
+    return { id: best, pct: Math.round(cnt[best] / tot * 100), src: "발령", n: ps.length, m: m, dt: dt, typ: ty, note: "발령 " + ps.length + "명 중 " + m + "명 · " + (dt ? dt.replace(/-/g, ".") : "") + " " + (ty || "") };
   }
   /* 추천: 그 이름이 마지막으로 나온 명부의 사람들이 다음 명부에서 간 곳 */
   function suggest(u, order) {
@@ -548,7 +669,7 @@ var M = (function () {
   function exportMaster() { return toWorkbook(); }
 
   return {
-    P_ROSTER: P_ROSTER, P_ORDERS: P_ORDERS, P_ORGLIST: P_ORGLIST, P_DATA: P_DATA, P_BACKUP: P_BACKUP, P_MERGE: P_MERGE, MERGE: MERGE, buildMerge: buildMerge, dropMerge: dropMerge, get MINFO() { return MINFO; }, LVN: LVN, PRIVATE: PRIVATE,
+    P_ROSTER: P_ROSTER, P_ORDERS: P_ORDERS, P_ORGLIST: P_ORGLIST, P_DATA: P_DATA, P_BACKUP: P_BACKUP, P_MERGE: P_MERGE, MERGE: MERGE, buildMerge: buildMerge, dropMerge: dropMerge, get MINFO() { return MINFO; }, get OMINFO() { return OMINFO; }, get OFILES() { return OFILES; }, get ORD() { return ORD; }, OMERGE: OMERGE, LVN: LVN, PRIVATE: PRIVATE,
     get S() { return S; }, get FILES() { return FILES; }, get MONTHS() { return MONTHS; }, get HEADERS() { return HEADERS; }, get newer() { return newer; },
     nid: nid, nm: nm, list: list, byId: byId, kids: kids, path: path, desc: desc, touch: touch, bump: bump, R: R,
     findOrg: findOrg, findGrd: findGrd, findJob: findJob, scanFiles: scanFiles, loadAll: loadAll, issues: issues, issueCount: issueCount, latestFile: latestFile, snap: snap, fileOfMonth: fileOfMonth,
