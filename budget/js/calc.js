@@ -30,7 +30,7 @@
 
   // t: 총액(인원 · 단가×수량 역산용, 0 이면 전년 실적), auto: 자동 계산할 칸 a|b|c|t, pm: 전년 월별 실적
   function blankPlan() {
-    return { prev: 0, meth: "", a: 0, b: 0, c: 0, t: 0, auto: "t", split: "균등", sv: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], memo: "", pm: [] };
+    return { prev: 0, meth: "", a: 0, b: 0, c: 0, t: 0, auto: "t", split: "균등", sv: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], memo: "", pm: [], items: [] };
   }
 
   function blankRow(acc) {
@@ -75,6 +75,31 @@
     return out;
   }
 
+  /* 확정 항목: 계정 총액에서 굵직한 것만 떼어 둔 것 {id, name, code, how, mo, amt, months[12], cond:{memo, ptn}, memo}
+     how: 일시(mo월에 amt) · 매월 · 분기(3 · 6 · 9 · 12월) · 반기(6 · 12월) · 직접(months 그대로) */
+  var ITEM_HOWS = ["일시", "매월", "분기", "반기", "직접"];
+  function itemMonths(it) {
+    var o = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], a = num(it.amt), i;
+    if (it.how === "직접") { for (i = 0; i < 12; i++) o[i] = num(it.months && it.months[i]); return o; }
+    if (it.how === "매월") { for (i = 0; i < 12; i++) o[i] = a; }
+    else if (it.how === "분기") { o[2] = o[5] = o[8] = o[11] = a; }
+    else if (it.how === "반기") { o[5] = o[11] = a; }
+    else { var m = Math.max(1, Math.min(12, num(it.mo) || 1)); o[m - 1] = a; }
+    return o;
+  }
+  function itemsMonths(items) {
+    var o = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    (items || []).forEach(function (it) { itemMonths(it).forEach(function (v, i) { o[i] += v; }); });
+    return o;
+  }
+  // 나머지(총액 − 확정 항목)를 12달로: 단위로 반올림, 끝수는 12월에
+  function splitRest(rest, unit) {
+    var per = roundTo(rest / 12, unit, "반올림"), out = [];
+    for (var i = 0; i < 11; i++) out.push(per);
+    out.push(rest - per * 11);
+    return out;
+  }
+
   /* 월 금액 · 확정 계획액
      균등 · 비율: 연간 금액을 먼저 반올림 단위 · 방식으로 확정 → 달로 나누고 끝수는 한 달에 (월 합계 = 연간 금액)
        균등은 12월, 비율은 비율이 가장 큰 달. 비율 합이 100% 가 아니면 끝수 조정 없이 경고
@@ -87,7 +112,21 @@
     for (i = 0; i < 12; i++) svSum += num(r.sv[i]);
     var ratioOk = Math.abs(svSum - 1) <= 0.0005;
     var annual = roundTo(k, unit, mode);
-    if (!r.meth) months = new Array(12).fill(0);
+    var IM = itemsMonths(r.items), isum = IM.reduce(function (x, y) { return x + y; }, 0), hasItems = !!(r.items && r.items.length && isum);
+    var check = "";
+    if (!r.meth && hasItems) months = IM.slice();
+    else if (!r.meth) months = new Array(12).fill(0);
+    else if (hasItems && r.split !== "수기") {
+      // 확정 항목은 그 달에 그대로, 나머지만 분할 방식대로
+      var rest = annual - isum, rm;
+      if (r.split === "비율" && ratioOk) {
+        var bg = 0; rm = [];
+        for (i = 0; i < 12; i++) { rm.push(roundTo(rest * num(r.sv[i]), unit, "반올림")); if (num(r.sv[i]) > num(r.sv[bg])) bg = i; }
+        rm[bg] += rest - rm.reduce(function (x, y) { return x + y; }, 0); fixMonth = bg;
+      } else { rm = splitRest(rest, unit); if (rm[11] !== rm[0]) fixMonth = 11; }
+      for (i = 0; i < 12; i++) months.push(IM[i] + rm[i]);
+      if (rest < 0) check = "확정 항목 합이 총액보다 " + fmtWon(-rest) + "원 큼";
+    }
     else if (r.split === "수기") for (i = 0; i < 12; i++) months.push(roundTo(num(r.sv[i]), unit, "반올림"));
     else if (r.split === "비율") {
       var big = 0;
@@ -101,13 +140,13 @@
       if (months[11] !== months[0]) fixMonth = 11;
     }
     var sum = months.reduce(function (x, y) { return x + y; }, 0);
-    var check = "";
     if (r.meth && r.split === "비율" && !ratioOk) check = "비율 합 " + (svSum * 100).toFixed(1) + "%";
+    if (hasItems && r.meth && r.split === "수기" && months.some(function (v, j) { return v < IM[j]; })) check = "월 금액이 확정 항목보다 작은 달이 있음";
     var prev = num(r.prev);
     return {
       base: k, annual: annual, months: months, plan: sum, fixMonth: fixMonth,
       yoy: prev ? sum / prev - 1 : (sum ? Infinity : NaN),
-      missing: !r.meth, check: check, svSum: svSum,
+      missing: !r.meth && !hasItems, check: check, svSum: svSum, items: IM, itemSum: isum,
       manualDiff: r.meth && r.split === "수기" ? sum - annual : 0,
       checkDiff: r.split === "수기" ? svSum - k : 0
     };
@@ -166,8 +205,10 @@
         break;
       case "수기": s = "연간 " + t(r.a); break;
     }
+    if (!r.meth && r.items && r.items.length) s = "확정 항목 " + r.items.length + "개만";
     if (s && r.split === "수기") s += " · 월 수기";
     else if (s && r.split === "비율") s += " · 월 비율분할";
+    if (s && r.meth && r.items && r.items.length) s += " · 확정 항목 " + r.items.length + "개 (" + t(itemsMonths(r.items).reduce(function (x, y) { return x + y; }, 0)) + ")";
     return s;
   }
 
@@ -206,7 +247,7 @@
   root.Calc = {
     METHODS: METHODS, SPLITS: SPLITS, RND_UNITS: RND_UNITS, RND_MODES: RND_MODES, DISP_UNITS: DISP_UNITS,
     num: num, roundTo: roundTo, blankPlan: blankPlan, blankRow: blankRow, baseAmount: baseAmount, compute: compute,
-    solve: solve, isQty: isQty, totalOf: totalOf, ratiosFrom: ratiosFrom, hangulWon: hangulWon,
+    solve: solve, isQty: isQty, totalOf: totalOf, ratiosFrom: ratiosFrom, hangulWon: hangulWon, ITEM_HOWS: ITEM_HOWS, itemMonths: itemMonths, itemsMonths: itemsMonths,
     basisText: basisText, fmtUnit: fmtUnit, fmtPct: fmtPct, fmtWon: fmtWon, groupRows: groupRows
   };
 })(this);

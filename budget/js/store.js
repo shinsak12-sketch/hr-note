@@ -160,6 +160,26 @@
     }
     return ws;
   }
+  /* ---------- 칸 서식 (배경 · 글씨색 · 굵게 · 기울임 · 밑줄 · 크기) — 대상 = 줄키|열키 ---------- */
+  var FMT_HEAD = ["대상", "배경", "글씨색", "굵게", "기울임", "밑줄", "크기"];
+  function fmtSheet(fmt) {
+    return sheet([FMT_HEAD].concat(Object.keys(fmt || {}).map(function (k) { var f = fmt[k]; return [k, f.bg || "", f.fg || "", f.b ? "Y" : "", f.i ? "Y" : "", f.u ? "Y" : "", f.fs || ""]; })), [40, 10, 10, 6, 6, 6, 6]);
+  }
+  function fmtOf(wb) {
+    var o = {};
+    rowsOf(wb, "서식").forEach(function (r) {
+      var k = str(r["대상"]), f = {};
+      if (!k) return;
+      if (str(r["배경"])) f.bg = str(r["배경"]);
+      if (str(r["글씨색"])) f.fg = str(r["글씨색"]);
+      if (str(r["굵게"]) === "Y") f.b = 1;
+      if (str(r["기울임"]) === "Y") f.i = 1;
+      if (str(r["밑줄"]) === "Y") f.u = 1;
+      if (Calc.num(r["크기"])) f.fs = Calc.num(r["크기"]);
+      if (Object.keys(f).length) o[k] = f;
+    });
+    return o;
+  }
   function toBytes(wb) { return new Uint8Array(XLSX.write(wb, { type: "array", bookType: "xlsx" })); }
 
   /* ---------- 기준정보 (분류 + 더존 연결 + 버전 이력) ----------
@@ -358,6 +378,14 @@
         for (var i = 1; i <= 12; i++) e.months.push(Calc.num(r[i + "월"]));
         rd.snap[str(r["ID"])] = e;
       });
+      // 확정 항목 (차수 비움 = 지금 계획, 숫자 = 그 차수 마감본)
+      rowsOf(wb, "확정항목").forEach(function (r) {
+        var it = itemOf(r), n = str(r["차수"]), id = str(r["계정ID"]);
+        if (!id) return;
+        if (n === "") { if (plan[id]) (plan[id].items = plan[id].items || []).push(it); return; }
+        var rd = rounds.filter(function (x) { return x.n === Calc.num(n); })[0];
+        if (rd && rd.snap[id]) (rd.snap[id].items = rd.snap[id].items || []).push(it);
+      });
       var last = rounds[rounds.length - 1];
       var lock = { state: !last ? "draft" : last.closedAt ? "closed" : "open", rounds: rounds };
       var log = rowsOf(wb, "이력").map(function (r) { return { t: str(r["시각"]), m: str(r["내용"]) }; });
@@ -368,7 +396,7 @@
           rndUnit: Calc.RND_UNITS[info["반올림단위"]] ? info["반올림단위"] : "천원",
           rndMode: Calc.RND_MODES.indexOf(info["반올림방식"]) >= 0 ? info["반올림방식"] : "반올림"
         },
-        plan: plan, legacy: legacy, lock: lock, log: log, savedAt: str(info["저장시각"])
+        plan: plan, legacy: legacy, lock: lock, log: log, savedAt: str(info["저장시각"]), fmt: fmtOf(wb)
       };
     });
   }
@@ -386,6 +414,22 @@
       .concat(e.sv.map(function (v) { return v || ""; })).concat([e.memo, e.out ? "Y" : "", use === false ? "N" : "Y", e.t || "",
         Calc.isQty(e.meth) && e.auto && e.auto !== "t" ? { a: e.meth === "인원" ? "월액" : "단가", b: e.meth === "인원" ? "인원" : "수량", c: "개월" }[e.auto] : ""])
       .concat(e.pm && e.pm.length === 12 ? e.pm : new Array(12).fill(""));
+  }
+
+  var ITEM_HEAD = (function () {
+    var h = ["차수", "계정ID", "대분류", "중분류", "소분류", "항목ID", "항목", "더존코드", "시기", "월", "금액"];
+    for (var i = 1; i <= 12; i++) h.push(i + "월");
+    return h.concat(["합계", "적요조건", "거래처조건", "메모"]);
+  })();
+  function itemCells(n, id, l1, l2, l3, it) {
+    var ms = Calc.itemMonths(it);
+    return [n, id, l1, l2, l3, it.id, it.name, it.code, it.how, it.how === "일시" ? it.mo : "", it.how === "직접" ? "" : it.amt].concat(ms).concat([ms.reduce(function (a, b) { return a + b; }, 0), (it.cond || {}).memo || "", (it.cond || {}).ptn || "", it.memo || ""]);
+  }
+  function itemOf(r) {
+    var how = Calc.ITEM_HOWS.indexOf(str(r["시기"])) >= 0 ? str(r["시기"]) : "일시", ms = [];
+    for (var i = 1; i <= 12; i++) ms.push(Calc.num(r[i + "월"]));
+    return { id: str(r["항목ID"]) || "I" + Math.random().toString(36).slice(2, 8), name: str(r["항목"]), code: str(r["더존코드"]), how: how, mo: Calc.num(r["월"]) || 1, amt: Calc.num(r["금액"]), months: ms,
+      cond: { memo: str(r["적요조건"]), ptn: str(r["거래처조건"]) }, memo: str(r["메모"]) };
   }
 
   // state.allRows: 분류 순서대로 모든 계정(사용 안 함 포함) [{id,l1,l2,l3,dz,use, ...입력값}]
@@ -429,6 +473,11 @@
     });
     XLSX.utils.book_append_sheet(wb, sheet(snapRows, [6, 14].concat(new Array(12).fill(12)).concat([8, 12, 16, 14]), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 19]), "마감본");
 
+    var itRows = [ITEM_HEAD];
+    all.forEach(function (r) { (r.items || []).forEach(function (it) { itRows.push(itemCells("", r.id, r.l1, r.l2, r.l3, it)); }); });
+    lock.rounds.forEach(function (rd) { Object.keys(rd.snap).forEach(function (id) { var e = rd.snap[id]; (e.items || []).forEach(function (it) { itRows.push(itemCells(rd.n, id, e.l1, e.l2, e.l3, it)); }); }); });
+    XLSX.utils.book_append_sheet(wb, fmtSheet(state.fmt), "서식");
+    XLSX.utils.book_append_sheet(wb, sheet(itRows, [5, 8, 12, 16, 14, 8, 22, 9, 6, 4, 14].concat(new Array(13).fill(12)).concat([16, 16, 24]), [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]), "확정항목");
     XLSX.utils.book_append_sheet(wb, sheet([["시각", "내용"]].concat(state.log.slice(-2000).map(function (l) { return [l.t, l.m]; })), [20, 80]), "이력");
     return wb;
   }
@@ -461,6 +510,9 @@
         log: rowsOf(wb, "기록").map(function (r) { return { t: str(r["시각"]), m: str(r["내용"]) }; }), lines: []
       };
       rowsOf(wb, "메모").forEach(function (r) { X.memos[str(r["대상"])] = { text: str(r["메모"]), at: str(r["일시"]), label: str(r["위치"]) }; });
+      X.pins = {}; X.rules = []; X.fmt = fmtOf(wb);
+      rowsOf(wb, "항목지정").forEach(function (r) { if (str(r["전표"])) X.pins[str(r["전표"])] = str(r["항목ID"]); });
+      X.rules = rowsOf(wb, "항목규칙").map(function (r) { return { leaf: str(r["계정ID"]), item: str(r["항목ID"]), memo: str(r["적요"]), ptn: str(r["거래처"]), at: str(r["일시"]) }; }).filter(function (x) { return x.leaf && x.item; });
       return readFile("data", execLinesName(year)).then(function (b2) {
         X.lines = rowsOf(XLSX.read(b2, { type: "array" }), "내역").map(lineOf);
         return X;
@@ -483,6 +535,9 @@
     })), [8, 20, 20, 5, 8, 30, 14, 14, 14, 50, 8, 20, 30], [6, 7, 8]), "지난달수정");
     XLSX.utils.book_append_sheet(wb, sheet([["대상", "위치", "메모", "일시"]].concat(Object.keys(X.memos).map(function (k) { var m = X.memos[k]; return [k, m.label || "", m.text, m.at]; })), [30, 30, 60, 20]), "메모");
     XLSX.utils.book_append_sheet(wb, sheet([["일시", "파일", "내용"]].concat(X.problems.map(function (p) { return [p.at, p.file, p.text]; })), [20, 24, 80]), "문제");
+    XLSX.utils.book_append_sheet(wb, fmtSheet(X.fmt), "서식");
+    XLSX.utils.book_append_sheet(wb, sheet([["전표", "항목ID"]].concat(Object.keys(X.pins || {}).map(function (k) { return [k, X.pins[k]]; })), [60, 10]), "항목지정");
+    XLSX.utils.book_append_sheet(wb, sheet([["계정ID", "항목ID", "적요", "거래처", "일시"]].concat((X.rules || []).map(function (r) { return [r.leaf, r.item, r.memo, r.ptn, r.at]; })), [8, 10, 30, 20, 20]), "항목규칙");
     XLSX.utils.book_append_sheet(wb, sheet([["시각", "내용"]].concat(X.log.slice(-2000).map(function (l) { return [l.t, l.m]; })), [20, 80]), "기록");
     var name = execName(X.year), job = backupIfDue(name).then(function () { return writeFile("data", name, toBytes(wb)); });
     if (linesChanged) job = job.then(function () {

@@ -167,6 +167,15 @@
         }
       }
     });
+    // 분석 테스트: 2월에 같은 금액 · 같은 거래처 전표 두 건 (중복 의심)
+    if (asOf >= 2) {
+      var so = list.filter(function (x) { return /소모품/.test(x.name) && x.code; })[0];
+      if (so && amounts[so.name]) {
+        put(year + "/02/10", 1250000, "[" + so.code + "]" + so.name, 1250000, "[25300]미지급금", "사무용품 구입", "미래문구");
+        put(year + "/02/13", 1250000, "[" + so.code + "]" + so.name, 1250000, "[25300]미지급금", "사무용품 구입", "미래문구");
+        amounts[so.name][1] += 2500000;
+      }
+    }
     // 지난 달 수정 테스트 (4월 파일부터)
     if (asOf >= 4) {
       var gyeong = list.filter(function (x) { return /경조금/.test(x.name) && x.code; })[0];

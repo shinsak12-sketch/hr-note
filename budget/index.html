@@ -15,6 +15,7 @@
 
   <div class="rtabs" id="rtabs">
     <a data-tab="file">파일</a><a data-tab="exec">집행</a><a data-tab="plan" class="on">계획</a><a data-tab="set">설정</a><a data-tab="help">도움말</a>
+    <div class="splitctl" id="splitCtl" title="화면 분할 — 칸마다 다른 화면 · 연도를 띄움"><span>화면</span><button data-split="1" title="1칸">▯</button><button data-split="lr" title="좌우 2칸">◫</button><button data-split="tb" title="상하 2칸">⊟</button><button data-split="4" title="4칸">⊞</button></div>
   </div>
 
   <div class="ribbons">
@@ -67,6 +68,11 @@
       <button class="rb" data-act="toggleAll"><span class="ic">⊟</span><span id="foldText">모두 접기</span></button>
       <button class="rb" data-act="onlyWarn" id="btnWarn"><span class="ic">⚠</span>확인 필요만</button>
     </div><div class="gname">보기</div></div>
+    <div class="rgrp"><div class="items fmt-items">
+      <div class="fmt-row"><button class="fb" data-fmt="b" title="굵게 (Ctrl+B)"><b>가</b></button><button class="fb" data-fmt="i" title="기울임 (Ctrl+I)"><i>가</i></button><button class="fb" data-fmt="u" title="밑줄 (Ctrl+U)"><u>가</u></button>
+        <select class="fsize" data-fmt="fs" title="글씨 크기"><option value="">크기</option><option value="0">기본</option><option value="10">10</option><option value="11">11</option><option value="13">13</option><option value="14">14</option><option value="16">16</option><option value="18">18</option></select></div>
+      <div class="fmt-row"><button class="fb fcol" data-fmt="fg" title="글씨색"><span>가</span><i style="background:#D93025"></i></button><button class="fb fcol" data-fmt="bg" title="배경색"><span>▤</span><i style="background:#FFF2B3"></i></button><button class="fb" data-fmt="clear" title="서식 지우기">✕ 지우기</button></div>
+    </div><div class="gname">서식</div></div>
     <div class="rgrp"><div class="items">
       <button class="rb" data-act="undo" id="btnUndo"><span class="ic">↶</span>실행 취소</button>
       <button class="rb" data-act="redo" id="btnRedo"><span class="ic">↷</span>다시 실행</button>
@@ -82,6 +88,11 @@
       <button class="rb" data-act="xLog"><span class="ic">≡</span>반영 기록</button>
     </div><div class="gname">더존 자료</div></div>
     <div class="rgrp"><div class="items"><div class="mstat" id="xMstat"></div></div><div class="gname">월별 반영</div></div>
+    <div class="rgrp"><div class="items fmt-items">
+      <div class="fmt-row"><button class="fb" data-fmt="b" title="굵게 (Ctrl+B)"><b>가</b></button><button class="fb" data-fmt="i" title="기울임 (Ctrl+I)"><i>가</i></button><button class="fb" data-fmt="u" title="밑줄 (Ctrl+U)"><u>가</u></button>
+        <select class="fsize" data-fmt="fs" title="글씨 크기"><option value="">크기</option><option value="0">기본</option><option value="10">10</option><option value="11">11</option><option value="13">13</option><option value="14">14</option><option value="16">16</option><option value="18">18</option></select></div>
+      <div class="fmt-row"><button class="fb fcol" data-fmt="fg" title="글씨색"><span>가</span><i style="background:#D93025"></i></button><button class="fb fcol" data-fmt="bg" title="배경색"><span>▤</span><i style="background:#FFF2B3"></i></button><button class="fb" data-fmt="clear" title="서식 지우기">✕ 지우기</button></div>
+    </div><div class="gname">서식</div></div>
     <div class="rgrp"><div class="items">
       <div class="rsel"><label>표시 단위 <select id="selDispX"></select></label></div>
       <button class="rb" data-act="catMgr"><span class="ic">☰</span>분류 관리</button>
@@ -98,13 +109,12 @@
   </div>
 
   <div class="ribbon help" id="rb-help" hidden>
+    <button class="rb strong" data-act="manual" style="flex:none"><span class="ic">📖</span>사용<br>설명서</button>
     <div class="helptext">
-      <b>계획 칸 클릭</b> = 산출 입력 · <b>월 · 비고 칸</b> = 바로 입력 (숫자 치기 · 더블클릭 · F2, Enter/Tab/방향키로 이동, Delete 지우기) · <b>열 우클릭</b> = 정렬 · 필터 · 틀 고정 · 일괄 적용<br>
-      <b>Ctrl/Shift + 클릭</b> = 여러 계정 선택 · <b>⋮⋮ 끌기</b> = 순서 바꾸기 (같은 상위 안) · 리본 묶음 오른쪽 <b>⋮⋮</b> 끌기 = 묶음 위치 바꾸기 · <b>Ctrl+Z / Ctrl+Y</b> = 실행 취소 / 다시 실행 (최근 100번) · <b>Ctrl+F</b> = 계정 검색<br>
-      계정 분류 · 순번 · 더존 과목 연결은 <b>설정 › 분류 관리</b>에서 바꿉니다. 소분류가 없으면 중분류가, 있으면 소분류가 계정입니다. 저장할 때마다 <b>버전</b>이 남습니다.<br>
-      <b>계획 마감</b> 후에는 계획을 고칠 수 없고, 금액 있는 계정은 옮기거나 지울 수 없습니다. 고치려면 <b>계획 변경</b>(1차 · 2차 …)을 열고, 끝나면 <b>변경 마감</b>. 마감 뒤에 생긴 계정은 <b>계획 외</b>입니다.<br>
-      금액은 항상 <b>원 단위</b>로 입력합니다. 표시 단위는 보기용입니다. 월별 금액은 반올림 단위로 맞추고, <b>확정 계획액 = 월별 금액의 합</b>입니다.<br>
-      바뀔 때마다 <b>data\사업비계획_연도.xlsx</b>에 자동 저장되고, 이전 파일은 <b>backup</b> 폴더에 30분마다 보관됩니다(연도별 최근 30개).
+      <b>📖 사용 설명서</b>(왼쪽 버튼)에 모든 기능이 있습니다 · 설명서 안에서 찾기도 됩니다.<br>
+      <b>분류 이름 클릭</b> = 분류 분석 · <b>머리글(월 · 분기 · 누계) 클릭</b> = 기간 분석 · <b>▾</b> = 접기 · 펴기 · <b>집행 칸 클릭</b> = 분개장 내역 · <b>계획 칸 클릭</b> = 산출 입력<br>
+      <b>머리글 끌기</b> = 열 순서 · <b>⋮⋮ 끌기</b> = 줄 순서(같은 레벨만) · <b>칸 끌어 고르기 + 리본 [서식]</b> = 칸 서식 (Ctrl+B · I · U) · <b>우클릭</b> = 정렬 · 필터 · 틀 고정 · 열 숨기기 · 메모<br>
+      <b>[화면]</b>(탭 줄 오른쪽) = 화면 분할 · 팝업은 제목 줄 끌기 = 이동, 가장자리 끌기 = 크기, 더블클릭 = 최대화 · <b>Ctrl+Z / Ctrl+Y</b> = 실행 취소 / 다시 실행 · <b>Ctrl+F</b> = 계정 검색
     </div>
   </div>
 
@@ -114,6 +124,7 @@
     <div class="ref" id="fRef">-</div><div class="fx">산출</div><div class="val" id="fVal"></div>
   </div>
 
+  <div class="panes" id="panes"><div class="pane on" id="paneMain">
   <div class="strip" id="strip">
     <div id="kpis" class="kpis"></div>
     <div class="panel"><h3 id="stripH1">대분류별 구성비</h3><div id="cats"></div></div>
@@ -126,10 +137,11 @@
     <select class="navsel" id="navT" title="대분류"></select><span class="navsep">›</span>
     <select class="navsel" id="navM" title="중분류"></select><span class="navsep">›</span>
     <select class="navsel" id="navS" title="소분류"></select>
+    <div class="seg vseg2 plan-only" id="pAgg"><button data-pa="month">월별</button><button data-pa="q">분기</button><button data-pa="h">반기</button></div>
     <button class="chip warn plan-only" id="btnWarnChip" hidden></button>
     <div class="xtools exec-only" id="xTools">
       <div class="seg vseg2"><button data-xv="all">전체</button><button data-xv="act">집행만</button><button data-xv="plan">계획만</button><button data-xv="diff">증감만</button></div>
-      <div class="seg vseg2"><button data-xa="month">월별</button><button data-xa="cum">누계</button></div>
+      <div class="seg vseg2"><button data-xa="month">월별</button><button data-xa="q">분기</button><button data-xa="h">반기</button><button data-xa="cum">누계</button></div>
       <label class="tsel">기준 <select class="navsel" id="xUpto"></select></label>
       <label class="tsel">비교 <select class="navsel" id="xCmp"><option value="plan">계획</option><option value="prev">전년 같은 달</option><option value="avg">올해 월평균</option></select></label>
       <span id="xQuick" class="xquick"></span>
@@ -146,7 +158,9 @@
     <a class="on" data-sheet="plan">사업비 계획</a>
     <a class="soon" data-soon="수입 관리">수입 관리</a>
     <a class="soon" data-soon="대시보드">대시보드</a>
+    <span class="pane-ctl"><label>연도 <select class="pane-year" title="이 칸의 연도"></select></label><label class="pane-link" title="다른 칸에서 계정을 누르면 이 칸도 같은 계정으로 이동"><input type="checkbox" class="pane-lk" checked> 선택 연동</label><button class="pane-x" title="이 칸 닫기">✕</button></span>
   </div>
+  </div></div>
   <div class="status">
     <span id="stState">준비</span><span id="stCount"></span>
     <div class="r"><span id="stSel"></span><span id="stSum"></span></div>
@@ -191,6 +205,7 @@
 <script src="js/calc.js"></script>
 <script src="js/base.js"></script>
 <script src="js/testdata.js"></script>
+<script src="js/help.js"></script>
 <script src="js/store.js"></script>
 <script src="js/app.js"></script>
 </body>
