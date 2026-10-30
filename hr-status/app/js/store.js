@@ -50,10 +50,17 @@ var Store = (function () {
     var fh = await h.getFileHandle(nm, { create: true });
     var w = await fh.createWritable(); await w.write(bytes); await w.close();
   }
+  /* 파일 크기 · 수정 시각 (캐시가 원본과 같은지 볼 때) */
+  async function info(path) {
+    var h = await sub(path, false), out = {};
+    if (!h) return out;
+    for await (var e of h.values()) if (e.kind === "file" && !/^~\$/.test(e.name)) { try { var f = await e.getFile(); out[e.name] = { size: f.size, mt: f.lastModified }; } catch (x) { } }
+    return out;
+  }
   async function remove(path, nm) { var h = await sub(path, false); if (h) try { await h.removeEntry(nm); } catch (e) { } }
   async function copy(fromPath, nm, toPath, newName) { var b = await read(fromPath, nm); if (b) await write(toPath, newName, new Uint8Array(b)); return !!b; }
   async function ensure(paths) { for (var i = 0; i < paths.length; i++) await sub(paths[i], true); }
 
   return { supported: supported, restore: restore, grant: grant, pick: pick, useHandle: useHandle, name: name,
-    list: list, read: read, write: write, remove: remove, copy: copy, ensure: ensure };
+    list: list, info: info, read: read, write: write, remove: remove, copy: copy, ensure: ensure };
 })();

@@ -1,8 +1,8 @@
 /* 자료 모델: 기준값(조직 · 직급 · 직무 버전) · 분류 기준 · 직원명부 스냅샷 · 집계 */
 var M = (function () {
   var P_ROSTER = "백데이터/설정/직원명부", P_ORDERS = "백데이터/설정/발령검색", P_ORGLIST = "백데이터/설정/조직목록",
-    P_DATA = "data", P_BACKUP = "backup", MASTER = "기준정보.xlsx";
-  var APP_VER = "0.1.2";
+    P_DATA = "data", P_BACKUP = "backup", P_CACHE = "cache/직원명부", MASTER = "기준정보.xlsx";
+  var APP_VER = "0.1.3";
   var LVN = { 0: "레벨 미정", 1: "회사", 2: "본부", 3: "부서·파트", 4: "센터" };
   var LVCOL = { "소속6": 1, "소속5": 2, "소속4": 3, "소속3": 4 };
   var PRIVATE = /주민|생년월일|성명|이름|전화|휴대|주소|메일|계좌/;
@@ -49,29 +49,61 @@ var M = (function () {
   /* ── 직원명부 읽기 ── */
   var FILES = [], MONTHS = [], SNAP = {}, HEADERS = [];
   function rosterDate(fn) { var m = /(\d{4})[-_.]?(\d{2})[-_.]?(\d{2})/.exec(fn); return m ? m[1] + "-" + m[2] + "-" + m[3] : null; }
-  function parseRoster(buf, date) {
+  /* 엑셀 → 머리글 + 사번 있는 줄 (값은 글자로 정리) */
+  function rosterTable(buf) {
     var wb = XLSX.read(buf, { type: "array", cellDates: true });
     var ws = wb.Sheets[wb.SheetNames[0]], aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: "" });
     var hi = -1; for (var i = 0; i < Math.min(10, aoa.length); i++) if (aoa[i].some(function (c) { return U.norm(c) === "사번"; })) { hi = i; break; }
     if (hi < 0) throw new Error("머리글에 '사번' 열이 없습니다");
-    var H = aoa[hi].map(U.norm), at = {}; H.forEach(function (h, k) { if (h && at[h] === undefined) at[h] = k; });
-    if (at["소속"] === undefined) throw new Error("머리글에 '소속' 열이 없습니다");
-    var lvCols = Object.keys(LVCOL).filter(function (h) { return at[h] !== undefined; });
-    var out = [];
+    var H = aoa[hi].map(U.norm), sbi = H.indexOf("사번");
+    if (H.indexOf("소속") < 0) throw new Error("머리글에 '소속' 열이 없습니다");
+    var d = [];
     for (var r = hi + 1; r < aoa.length; r++) {
-      var row = aoa[r], sb = U.norm(row[at["사번"]]); if (!sb) continue;
-      var o = {}; H.forEach(function (h, k) { if (h) o[h] = row[k] instanceof Date ? U.dateStr(row[k]) : U.norm(row[k]); });
+      var row = aoa[r]; if (!U.norm(row[sbi])) continue;
+      d.push(H.map(function (h, k) { return !h ? "" : row[k] instanceof Date ? U.dateStr(row[k]) : U.norm(row[k]); }));
+    }
+    return { h: H, d: d };
+  }
+  /* 머리글 + 줄 → 사람 목록 (캐시에서도 이걸로 만듦) */
+  function buildPersons(t) {
+    var H = t.h, at = {}; H.forEach(function (h, k) { if (h && at[h] === undefined) at[h] = k; });
+    var lvCols = Object.keys(LVCOL).filter(function (h) { return at[h] !== undefined; }).sort(function (a, b) { return LVCOL[a] - LVCOL[b]; });
+    var out = t.d.map(function (row) {
+      var o = {}; H.forEach(function (h, k) { if (h) o[h] = row[k]; });
       var chain = [];
-      lvCols.sort(function (a, b) { return LVCOL[a] - LVCOL[b]; }).forEach(function (h) {
+      lvCols.forEach(function (h) {
         var v = o[h]; if (U.blank(v)) return;
         if (chain.length && chain[chain.length - 1].nm === v) return;
         chain.push({ lv: LVCOL[h], nm: v });
       });
       var low = o["소속"];
       if (!U.blank(low) && !chain.some(function (c) { return c.nm === low; })) chain.push({ lv: Math.min(4, (chain.length ? chain[chain.length - 1].lv : 0) + 1), nm: low });
-      out.push({ sb: sb, nm: o["성명"] || "", org: low, chain: chain, gnm: o["직급"] || "", gcd: o["직급코드"] || "", job: o["직무"] || "", pos: o["직책"] || "", row: o, r: -1 });
-    }
+      return { sb: o["사번"], nm: o["성명"] || "", org: low, chain: chain, gnm: o["직급"] || "", gcd: o["직급코드"] || "", job: o["직무"] || "", pos: o["직책"] || "", row: o, r: -1 };
+    });
     return { headers: H.filter(Boolean), persons: out };
+  }
+  function parseRoster(buf) { return buildPersons(rosterTable(buf)); }
+
+  /* ── 캐시: cache\직원명부\<원본 이름>.dat · 원본 크기 · 수정 시각이 같으면 엑셀을 다시 풀지 않음 ── */
+  var CACHE_FMT = 1;
+  async function gz(str) {
+    if (!window.CompressionStream) return new TextEncoder().encode(str);
+    return new Uint8Array(await new Response(new Blob([str]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer());
+  }
+  async function gunz(buf) {
+    var b = new Uint8Array(buf);
+    if (b[0] === 0x1f && b[1] === 0x8b) return await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+    return new TextDecoder().decode(b);
+  }
+  async function cacheGet(f, st) {
+    try {
+      var b = await Store.read(P_CACHE, f.name + ".dat"); if (!b) return null;
+      var c = JSON.parse(await gunz(b));
+      return c.fmt === CACHE_FMT && c.size === st.size && c.mt === st.mt ? c : null;
+    } catch (e) { return null; }
+  }
+  async function cachePut(f, st, body) {
+    try { body.fmt = CACHE_FMT; body.size = st.size; body.mt = st.mt; await Store.write(P_CACHE, f.name + ".dat", await gz(JSON.stringify(body))); } catch (e) { }
   }
   /* 백데이터 점검 결과: 인식 못 한 파일 · 읽기 실패 · 빠진 달 · 조직 목록 없음 */
   var ISSUES = { skip: [], err: [], gaps: [], dup: [], orgList: true, orders: [] };
@@ -101,25 +133,35 @@ var M = (function () {
     return byM;
   }
   async function loadAll(progress) {
-    await scanFiles(); var done = 0, errs = [], all = FILES.slice();
+    await scanFiles(); var done = 0, errs = [], all = FILES.slice(), fresh = 0;
+    var st = await Store.info(P_ROSTER);
     for (var i = 0; i < all.length; i++) {
       var f = all[i];
       if (!SNAP[f.name]) {
+        var s0 = st[f.name] || { size: -1, mt: -1 }, c = await cacheGet(f, s0);
         try {
-          var b = await Store.read(P_ROSTER, f.name); var p = parseRoster(b, f.date);
-          if (!p.persons.length) throw new Error("사번이 있는 줄이 하나도 없음");
+          if (!c) {
+            fresh++;
+            var b = await Store.read(P_ROSTER, f.name); if (!b) throw new Error("파일을 열 수 없음 (다른 프로그램에서 쓰는 중인지 확인)");
+            c = rosterTable(b); if (!c.d.length) throw new Error("사번이 있는 줄이 하나도 없음");
+            await cachePut(f, s0, c);
+          }
+          var p = buildPersons(c);
           SNAP[f.name] = { file: f, persons: p.persons, headers: p.headers, r: -1 };
         } catch (e) { errs.push({ name: f.name, why: e.message || String(e) }); }
       }
-      done++; if (progress) progress(done, all.length);
+      done++; if (progress) progress(done, all.length, fresh);
     }
+    /* 원본이 없어진 캐시는 지움 */
+    var keep = {}; all.forEach(function (f) { keep[f.name + ".dat"] = 1; });
+    var cl = await Store.list(P_CACHE); for (var j = 0; j < cl.length; j++) if (!keep[cl[j]]) await Store.remove(P_CACHE, cl[j]);
     /* 읽지 못한 파일은 월 목록에서 뺌 (그달이 0명으로 나오지 않게) */
     FILES = FILES.filter(function (f) { return SNAP[f.name]; });
     var byM = monthsOf(); ISSUES.err = errs;
     var on = await Store.list(P_ORGLIST); ISSUES.orgList = on.some(function (n) { return /^조직\s*목록\.xls/i.test(n); });
     var od = await Store.list(P_ORDERS); ISSUES.orders = od.filter(function (n) { return !/\.xls[xm]?$/i.test(n) || !validDate(rosterDate(n)); }).map(function (n) { return { name: n, why: !/\.xls[xm]?$/i.test(n) ? "엑셀 파일이 아님" : "파일 이름에 8자리 날짜가 없음" }; });
     var last = latestFile(); HEADERS = last && SNAP[last.name] ? SNAP[last.name].headers : [];
-    return { files: FILES.length, months: MONTHS.length, errs: errs, byM: byM };
+    return { files: FILES.length, months: MONTHS.length, errs: errs, byM: byM, fresh: fresh };
   }
   function issues() { return ISSUES; }
   function issueCount() { return ISSUES.skip.length + ISSUES.err.length + ISSUES.gaps.length + ISSUES.orders.length + (ISSUES.orgList ? 0 : 1); }

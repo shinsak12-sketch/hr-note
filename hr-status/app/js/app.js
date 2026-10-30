@@ -103,7 +103,7 @@ var App = (function () {
       if (ld.updated) U.toast("프로그램이 " + M.APP_VER + " 로 바뀌었습니다. 기존 기준정보는 backup\\기준정보_업데이트전_v" + ld.updated + "_… 로 먼저 보관했습니다.", false, 6000);
       if (ld.migrated) U.toast("이전 형식(v" + ld.from + ") 기준정보를 새 형식으로 바꿨습니다. 원본은 backup 폴더에 있습니다.", false, 6000);
       M.reset();
-      var r = await M.loadAll(function (d, n) { setSave("busy", "직원명부 읽는 중 " + d + "/" + n); });
+      var r = await M.loadAll(function (d, n, f) { setSave("busy", "직원명부 읽는 중 " + d + "/" + n + (f ? " · 새 파일 " + f + "개" : "")); });
       fileChip(!(ld.fresh || !M.S.org.length));
       var ol = await M.readOrgList();
       ready = true;
@@ -118,7 +118,7 @@ var App = (function () {
       unmatched(true);
       var v = "board"; try { v = localStorage.getItem("hrs.view") || "board"; } catch (e) { }
       go(v === "help" ? "board" : v);
-      U.toast("직원명부 " + r.files + "개 · " + r.months + "개월 읽음");
+      U.toast("직원명부 " + r.files + "개 · " + r.months + "개월 읽음" + (r.fresh ? " · 새 파일 " + r.fresh + "개는 cache 폴더에 저장 (다음부터 빠르게 열림)" : ""), false, r.fresh ? 6000 : 3000);
     } catch (e) {
       setSave("error", "오류"); U.toast("폴더를 읽지 못했습니다: " + (e.message || e), true, 9000); console.error(e);
     }
@@ -126,7 +126,7 @@ var App = (function () {
   async function reload() {
     if (!ready) return;
     M.reset(); M.clearCache(); M.touch();
-    var r = await M.loadAll(function (d, n) { setSave("busy", "직원명부 읽는 중 " + d + "/" + n); });
+    var r = await M.loadAll(function (d, n, f) { setSave("busy", "직원명부 읽는 중 " + d + "/" + n + (f ? " · 새 파일 " + f + "개" : "")); });
     var ol = await M.readOrgList(); if (ol.list.changed) scheduleSave();
     setSave("ok", "다시 읽음"); unmatched(true); render(); fileChip(true);
     if (!M.issueCount()) U.toast("백데이터를 다시 읽었습니다 · 직원명부 " + r.files + "개 · 문제 없음");

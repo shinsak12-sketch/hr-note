@@ -5,6 +5,7 @@ var Setting = (function () {
   function tab(t) { tabNow = t; try { localStorage.setItem("hrs.stab", t); } catch (e) { } if (App.view === "setting") render(); }
   function init() { try { tabNow = localStorage.getItem("hrs.stab") || "org"; } catch (e) { }
     U.$$("#stabs button").forEach(function (b) { b.onclick = function () { tab(b.dataset.st); }; });
+    document.addEventListener("mousedown", function (e) { if (mmPop && !mmPop.contains(e.target) && !e.target.closest("[data-mf],[data-mtg]")) mmClose(); });
     document.addEventListener("click", onClick); document.addEventListener("contextmenu", onCtx); document.addEventListener("dblclick", onDbl);
   }
   /* 최신 직원명부 인원 */
@@ -274,57 +275,186 @@ var Setting = (function () {
       { ic: "＋", t: (kind === "grd" ? "직급" : "직무") + " 추가", fn: function () { flatAdd(kind); } }]);
   }
 
-  /* ════ 미매칭 ════ */
-  var mmKind = "all";
-  function renderMM(el) {
-    var all = App.unmatched(), list = all.filter(function (u) { return mmKind === "all" || u.kind === mmKind; });
-    var good = all.filter(function (u) { return u.sug && u.sug.pct >= 80; });
-    var K = { org: "조직", grd: "직급", job: "직무" };
-    el.innerHTML = '<div class="mmw"><div class="mmh"><div class="seg" id="mmk">' + ["all", "org", "grd", "job"].map(function (k) { var n = k === "all" ? all.length : all.filter(function (u) { return u.kind === k; }).length; return '<button data-mk="' + k + '"' + (mmKind === k ? ' class="on"' : "") + ">" + (k === "all" ? "전체" : K[k]) + " " + n + "</button>"; }).join("") + "</div>" +
-      '<span class="fs">과거 직원명부에 있는데 기준값에 없는 이름입니다. 한 번 처리하면 다음부터 자동으로 맞춰집니다.</span><span style="flex:1"></span>' +
-      (good.length ? '<button class="btn sm pri" data-act="mmBulk">추천 80% 이상 ' + good.length + "건 한 번에 연결</button>" : "") + "</div>" +
-      (list.length ? '<div class="tblw2"><table class="tbl"><thead><tr><th>구분</th><th>옛 이름</th><th>그때 상위</th><th>처음 나온 명부</th><th>마지막 명부</th><th class="n">명부 수</th><th class="n">인원</th><th>추천 연결</th><th></th></tr></thead><tbody>' +
-        list.map(function (u) {
-          var i = all.indexOf(u), s = u.sug && M.byId(u.kind, u.sug.id);
-          return "<tr><td>" + K[u.kind] + (u.kind === "org" ? ' <span class="lv lv' + u.lv + '">L' + u.lv + "</span>" : "") + "</td><td><b>" + esc(u.nm) + "</b>" + (u.code ? ' <code>' + esc(u.code) + "</code>" : "") + "</td><td>" + esc(u.up || "-") +
-            '</td><td class="mono">' + esc(u.first) + '</td><td class="mono">' + esc(u.last) + '</td><td class="n">' + u.nFiles + '</td><td class="n">' + u.n + "</td><td>" +
-            (s ? '→ <b>' + esc(M.nm(s)) + '</b><br><span class="fs">다음 명부에서 ' + u.sug.pct + "%가 여기로</span>" : '<span class="fs">이어지는 곳 없음</span>') +
-            '</td><td><button class="btn sm pri" data-mm="' + i + '">처리</button></td></tr>';
-        }).join("") + "</tbody></table></div>" : '<div class="emptyset"><h2>✓ 미매칭 없음</h2><p>모든 직원명부의 조직 · 직급 · 직무 이름이 기준값과 맞습니다.</p></div>') + "</div>";
+  /* ════ 미매칭: 줄마다 연결 대상(추천) + 확정 · 폐지 · 신설 / 체크해서 한 번에 / 정렬 · 필터 ════ */
+  var mmKind = "all", mmS = null, mmF = {}, mmQ = "", mmSel = {}, mmPick = {}, mmLastI = -1, mmPop = null;
+  var MK = { org: "조직", grd: "직급", job: "직무" };
+  function fdMap() { var o = {}; M.FILES.forEach(function (f) { o[f.name] = f.date; }); return o; }
+  function tgt(u) { return mmPick[u.k] !== undefined ? mmPick[u.k] : u.sug ? u.sug.id : ""; }
+  function mmCols(fd) {
+    return [
+      { k: "kind", t: "구분", v: function (u) { return MK[u.kind]; } },
+      { k: "lv", t: "레벨", v: function (u) { return u.kind === "org" ? "L" + u.lv + " " + M.LVN[u.lv] : "-"; } },
+      { k: "nm", t: "옛 이름", v: function (u) { return u.nm; } },
+      { k: "up", t: "그때 상위", v: function (u) { return u.up || "-"; } },
+      { k: "first", t: "처음", v: function (u) { return U.fmtM((fd[u.first] || "").slice(0, 7)); } },
+      { k: "last", t: "마지막", v: function (u) { return U.fmtM((fd[u.last] || "").slice(0, 7)); } },
+      { k: "nFiles", t: "명부 수", num: 1, v: function (u) { return u.nFiles; } },
+      { k: "n", t: "인원", num: 1, v: function (u) { return u.n; } },
+      { k: "tg", t: "연결 대상", v: function (u) { var id = tgt(u); return id ? M.nm(M.byId(u.kind, id)) : "(없음)"; } },
+      { k: "pct", t: "추천 %", num: 1, v: function (u) { return u.sug && tgt(u) === u.sug.id ? u.sug.pct : 0; } }];
   }
-  function mmDialog(u) {
-    var K = { org: "조직", grd: "직급", job: "직무" }[u.kind];
+  /* 조건(구분 · 찾기 · 열 필터)을 거친 줄. skip = 이 열 필터는 빼고 */
+  function mmRows(all, cols, skip) {
+    var q = U.norm(mmQ);
+    var r = all.filter(function (u) {
+      if (mmKind !== "all" && u.kind !== mmKind) return false;
+      if (q && (u.nm + " " + (u.up || "") + " " + cols[8].v(u)).indexOf(q) < 0) return false;
+      for (var i = 0; i < cols.length; i++) { var c = cols[i], f = mmF[c.k]; if (f && c.k !== skip && !f[String(c.v(u))]) return false; }
+      return true;
+    });
+    if (mmS) { var c = cols.filter(function (x) { return x.k === mmS.k; })[0];
+      if (c) r.sort(function (a, b) { var x = c.v(a), y = c.v(b); return (c.num ? x - y : String(x).localeCompare(String(y), "ko")) * mmS.dir; }); }
+    return r;
+  }
+  function renderMM(el) {
+    var all = App.unmatched(), fd = fdMap(), cols = mmCols(fd), rows = mmRows(all, cols);
+    var keys = {}; all.forEach(function (u) { keys[u.k] = 1; }); Object.keys(mmSel).forEach(function (k) { if (!keys[k]) delete mmSel[k]; });
+    var selN = Object.keys(mmSel).length, nF = Object.keys(mmF).length + (mmQ ? 1 : 0);
+    var allOn = rows.length && rows.every(function (u) { return mmSel[u.k]; });
+    var h = '<div class="mmw"><div class="mmh"><div class="seg" id="mmk">' + ["all", "org", "grd", "job"].map(function (k) { var n = k === "all" ? all.length : all.filter(function (u) { return u.kind === k; }).length; return '<button data-mk="' + k + '"' + (mmKind === k ? ' class="on"' : "") + ">" + (k === "all" ? "전체" : MK[k]) + " " + n + "</button>"; }).join("") + "</div>" +
+      '<input class="srch" id="mmq" placeholder="이름 · 상위 · 대상 찾기" value="' + esc(mmQ) + '">' +
+      (nF || mmS ? '<button class="fchip" data-act="mmClr" title="정렬 · 필터 모두 해제">' + (nF ? "필터 " + nF + "개" : "") + (nF && mmS ? " · " : "") + (mmS ? "정렬" : "") + " 적용 중 ✕</button>" : "") +
+      '<span class="fs">' + rows.length + " / " + all.length + "건 표시</span><span style=\"flex:1\"></span>" +
+      '<button class="btn sm" data-act="mmPick80" title="보이는 줄 중 추천 80% 이상을 체크">추천 80%↑ 체크</button>' +
+      '<button class="btn sm" data-act="mmXls" title="보이는 목록을 엑셀로">⇩ 엑셀</button></div>' +
+      '<div class="mmbulk' + (selN ? " on" : "") + '"><b>' + selN + "건 선택</b>" +
+      '<button class="btn sm pri" data-mb="1">✓ 확정 (각 줄 연결 대상으로)</button><button class="btn sm" data-mb="2">⊘ 폐지로 등록</button><button class="btn sm" data-mb="3">＋ 신설 (사용 중)</button>' +
+      '<span class="fs">Shift+클릭 = 범위 선택 · 대상 ▾ 를 바꾸면 그 대상으로 확정</span><span style="flex:1"></span><button class="btn sm" data-act="mmNone">선택 해제</button></div>';
+    if (!all.length) h += '<div class="emptyset"><h2>✓ 미매칭 없음</h2><p>모든 직원명부의 조직 · 직급 · 직무 이름이 기준값과 맞습니다.</p></div>';
+    else h += '<div class="tblw2"><table class="tbl mmt"><thead><tr><th class="ck"><input type="checkbox" data-mmall' + (allOn ? " checked" : "") + ' title="보이는 줄 모두 선택"></th>' +
+      cols.map(function (c) { return '<th class="mmth' + (c.num ? " n" : "") + '"><span data-ms="' + c.k + '">' + c.t + (mmS && mmS.k === c.k ? (mmS.dir > 0 ? " ▲" : " ▼") : "") + '</span><button class="fb' + (mmF[c.k] ? " on" : "") + '" data-mf="' + c.k + '" title="정렬 · 필터">▾</button></th>'; }).join("") +
+      "<th>처리</th></tr></thead><tbody>" +
+      rows.map(function (u) {
+        var i = all.indexOf(u), id = tgt(u), t = id && M.byId(u.kind, id), on = !!mmSel[u.k], ps = t && u.kind === "org" && t.p ? M.path(M.byId("org", t.p)) : "";
+        return '<tr class="' + (on ? "sel" : "") + '"><td class="ck"><input type="checkbox" data-mck="' + i + '"' + (on ? " checked" : "") + "></td>" +
+          "<td>" + MK[u.kind] + "</td><td>" + (u.kind === "org" ? '<span class="lv lv' + u.lv + '">L' + u.lv + "</span>" : "-") + "</td><td><b>" + esc(u.nm) + "</b>" + (u.code ? " <code>" + esc(u.code) + "</code>" : "") + "</td><td>" + esc(u.up || "-") +
+          '</td><td class="mono">' + cols[4].v(u) + '</td><td class="mono">' + cols[5].v(u) + '</td><td class="n">' + u.nFiles + '</td><td class="n">' + u.n + "</td>" +
+          '<td><button class="tgb' + (t ? "" : " none") + (mmPick[u.k] !== undefined ? " chg" : "") + '" data-mtg="' + i + '" title="' + esc(t ? (u.kind === "org" ? M.path(t) : M.nm(t)) : "") + '">' + (t ? "→ <b>" + esc(M.nm(t)) + "</b>" + (ps ? ' <span class="fs">' + esc(ps) + "</span>" : "") : "대상 고르기") + " ▾</button></td>" +
+          '<td class="n">' + (u.sug && id === u.sug.id ? u.sug.pct + "%" : mmPick[u.k] !== undefined && id ? '<span class="fs">직접</span>' : "-") + "</td>" +
+          '<td class="acts"><button class="btn sm pri" data-mdo="1|' + i + '"' + (t ? "" : ' disabled title="연결 대상을 먼저 고르세요"') + '>확정</button><button class="btn sm" data-mdo="2|' + i + '">폐지</button><button class="btn sm" data-mdo="3|' + i + '">신설</button></td></tr>';
+      }).join("") + (rows.length ? "" : '<tr><td colspan="12" class="fs" style="text-align:center;padding:20px">조건에 맞는 줄이 없습니다</td></tr>') + "</tbody></table></div>";
+    el.innerHTML = h + "</div>";
+    var qi = el.querySelector("#mmq");
+    if (qi) qi.oninput = function () { mmQ = qi.value; var p = qi.selectionStart; render(); var n = $("#mmq"); if (n) { n.focus(); n.setSelectionRange(p, p); } };
+  }
+  function mmClose() { if (mmPop) { mmPop.remove(); mmPop = null; } }
+  function mmPlace(pop, btn) { document.body.appendChild(pop); var b = btn.getBoundingClientRect(); pop.style.left = Math.max(8, Math.min(b.left, innerWidth - pop.offsetWidth - 8)) + "px"; pop.style.top = Math.max(8, Math.min(b.bottom + 4, innerHeight - pop.offsetHeight - 8)) + "px"; }
+  /* 열 머리 ▾ : 정렬 + 값 고르기 (엑셀 필터처럼) */
+  function mmFilterPop(k, btn) {
+    mmClose(); var all = App.unmatched(), cols = mmCols(fdMap()), c = cols.filter(function (x) { return x.k === k; })[0];
+    var base = mmRows(all, cols, k), cnt = {};
+    base.forEach(function (u) { var v = String(c.v(u)); cnt[v] = (cnt[v] || 0) + 1; });
+    var vals = Object.keys(cnt).sort(function (a, b) { return c.num ? a - b : a.localeCompare(b, "ko"); }), cur = mmF[k];
+    var p = mmPop = document.createElement("div"); p.className = "fpop";
+    p.innerHTML = '<div class="fh">' + c.t + '</div><button class="fi" data-s="1">↑ ' + (c.num ? "작은 값부터" : "가나다순") + '</button><button class="fi" data-s="-1">↓ ' + (c.num ? "큰 값부터" : "가나다 역순") + "</button>" + (mmS ? '<button class="fi" data-s="0">↺ 정렬 해제</button>' : "") +
+      '<hr><input class="fsrch" placeholder="값 찾기"><label class="fc all"><input type="checkbox" data-all>(모두 선택)</label><div class="flist">' +
+      vals.map(function (v) { return '<label class="fc" data-v="' + esc(v) + '"><input type="checkbox" data-val="' + esc(v) + '"' + (!cur || cur[v] ? " checked" : "") + ">" + esc(v) + ' <span class="fnote" style="margin-left:auto">' + cnt[v] + "</span></label>"; }).join("") + "</div>" +
+      '<div class="fft"><button class="btn sm" data-fclr>이 열 필터 지우기</button><span style="flex:1"></span><button class="btn sm" data-fno>취소</button><button class="btn sm pri" data-fok>확인</button></div>';
+    mmPlace(p, btn);
+    var boxes = U.$$("[data-val]", p), am = p.querySelector("[data-all]"), sr = p.querySelector(".fsrch");
+    function vis(x) { return x.closest(".fc").style.display !== "none"; }
+    function sync() { var v = boxes.filter(vis); am.checked = v.length && v.every(function (x) { return x.checked; }); }
+    sync(); am.onchange = function () { boxes.forEach(function (x) { if (vis(x)) x.checked = am.checked; }); };
+    boxes.forEach(function (x) { x.onchange = sync; });
+    sr.oninput = function () { var q = U.norm(sr.value); U.$$(".flist .fc", p).forEach(function (l) { l.style.display = !q || l.dataset.v.indexOf(q) >= 0 ? "" : "none"; }); sync(); };
+    U.$$("[data-s]", p).forEach(function (x) { x.onclick = function () { var d = +x.dataset.s; mmS = d ? { k: k, dir: d } : null; mmClose(); render(); }; });
+    p.querySelector("[data-fno]").onclick = mmClose;
+    p.querySelector("[data-fclr]").onclick = function () { delete mmF[k]; if (mmS && mmS.k === k) mmS = null; mmClose(); render(); };
+    p.querySelector("[data-fok]").onclick = function () {
+      var q = sr.value.trim(), ok = {}, n = 0;
+      boxes.forEach(function (x) { if (x.checked && (!q || vis(x))) { ok[x.dataset.val] = 1; n++; } });
+      if (!n) { U.toast("값을 하나 이상 고르세요"); return; }
+      if (n === vals.length) delete mmF[k]; else mmF[k] = ok;
+      mmClose(); render();
+    };
+  }
+  /* 연결 대상 ▾ : 바꾸기 */
+  function mmTgtPop(u, btn) {
+    mmClose();
     var cands = M.S[u.kind].filter(function (x) { return u.kind !== "org" || x.lv === u.lv || x.lv === 0; });
-    U.modal("<h3>" + esc(u.nm) + " 처리</h3><p>" + esc(u.first) + " ~ " + esc(u.last) + " · 명부 " + u.nFiles + "개 · 마지막 명부 인원 " + u.n + "명" + (u.up ? " · 그때 상위 " + esc(u.up) : "") + "</p>" +
-      '<div class="choice"><label class="opt on"><input type="radio" name="how" id="h1" checked><div><b>지금 ' + K + '의 옛 이름으로 연결</b><span>고른 ' + K + "에 옛 버전으로 추가 · 기간은 명부 날짜로 자동</span>" +
-      '<select class="inp" id="tgt" style="margin-top:6px;width:100%">' + cands.map(function (c) { return '<option value="' + c.id + '"' + (u.sug && u.sug.id === c.id ? " selected" : "") + ">" + esc(u.kind === "org" ? M.path(c) : M.nm(c)) + (c.dead ? " (폐지)" : "") + "</option>"; }).join("") + "</select></div></label>" +
-      '<label class="opt"><input type="radio" name="how" id="h2"><div><b>폐지된 ' + K + "으로 등록</b><span>이어지는 " + K + " 없음 · 마지막 명부 날짜를 폐지일로</span></div></label>" +
-      '<label class="opt"><input type="radio" name="how" id="h3"><div><b>새 ' + K + "으로 등록 (사용 중)</b><span>지금도 쓰는데 빠진 값</span></div></label></div>" +
-      '<div class="foot"><button class="btn" data-x>취소</button><button class="btn pri" id="ok">적용</button></div>', function (ov, close) {
-        ov.querySelector("#ok").onclick = function () {
-          var how = ov.querySelector("#h1").checked ? 1 : ov.querySelector("#h2").checked ? 2 : 3, tg = ov.querySelector("#tgt").value;
-          resolveMM(u, how, tg); close();
-        };
-      });
+    var lab = function (c) { return u.kind === "org" ? M.path(c) : M.nm(c) + (c.v[0].code ? " (" + c.v[0].code + ")" : ""); };
+    var others = Object.keys(mmSel).filter(function (k) { return k !== u.k && k.split("|")[0] === u.kind; }).length;
+    var p = mmPop = document.createElement("div"); p.className = "fpop mmpk";
+    p.innerHTML = '<div class="fh">' + esc(u.nm) + " → 연결 대상</div>" + (u.sug ? '<p class="fnote">추천: ' + esc(M.nm(M.byId(u.kind, u.sug.id))) + " (다음 명부에서 " + u.sug.pct + "%)</p>" : "") +
+      '<input class="fsrch" placeholder="' + MK[u.kind] + ' 이름 찾기"><div class="flist">' +
+      cands.map(function (c) { return '<button class="fi' + (c.id === tgt(u) ? " on" : "") + '" data-c="' + c.id + '" data-v="' + esc(lab(c)) + '">' + esc(lab(c)) + (c.dead ? ' <span class="fnote">폐지</span>' : "") + (u.sug && u.sug.id === c.id ? ' <span class="fnote">추천</span>' : "") + "</button>"; }).join("") + "</div>" +
+      (others && mmSel[u.k] ? '<label class="fc"><input type="checkbox" id="mmAllSel">선택한 ' + MK[u.kind] + " " + (others + 1) + "건 모두 이 대상으로</label>" : "") +
+      '<div class="fft">' + (mmPick[u.k] !== undefined && u.sug ? '<button class="btn sm" data-reset>추천으로 되돌리기</button>' : "") + '<span style="flex:1"></span><button class="btn sm" data-fno>닫기</button></div>';
+    mmPlace(p, btn);
+    var sr = p.querySelector(".fsrch"); sr.focus();
+    sr.oninput = function () { var q = U.norm(sr.value); U.$$(".flist .fi", p).forEach(function (l) { l.style.display = !q || l.dataset.v.indexOf(q) >= 0 ? "" : "none"; }); };
+    U.$$("[data-c]", p).forEach(function (b) { b.onclick = function () {
+      var id = b.dataset.c, ch = p.querySelector("#mmAllSel");
+      if (ch && ch.checked) Object.keys(mmSel).forEach(function (k) { if (k.split("|")[0] === u.kind) mmPick[k] = id; });
+      mmPick[u.k] = id; mmClose(); render(); }; });
+    p.querySelector("[data-fno]").onclick = mmClose;
+    var rs = p.querySelector("[data-reset]"); if (rs) rs.onclick = function () { delete mmPick[u.k]; mmClose(); render(); };
   }
   function fileDate(fn) { var f = M.FILES.filter(function (x) { return x.name === fn; })[0]; return f ? f.date : ""; }
-  function resolveMM(u, how, tg, quiet) {
+  /* 한 건 반영 (App.change 안에서 부름) */
+  function applyMM(u, how, tg) {
     var from = fileDate(u.first), to = fileDate(u.last);
-    App.change(function () {
-      if (how === 1) {
-        var e = M.byId(u.kind, tg);
-        e.v.push({ n: 0, nm: u.nm, code: u.code || "", from: firstDay(from), to: to, src: u.first + " ~ " + u.last, note: "미매칭 연결 " + U.today() });
-        e.v.sort(function (a, b) { return (a.from || "") < (b.from || "") ? -1 : 1; }); e.v.forEach(function (v, i) { v.n = i + 1; }); e.v.reverse();
-        if (e.lv === 0 && u.kind === "org") e.lv = u.lv;
-      } else {
-        var k = u.kind === "org" ? "o" : u.kind === "grd" ? "g" : "j";
-        var ne = { id: M.nid(k), ord: 0, dead: how === 2, v: [{ n: 1, nm: u.nm, code: u.code || "", from: firstDay(from), to: how === 2 ? to : "", src: u.first + " ~ " + u.last, note: how === 2 ? "미매칭 → 폐지 등록" : "미매칭 → 신규 등록" }] };
-        if (u.kind === "org") { ne.lv = u.lv; ne.p = u.up ? M.findOrg(u.up, to) : null; ne.code = ""; }
-        M.S[u.kind].push(ne);
-      }
-    }, "master", "미매칭 처리: " + u.nm + " → " + (how === 1 ? M.nm(M.byId(u.kind, tg)) : how === 2 ? "폐지 등록" : "신규 등록"));
-    App.unmatched(true); render();
-    if (!quiet) U.toast(u.nm + (how === 1 ? " → " + M.nm(M.byId(u.kind, tg)) + " 옛 이름으로 연결" : how === 2 ? " 폐지로 등록" : " 새로 등록") + " · 남은 미매칭 " + App.unmatched().length + "건");
+    if (how === 1) {
+      var e = M.byId(u.kind, tg);
+      e.v.push({ n: 0, nm: u.nm, code: u.code || "", from: firstDay(from), to: to, src: u.first + " ~ " + u.last, note: "미매칭 연결 " + U.today() });
+      e.v.sort(function (a, b) { return (a.from || "") < (b.from || "") ? -1 : 1; }); e.v.forEach(function (v, i) { v.n = i + 1; }); e.v.reverse();
+      if (e.lv === 0 && u.kind === "org") e.lv = u.lv;
+    } else {
+      var k = u.kind === "org" ? "o" : u.kind === "grd" ? "g" : "j";
+      var ne = { id: M.nid(k), ord: 0, dead: how === 2, v: [{ n: 1, nm: u.nm, code: u.code || "", from: firstDay(from), to: how === 2 ? to : "", src: u.first + " ~ " + u.last, note: how === 2 ? "미매칭 → 폐지 등록" : "미매칭 → 신규 등록" }] };
+      if (u.kind === "org") { ne.lv = u.lv; ne.p = u.up ? M.findOrg(u.up, to) : null; ne.code = ""; }
+      M.S[u.kind].push(ne);
+    }
+    delete mmSel[u.k]; delete mmPick[u.k];
+    M.touch(); /* 같은 묶음 안에서 방금 만든 상위 조직도 찾게 */
+  }
+  var HOW = { 1: "확정", 2: "폐지 등록", 3: "신설" };
+  function resolveMM(u, how) {
+    var tg = tgt(u); if (how === 1 && !tg) { U.toast("연결 대상을 먼저 고르세요", true); return; }
+    var tn = how === 1 ? M.nm(M.byId(u.kind, tg)) : "";
+    App.change(function () { applyMM(u, how, tg); }, "master", "미매칭 " + HOW[how] + ": " + u.nm + (tn ? " → " + tn : ""));
+    U.toast(u.nm + (how === 1 ? " → " + tn + " 옛 이름으로 연결" : how === 2 ? " 폐지로 등록" : " 신설") + " · 남은 미매칭 " + App.unmatched().length + "건 · Ctrl+Z 되돌리기");
+  }
+  function bulkMM(how) {
+    var all = App.unmatched(), sel = all.filter(function (u) { return mmSel[u.k]; });
+    if (!sel.length) return;
+    var go = how === 1 ? sel.filter(function (u) { return tgt(u); }) : sel, skip = sel.length - go.length;
+    if (!go.length) { U.toast("선택한 줄에 연결 대상이 없습니다", true); return; }
+    go.sort(function (a, b) { return (a.lv || 0) - (b.lv || 0); }); /* 신설 때 상위 먼저 */
+    U.confirmBox(HOW[how] + " " + go.length + "건", go.slice(0, 10).map(function (u) { return esc(u.nm) + (how === 1 ? " → <b>" + esc(M.nm(M.byId(u.kind, tgt(u)))) + "</b>" : ""); }).join("<br>") + (go.length > 10 ? "<br>… 외 " + (go.length - 10) + "건" : "") +
+      (skip ? '<br><br><span style="color:var(--bad)">연결 대상이 없는 ' + skip + "건은 건너뜀 (체크 유지)</span>" : "") + "<br><br>Ctrl+Z 한 번으로 모두 되돌릴 수 있습니다.", HOW[how], how !== 1, function () {
+        var tgs = go.map(tgt);
+        App.change(function () { go.forEach(function (u, i) { applyMM(u, how, tgs[i]); }); }, "master", "미매칭 " + HOW[how] + " " + go.length + "건 한 번에");
+        U.toast(go.length + "건 " + HOW[how] + " · 남은 미매칭 " + App.unmatched().length + "건", false, 5000);
+      });
+  }
+  function mmXls() {
+    var all = App.unmatched(), cols = mmCols(fdMap()), rows = mmRows(all, cols);
+    var aoa = [cols.map(function (c) { return c.t; }).concat(["연결 대상 경로", "처음 명부", "마지막 명부"])].concat(rows.map(function (u) { var t = tgt(u) && M.byId(u.kind, tgt(u)); return cols.map(function (c) { return c.v(u); }).concat([t ? (u.kind === "org" ? M.path(t) : M.nm(t)) : "", u.first, u.last]); }));
+    var wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "미매칭");
+    U.download(new Uint8Array(XLSX.write(wb, { type: "array", bookType: "xlsx" })), "미매칭_" + U.stamp() + ".xlsx"); U.toast("보이는 " + rows.length + "건을 엑셀로 내려받았습니다");
+  }
+  function mmClick(e) {
+    var t, all;
+    if ((t = e.target.closest("[data-mk]"))) { mmKind = t.dataset.mk; render(); return true; }
+    if ((t = e.target.closest("[data-mf]"))) { e.stopPropagation(); mmFilterPop(t.dataset.mf, t); return true; }
+    if ((t = e.target.closest("[data-ms]"))) { var k = t.dataset.ms; mmS = mmS && mmS.k === k ? (mmS.dir > 0 ? { k: k, dir: -1 } : null) : { k: k, dir: 1 }; render(); return true; }
+    if ((t = e.target.closest("[data-mtg]"))) { e.stopPropagation(); mmTgtPop(App.unmatched()[+t.dataset.mtg], t); return true; }
+    if ((t = e.target.closest("[data-mdo]"))) { var a = t.dataset.mdo.split("|"); resolveMM(App.unmatched()[+a[1]], +a[0]); return true; }
+    if ((t = e.target.closest("[data-mb]"))) { bulkMM(+t.dataset.mb); return true; }
+    if ((t = e.target.closest("[data-mmall]"))) { all = App.unmatched(); var vr = mmRows(all, mmCols(fdMap())); vr.forEach(function (u) { if (t.checked) mmSel[u.k] = 1; else delete mmSel[u.k]; }); render(); return true; }
+    if ((t = e.target.closest("[data-mck]"))) {
+      all = App.unmatched(); var i = +t.dataset.mck, u = all[i], on = t.checked;
+      if (e.shiftKey && mmLastI >= 0) { var vr2 = mmRows(all, mmCols(fdMap())), a1 = vr2.indexOf(all[mmLastI]), b1 = vr2.indexOf(u);
+        if (a1 >= 0 && b1 >= 0) vr2.slice(Math.min(a1, b1), Math.max(a1, b1) + 1).forEach(function (x) { if (on) mmSel[x.k] = 1; else delete mmSel[x.k]; }); }
+      if (on) mmSel[u.k] = 1; else delete mmSel[u.k];
+      mmLastI = i; render(); return true;
+    }
+    if ((t = e.target.closest("[data-act='mmClr']"))) { mmF = {}; mmS = null; mmQ = ""; render(); return true; }
+    if ((t = e.target.closest("[data-act='mmNone']"))) { mmSel = {}; render(); return true; }
+    if ((t = e.target.closest("[data-act='mmPick80']"))) { all = App.unmatched(); var n = 0; mmRows(all, mmCols(fdMap())).forEach(function (u) { if (u.sug && tgt(u) === u.sug.id && u.sug.pct >= 80) { mmSel[u.k] = 1; n++; } }); render(); U.toast("추천 80% 이상 " + n + "건 체크 · 위 [✓ 확정] 을 누르면 반영"); return true; }
+    if ((t = e.target.closest("[data-act='mmXls']"))) { mmXls(); return true; }
+    return false;
   }
   function firstDay(d) { return d ? d.slice(0, 8) + "01" : ""; }
 
@@ -361,14 +491,7 @@ var Setting = (function () {
     if ((t = e.target.closest("[data-fid]"))) { if (tabNow === "grd") selG = t.dataset.fid; else selJ = t.dataset.fid; render(); return; }
     if ((t = e.target.closest("[data-fa]"))) { var it = M.byId(tabNow, tabNow === "grd" ? selG : selJ), a = t.dataset.fa;
       if (a === "add") flatAdd(tabNow); else if (a === "edit") flatEdit(tabNow, it); else if (a === "del") flatDel(tabNow, it); else flatMove(tabNow, it, a === "up" ? -1 : 1); return; }
-    if ((t = e.target.closest("[data-mk]"))) { mmKind = t.dataset.mk; render(); return; }
-    if ((t = e.target.closest("[data-mm]"))) { mmDialog(App.unmatched()[+t.dataset.mm]); return; }
-    if ((t = e.target.closest("[data-act='mmBulk']"))) {
-      var good = App.unmatched().filter(function (u) { return u.sug && u.sug.pct >= 80; });
-      U.confirmBox("추천대로 한 번에 연결", good.length + "건을 추천 대상의 옛 이름으로 연결합니다.<br>" + good.slice(0, 8).map(function (u) { return esc(u.nm) + " → " + esc(M.nm(M.byId(u.kind, u.sug.id))); }).join("<br>") + (good.length > 8 ? "<br>…" : ""), "연결", false, function () {
-        good.forEach(function (u) { resolveMM(u, 1, u.sug.id, true); }); U.toast(good.length + "건 연결 · 남은 미매칭 " + App.unmatched().length + "건");
-      }); return;
-    }
+    if (tabNow === "mm" && mmClick(e)) return;
   }
   function onCtx(e) {
     if (App.view !== "setting" || tabNow === "classify") return;
