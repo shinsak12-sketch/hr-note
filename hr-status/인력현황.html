@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>인력현황 관리 프로그램</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="app/css/app.css">
+</head>
+<body>
+<div class="app" id="app">
+  <div class="tbar">
+    <b class="brand">인력현황 관리</b>
+    <nav class="menu" id="menu">
+      <a data-go="main">메인</a><a data-go="board" class="on">인력현황</a><a data-go="setting">설정</a><a data-go="help">도움말</a>
+    </nav>
+    <span class="folder" id="folderName"></span>
+    <span class="saved off" id="saved" title="누르면 바로 저장 (Ctrl+S)">
+      <svg class="mascot" viewBox="0 0 13 10" shape-rendering="crispEdges" aria-hidden="true"><g class="m-body"><rect x="3" y="0" width="2" height="1"/><rect x="8" y="0" width="2" height="1"/><rect x="2" y="1" width="9" height="5"/><rect x="0" y="3" width="2" height="2"/><rect x="11" y="3" width="2" height="2"/><rect x="3" y="6" width="1" height="2"/><rect x="5" y="6" width="1" height="2"/><rect x="7" y="6" width="1" height="2"/><rect x="9" y="6" width="1" height="2"/></g><g class="m-eye"><rect x="4" y="2" width="1" height="2"/><rect x="8" y="2" width="1" height="2"/></g></svg>
+      <span id="savedT">폴더 연결 전</span>
+    </span>
+  </div>
+
+  <!-- 인력현황 -->
+  <section class="view" id="v-board">
+    <div class="tools">
+      <span class="fld">기준월</span><button class="pick" id="asofBtn" title="기준월 고르기 (말일자)"></button>
+      <span class="sep"></span>
+      <span class="fld">기간</span><button class="pick" id="perBtn" title="출력 기간 고르기"></button>
+      <div class="seg" id="unit"><button data-u="m">월별</button><button data-u="q">분기말</button><button data-u="y">연말</button></div>
+      <span class="sep"></span>
+      <label class="tg"><input type="checkbox" data-cmp="mom">전월比</label>
+      <label class="tg"><input type="checkbox" data-cmp="yoy">전년比</label>
+      <label class="tg"><input type="checkbox" data-cmp="per">처음比</label>
+      <label class="tg"><input type="checkbox" data-opt="avg">연평균</label>
+      <label class="tg"><input type="checkbox" data-opt="heat">변화 색칠</label>
+      <div class="seg" id="lvl" title="펼침 단계"><button data-lv="1">1</button><button data-lv="2">2</button><button data-lv="3">3</button><button data-lv="9">전체</button></div>
+      <span class="sp"></span>
+      <button class="ib" data-act="reload" title="백데이터 다시 읽기">↻</button>
+      <button class="ib" data-act="memos" title="메모 모아보기">✎</button>
+      <button class="ib" data-act="newSheet" title="새 시트 (지금 화면 복사)">＋</button>
+      <span class="sep"></span>
+      <button class="ib wide" data-act="exportRep" title="보고용 엑셀 내려받기">⇩ 보고용</button>
+      <button class="ib wide" data-act="exportList" title="기준월 명단 엑셀 내려받기">⇩ 명단</button>
+    </div>
+    <div class="setbar"><div class="sets" id="sets"></div><span id="fchip"></span><span class="sp"></span>
+      <input class="srch" id="q" placeholder="줄 찾기 Ctrl+F" aria-label="줄 찾기"><span id="unc"></span>
+      <button class="ib wide" data-go="classify" title="분류 기준 편집">✎ 분류 기준</button></div>
+    <div class="sheetv"><div class="tcard" id="tcard"></div></div>
+    <div class="sheets" id="sheets"></div>
+  </section>
+
+  <!-- 설정 -->
+  <section class="view" id="v-setting" hidden>
+    <div class="tools">
+      <div class="seg big" id="stabs">
+        <button data-st="org">조직</button><button data-st="grd">직급</button><button data-st="job">직무</button>
+        <button data-st="mm">미매칭 <em id="mmN"></em></button><button data-st="classify">분류 기준</button>
+      </div>
+      <span class="sep"></span>
+      <button class="ib wide" data-act="autoSetup" title="최신 직원명부 · 조직 목록으로 기준값을 만듦">⚙ 기본 세팅</button>
+      <button class="ib wide" data-act="rescan" title="모든 직원명부를 다시 읽어 미매칭을 찾음">⟳ 미매칭 검사</button>
+      <span class="sp"></span>
+      <button class="ib" data-act="undo" title="실행 취소 (Ctrl+Z)">↶</button>
+      <button class="ib" data-act="redo" title="다시 실행 (Ctrl+Y)">↷</button>
+      <span class="sep"></span>
+      <button class="ib wide" data-act="exportMaster" title="기준값을 엑셀로 내려받기">⇩ 기준값</button>
+    </div>
+    <div class="spane" id="spane"></div>
+  </section>
+
+  <!-- 메인 -->
+  <section class="view" id="v-main" hidden>
+    <div class="empty-main" id="mainBox"></div>
+  </section>
+
+  <div class="status"><span id="stSel"></span><span id="stCond"></span><div class="r"><span id="stL"></span><span id="stR"></span><span>F1 = 단축키</span></div></div>
+</div>
+
+<div class="cover" id="cover" hidden><div class="cover-box">
+  <div class="cover-brand">인력현황 관리 프로그램</div>
+  <div class="cover-title" id="coverTitle"></div>
+  <div class="cover-text" id="coverText"></div>
+  <div class="cover-btns" id="coverBtns"></div>
+  <div class="cover-foot">자료는 연결한 폴더 안 <b>백데이터</b> 에서 읽고, 설정은 <b>data\기준정보.xlsx</b> 에 저장합니다. 이전 파일은 <b>backup</b> 에 보관됩니다.</div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+<div class="mtip" id="mtip"></div>
+
+<script src="app/vendor/xlsx.full.min.js"></script>
+<script src="app/js/util.js"></script>
+<script src="app/js/store.js"></script>
+<script src="app/js/migrate.js"></script>
+<script src="app/js/model.js"></script>
+<script src="app/js/setting.js"></script>
+<script src="app/js/classify.js"></script>
+<script src="app/js/board.js"></script>
+<script src="app/js/app.js"></script>
+</body>
+</html>
