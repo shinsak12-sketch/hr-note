@@ -3203,7 +3203,7 @@
     function load() {
       var y = parseInt($("nyYear").value, 10);
       if (!(y >= 2000 && y <= 2100)) return;
-      baseYearInfo(y - 1).then(function (r) { info = r; if (!r.M && mode === "act") mode = "empty"; else if (r.M) mode = mode || "act"; $("nyOpts").innerHTML = opts(); });
+      baseYearInfo(y - 1).then(function (r) { var box = $("nyOpts"); if (!box || parseInt($("nyYear").value, 10) !== y) return; info = r; if (!r.M && mode === "act") mode = "empty"; else if (r.M) mode = mode || "act"; box.innerHTML = opts(); }); // 팝업이 닫혔거나 연도를 또 바꿨으면 버림
     }
     openDialog({
       title: "새 연도 만들기", width: 560,
