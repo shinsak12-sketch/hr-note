@@ -1594,6 +1594,92 @@ body[data-tool="spot"] .spot{display:block}
   .slide.active .app-side>:nth-child(3){animation-delay:.7s}
   .slide.active .app-side>:nth-child(n+4){animation-delay:.85s}
 }
+
+/* ===== 모션그래픽: 7 AI 원리 · 30 긴 프롬프트 · 48 스킬북 소환 · 63 별거 없다 ===== */
+.lp-rush{display:none}
+.lpdoc{position:relative}.lpbar{position:relative;z-index:2}
+.mg-circle{display:none}
+.vbuild{display:flex;align-items:center;justify-content:center;gap:clamp(14px,2vw,30px);margin-top:clamp(22px,3.6vh,40px)}
+.vb-in{display:flex;align-items:center;gap:.7em;background:var(--surface);border:2px solid var(--line-strong);border-radius:16px;padding:.7em 1.1em;box-shadow:var(--shadow);min-width:clamp(260px,26vw,400px);text-align:left}
+.vb-in .k{flex:none;width:2em;height:2em;border-radius:50%;display:grid;place-items:center;background:var(--coral);color:#fff;font-weight:900;font-size:clamp(12px,1.2vw,15px)}
+.vb-in p{margin:0;font-size:clamp(17px,1.9vw,25px);font-weight:800;min-height:1.4em}
+.vb-in p.typing::after{content:"";display:inline-block;width:2px;height:1em;background:var(--indigo);margin-left:3px;vertical-align:-.12em;animation:blink .8s infinite}
+.vb-go{font-size:clamp(24px,3vw,40px);font-weight:900;color:var(--indigo)}
+.vb-app{display:grid;gap:7px;width:clamp(150px,13vw,200px);padding:10px;border:3px solid #1E1B33;border-radius:22px;background:#fff;box-shadow:var(--shadow)}
+.vb-app i{display:block;border-radius:8px;background:#EEF0FB;height:clamp(18px,2.4vh,26px)}
+.vb-app i.h{background:var(--indigo);height:clamp(30px,4vh,40px);display:flex;align-items:center;padding-left:.7em}
+.vb-app i.h em{font-style:normal;color:#fff;font-weight:900;font-size:clamp(11px,1.1vw,14px)}
+.vb-app i.c.s{width:70%}
+.vb-app i.btn{background:var(--coral);height:auto;color:#fff;font-style:normal;font-weight:900;font-size:clamp(11px,1.05vw,13px);text-align:center;padding:.45em 0}
+@keyframes mgBlink{50%{opacity:0}}
+@keyframes mgDrop{0%{transform:translateY(-160px);opacity:0}60%{transform:translateY(6px);opacity:1}80%{transform:translateY(-3px)}100%{transform:none}}
+@keyframes mgSpin{from{transform:rotate(0)}to{transform:rotate(720deg)}}
+@keyframes mgPop{0%{opacity:0;transform:scale(0)}70%{transform:scale(1.25)}100%{opacity:1;transform:none}}
+@keyframes mgGlowSvg{50%{filter:drop-shadow(0 0 8px #FFB300)}}
+@keyframes mgStamp{0%{opacity:0;transform:scale(2.6)}60%{opacity:1;transform:scale(.92)}100%{opacity:1;transform:none}}
+@keyframes mgWiggle{0%,100%{transform:none}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+@keyframes mgRush{from{background-position:0 0}to{background-position:0 -2600px}}
+@keyframes mgOut{to{opacity:0;visibility:hidden}}
+@keyframes mgThumb{from{top:12%}to{top:82%}}
+@keyframes mgCircle{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(0)}25%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(60deg)}80%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(260deg)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.5) rotate(300deg)}}
+@keyframes mgSpinR{to{transform:rotate(-360deg)}}
+@keyframes mgCore{0%,60%{opacity:.2;r:10}85%{opacity:1;r:60}100%{opacity:0;r:90}}
+@keyframes mgBook{from{opacity:0;transform:perspective(600px) rotateX(-70deg)}}
+@keyframes mgItem{from{opacity:0;transform:scale(.6)}}
+@keyframes mgHalo{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 2px #4be24b,0 0 22px 4px rgba(75,226,75,.6)}}
+@keyframes mgBlock{0%{opacity:0;transform:translateY(-26px) scale(.9)}70%{opacity:1;transform:translateY(3px)}100%{transform:none}}
+@media (prefers-reduced-motion:no-preference){
+  /* 7: 빈칸 깜빡 → 책이 쌓이고 → 주사위 굴러 막대가 뻗고 '가평' 뽑힘 → 판례 도장 쾅 */
+  .slide.active .mg-blank{animation:mgBlink 1s steps(1) infinite}
+  .slide.active .mg-bk{animation:mgDrop .7s cubic-bezier(.3,.7,.3,1) both}
+  .slide.active .mg-bk:nth-of-type(1){animation-delay:.7s}.slide.active .mg-bk:nth-of-type(2){animation-delay:.82s}
+  .slide.active .mg-bk:nth-of-type(3){animation-delay:.94s}.slide.active .mg-bk:nth-of-type(4){animation-delay:1.06s}
+  .slide.active .mg-bk:nth-of-type(5){animation-delay:1.18s}.slide.active .mg-bk:nth-of-type(6){animation-delay:1.3s}
+  .slide.active .mg-bk:nth-of-type(7){animation-delay:1.42s}
+  .slide.active .mg-dice{transform-box:fill-box;transform-origin:50% 50%;animation:mgSpin 1s cubic-bezier(.2,.7,.3,1) 1.6s both}
+  .slide.active .mg-bar>rect{transform-box:fill-box;transform-origin:0 50%;animation:mGrowX .6s cubic-bezier(.2,.8,.2,1) both}
+  .slide.active .mg-bar>text{animation:mFade .3s ease both}
+  .slide.active .mg-bar.b1>*{animation-delay:2.0s}.slide.active .mg-bar.b2>*{animation-delay:2.2s}
+  .slide.active .mg-bar.b3>*{animation-delay:2.4s}.slide.active .mg-bar.b4>*{animation-delay:2.6s}
+  .slide.active .mg-bar.top>rect{animation:mGrowX .6s cubic-bezier(.2,.8,.2,1) 2s both,mgGlowSvg .8s ease 3.1s 2}
+  .slide.active .mg-pick{transform-box:fill-box;transform-origin:50% 50%;animation:mgPop .5s cubic-bezier(.2,1.4,.4,1) 3.1s both}
+  .slide.active .mg-q{transform-box:fill-box;transform-origin:50% 50%;animation:mgWiggle .5s ease 3.4s 2}
+  .slide.active .mg-stamp{transform-box:fill-box;transform-origin:50% 50%;animation:mgStamp .45s cubic-bezier(.3,1.3,.5,1) 3.8s both}
+
+  /* 30: 긴 문서를 빠르게 끝까지 훑어 내려감 → 줄 수 770 */
+  .slide.active .lp-rush{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1em;position:absolute;inset:0;z-index:1;
+    background-color:var(--code-bg);
+    background-image:repeating-linear-gradient(180deg,transparent 0 8px,rgba(255,255,255,.13) 8px 12px,transparent 12px 20px,rgba(185,182,211,.09) 20px 24px,transparent 24px 31px,rgba(255,180,172,.10) 31px 35px,transparent 35px 44px);
+    background-size:100% 220px;
+    animation:mgRush 2.6s linear .4s both,mgOut .45s ease 3.1s forwards}
+  .slide.active .lp-rush::after{content:"";position:absolute;right:8px;width:6px;height:14%;border-radius:4px;background:#B9B6D3;animation:mgThumb 2.6s linear .4s both}
+  .slide.active .lp-rush em{font-style:normal;font-family:var(--font-sans);font-weight:800;font-size:clamp(13px,1.4vw,18px);color:#B9B6D3;background:var(--code-bg);padding:.1em .6em;border-radius:6px}
+  .slide.active .lp-rush b{font-family:var(--font-mono);font-size:clamp(46px,6vw,92px);font-weight:900;color:#FFB4AC;line-height:1;background:var(--code-bg);padding:0 .2em;border-radius:10px}
+  .slide.active .lp-rush span{font-family:var(--font-sans);font-weight:800;color:#FFB4AC;font-size:clamp(14px,1.5vw,20px);background:var(--code-bg);padding:0 .5em;border-radius:6px}
+
+  /* 48: 마법진이 돌고 빛나면 스킬북이 펼쳐지고, 고른 스킬이 반짝 */
+  .slide.active.mg-summon .sbook{overflow:hidden}
+  .slide.active.mg-summon .mg-circle{display:block;position:absolute;left:50%;top:50%;width:min(78%,340px);height:auto;z-index:3;pointer-events:none;filter:drop-shadow(0 0 10px rgba(255,200,90,.9));animation:mgCircle 1.6s ease-in-out .5s both}
+  .slide.active.mg-summon .mg-circle .r2{transform-origin:100px 100px;animation:mgSpinR 1.6s linear .5s both}
+  .slide.active.mg-summon .mg-circle .core{animation:mgCore 1.6s ease-in .5s both}
+  .slide.active.mg-summon .sbook>:is(.gk,.sg){animation:mgBook .55s cubic-bezier(.2,.8,.3,1) both}
+  .slide.active.mg-summon .sbook>.gk{animation-delay:1.85s}
+  .slide.active.mg-summon .sbook>.sg:nth-of-type(1){animation-delay:2s}.slide.active.mg-summon .sbook>.sg:nth-of-type(2){animation-delay:2.15s}.slide.active.mg-summon .sbook>.sg:nth-of-type(3){animation-delay:2.3s}
+  .slide.active.mg-summon .sbook .it2{animation:mgItem .35s cubic-bezier(.2,1.4,.4,1) 2.2s both}
+  .slide.active.mg-summon .sbook .sg .it2:nth-of-type(2){animation-delay:2.3s}.slide.active.mg-summon .sbook .sg .it2:nth-of-type(3){animation-delay:2.4s}.slide.active.mg-summon .sbook .sg .it2:nth-of-type(4){animation-delay:2.5s}
+  .slide.active.mg-summon .sbook .it2.qs{animation:mgItem .35s cubic-bezier(.2,1.4,.4,1) 2.35s both,mgHalo .9s ease 4.1s 3}
+  .slide.active.mg-summon .dsum .call>:nth-child(1){animation-delay:.2s}
+  .slide.active.mg-summon .dsum .call>:nth-child(2){animation-delay:2.8s}
+  .slide.active.mg-summon .dsum .call>:nth-child(3){animation-delay:3.5s}
+
+  /* 63: 말 한 줄을 치면 → 앱이 조립된다 */
+  .slide.active .vb-go{animation:mFade .3s ease 2.3s both}
+  .slide.active .vb-app{animation:mFade .3s ease 2.4s both}
+  .slide.active .vb-app i{animation:mgBlock .45s cubic-bezier(.2,.8,.3,1) both}
+  .slide.active .vb-app i:nth-child(1){animation-delay:2.5s}.slide.active .vb-app i:nth-child(2){animation-delay:2.7s}
+  .slide.active .vb-app i:nth-child(3){animation-delay:2.85s}.slide.active .vb-app i:nth-child(4){animation-delay:3s}
+  .slide.active .vb-app i:nth-child(5){animation-delay:3.2s}
+}
 @media print{*{animation:none!important}}
 .slide.m-off *{animation:none!important}
 </style>
@@ -1774,7 +1860,7 @@ body[data-tool="spot"] .spot{display:block}
   </div>
 </section>
 
-<section class="slide wide" data-accent="indigo" data-title="AI 원리 · 오픈북 시험 보는 학생"
+<section class="slide wide mg-ai" data-accent="indigo" data-title="AI 원리 · 오픈북 시험 보는 학생"
   data-notes="[0:22 · 5분] 앞 장의 '왜?'에 대한 답. 한 장에 네 컷, 왼쪽부터 순서대로.
 ① AI는 오픈북 시험 보는 학생. 문제는 늘 하나, 빈칸에 들어갈 '다음 말' 맞히기. 긴 답도 이걸 수백 번 이어 붙인 것.
 ② 오픈북을 두껍게 하려고 세상 글을 다 베꼈다. Meta Llama 3.1은 15조 개가 넘는 글 조각(토큰)을 읽었다(Meta 2024, 15.6조). 사람이 1초에 한 조각씩 쉬지 않고 읽어도 약 48만 년(강사 환산). 이걸 넘겨 보는 손 = AI 반도체 한 장이 1초에 약 1,000조 번 계산(NVIDIA H100, BF16 989 TFLOPS).
@@ -1796,7 +1882,7 @@ body[data-tool="spot"] .spot{display:block}
             <rect x="170" y="22" width="216" height="92" rx="14" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
             <path d="M190 114 L180 132 L208 114" fill="#fff" stroke="#1E1B33" stroke-width="3" stroke-linejoin="round"/>
             <text x="278" y="52" class="ct sm" text-anchor="middle">문제는 늘 하나!</text>
-            <text x="278" y="80" class="ct" text-anchor="middle">"주말엔 가평으로 ___"</text>
+            <text x="278" y="80" class="ct" text-anchor="middle">"주말엔 가평으로 <tspan class="mg-blank">___</tspan>"</text>
             <text x="278" y="104" class="ct sm teal" text-anchor="middle">다음 말 맞히기</text>
           </svg>
         </div>
@@ -1808,13 +1894,13 @@ body[data-tool="spot"] .spot{display:block}
           <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
             <rect x="0" y="0" width="400" height="300" fill="#EAFBF7"/>
             <g>
-              <rect x="232" y="196" width="134" height="20" rx="3" fill="#5D57E8"/><text x="299" y="211" class="ct xs white" text-anchor="middle">블로그</text>
-              <rect x="240" y="176" width="122" height="20" rx="3" fill="#FFD43B"/><text x="301" y="191" class="ct xs" text-anchor="middle">여행 후기</text>
-              <rect x="228" y="156" width="130" height="20" rx="3" fill="#0FB6A4"/><text x="293" y="171" class="ct xs white" text-anchor="middle">신문</text>
-              <rect x="236" y="136" width="126" height="20" rx="3" fill="#FF5A4D"/><text x="299" y="151" class="ct xs white" text-anchor="middle">책</text>
-              <rect x="244" y="116" width="116" height="20" rx="3" fill="#B7A6FF"/><text x="302" y="131" class="ct xs" text-anchor="middle">인터넷 글</text>
-              <rect x="234" y="96" width="124" height="20" rx="3" fill="#FFB74D"/><text x="296" y="111" class="ct xs" text-anchor="middle">카페 글</text>
-              <rect x="242" y="76" width="112" height="20" rx="3" fill="#80CBC4"/><text x="298" y="91" class="ct xs" text-anchor="middle">백과사전</text>
+              <g class="mg-bk"><rect x="232" y="196" width="134" height="20" rx="3" fill="#5D57E8"/><text x="299" y="211" class="ct xs white" text-anchor="middle">블로그</text></g>
+              <g class="mg-bk"><rect x="240" y="176" width="122" height="20" rx="3" fill="#FFD43B"/><text x="301" y="191" class="ct xs" text-anchor="middle">여행 후기</text></g>
+              <g class="mg-bk"><rect x="228" y="156" width="130" height="20" rx="3" fill="#0FB6A4"/><text x="293" y="171" class="ct xs white" text-anchor="middle">신문</text></g>
+              <g class="mg-bk"><rect x="236" y="136" width="126" height="20" rx="3" fill="#FF5A4D"/><text x="299" y="151" class="ct xs white" text-anchor="middle">책</text></g>
+              <g class="mg-bk"><rect x="244" y="116" width="116" height="20" rx="3" fill="#B7A6FF"/><text x="302" y="131" class="ct xs" text-anchor="middle">인터넷 글</text></g>
+              <g class="mg-bk"><rect x="234" y="96" width="124" height="20" rx="3" fill="#FFB74D"/><text x="296" y="111" class="ct xs" text-anchor="middle">카페 글</text></g>
+              <g class="mg-bk"><rect x="242" y="76" width="112" height="20" rx="3" fill="#80CBC4"/><text x="298" y="91" class="ct xs" text-anchor="middle">백과사전</text></g>
             </g>
             <use href="#stu" x="70" y="78" width="120" height="150"/><use href="#f-happy" x="70" y="78" width="120" height="150"/>
             <rect x="20" y="216" width="360" height="18" rx="4" fill="#E9C89C" stroke="#1E1B33" stroke-width="3"/>
@@ -1832,12 +1918,12 @@ body[data-tool="spot"] .spot{display:block}
             <rect x="0" y="0" width="400" height="300" fill="#FFF8E1"/>
             <use href="#stu" x="24" y="82" width="120" height="150"/><use href="#f-think" x="24" y="82" width="120" height="150"/>
             <rect x="10" y="222" width="380" height="18" rx="4" fill="#E9C89C" stroke="#1E1B33" stroke-width="3"/>
-            <g transform="rotate(-14 172 190)"><use href="#dice" x="148" y="166" width="46" height="46"/></g>
+            <g transform="rotate(-14 172 190)"><use class="mg-dice" href="#dice" x="148" y="166" width="46" height="46"/></g>
             <text x="300" y="30" class="ct sm" text-anchor="middle">오픈북에 나온 횟수</text>
-            <rect x="214" y="42" width="170" height="34" rx="9" fill="#FFD43B" stroke="#1E1B33" stroke-width="3"/><text x="299" y="65" class="ct" text-anchor="middle">가평 38%</text>
-            <rect x="214" y="84" width="140" height="34" rx="9" fill="#FFE58A" stroke="#1E1B33" stroke-width="3"/><text x="284" y="107" class="ct" text-anchor="middle">춘천 31%</text>
-            <rect x="214" y="126" width="96" height="34" rx="9" fill="#fff" stroke="#1E1B33" stroke-width="3"/><text x="262" y="149" class="ct sm" text-anchor="middle">양평 17%</text>
-            <rect x="214" y="168" width="40" height="30" rx="8" fill="#fff" stroke="#1E1B33" stroke-width="2.5" stroke-dasharray="4 4"/><text x="262" y="189" class="ct xs" text-anchor="start">숨은 명소 0.1%</text>
+            <g class="mg-bar b1 top"><rect x="214" y="42" width="170" height="34" rx="9" fill="#FFD43B" stroke="#1E1B33" stroke-width="3"/><text x="299" y="65" class="ct" text-anchor="middle">가평 38%</text><g class="mg-pick"><circle cx="370" cy="59" r="13" fill="#0FB6A4" stroke="#1E1B33" stroke-width="2.5"/><path d="M363 59 l5 5 l9 -10" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+            <g class="mg-bar b2"><rect x="214" y="84" width="140" height="34" rx="9" fill="#FFE58A" stroke="#1E1B33" stroke-width="3"/><text x="284" y="107" class="ct" text-anchor="middle">춘천 31%</text></g>
+            <g class="mg-bar b3"><rect x="214" y="126" width="96" height="34" rx="9" fill="#fff" stroke="#1E1B33" stroke-width="3"/><text x="262" y="149" class="ct sm" text-anchor="middle">양평 17%</text></g>
+            <g class="mg-bar b4"><rect x="214" y="168" width="40" height="30" rx="8" fill="#fff" stroke="#1E1B33" stroke-width="2.5" stroke-dasharray="4 4"/><text x="262" y="189" class="ct xs" text-anchor="start">숨은 명소 0.1%</text></g>
           </svg>
         </div>
         <h3>많이 나온 걸 뽑는다</h3>
@@ -1855,8 +1941,8 @@ body[data-tool="spot"] .spot{display:block}
             <text x="141" y="77" class="ct" text-anchor="middle">"○○다 12345 판결"에 따르면…</text>
             <rect x="226" y="104" width="150" height="104" rx="8" fill="#fff" stroke="#1E1B33" stroke-width="3"/>
             <path d="M301 104 V208" stroke="#1E1B33" stroke-width="2.5"/>
-            <text x="338" y="170" class="ct big" text-anchor="middle">???</text>
-            <g transform="rotate(-14 300 250)"><rect x="232" y="232" width="138" height="38" rx="8" fill="none" stroke="#FF5A4D" stroke-width="4"/><text x="301" y="258" class="ct coral" text-anchor="middle">그런 판례 없음</text></g>
+            <text x="338" y="170" class="ct big mg-q" text-anchor="middle">???</text>
+            <g transform="rotate(-14 300 250)"><g class="mg-stamp"><rect x="232" y="232" width="138" height="38" rx="8" fill="none" stroke="#FF5A4D" stroke-width="4"/><text x="301" y="258" class="ct coral" text-anchor="middle">그런 판례 없음</text></g></g>
           </svg>
         </div>
         <h3>없으면 지어낸다</h3>
@@ -2273,7 +2359,7 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
     <span class="eyebrow"><span class="dot"></span> 왜 하나만으로는 안 될까</span>
     <h2 class="subhead">이 프롬프트, <span class="accent">처음부터</span> 쓸 수 있을까요?</h2>
     <div class="lp">
-      <div class="lpdoc"><div class="lpbar"><i></i><i></i><i></i><span>프롬프트 개정안 v3.md</span></div>
+      <div class="lpdoc"><div class="lpbar"><i></i><i></i><i></i><span>프롬프트 개정안 v3.md</span></div><div class="lp-rush" aria-hidden="true"><em>끝까지 내려 보는 중…</em><b data-dur="2300">770</b><span>줄</span></div>
 <pre class="lphead"># 판단 입장
 당신은 보험사 소속 차량손해사정사의 시각으로 판단합니다. 손해사정의 목적은
 불필요한 수리를 억제하고 투명하고 공정한 보험금을 지급하는 것이며, 동시에
@@ -2296,8 +2382,8 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
 화재·산사태, 가해자 확정 사고 등은 보상 대상 예외)
 [업무처리] 기본옵션과 다른 타이어·휠 장착 시 부속품 담보 기재여부 확인. 제원(단면폭/</pre></div>
       <div class="lpstat">
-        <div><b>27,870<small>자</small></b><span>프롬프트 하나의 길이</span></div>
-        <div><b>770<small>줄</small></b><span>공통 블록 6 · 개별 3 · 참고자료 14</span></div>
+        <div><b data-dur="2300">27,870<small>자</small></b><span>프롬프트 하나의 길이</span></div>
+        <div><b data-dur="2300">770<small>줄</small></b><span>공통 블록 6 · 개별 3 · 참고자료 14</span></div>
         <div><b>v3</b><span>고치고 또 고친 세 번째 판</span></div>
         <p class="lpno">사람이 처음부터<br>한 번에 쓰기는 <b>불가능</b></p>
       </div>
@@ -2615,7 +2701,7 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
   </div>
 </section>
 
-<section class="slide wide game" data-accent="gold" data-title="응용 ① 스킬북 소환"
+<section class="slide wide game mg-summon" data-accent="gold" data-title="응용 ① 스킬북 소환"
   data-notes="[스킬북 소환 · 3분] 스킬이 여러 개로 늘어나면 뭐가 뭐였는지 가물가물해진다. 그래서 '스킬북 소환' 스킬을 하나 만들어 둔다. AI는 대화를 시작할 때 내 계정에 깔린 스킬들의 이름과 설명을 먼저 훑어보기 때문에, 이걸 업무별로 정리해 보여 주고 하려는 일에 맞는 스킬을 골라 줄 수 있다.
 만드는 법도 대화: '내 스킬 목록을 업무별로 정리해서 보여 주고, 내가 하려는 일을 말하면 맞는 스킬을 골라 주는 스킬 만들어 줘. 이름은 스킬북 소환.'
 한계: 추천 정확도는 각 스킬의 설명란에 달려 있다. 그 서비스 계정에 깔린 스킬만 보인다. 사용 기록은 모른다.
@@ -2629,7 +2715,7 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
         <div class="cb me">고객한테 보낼 파손 확인 보고서 만들어야 해. 뭐 쓰면 돼?</div>
         <div class="cb ai"><b class="u">입회보고서</b> 스킬을 쓰세요.<br>넣을 것: 현장 사진 + 짧은 메모</div>
       </div>
-      <div class="gp sbook"><span class="gk">📖 스킬북 · 7개</span>
+      <div class="gp sbook"><svg class="mg-circle" viewBox="0 0 200 200" aria-hidden="true"><g class="r1"><circle cx="100" cy="100" r="92" fill="none" stroke="#e8c36a" stroke-width="2"/><circle cx="100" cy="100" r="84" fill="none" stroke="#e8c36a" stroke-width="5" stroke-dasharray="2 9"/><circle cx="100" cy="100" r="76" fill="none" stroke="#e8c36a" stroke-width="1.5"/></g><g class="r2"><polygon points="100,30 160.6,135 39.4,135" fill="none" stroke="#ffd98a" stroke-width="2"/><polygon points="100,170 39.4,65 160.6,65" fill="none" stroke="#ffd98a" stroke-width="2"/><circle cx="100" cy="100" r="40" fill="none" stroke="#ffd98a" stroke-width="2" stroke-dasharray="14 6"/></g><circle class="core" cx="100" cy="100" r="22" fill="#fff3c4"/></svg><span class="gk">📖 스킬북 · 7개</span>
         <div class="sg"><span class="gl">장표</span><span class="it2 qu">디비-양식-일반<small>A4 가로 보고서</small></span><span class="it2 qu">디비-양식-와이드<small>16:9 장표</small></span><span class="it2 qu">디비-양식-세로<small>A4 세로 기안</small></span><span class="it2 qr">디비-장표-스타일<small>장표 디자인 규칙</small></span></div>
         <div class="sg"><span class="gl">현장</span><span class="it2 qs">입회보고서<small>사진 + 메모 → 보고서</small></span></div>
         <div class="sg"><span class="gl">민원</span><span class="it2 qm">민원 회신<small>⚔ 회신 문안</small></span><span class="it2 qd">회신 검수<small>🛡 표현 · 날짜 점검</small></span></div>
@@ -2892,11 +2978,16 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
 </section>
 
 <section class="slide center mid bp" data-accent="indigo" data-title="바이브코딩, 별거 없습니다"
-  data-notes="[도입 결론] 바이브코딩, 별거 없다. 지금까지 한 것과 똑같이 대화로, 만들고 싶은 걸 말하면 된다. 누구나 할 수 있다.">
+  data-notes="[도입 결론] 화면 아래: 말 한 줄을 치면 앱이 조립되는 모션(자동 재생). 바이브코딩, 별거 없다. 지금까지 한 것과 똑같이 대화로, 만들고 싶은 걸 말하면 된다. 누구나 할 수 있다.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 결론부터</span>
     <h2 class="headline">바이브코딩, <span class="accent">별거 없습니다</span></h2>
     <div class="vchips"><b>똑같이 대화로</b><b>만들고 싶은 걸</b><b>누구나</b></div>
+    <div class="vbuild" aria-hidden="true">
+      <div class="vb-in"><span class="k">나</span><p data-type="우리 센터 공지 앱 만들어 줘">우리 센터 공지 앱 만들어 줘</p></div>
+      <div class="vb-go">→</div>
+      <div class="vb-app"><i class="h"><em>센터 공지</em></i><i class="c"></i><i class="c"></i><i class="c s"></i><i class="btn">+ 새 공지</i></div>
+    </div>
   </div>
 </section>
 
@@ -3342,16 +3433,21 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
   // 숫자는 0부터 세면서 올라간다 (25% · 62.7% · 27,870 등)
   var reduceMotion=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   function countUp(sl){ if(reduceMotion) return;
-    sl.querySelectorAll('.vb b, .brow b, .cols4 .cl b, .lpstat b').forEach(function(el){
+    sl.querySelectorAll('.vb b, .brow b, .cols4 .cl b, .lpstat b, .lp-rush b').forEach(function(el){
       var tn=el.firstChild; if(!tn||tn.nodeType!==3) return;
       if(el.dataset.cu==null) el.dataset.cu=tn.nodeValue;
       var orig=el.dataset.cu, m=orig.match(/^([\d,]+(?:\.\d+)?)(.*)$/); if(!m) return;
       var num=parseFloat(m[1].replace(/,/g,'')), dec=(m[1].split('.')[1]||'').length, comma=m[1].indexOf(',')>=0, rest=m[2], t0=null, run=(el._cu=(el._cu||0)+1);
       function fmt(v){ return (comma?v.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec}):v.toFixed(dec))+rest; }
       tn.nodeValue=fmt(0);
-      function step(ts){ if(el._cu!==run) return; if(t0===null) t0=ts; var p=Math.min(1,Math.max(0,(ts-t0-450)/1000)), e=1-Math.pow(1-p,3);
+      function step(ts){ if(el._cu!==run) return; if(t0===null) t0=ts; var p=Math.min(1,Math.max(0,(ts-t0-450)/(+el.dataset.dur||1000))), e=1-Math.pow(1-p,3);
         tn.nodeValue=p<1?fmt(num*e):orig; if(p<1) requestAnimationFrame(step); }
-      requestAnimationFrame(step); }); }
+      requestAnimationFrame(step); });
+    // 글자를 한 자씩 친다 (63장)
+    sl.querySelectorAll('[data-type]').forEach(function(el){ var full=el.getAttribute('data-type'), n=0, run=(el._ty=(el._ty||0)+1);
+      el.textContent=''; el.classList.add('typing');
+      setTimeout(function tick(){ if(el._ty!==run) return; el.textContent=full.slice(0,++n);
+        if(n<full.length) setTimeout(tick,85); else setTimeout(function(){ if(el._ty===run) el.classList.remove('typing'); },600); },900); }); }
   // 화면이 작아 내용이 넘치면 그 장만 살짝 줄여서 맞춘다
   function fitSlide(sl){ var inner=sl&&sl.querySelector('.slide-inner'); if(!inner) return;
     inner.style.zoom=''; sl.classList.add('m-off'); var cs=getComputedStyle(sl);
