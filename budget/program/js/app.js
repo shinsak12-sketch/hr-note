@@ -3073,7 +3073,9 @@
   /* ---------- 연도 ---------- */
   function fillYearSelect() {
     var h = S.years.map(function (y) { return '<option value="' + y + '"' + (y === S.year ? " selected" : "") + ">" + y + "년</option>"; }).join("") + '<option value="new">＋ 새 연도…</option>';
-    $("selYear").innerHTML = h; $("selYearX").innerHTML = h;
+    var ey = execYear();
+    var hx = S.years.map(function (y) { var fut = ey && y > ey; return '<option value="' + y + '"' + (y === S.year ? " selected" : "") + (fut && y !== S.year ? " disabled" : "") + ">" + y + "년" + (CLOSED[y] ? " 🔒" : fut ? " (" + ey + " 연마감 후)" : "") + "</option>"; }).join("") + '<option value="new">＋ 새 연도…</option>';
+    $("selYear").innerHTML = h; $("selYearX").innerHTML = hx;
   }
 
   // 0.1 판 파일(코드로 연결)을 분류 ID 로 옮김. 분류에 없으면 새로 만듦
@@ -3155,10 +3157,13 @@
   // 이 연도 집행 자료 + 전년 집행 메모 (다음 해 계획에서 참고)
   function loadExecFor(y) {
     var me = ACT;
-    return Promise.all([Store.loadExec(y).catch(function () { return null; }), Store.loadExec(y - 1).catch(function () { return null; })]).then(function (r) { return withPane(me, function () {
+    var newer = null, soft = function (e) { if (e && e.name === "NewerFormat") newer = e; return null; };
+    return Promise.all([Store.loadExec(y).catch(soft), Store.loadExec(y - 1).catch(soft)]).then(function (r) { return withPane(me, function () {
+      if (newer) { Store.setReadOnly(true); clearInterval(autoTimer); renderSave(); toast(newer.message + " — 프로그램을 새 버전으로 바꿔 주세요. 자료를 지키려고 저장을 멈췄습니다.", true, 12000); }
       if (S.year !== y) return;
       X = r[0] || blankX(y); PREVX = r[1];
-      X.pins = X.pins || {}; X.rules = X.rules || []; X.fmt = X.fmt || {};
+      X.pins = X.pins || {}; X.rules = X.rules || []; X.fmt = X.fmt || {}; X.closeLog = X.closeLog || [];
+      if (X.close) CLOSED[y] = X.close; else delete CLOSED[y];
       if (MODE === "exec") renderAll();
       if (me === ACT) refreshChrome();
       renderOthers();
@@ -3626,6 +3631,17 @@
     var now = new Date(), ty = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear(), tm = now.getMonth() === 0 ? 12 : now.getMonth();
     var key = "budget.remind." + now.getFullYear() + "-" + (now.getMonth() + 1);
     try { if (localStorage.getItem(key)) return; } catch (e) { return; }
+    var ey = execYear();
+    if (ey && ty > ey && S.years.indexOf(ey) >= 0) { // 올해 자료를 넣을 차례인데 전년 집행 연마감이 아직
+      try { localStorage.setItem(key, "1"); } catch (e) { /* 저장소 막힘 */ }
+      openDialog({
+        title: ey + "년 연마감을 해 주세요", key: "remind", width: 600, okText: "연마감 하러 가기", cancelText: "나중에",
+        body: '<div class="mdl-pad msg remind"><div class="rm-ico">' + mascotSvg("rm-mascot") + '<span class="rm-bub">마감 먼저!</span></div><div><b>' + ty + "년 " + tm + "월</b> 자료를 넣으려면 먼저 <b>" + ey + "년 집행 연마감</b>이 필요합니다.<br><br>" +
+          "① " + ey + "년 12월까지 더존 자료 반영<br>② [지난 달 수정] 모두 처리<br>③ 미연결 더존 과목 정리<br>④ 집행 화면 <b>[연마감]</b><br><br><span class=\"mute\">이 안내는 매월 처음 켤 때 한 번만 나옵니다.</span></div></div>",
+        onOk: function () { setTimeout(function () { var go = function () { setMode("exec"); yCloseDialog(); }; if (S.year !== ey) switchYear(ey).then(go); else go(); }, 0); }
+      });
+      return;
+    }
     if (S.years.indexOf(ty) < 0) return;
     var get = S.year === ty && X && X.year === ty ? Promise.resolve(X) : Store.loadExec(ty).catch(function () { return null; });
     get.then(function (x) {
@@ -3734,12 +3750,16 @@
           ].filter(Boolean));
           return;
         }
+        return loadClosed().then(function () {
         hideCover();
         var last = 0;
         try { last = parseInt(localStorage.getItem("budget.lastYear"), 10); } catch (e) { last = 0; }
         try { PANE_SAVED = JSON.parse(localStorage.getItem("budget.panes") || "null"); } catch (e) { PANE_SAVED = null; }
         if (PANE_SAVED && PANE_SAVED.panes && PANE_SAVED.panes.length > 1 && S.years.indexOf(PANE_SAVED.panes[0].year) >= 0) last = PANE_SAVED.panes[0].year;
+        var startPlan = PANE_SAVED && PANE_SAVED.panes && PANE_SAVED.panes.length > 1 && PANE_SAVED.panes[0].mode === "plan";
+        if (!startPlan) last = execYear() || S.years[S.years.length - 1]; // 집행 화면은 연마감 안 된 연도부터
         return loadYear(S.years.indexOf(last) >= 0 ? last : S.years[S.years.length - 1]).then(function () { if (S.year) setMode(PANE_SAVED && PANE_SAVED.panes && PANE_SAVED.panes.length > 1 && PANE_SAVED.panes[0].mode === "plan" ? "plan" : "exec"); restorePanes(); setTimeout(monthRemind, 800); }); // 켜면 집행 화면부터 (분할은 지난번 그대로)
+        });
       });
     }).catch(function (e) {
       if (e && e.name === "NewerFormat") {
@@ -3758,7 +3778,7 @@
   /* ---------- 2026년 테스트(더미) 데이터 ----------
      2026년 계획(전년 = 2025 실적, 원안 마감 + 1차 변경 마감) + 더존 손익 원데이터 양식 더미(2026년 1~12월)
      → 2027년 새 연도를 만들고 [전년 실적 가져오기]로 그 파일을 넣어 보며 테스트 */
-  var APP_VER = "1.0.2"; // 프로그램 버전 (배포할 때마다 올림 · 설명서 · 첫 화면에 표시)
+  var APP_VER = "1.1.0"; // 프로그램 버전 (배포할 때마다 올림 · 설명서 · 첫 화면에 표시)
   var TEST_PL = "2026_손익_1-12월_테스트.xls";
   var HAS_TEST = typeof TestData !== "undefined"; // 배포판에는 testdata.js 가 없음 → 테스트 기능 숨김
   function testDataDialog() {
@@ -3881,7 +3901,11 @@
             return Store.writeBook("더존원본/2026", "분개장_" + mm + "월.xls", book(j.aoa), "biff8")
               .then(function () { return Store.writeBook("더존원본/2026", "손익_" + mm + "월.xls", book(TestData.profitLoss(list, 2026, m, j.amounts)), "biff8"); });
           });
-        }, Promise.resolve()); });
+        }, Promise.resolve()); }).then(function () { // 연마감 시험용 12월 파일: 하위 폴더에 두어 자동으로 읽히지 않게
+          var j = TestData.journal(list, 2026, 12);
+          return Store.writeBook("더존원본/2026/연마감테스트", "분개장_12월.xls", book(j.aoa), "biff8")
+            .then(function () { return Store.writeBook("더존원본/2026/연마감테스트", "손익_12월.xls", book(TestData.profitLoss(list, 2026, 12, j.amounts)), "biff8"); });
+        });
       })
       .then(function () { return testExecTo3(); })
       .then(function () { return Store.listYears(); })
@@ -3903,7 +3927,106 @@
   var XU = { view: "all", agg: "month", cmp: "plan", upto: 0, sort: null, quick: "", freeze: "acc", sel: null, cols: {}, hide: {}, itemOpen: {} };
   var xTimer = null, XL = null;
   function ensureX() { if (!X || X.year !== S.year) { X = blankX(S.year); XJN = null; } return X; }
-  function blankX(y) { return { year: y, month: 0, at: "", src: { jn: "", pl: "" }, files: [], alerts: [], memos: {}, problems: [], log: [], lines: [], pins: {}, rules: [], fmt: {} }; }
+  function blankX(y) { return { year: y, month: 0, at: "", src: { jn: "", pl: "" }, files: [], alerts: [], memos: {}, problems: [], log: [], lines: [], pins: {}, rules: [], fmt: {}, close: null, closeLog: [] }; }
+
+  /* ---------- 연마감: 집행은 연마감 안 된 가장 이른 연도에서만 (다음 연도 계획은 미리 써도 됨) ----------
+     CLOSED[연도] = {at, memo} — 집행 파일 정보 시트의 '연마감' */
+  var CLOSED = {};
+  function execYear() { var ys = S.years.slice().sort(function (a, b) { return a - b; }); for (var i = 0; i < ys.length; i++) if (!CLOSED[ys[i]]) return ys[i]; return null; }
+  function xFuture(y) { var e = execYear(); return !!(e && y > e); }
+  function loadClosed() { CLOSED = {}; return Promise.all(S.years.map(function (y) { return Store.execClosedAt(y).then(function (at) { if (at) CLOSED[y] = { at: at, memo: "" }; }); })); }
+  function renderYClose() {
+    var b = document.getElementById("btnYClose"); if (!b) return;
+    var c = !!(S.year && CLOSED[S.year]), f = !!(S.year && xFuture(S.year));
+    b.disabled = f || !S.year;
+    document.getElementById("yCloseTxt").innerHTML = c ? "연마감<br>해제" : "연마감";
+    b.classList.toggle("on", c);
+    var r = document.querySelector('#rb-exec [data-act="xRead"]');
+    if (r) { r.disabled = c || f; r.title = c ? "연마감된 연도입니다 — [연마감 해제] 후 읽을 수 있습니다" : f ? execYear() + "년 연마감 후 열 수 있습니다" : "더존원본\\연도 폴더의 분개장 · 재무제표(손익)를 읽어 반영"; }
+  }
+  function yCloseDialog() {
+    if (!S.year) return;
+    ensureX();
+    var y = S.year;
+    if (CLOSED[y]) return yOpenDialog();
+    if (xFuture(y)) { toast(execYear() + "년 연마감을 먼저 하세요", true); return; }
+    xRows(false); // 미연결 과목 계산 (XL)
+    var pend = X.alerts.filter(function (a) { return a.state !== "정상"; }).length, un = Object.keys(XL.C.un).length;
+    var checks = [
+      { ok: X.month === 12, t: "12월까지 반영", n: X.month === 12 ? "12월까지 반영됨" : (X.month ? X.month + "월까지만 반영됨 — 12월 자료를 [더존 자료 읽기]로 넣으세요" : "아직 반영한 자료가 없습니다") },
+      { ok: !pend, t: "지난 달 수정 처리", n: pend ? "미처리 " + pend + "건 — [지난 달 수정]에서 처리하세요" : "모두 처리됨" },
+      { ok: !un, t: "미연결 더존 과목", n: un ? un + "개 — [더존 자료 읽기] 2단계에서 연결하거나 제외하세요" : "없음" }
+    ];
+    if (S.years.indexOf(y - 1) >= 0) checks.push({ ok: !!CLOSED[y - 1], t: (y - 1) + "년 연마감", n: CLOSED[y - 1] ? "됨" : "아직 안 됨" });
+    var stop = checks.some(function (c) { return !c.ok; });
+    openDialog({
+      title: y + "년 집행 연마감", width: 640, okText: "연마감",
+      body: '<div class="mdl-pad"><div class="vk">' + checks.map(function (c) { return '<div class="vk-i ' + (c.ok ? "ok" : "stop") + '"><span class="vk-ic">' + (c.ok ? "✓" : "✖") + "</span><b>" + c.t + '</b><span class="vk-n">' + esc(c.n) + "</span></div>"; }).join("") + "</div>" +
+        (stop ? '<div class="pv-warn">✖ 항목을 먼저 해결해야 연마감할 수 있습니다.</div>' : "") +
+        '<div class="msg" style="margin:10px 0">연마감하면 <b>' + y + "년 집행은 잠기고</b>(더존 자료 읽기 불가 · 메모와 강조 표시는 가능) <b>" + (y + 1) + "년 집행이 열립니다</b>. 실수했으면 [연마감 해제]로 풀 수 있습니다.</div>" +
+        '<div class="f-row"><label>메모</label><input class="inp" id="ycMemo" placeholder="예: ' + y + '년 결산 확정" style="flex:1"></div>' +
+        '<label class="vk-c"><input type="checkbox" id="ycOk"' + (stop ? " disabled" : "") + "> 위 내용을 확인했습니다</label></div>",
+      onOk: function () { if (stop || !$("ycOk").checked) return false; doYClose(y, $("ycMemo").value.trim()); }
+    });
+    var ok = dlg.el.querySelector("[data-ok]");
+    if (ok) ok.disabled = true;
+    $("ycOk").addEventListener("change", function () { if (ok) ok.disabled = stop || !this.checked; });
+  }
+  function doYClose(y, memo) {
+    var at = Store.stamp(), y1 = y + 1;
+    X.close = { at: at, memo: memo }; X.closeLog = X.closeLog || []; X.closeLog.push({ t: at, k: "연마감", m: memo });
+    xLog("연마감" + (memo ? " — " + memo : ""));
+    CLOSED[y] = X.close;
+    var acts = xCompute().acts;
+    xSave(false, true); xFlush();
+    renderAll(); refreshChrome(); renderOthers();
+    if (S.years.indexOf(y1) < 0) { toast(y + "년 연마감을 했습니다 — " + y1 + "년 집행은 [새 연도 만들기]로 " + y1 + "년을 만들면 열립니다", false, 7000); return; }
+    setTimeout(function () {
+      openDialog({
+        title: y1 + "년 계획의 전년 실적 바꾸기", key: "yclose2", width: 580, okText: "바꾸기", cancelText: "그대로 두기",
+        body: '<div class="mdl-pad msg">' + y + "년 연마감을 했습니다. <b>" + y1 + "년 집행이 열렸습니다.</b><br><br>" + y1 + "년 계획을 만들 때 넣은 <b>전년 실적</b>을 " + y + "년 <b>1~12월 확정 실적</b>으로 바꿀까요?<br>" +
+          '<span class="mute">바뀌는 것은 참고 칸(전년 실적 · 월별 전년)뿐이고, 정해 둔 계획 금액은 그대로입니다. 실행 취소로 되돌릴 수 있습니다.</span></div>',
+        onOk: function () { setTimeout(function () { applyPrevActs(y, y1, acts); }, 0); }
+      });
+    }, 0);
+  }
+  // 다음 연도 계획의 전년 실적(prev · pm)을 확정 실적으로 — 그 연도를 띄운 칸이 있으면 거기서, 없으면 이 칸에서 열어서
+  function applyPrevActs(y0, y1, acts) {
+    var run = function () {
+      change(function () {
+        eachLeaf(S.cat, function (t, m, s, lf) {
+          var a = acts[lf.id] || new Array(12).fill(0), p = S.plan[lf.id];
+          if (!p) { if (!a.some(function (v) { return v; })) return; p = S.plan[lf.id] = Calc.blankPlan(); }
+          p.pm = a.slice(); p.prev = a.reduce(function (x, v) { return x + v; }, 0);
+        });
+      }, "전년 실적을 " + y0 + "년 1~12월 확정 실적으로 바꿈 (연마감)");
+      toast(y1 + "년 계획의 전년 실적을 " + y0 + "년 확정 실적으로 바꿨습니다", false, 5000);
+    };
+    if (PANES.some(function (q) { return (q === ACT ? S.year : q.year) === y1; })) return withYear(y1, run);
+    return switchYear(y1).then(function () { if (S.year === y1) { setMode("plan"); run(); } });
+  }
+  function yOpenDialog() {
+    var y = S.year, c = CLOSED[y];
+    if (!c) return;
+    if (CLOSED[y + 1]) { toast((y + 1) + "년이 연마감돼 있어 " + y + "년은 풀 수 없습니다 — " + (y + 1) + "년부터 해제하세요", true, 6000); return; }
+    var cx = X && X.close ? X.close : c;
+    openDialog({
+      title: y + "년 연마감 해제", width: 580, okText: "해제", danger: true,
+      body: '<div class="mdl-pad"><div class="msg">' + y + "년은 <b>" + esc(cx.at) + "</b>에 연마감했습니다" + (cx.memo ? " (" + esc(cx.memo) + ")" : "") + ".<br>해제하면 다시 더존 자료를 읽을 수 있고, <b>" + (y + 1) + "년 집행 화면은 다시 연마감할 때까지 닫힙니다</b> (자료는 그대로 남습니다).</div>" +
+        '<div class="f-row" style="margin-top:10px"><label>해제 사유</label><input class="inp" id="yoWhy" placeholder="예: 12월 전표 추가 반영" style="flex:1"></div><div class="pv-warn" id="yoErr"></div></div>',
+      onOk: function () {
+        var why = $("yoWhy").value.trim();
+        if (!why) { $("yoErr").textContent = "해제 사유를 적어 주세요"; return false; }
+        var at = Store.stamp();
+        X.close = null; X.closeLog = X.closeLog || []; X.closeLog.push({ t: at, k: "해제", m: why });
+        xLog("연마감 해제 — " + why);
+        delete CLOSED[y];
+        xSave(false, true); xFlush();
+        renderAll(); refreshChrome(); renderOthers();
+        toast(y + "년 연마감을 풀었습니다 — 다시 연마감할 때까지 " + (y + 1) + "년 집행은 닫힙니다", false, 5000);
+      }
+    });
+  }
   function xPath(y) { return "더존원본/" + (y || S.year); }
   function xLog(m) { X.log.push({ t: Store.stamp(), m: m }); if (X.log.length > 2000) X.log.shift(); }
   // 집행 저장: 연도마다 기다리는 내용(XQ)을 두고 0.5초 모아서. 내용(X · 보기용 집행 표)은 부르는 순간 것으로 고정
@@ -4044,8 +4167,19 @@
 
   function renderExec() {
     ensureX();
+    renderYClose();
+    if (xFuture(S.year)) { // 전년 연마감 전: 이 연도 집행은 아직 닫혀 있음
+      var ey = execYear();
+      $("execPill").textContent = "🔒 " + ey + "년 연마감 전";
+      $("kpis").innerHTML = ""; $("xMstat").innerHTML = ""; $("xQuick").innerHTML = "";
+      $("xAlertN").hidden = true;
+      $("tblX").innerHTML = '<div class="empty"><b>' + S.year + "년 집행은 아직 열 수 없습니다.</b><br>" + ey + "년 집행을 담당자가 <b>연마감</b>한 뒤에 열립니다. " + S.year + "년 <b>계획</b>은 계획 화면에서 계속 쓸 수 있습니다." +
+        '<br><br><button class="btn primary" data-act="goExecYear">' + ey + '년 집행으로 가기</button> <button class="btn" data-act="goPlan">' + S.year + "년 계획 보기</button></div>";
+      $("stCount").textContent = S.year + "년 집행 · " + ey + "년 연마감 전"; $("stSum").textContent = "";
+      return;
+    }
     var rows = xRows(false), U = xUpto(), M = X ? X.month : 0, base = XL.base;
-    $("execPill").textContent = "계획 기준: " + base.label;
+    $("execPill").textContent = (CLOSED[S.year] ? "🔒 연마감 " + String(CLOSED[S.year].at).slice(0, 10) + " · " : "") + "계획 기준: " + base.label;
     renderXStrip(rows, U);
     renderXMonths();
     $("xAlertN").textContent = X ? X.alerts.filter(function (a) { return a.state !== "정상"; }).length || "" : "";
@@ -4902,6 +5036,8 @@
   function lineKey(l) { return l.d + "|" + l.no + "|" + l.code + "|" + l.amt + "|" + l.memo; }
   function xRead() {
     if (!S.year) return;
+    if (CLOSED[S.year]) { toast(S.year + "년은 연마감됐습니다 — [연마감 해제] 후 읽을 수 있습니다", true, 5000); return; }
+    if (xFuture(S.year)) { toast(execYear() + "년 연마감 후 " + S.year + "년 집행을 열 수 있습니다", true, 5000); return; }
     ensureX();
     var path = xPath();
     toast("더존원본\\" + S.year + " 폴더를 읽는 중…", false, 1500);
@@ -5898,7 +6034,7 @@
     PANE_SAVED = null;
     if (!v || !v.panes || v.panes.length < 2 || !S.year) return;
     SPLIT.kind = v.kind || "lr"; SPLIT.sx = v.sx || 50; SPLIT.sy = v.sy || 50;
-    v.panes.slice(1, 4).forEach(function (q) { var p = addPane(q.mode, q.year); p.link = q.link !== false; p.el.querySelector(".pane-lk").checked = p.link; });
+    v.panes.slice(1, 4).forEach(function (q) { var p = addPane(q.mode, q.mode === "exec" && xFuture(q.year) ? execYear() : q.year); p.link = q.link !== false; p.el.querySelector(".pane-lk").checked = p.link; });
     activatePane(PANES[0]);
     layoutPanes();
   }
@@ -5985,6 +6121,9 @@
       case "takeOwner": return takeOwner();
       case "manual": return manualDialog();
       case "xRead": return xRead();
+      case "yClose": return yCloseDialog();
+      case "goExecYear": { var ey0 = execYear(); return ey0 ? switchYear(ey0) : null; }
+      case "goPlan": return setMode("plan");
       case "xAlerts": return alertsDialog();
       case "xMemos": return memoList();
       case "xSearch": return X && X.lines.length ? xSearchDialog() : toast("아직 반영한 더존 자료가 없습니다");

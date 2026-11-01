@@ -9,7 +9,7 @@
   var BACKUP_EVERY_MS = 30 * 60000;  // 같은 파일은 30분에 한 번만 백업
   var PREFIX = "사업비계획_";
   var MASTER = "기준정보.xlsx";
-  var FORMAT_VER = 3;                // 파일 구조를 바꾸면 올림 → 옛 프로그램이 새 자료를 열면 막음 (자료 보호)
+  var FORMAT_VER = 4;                // 파일 구조를 바꾸면 올림 → 옛 프로그램이 새 자료를 열면 막음 (자료 보호)
 
   var dir = null;
   var lastBackup = {};
@@ -534,6 +534,7 @@
   function loadExec(year) {
     return readFile("data", execName(year)).then(function (buf) {
       var wb = XLSX.read(buf, { type: "array" }), info = {};
+      newerCheck(wb, execName(year));
       rowsOf(wb, "정보").forEach(function (r) { info[str(r["항목"])] = r["값"]; });
       var j = function (v) { try { return JSON.parse(str(v) || "null"); } catch (e) { return null; } };
       var X = {
@@ -544,7 +545,9 @@
             changes: j(r["바뀐전표"]) || [], state: str(r["상태"]) || "미처리", doneAt: str(r["처리일시"]), reason: str(r["사유"]) };
         }),
         memos: {}, problems: rowsOf(wb, "문제").map(function (r) { return { at: str(r["일시"]), file: str(r["파일"]), text: str(r["내용"]) }; }),
-        log: rowsOf(wb, "기록").map(function (r) { return { t: str(r["시각"]), m: str(r["내용"]) }; }), lines: []
+        log: rowsOf(wb, "기록").map(function (r) { return { t: str(r["시각"]), m: str(r["내용"]) }; }), lines: [],
+        close: str(info["연마감"]) ? { at: str(info["연마감"]), memo: str(info["연마감메모"]) } : null,
+        closeLog: rowsOf(wb, "연마감기록").map(function (r) { return { t: str(r["시각"]), k: str(r["구분"]), m: str(r["메모"]) }; })
       };
       rowsOf(wb, "메모").forEach(function (r) { X.memos[str(r["대상"])] = { text: str(r["메모"]), at: str(r["일시"]), label: str(r["위치"]) }; });
       X.pins = {}; X.rules = []; X.fmt = fmtOf(wb);
@@ -556,10 +559,19 @@
       }, function () { return X; });
     }, function (e) { if (e && e.name === "NotFoundError") return null; throw e; });
   }
+  // 연마감 일시만 빨리 (정보 시트만 읽음) — 없거나 마감 전이면 ""
+  function execClosedAt(year) {
+    return readFile("data", execName(year), true).then(function (buf) {
+      var wb = XLSX.read(buf, { type: "array", sheets: ["정보"] }), at = "";
+      rowsOf(wb, "정보").forEach(function (r) { if (str(r["항목"]) === "연마감") at = str(r["값"]); });
+      return at;
+    }, function () { return ""; });
+  }
   // actRows: [{id,l1,l2,l3,m:[12]}] — 보기용 (집행은 내역과 분류로 늘 다시 계산)
   function saveExec(X, actRows, linesChanged) {
     var wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, sheet([["항목", "값"], ["연도", X.year], ["반영월", X.month], ["반영일시", X.at], ["분개장", X.src.jn], ["손익", X.src.pl], ["저장시각", stamp()],
+      ["연마감", X.close ? X.close.at : ""], ["연마감메모", X.close ? X.close.memo : ""], ["형식버전", FORMAT_VER],
       ["설명", "집행 금액은 더존 분개장(판관비 줄: 차변 − 대변)에서 계산합니다. 원본 파일은 더존원본 폴더에 그대로 있습니다."]], [12, 60]), "정보");
     var ah = ["ID", "대분류", "중분류", "소분류"];
     for (var i = 1; i <= 12; i++) ah.push(i + "월");
@@ -575,6 +587,7 @@
     XLSX.utils.book_append_sheet(wb, fmtSheet(X.fmt), "서식");
     XLSX.utils.book_append_sheet(wb, sheet([["전표", "항목ID"]].concat(Object.keys(X.pins || {}).map(function (k) { return [k, X.pins[k]]; })), [60, 10]), "항목지정");
     XLSX.utils.book_append_sheet(wb, sheet([["계정ID", "항목ID", "적요", "거래처", "일시"]].concat((X.rules || []).map(function (r) { return [r.leaf, r.item, r.memo, r.ptn, r.at]; })), [8, 10, 30, 20, 20]), "항목규칙");
+    XLSX.utils.book_append_sheet(wb, sheet([["시각", "구분", "메모"]].concat((X.closeLog || []).map(function (l) { return [l.t, l.k, l.m]; })), [20, 10, 60]), "연마감기록");
     XLSX.utils.book_append_sheet(wb, sheet([["시각", "내용"]].concat(X.log.slice(-2000).map(function (l) { return [l.t, l.m]; })), [20, 80]), "기록");
     // 부른 순간의 내용으로 고정 (나중에 X 가 바뀌어도 이 저장은 이 내용)
     var name = execName(X.year), bytes = toBytes(wb), lname = execLinesName(X.year), lbytes = null;
@@ -776,7 +789,7 @@
     listYears: listYears, load: load, save: save, loadMaster: loadMaster, saveMaster: saveMaster,
     fileName: fileName, MASTER: MASTER, exportReport: exportReport, readAnyFile: readAnyFile, stamp: stamp,
     downloadTemplate: downloadTemplate, parseTemplate: parseTemplate, roundLabel: roundLabel, writeBook: writeBook,
-    listFiles: listFiles, readPath: readPath, readDouzone: readDouzone, loadExec: loadExec, saveExec: saveExec, execName: execName, download: download, removeFile: removeFile,
+    listFiles: listFiles, readPath: readPath, readDouzone: readDouzone, loadExec: loadExec, saveExec: saveExec, execClosedAt: execClosedAt, execName: execName, download: download, removeFile: removeFile,
     acceptExternal: acceptExternal, setReadOnly: setReadOnly, idle: idle, readOnly: readOnly, readRaw: readRaw, writeRaw: writeRaw, execLinesName: execLinesName
   };
 })(this);
