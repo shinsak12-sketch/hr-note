@@ -925,6 +925,13 @@ textarea.ml.nl{min-height:70px;max-height:60vh;overflow-y:auto}
 
 .cell-ed{resize:none;overflow:hidden;line-height:18px;white-space:pre}
 .cell-ed.on:not(.num){white-space:pre-wrap;word-break:break-all}
-.plan td.c-note{white-space:pre;line-height:18px;vertical-align:middle}
+.plan td.c-note{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-all;line-height:18px;vertical-align:middle}
 .ml-txt{white-space:pre-wrap}
 .pv-basis{white-space:pre-wrap}
+/* 칸 크기 조절: 머리글 오른쪽 끝 = 열 너비, 계정 칸 아래 끝 = 줄 높이 */
+.colrs{position:absolute;top:0;right:0;width:6px;height:100%;cursor:col-resize;z-index:6}
+.rowrs{position:absolute;left:0;right:0;bottom:0;height:5px;cursor:row-resize;z-index:4}
+.colrs:hover,.rowrs:hover{background:rgba(30,123,79,.45)}
+body.rsz-c,body.rsz-c *{cursor:col-resize!important;user-select:none!important}
+body.rsz-r,body.rsz-r *{cursor:row-resize!important;user-select:none!important}
+.plan td.cw:not(.c-note),.plan th.cw{overflow:hidden;text-overflow:ellipsis}

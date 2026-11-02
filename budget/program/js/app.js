@@ -778,7 +778,7 @@
     };
     var per = function (k) { return /^[mqh]\d/.test(k) || k === "plan"; };
     h.push('<table class="plan"><thead><tr><th class="c-acc" data-k="acc">계정' + mark("acc") + "</th>" + cols.map(function (k) {
-      return '<th data-k="' + k + '" data-b="' + k + '" draggable="true" class="' + (k === "before" ? "c-before " : "") + (per(k) ? "per" : "") + '"' + (k === "note" ? ' style="min-width:260px"' : "") +
+      return '<th data-k="' + k + '" data-b="' + k + '" draggable="true" class="' + (k === "before" ? "c-before " : "") + (per(k) ? "per" : "") + '"' + "" +
         (per(k) ? ' title="누르면 ' + (k === "plan" ? "연간" : colName(k)) + ' 계획 분석 · 끌어서 열 순서 바꾸기"' : ' title="끌어서 열 순서 바꾸기 · 우클릭 = 정렬 · 필터 · 숨기기"') + ">" + thName(k) + mark(k) + "</th>";
     }).join("") + "</tr></thead><tbody>");
     // 칸 그리기 (k: 열, r: 계정 줄 | g: 묶음 · 합계)
@@ -832,6 +832,7 @@
     if (!shown && filtered) h.push('<div class="empty">조건에 맞는 계정이 없습니다.</div>');
     var top = el.scrollTop, left = el.scrollLeft;
     el.innerHTML = h.join("");
+    applySizes(el, "plan");
     stickTotal(el);
     fmtPaint(el, S.fmt, "plan");
     applyFreeze();
@@ -885,8 +886,13 @@
     var ch = S.rows.filter(function (r) { return !r.out && r._c && !r._c.missing; }).map(function (r) { return { r: r, d: r._c.plan - Calc.num(r.prev), b: Calc.num(r.prev) }; });
     var ups = ch.filter(function (x) { return x.d > 0; }).sort(function (a, b) { return b.d - a.d; }).slice(0, 3), dns = ch.filter(function (x) { return x.d < 0; }).sort(function (a, b) { return a.d - b.d; }).slice(0, 3);
     var w = R.missing + R.checks;
+    // 순수사업비 = 전체 − 성과상여 (계정 이름에 '성과상여'가 들어간 계정)
+    var bn = S.rows.filter(function (r) { return /성과상여/.test(r.name) && r._c; }), bPlan = 0, bPrev = 0;
+    bn.forEach(function (r) { bPlan += r.out || r._c.missing ? 0 : r._c.plan; bPrev += Calc.num(r.prev); });
+    var pPlan = t.plan - bPlan, pPrev = t.prev - bPrev, pd = pPlan - pPrev;
+    var pureSeg = bn.length ? sumSeg("순수사업비", '<b class="big" title="전체 ' + Calc.fmtWon(t.plan) + "원 − 성과상여 " + Calc.fmtWon(bPlan) + '원 (' + esc(bn.map(function (r) { return rowLabel(r); }).join(", ")) + ')">' + u(pPlan, true) + "</b> · 전년 대비 <b class=\"" + (pd > 0 ? "upc" : pd < 0 ? "dnc" : "") + "\">" + (pPrev ? pctTxt(pd / pPrev, true) : "-") + "</b> <small>(" + dTxt(pd) + ")</small>") : "";
     $("kpis").innerHTML = '<div class="sl">' +
-      sumSeg(y + "년 계획", "<b class=\"big\">" + u(t.plan, true) + "</b> · 전년 실적 대비 <b class=\"" + (d > 0 ? "upc" : d < 0 ? "dnc" : "") + "\">" + (t.prev ? pctTxt(d / t.prev, true) : "-") + "</b> <small>(" + dTxt(d) + ")</small>") +
+      sumSeg(y + "년 계획", "<b class=\"big\">" + u(t.plan, true) + "</b> · 전년 실적 대비 <b class=\"" + (d > 0 ? "upc" : d < 0 ? "dnc" : "") + "\">" + (t.prev ? pctTxt(d / t.prev, true) : "-") + "</b> <small>(" + dTxt(d) + ")</small>") + pureSeg +
       sumSeg("상태", esc(st) + (vsOrig !== null && Math.round(vsOrig) ? " · 원안 대비 <b>" + (o0.total ? pctTxt(vsOrig / o0.total, true) : "") + "</b> <small>(" + dTxt(vsOrig) + ")</small>" : "")) +
       (icnt ? sumSeg("확정 항목", icnt + "개 · " + u(isum, true)) : "") + '<span class="su">단위: ' + unitName() + "</span></div>" +
       '<div class="sl">' + sumSeg("입력", "완료 <b>" + done + " / " + n + "</b>" + (w ? ' · <a class="sa warn" data-sw="warn">확인 필요 ' + w + "</a>" : " · 확인 필요 없음") + (R.outs ? " · 계획 외 " + R.outs : "") + (R.base ? " · 변경 " + R.changed : "")) +
@@ -4000,7 +4006,7 @@
   /* ---------- 2026년 테스트(더미) 데이터 ----------
      2026년 계획(전년 = 2025 실적, 원안 마감 + 1차 변경 마감) + 더존 손익 원데이터 양식 더미(2026년 1~12월)
      → 2027년 새 연도를 만들고 [전년 실적 가져오기]로 그 파일을 넣어 보며 테스트 */
-  var APP_VER = "1.2.0"; // 프로그램 버전 (배포할 때마다 올림 · 설명서 · 첫 화면에 표시)
+  var APP_VER = "1.3.0"; // 프로그램 버전 (배포할 때마다 올림 · 설명서 · 첫 화면에 표시)
   var TEST_PL = "2026_손익_1-12월_테스트.xls";
   var HAS_TEST = typeof TestData !== "undefined"; // 배포판에는 testdata.js 가 없음 → 테스트 기능 숨김
   function testDataDialog() {
@@ -4664,6 +4670,7 @@
     el.innerHTML = h.join("");
     // 머리글 2줄: 아랫줄(계획 · 집행 · 증감)은 윗줄 바로 밑에 고정 (안 하면 스크롤할 때 윗줄 위로 올라가 집행률 칸과 어긋남)
     var hr = el.querySelectorAll("thead tr");
+    applySizes(el, "exec");
     if (hr.length > 1) { var h1 = hr[0].getBoundingClientRect().height; hr[1].querySelectorAll("th").forEach(function (th) { th.style.top = h1 + "px"; }); }
     stickTotal(el);
     el.scrollTop = top; el.scrollLeft = left;
@@ -4708,6 +4715,70 @@
     return null;
   }
   // 합계 줄을 머리글 바로 밑에 고정
+  /* ---------- 칸 크기: 열 너비 (머리글 오른쪽 끝) · 줄 높이 (계정 칸 아래 끝) 끌기, 더블클릭 = 처음대로 ----------
+     열 너비를 정하면 그 너비를 넘는 글은 비고는 줄바꿈, 숫자는 … 으로. 이 PC에 기억 (모든 연도 · 칸 공통) */
+  var SZ = { plan: { w: {}, h: {} }, exec: { w: {}, h: {} } }, NOTE_W = 260, rszJust = 0;
+  (function () {
+    try { var o = JSON.parse(localStorage.getItem("budget.sizes") || "null"); if (o) ["plan", "exec"].forEach(function (k) { if (o[k]) SZ[k] = { w: o[k].w || {}, h: o[k].h || {} }; }); } catch (e) { /* 저장소 막힘 */ }
+  })();
+  function saveSizes() { try { localStorage.setItem("budget.sizes", JSON.stringify(SZ)); } catch (e) { /* 저장소 막힘 */ } }
+  function colW(scr, k) { return SZ[scr].w[k] || (scr === "plan" && k === "note" ? NOTE_W : 0); }
+  function setColW(el, k, w) {
+    el.querySelectorAll('[data-k="' + k + '"]').forEach(function (c) {
+      var v = w ? w + "px" : "";
+      c.style.boxSizing = w ? "border-box" : ""; c.style.width = v; c.style.minWidth = v; c.style.maxWidth = v;
+      c.classList.toggle("cw", !!w);
+    });
+  }
+  function applySizes(el, scr) {
+    el.querySelectorAll("thead th[data-k]").forEach(function (th) { if (!th.querySelector(".colrs")) th.insertAdjacentHTML("beforeend", '<span class="colrs" title="끌어서 열 너비 조절 · 더블클릭 = 처음대로"></span>'); });
+    el.querySelectorAll("tbody td.c-acc").forEach(function (td) { if (rowKeyOf(td.parentNode) && !td.querySelector(".rowrs")) td.insertAdjacentHTML("beforeend", '<span class="rowrs" title="끌어서 줄 높이 조절 · 더블클릭 = 처음대로"></span>'); });
+    var ks = {}; el.querySelectorAll("thead th[data-k]").forEach(function (th) { ks[th.getAttribute("data-k")] = 1; });
+    Object.keys(ks).forEach(function (k) { var w = colW(scr, k); if (w) setColW(el, k, w); });
+    var H = SZ[scr].h;
+    if (Object.keys(H).length) el.querySelectorAll("tbody tr").forEach(function (tr) { var rk = rowKeyOf(tr); if (rk && H[rk]) { tr.style.height = H[rk] + "px"; tr.classList.add("rh"); } });
+  }
+  function rerenderAllPanes() { renderAll(); PANES.forEach(function (p) { if (p !== ACT) withPane(p, function () { if (p.year && (YD[p.year] || p.data)) renderPane(); }); }); }
+  document.addEventListener("mousedown", function (e) {
+    var hd = e.target.closest && e.target.closest(".colrs,.rowrs");
+    if (!hd || e.button !== 0) return;
+    e.preventDefault(); e.stopPropagation();
+    var wrap = hd.closest("#tbl,#tblX");
+    if (!wrap) return;
+    var scr = wrap.id === "tbl" ? "plan" : "exec", isCol = hd.classList.contains("colrs"), x0 = e.clientX, y0 = e.clientY, fin = null;
+    document.body.classList.add(isCol ? "rsz-c" : "rsz-r");
+    if (isCol) {
+      var th = hd.closest("th"), k = th.getAttribute("data-k"), w0 = th.getBoundingClientRect().width;
+      var mv = function (ev) { fin = Math.max(32, Math.round(w0 + ev.clientX - x0)); setColW(wrap, k, fin); };
+    } else {
+      var tr = hd.closest("tr"), rk = rowKeyOf(tr), h0 = tr.getBoundingClientRect().height;
+      var mv = function (ev) { fin = Math.max(18, Math.round(h0 + ev.clientY - y0)); tr.style.height = fin + "px"; tr.classList.add("rh"); }; // eslint-disable-line no-redeclare
+    }
+    var up = function () {
+      document.removeEventListener("mousemove", mv); document.removeEventListener("mouseup", up);
+      document.body.classList.remove("rsz-c", "rsz-r");
+      rszJust = Date.now();
+      if (fin === null) return;
+      if (isCol) SZ[scr].w[k] = fin;
+      else {
+        var keys = [rk];
+        if (scr === "plan" && UI.multi[rk]) keys = Object.keys(UI.multi); // 여러 줄을 골라 두었으면 모두 같은 높이
+        keys.forEach(function (x) { SZ[scr].h[x] = fin; });
+      }
+      saveSizes(); rerenderAllPanes();
+    };
+    document.addEventListener("mousemove", mv); document.addEventListener("mouseup", up);
+  }, true);
+  document.addEventListener("click", function (e) { if (rszJust && Date.now() - rszJust < 400 && e.target.closest && e.target.closest(".colrs,.rowrs,th,td.c-acc")) { e.stopPropagation(); e.preventDefault(); } }, true);
+  document.addEventListener("dblclick", function (e) {
+    var hd = e.target.closest && e.target.closest(".colrs,.rowrs");
+    if (!hd) return;
+    e.preventDefault(); e.stopPropagation();
+    var wrap = hd.closest("#tbl,#tblX"), scr = wrap && wrap.id === "tbl" ? "plan" : "exec";
+    if (hd.classList.contains("colrs")) delete SZ[scr].w[hd.closest("th").getAttribute("data-k")];
+    else delete SZ[scr].h[rowKeyOf(hd.closest("tr"))];
+    saveSizes(); rerenderAllPanes();
+  }, true);
   function stickTotal(el) {
     var tr = el.querySelector("tr.total.ttop"), th = el.querySelector("thead");
     if (!tr || !th) return;
