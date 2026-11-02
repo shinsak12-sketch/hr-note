@@ -785,7 +785,7 @@
     var grpCell = function (g, k) {
       if (k === "yoy") return yoyCell(g.prev ? g.plan / g.prev - 1 : NaN);
       if (k === "note") return '<td data-k="note"></td>';
-      return '<td class="num' + (k === "before" ? " c-before" : "") + '" data-k="' + k + '">' + u(groupVal(g, k)) + "</td>";
+      return '<td class="num' + (k === "before" ? " c-before" : "") + '" data-k="' + k + '" data-v="' + Math.round(Calc.num(groupVal(g, k))) + '">' + u(groupVal(g, k)) + "</td>";
     };
     var shown = 0, filtered = filtering(), noDrag = filtered || !!UI.sort;
     var t0 = R.tot;
@@ -819,9 +819,9 @@
           subs.forEach(function (x) {
             var tot = sum12(x.m);
             h.push('<tr class="itm' + (x.rest ? " rest" : "") + '" data-of="' + esc(r.id) + '" data-iid="' + esc(x.iid) + '"><td class="c-acc" data-k="acc"><span class="grip off"></span><span class="itn">└ ' + esc(x.name) + '</span><span class="itt">' + esc(x.tag) + "</span></td>" + cols.map(function (k) {
-              if (k === "plan") return '<td class="num" data-k="plan">' + u(tot) + "</td>";
-              if (/^m\d/.test(k)) return '<td class="num" data-k="' + k + '">' + u(x.m[+k.slice(1)]) + "</td>";
-              if (/^[qh]\d/.test(k)) return '<td class="num" data-k="' + k + '">' + u(sumIdx(x.m, idxOf(k))) + "</td>";
+              if (k === "plan") return '<td class="num" data-k="plan" data-v="' + Math.round(tot) + '">' + u(tot) + "</td>";
+              if (/^m\d/.test(k)) return '<td class="num" data-k="' + k + '" data-v="' + Math.round(Calc.num(x.m[+k.slice(1)])) + '">' + u(x.m[+k.slice(1)]) + "</td>";
+              if (/^[qh]\d/.test(k)) return '<td class="num" data-k="' + k + '" data-v="' + Math.round(sumIdx(x.m, idxOf(k))) + '">' + u(sumIdx(x.m, idxOf(k))) + "</td>";
               return '<td data-k="' + k + '"></td>';
             }).join("") + "</tr>");
           });
@@ -1618,8 +1618,10 @@
   function setCell(id, k, scroll) {
     if (editing) commitEdit($("cellEd").value, 0, 0);
     UI.cell = k ? { id: id, k: k } : null;
+    if (k) { FS = { scr: "plan", a: { r: String(id), c: k }, b: { r: String(id), c: k } }; fsDragged = false; }
     select(id, scroll);
     markCell();
+    if (k) fmtRepaint();
     if (scroll && UI.cell) { var td = curTd(); if (td) td.scrollIntoView({ block: "nearest", inline: "nearest" }); placeEd(); }
   }
   function moveCell(dx, dy) {
@@ -1687,6 +1689,196 @@
     if (k === "note") { if (r.memo) change(function () { var p = clone(planFor(r.id)); p.memo = ""; setPlan(r.id, p); }, rowLabel(r) + " 메모 지움"); }
     else if (!r._c.missing) setMonth(r, +k.slice(1), 0);
   }
+  /* ---------- 여러 칸 선택 · 복사 · 붙여넣기 (엑셀처럼) ----------
+     선택 범위 = FS (끌기 · Shift+클릭 · Shift+방향키). 계획 복사는 실제 원 금액 · 집행 복사는 보이는 값
+     붙여넣기 · 지우기 · Ctrl+Enter 채우기는 계획의 1~12월 · 비고 칸만 (한 번에 Ctrl+Z 한 번) */
+  function fsMulti(scr) { return !!(FS && FS.scr === scr && (FS.a.r !== FS.b.r || FS.a.c !== FS.b.c)); }
+  function isAccKey(rk) { return !!rk && !/^(g:|i:|tot$)/.test(rk) && !!rowBy(rk); }
+  function canPaste(k) { return k === "note" || /^m\d/.test(k); }
+  function selGrid(scr) {
+    var tbl = $(scr === "plan" ? "tbl" : "tblX");
+    if (!tbl) return null;
+    var G = fmtGrid(tbl), ra = G.rows.map(rowKeyOf);
+    var s = FS && FS.scr === scr ? FS : scr === "plan" && UI.cell ? { a: { r: String(UI.cell.id), c: UI.cell.k }, b: { r: String(UI.cell.id), c: UI.cell.k } } : null;
+    if (!s) return null;
+    var r0 = ra.indexOf(s.a.r), r1 = ra.indexOf(s.b.r), c0 = G.cols.indexOf(s.a.c), c1 = G.cols.indexOf(s.b.c);
+    if (r0 < 0 || r1 < 0 || c0 < 0 || c1 < 0) return null;
+    var rA = Math.min(r0, r1), rB = Math.max(r0, r1), cA = Math.min(c0, c1), cB = Math.max(c0, c1);
+    return { G: G, ra: ra, r0: rA, c0: cA, rows: ra.slice(rA, rB + 1), trs: G.rows.slice(rA, rB + 1), cols: G.cols.slice(cA, cB + 1) };
+  }
+  function selStatus() {
+    var sg = FS ? selGrid(FS.scr) : null, n = sg ? sg.rows.length * sg.cols.length : 0, sum = 0, cnt = 0;
+    if (n > 1 && FS.scr === "plan") sg.rows.forEach(function (rk) { if (isAccKey(rk)) sg.cols.forEach(function (k) { if (/^(prev|plan|before|[mqh]\d+)$/.test(k)) { var v = copyVal("plan", sg.trs[sg.rows.indexOf(rk)], rk, k); if (v !== "") { sum += Calc.num(v); cnt++; } } }); });
+    if (n > 1) $("stSel").textContent = n + "칸 선택" + (cnt ? " · 계정 칸 합계 " + Calc.fmtWon(sum) + "원" : "") + " · Ctrl+C 복사" + (FS.scr === "plan" ? " · Ctrl+V 붙여넣기 · Delete 지우기 · 숫자 입력 후 Ctrl+Enter = 모두 채우기" : "") + " · 서식(Ctrl+B · I · U)";
+  }
+  // 끌어서 고른 뒤: 시작 칸이 입력 칸이면 그 칸을 현재 칸으로 (키보드 입력 · 붙여넣기를 받도록)
+  function anchorCell() {
+    var a = FS.a;
+    if (isAccKey(a.r) && canPaste(a.c)) { UI.cell = { id: a.r, k: a.c }; UI.sel = a.r; } else UI.cell = null;
+    markCell(); fmtRepaint(); selStatus();
+  }
+  function extendSel(dx, dy) {
+    if (!FS || FS.scr !== "plan") { if (!UI.cell) return; FS = { scr: "plan", a: { r: String(UI.cell.id), c: UI.cell.k }, b: { r: String(UI.cell.id), c: UI.cell.k } }; }
+    var G = fmtGrid($("tbl")), ra = G.rows.map(rowKeyOf), ri = ra.indexOf(FS.b.r), ci = G.cols.indexOf(FS.b.c);
+    if (ri < 0 || ci < 0) return;
+    ri = Math.max(0, Math.min(ra.length - 1, ri + dy)); ci = Math.max(0, Math.min(G.cols.length - 1, ci + dx));
+    FS.b = { r: ra[ri], c: G.cols[ci] };
+    fmtRepaint(); selStatus();
+    var td = G.rows[ri].querySelector('td[data-k="' + G.cols[ci] + '"]');
+    if (td) td.scrollIntoView({ block: "nearest", inline: "nearest" });
+    placeEd();
+  }
+  function copyVal(scr, tr, rk, k) {
+    var td = tr.querySelector('td[data-k="' + k + '"]');
+    if (scr === "plan" && isAccKey(rk)) {
+      var r = rowBy(rk);
+      if (k === "acc") return rowLabel(r);
+      if (k === "note") return r.memo || "";
+      if (k === "yoy") return td ? td.innerText.trim() : "";
+      if (k === "plan" && (r.out || r._c.missing)) return "";
+      if (/^[mqh]\d/.test(k) && r._c.missing) return "";
+      return String(Math.round(Calc.num(colVal(r, k))));
+    }
+    if (!td) return "";
+    if (scr === "plan" && td.hasAttribute("data-v")) return td.getAttribute("data-v");
+    return td.innerText.trim();
+  }
+  function tsvOut(grid) {
+    return grid.map(function (row) { return row.map(function (v) { v = String(v); return /[\t\n"]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join("\t"); }).join("\r\n");
+  }
+  function tsvIn(t) {
+    t = String(t || "").replace(/\r\n?/g, "\n");
+    var rows = [], row = [], cur = "", q = false;
+    for (var i = 0; i < t.length; i++) {
+      var ch = t[i];
+      if (q) { if (ch === '"') { if (t[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+      else if (ch === '"' && cur === "") q = true;
+      else if (ch === "\t") { row.push(cur); cur = ""; }
+      else if (ch === "\n") { row.push(cur); rows.push(row); row = []; cur = ""; }
+      else cur += ch;
+    }
+    if (cur !== "" || row.length) { row.push(cur); rows.push(row); }
+    return rows;
+  }
+  function copySel(scr) {
+    var sg = selGrid(scr);
+    if (!sg) return null;
+    var grid = sg.trs.map(function (tr, i) { return sg.cols.map(function (k) { return copyVal(scr, tr, sg.rows[i], k); }); });
+    var n = sg.rows.length * sg.cols.length;
+    toast(n > 1 ? n + "칸을 복사했습니다" + (scr === "plan" ? " (금액은 원 단위)" : "") : "복사했습니다" + (scr === "plan" ? " (원 단위)" : ""), false, 1800);
+    return tsvOut(grid);
+  }
+  function parseWon(v) {
+    var s = String(v === undefined || v === null ? "" : v).trim(), neg = /^\(.*\)$/.test(s) || /^△/.test(s);
+    s = s.replace(/[(),\s원₩△]/g, "");
+    if (s === "" || s === "-") return 0;
+    var n = parseFloat(s);
+    if (!isFinite(n) || !/^[+\-]?[\d.]+$/.test(s)) return NaN;
+    return Math.round(neg ? -Math.abs(n) : n);
+  }
+  // list: [{id, k, v}] → 한 번의 변경(실행 취소 한 번)으로 반영
+  function applyCells(list, label) {
+    var hasM = list.some(function (x) { return x.k !== "note"; }), blocked = false;
+    if (hasM && isClosed()) { guardClosed("월 금액을 바꾸려면"); blocked = true; }
+    var W = {}, bad = 0, outN = 0, n = 0;
+    list.forEach(function (x) {
+      var r = rowBy(x.id);
+      if (!r) return;
+      if (x.k === "note") {
+        var mv = memoClean(x.v);
+        if (mv === (r.memo || "")) return;
+        (W[r.id] = W[r.id] || { r: r, m: {} }).memo = mv; n++;
+        return;
+      }
+      if (blocked) return;
+      if (r.out) { outN++; return; }
+      var v = parseWon(x.v), mi = +x.k.slice(1);
+      if (isNaN(v)) { bad++; return; }
+      if (!r._c.missing && r._c.months[mi] === v) return;
+      (W[r.id] = W[r.id] || { r: r, m: {} }).m[mi] = v; n++;
+    });
+    var ids = Object.keys(W), conv = 0;
+    if (!ids.length) {
+      if (!blocked) toast(bad ? "숫자가 아니라 넣지 못했습니다 (" + bad + "칸)" : outN ? "계획 외 계정에는 계획을 넣지 않습니다" : "바뀐 칸이 없습니다", !!(bad || outN));
+      return false;
+    }
+    change(function () {
+      ids.forEach(function (id) {
+        var w = W[id], r = w.r, p = clone(planFor(id)), ms = Object.keys(w.m);
+        if (ms.length) {
+          if (!p.meth) { p.meth = "수기"; p.a = 0; p.split = "수기"; p.sv = new Array(12).fill(0); }
+          else if (p.split !== "수기") { p.sv = Calc.compute(r, S.settings).months.slice(); p.split = "수기"; conv++; }
+          ms.forEach(function (mi) { p.sv[+mi] = w.m[mi]; });
+          if (p.meth === "수기") p.a = p.sv.reduce(function (a, b) { return a + Calc.num(b); }, 0);
+        }
+        if (w.memo !== undefined) p.memo = w.memo;
+        setPlan(id, p);
+      });
+    }, label + ": " + n + "칸 (계정 " + ids.length + "개)");
+    toast(label + " — " + n + "칸" + (conv ? " · 계정 " + conv + "개는 수기 분할로 바뀜" : "") + (bad ? " · 숫자가 아닌 " + bad + "칸 건너뜀" : "") + (outN ? " · 계획 외 계정 " + outN + "칸 건너뜀" : "") + " (Ctrl+Z 되돌리기)", !!(bad || outN), 3500);
+    return true;
+  }
+  function pasteText(text) {
+    var clip = tsvIn(text);
+    if (!clip.length) return;
+    var sg = selGrid("plan");
+    if (!sg) { toast("붙여넣을 칸을 먼저 고르세요", true); return; }
+    var R = clip.length, C = Math.max.apply(null, clip.map(function (r) { return r.length; }));
+    var sr = sg.rows.length, sc = sg.cols.length, nr = R, nc = C;
+    if (R === 1 && C === 1) { nr = sr; nc = sc; } // 한 칸 → 고른 칸 모두
+    else if (sr % R === 0 && sc % C === 0) { nr = sr; nc = sc; } // 고른 범위가 복사한 크기의 배수면 반복
+    var list = [], last = { r: sg.r0, c: sg.c0 };
+    for (var i = 0; i < nr; i++) for (var j = 0; j < nc; j++) {
+      var ri = sg.r0 + i, cj = sg.c0 + j;
+      if (ri >= sg.ra.length || cj >= sg.G.cols.length) continue;
+      last = { r: Math.max(last.r, ri), c: Math.max(last.c, cj) };
+      var rk = sg.ra[ri], k = sg.G.cols[cj];
+      if (!isAccKey(rk) || !canPaste(k)) continue;
+      var v = (clip[i % R] || [])[j % C];
+      list.push({ id: rk, k: k, v: v === undefined ? "" : v });
+    }
+    if (!list.length) { toast("붙여넣을 수 있는 칸이 없습니다 — 1~12월 · 비고 칸만 됩니다", true); return; }
+    var a = { r: sg.ra[sg.r0], c: sg.G.cols[sg.c0] }, b = { r: sg.ra[last.r], c: sg.G.cols[last.c] };
+    applyCells(list, "붙여넣기");
+    FS = { scr: "plan", a: a, b: b }; fmtRepaint(); selStatus();
+  }
+  function selTargets() {
+    var sg = selGrid("plan"), out = [];
+    if (!sg) return out;
+    sg.rows.forEach(function (rk) { if (isAccKey(rk)) sg.cols.forEach(function (k) { if (canPaste(k)) out.push({ id: rk, k: k }); }); });
+    return out;
+  }
+  function clearRange() {
+    var t = selTargets();
+    if (!t.length) { toast("지울 수 있는 칸이 없습니다 — 1~12월 · 비고 칸만 됩니다", true); return; }
+    applyCells(t.map(function (x) { return { id: x.id, k: x.k, v: "" }; }), "지우기");
+    fmtRepaint();
+  }
+  function fillRange(val) {
+    var t = selTargets();
+    if (!t.length) { placeEd(); return; }
+    applyCells(t.map(function (x) { return { id: x.id, k: x.k, v: val }; }), "같은 값 채우기");
+    fmtRepaint(); placeEd();
+  }
+  document.addEventListener("copy", function (e) {
+    if (dlg || editing || !$("cover").hidden) return;
+    var ae = document.activeElement;
+    if (ae && ae.id !== "cellEd" && /INPUT|TEXTAREA|SELECT/.test(ae.tagName)) return;
+    if (ae && ae.id !== "cellEd" && String(window.getSelection ? window.getSelection() : "")) return; // 글자를 끌어 고른 경우는 그대로 복사
+    var txt = copySel(MODE === "exec" ? "exec" : "plan");
+    if (txt === null) return;
+    e.preventDefault();
+    e.clipboardData.setData("text/plain", txt);
+  });
+  document.addEventListener("paste", function (e) {
+    if (dlg || editing || MODE === "exec" || !$("cover").hidden) return;
+    var ae = document.activeElement;
+    if (ae && ae.id !== "cellEd" && /INPUT|TEXTAREA|SELECT/.test(ae.tagName)) return;
+    if (!UI.cell && !(FS && FS.scr === "plan")) return;
+    e.preventDefault();
+    var t = e.clipboardData && e.clipboardData.getData("text/plain");
+    if (t) pasteText(t);
+  });
   function bindCellEd() {
     var ed = $("cellEd");
     ed.addEventListener("compositionstart", function () { if (!editing) startEdit(true); });
@@ -1702,6 +1894,7 @@
       var k = e.key, ctl = e.ctrlKey || e.metaKey;
       if (editing) {
         if (k === "Enter" && e.altKey) { e.preventDefault(); return; }
+        if (k === "Enter" && ctl && fsMulti("plan")) { e.preventDefault(); var fv = ed.value; stopEdit(); fillRange(fv); return; }
         if (k === "Enter") { e.preventDefault(); commitEdit(ed.value, 0, e.shiftKey ? -1 : 1); }
         else if (k === "Tab") { e.preventDefault(); commitEdit(ed.value, e.shiftKey ? -1 : 1, 0); }
         else if (k === "Escape") { e.preventDefault(); stopEdit(); placeEd(); }
@@ -1713,11 +1906,15 @@
       if (ctl && k.toLowerCase() === "y") { e.preventDefault(); redo(); return; }
       if (ctl && k.toLowerCase() === "f") { e.preventDefault(); $("search").focus(); $("search").select(); return; }
       if (ctl && k.toLowerCase() === "s") { e.preventDefault(); saveAll("button"); return; }
+      if (e.shiftKey && /^Arrow/.test(k)) { e.preventDefault(); extendSel(k === "ArrowLeft" ? -1 : k === "ArrowRight" ? 1 : 0, k === "ArrowUp" ? -1 : k === "ArrowDown" ? 1 : 0); return; }
       if (k === "ArrowDown" || k === "ArrowUp") { e.preventDefault(); moveCell(0, k === "ArrowDown" ? 1 : -1); }
       else if (k === "ArrowLeft" || k === "ArrowRight") { e.preventDefault(); moveCell(k === "ArrowLeft" ? -1 : 1, 0); }
       else if (k === "Tab") { e.preventDefault(); moveCell(e.shiftKey ? -1 : 1, 0); }
       else if (k === "Enter" || k === "F2") { e.preventDefault(); startEdit(false); }
-      else if (k === "Delete" || k === "Backspace") { e.preventDefault(); clearCell(); }
+      else if (k === "Delete" || k === "Backspace") { e.preventDefault(); if (fsMulti("plan")) clearRange(); else clearCell(); }
+      // 칸을 고른 채 숫자를 치면 바로 입력 시작 (입력기 상태와 상관없이)
+      else if (!ctl && !e.altKey && k.length === 1 && /[0-9\-.]/.test(k) && UI.cell && UI.cell.k !== "plan") { e.preventDefault(); ed.value = k; startEdit(true); }
+      else if (k === "Escape" && fsMulti("plan") && UI.cell) { e.preventDefault(); FS = { scr: "plan", a: { r: String(UI.cell.id), c: UI.cell.k }, b: { r: String(UI.cell.id), c: UI.cell.k } }; fmtRepaint(); select(UI.cell.id); }
       else if (k === "Escape") { e.preventDefault(); closeCtx(); if (Object.keys(UI.multi).length) { UI.multi = {}; renderAll(); } else { UI.cell = null; markCell(); ed.blur(); } }
     });
     ed.addEventListener("blur", function () { if (editing) setTimeout(function () { if (editing && document.activeElement !== ed) commitEdit(ed.value, 0, 0); }, 0); });
@@ -2145,7 +2342,7 @@
 
   /* ---------- 칸 서식 (배경 · 글씨색 · 굵게 · 기울임 · 밑줄 · 크기) ----------
      칸을 누르거나 끌어서 고른 뒤 리본 [서식] 또는 Ctrl+B · I · U. 계획 화면 서식은 계획 파일, 집행 화면 서식은 집행 파일에 저장 */
-  var FS = null, fsDrag = false, fmtDown = null;
+  var FS = null, fsDrag = false, fmtDown = null, fsDragged = false;
   function rowKeyOf(tr) {
     if (!tr) return null;
     if (tr.classList.contains("unl")) return null;
@@ -2252,7 +2449,7 @@
       var rk = rowKeyOf(td.closest("tr"));
       if (!rk) return;
       FS = { scr: tblId === "tbl" ? "plan" : "exec", a: { r: rk, c: td.getAttribute("data-k") }, b: { r: rk, c: td.getAttribute("data-k") } };
-      fsDrag = true; tbl.classList.add("fsdrag");
+      fsDrag = true; fsDragged = false; tbl.classList.add("fsdrag");
       fmtRepaint();
     };
     fmtDown = down;
@@ -2264,10 +2461,10 @@
       var rk = rowKeyOf(td.closest("tr"));
       if (!rk || (FS.b.r === rk && FS.b.c === td.getAttribute("data-k"))) return;
       FS.b = { r: rk, c: td.getAttribute("data-k") };
+      fsDragged = true;
       e.preventDefault();
       fmtRepaint();
-      var n = fmtKeys().length;
-      $("stSel").textContent = n > 1 ? n + "칸 선택 (리본 [서식] · Ctrl+B · I · U)" : $("stSel").textContent;
+      selStatus();
     });
     document.addEventListener("mouseup", function () { if (fsDrag) { fsDrag = false; $("tbl").classList.remove("fsdrag"); $("tblX").classList.remove("fsdrag"); } });
     document.addEventListener("click", function (e) {
@@ -3803,7 +4000,7 @@
   /* ---------- 2026년 테스트(더미) 데이터 ----------
      2026년 계획(전년 = 2025 실적, 원안 마감 + 1차 변경 마감) + 더존 손익 원데이터 양식 더미(2026년 1~12월)
      → 2027년 새 연도를 만들고 [전년 실적 가져오기]로 그 파일을 넣어 보며 테스트 */
-  var APP_VER = "1.1.1"; // 프로그램 버전 (배포할 때마다 올림 · 설명서 · 첫 화면에 표시)
+  var APP_VER = "1.2.0"; // 프로그램 버전 (배포할 때마다 올림 · 설명서 · 첫 화면에 표시)
   var TEST_PL = "2026_손익_1-12월_테스트.xls";
   var HAS_TEST = typeof TestData !== "undefined"; // 배포판에는 testdata.js 가 없음 → 테스트 기능 숨김
   function testDataDialog() {
@@ -5869,6 +6066,7 @@
       if (calcOpen() && ctd && ctd.classList.contains("num") && !ctd.closest("tr.acc")) { calcPickCell(ctd); return; }
       var th = e.target.closest("th.per");
       if (th) { anaPeriod("plan", th.getAttribute("data-k")); return; }
+      if (fsDragged && fsMulti("plan")) { fsDragged = false; anchorCell(); return; }
       var g = e.target.closest("tr.grp");
       if (g) {
         var n = g.getAttribute("data-grp");
@@ -5884,6 +6082,7 @@
       if (an && !e.ctrlKey && !e.metaKey && !e.shiftKey && !calcOpen()) { setCell(id, null); anaNode("plan", { lv: an.getAttribute("data-an"), id: id }); return; }
       if (calcOpen() && td && td.classList.contains("num")) { calcPickCell(td); select(id); $("calc").focus(); return; }
       if (e.ctrlKey || e.metaKey) { toggleMulti(id); UI.sel = id; return; }
+      if (e.shiftKey && k && k !== "acc" && UI.cell) { FS = { scr: "plan", a: { r: String(UI.cell.id), c: UI.cell.k }, b: { r: String(id), c: k } }; fmtRepaint(); selStatus(); placeEd(); return; }
       if (e.shiftKey) { rangeMulti(id); return; }
       if (Object.keys(UI.multi).length) { UI.multi = {}; renderAll(); }
       setCell(id, editCols().indexOf(k) >= 0 ? k : null);
@@ -6260,6 +6459,8 @@
 
       if (inField) { if (e.key === "Escape" && e.target.id === "search") { e.target.value = ""; UI.search = ""; renderAll(); e.target.blur(); } return; }
       if (e.key === "Escape") { closeCtx(); if (Object.keys(UI.multi).length) { UI.multi = {}; renderAll(); } else if (UI.cell) { UI.cell = null; markCell(); } return; }
+      if (e.shiftKey && /^Arrow/.test(e.key) && FS && FS.scr === "plan") { e.preventDefault(); extendSel(e.key === "ArrowLeft" ? -1 : e.key === "ArrowRight" ? 1 : 0, e.key === "ArrowUp" ? -1 : e.key === "ArrowDown" ? 1 : 0); return; }
+      if ((e.key === "Delete" || e.key === "Backspace") && fsMulti("plan")) { e.preventDefault(); clearRange(); return; }
       if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); moveCell(0, e.key === "ArrowDown" ? 1 : -1); }
       else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && UI.cell) { e.preventDefault(); moveCell(e.key === "ArrowLeft" ? -1 : 1, 0); }
       else if (e.key === "Tab" && UI.cell) { e.preventDefault(); moveCell(e.shiftKey ? -1 : 1, 0); }
