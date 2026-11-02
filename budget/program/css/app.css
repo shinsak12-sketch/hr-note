@@ -939,3 +939,12 @@ body.rsz-r,body.rsz-r *{cursor:row-resize!important;user-select:none!important}
 #rszLine{position:fixed;z-index:110;pointer-events:none}
 #rszLine.v{width:0;border-left:1px dashed #1E7B4F}
 #rszLine.h{height:0;border-top:1px dashed #1E7B4F}
+/* 팝업 스크롤: 내용이 팝업보다 크면 상하 · 좌우 스크롤 (팝업 밖으로 넘치지 않게) */
+.mdl-body{flex:1 1 auto;min-height:0;min-width:0;overflow:auto}
+.cm-wrap,.cm-wrap4,.vh{grid-template-rows:minmax(0,1fr)}
+.cm-col,.cm-list,.vh-list{min-height:0}
+.mdl{max-width:calc(100vw - 16px);max-height:calc(100vh - 16px)}
+.vch-pop,.memo-ed{max-width:calc(100vw - 16px)}
+.mdl-cat .mdl-body{overflow:auto}
+.cm-wrap,.cm-wrap4,.vh{min-height:min(380px,calc(100vh - 200px))}
+.ctx,.fpop{max-height:calc(100vh - 12px);overflow-y:auto}
