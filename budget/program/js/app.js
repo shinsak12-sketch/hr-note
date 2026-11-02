@@ -2581,8 +2581,8 @@
       var lockT = leaf && lockReason(x.id) ? '<span class="ci-lock" title="' + esc(lockReason(x.id)) + ' — 옮기기 · 삭제 · 사용 안 함 불가">🔒</span>' : "";
       return '<div class="ci' + (on ? " on" : "") + (leaf && x.use === false ? " off" : "") + '" draggable="true" data-lv="' + lv + '" data-i="' + i + '">' +
         '<span class="grip">⋮⋮</span><input class="ci-no" data-f="no" value="' + (i + 1) + '" title="순번 (숫자를 바꾸고 Enter)">' +
-        '<input class="ci-name" data-f="name" value="' + esc(x.name) + '" placeholder="' + (lv === 1 ? "대분류" : lv === 2 ? "중분류" : "소분류") + ' 이름">' + lockT + extra +
-        '<button class="ci-del" data-f="del" title="삭제">✕</button></div>';
+        '<input class="ci-name" data-f="name" value="' + esc(x.name) + '" placeholder="' + (lv === 1 ? "대분류" : lv === 2 ? "중분류" : "소분류") + ' 이름" title="눌러서 이름 고치기 · 우클릭 = 메뉴 (추가 · 옮기기 · 삭제)">' + lockT + extra +
+        '<button class="ci-del" data-f="del" title="삭제 (저장 전까지는 [취소]로 되돌림)">✕</button></div>';
     }
     function list(lv) {
       if (lv === 1) return W;
@@ -2597,14 +2597,16 @@
       [1, 2].forEach(function (lv) {
         if (lv < fromLv) return;
         var L = list(lv), col = $("cmCol" + lv);
-        col.querySelector(".cm-h").innerHTML = (lv === 1 ? "대분류" : "중분류") + '<span class="cm-n">' + (lv === 2 && selT ? esc(selT.name || "(이름 없음)") + " · " : "") + (L ? L.length : 0) + "</span>";
+        col.querySelector(".cm-h").innerHTML = (lv === 1 ? "대분류" : "중분류") + '<span class="cm-n">' + (lv === 2 && selT ? esc(selT.name || "(이름 없음)") + " · " : "") + (L ? L.length : 0) + "</span>" +
+          (L ? '<button class="cm-hadd" data-add="' + lv + '" title="' + (lv === 1 ? "대분류" : "중분류") + ' 추가 (맨 아래)">＋ 추가</button>' : "");
         col.querySelector(".cm-list").innerHTML = !L ? '<div class="cm-empty">왼쪽에서 대분류를 고르세요</div>' :
           (L.length ? L.map(function (x, i) { return item(lv, x, i, (lv === 1 && x === selT) || (lv === 2 && x === selM)); }).join("") : '<div class="cm-empty">아직 없습니다. 아래 [추가]를 누르세요</div>');
         col.querySelector(".cm-add").disabled = !L;
       });
       var c3 = $("cmCol3"), L3 = list(3);
       if (fromLv <= 3) {
-      c3.querySelector(".cm-h").innerHTML = "소분류" + '<span class="cm-n">' + (selM ? esc(selM.name || "(이름 없음)") + " · " + (L3 ? L3.length : 0) : "선택 사항") + "</span>";
+      c3.querySelector(".cm-h").innerHTML = "소분류" + '<span class="cm-n">' + (selM ? esc(selM.name || "(이름 없음)") + " · " + (L3 ? L3.length : 0) : "선택 사항") + "</span>" +
+        (L3 ? '<button class="cm-hadd" data-add="3" title="소분류 추가 (맨 아래)">＋ 추가</button>' : "");
       if (!selM) c3.querySelector(".cm-list").innerHTML = '<div class="cm-empty">중분류를 고르세요</div>';
       else if (!L3) c3.querySelector(".cm-list").innerHTML = '<div class="cm-none"><b>소분류 없음</b><p>‘' + esc(selM.name || "(이름 없음)") + '’ 은(는) 소분류 없이 씁니다.<br>더존 과목이 <b>중분류에 바로</b> 연결됩니다.</p>' +
         '<button class="btn" data-add="3">＋ 소분류 추가</button><p class="s">더 잘게 나눌 때만 추가하세요.<br>추가하면 연결된 더존 과목과 계획은 첫 소분류로 옮겨집니다.</p></div>';
@@ -2676,6 +2678,7 @@
         '<button class="btn sm" id="cmDown"><b class="ic">⇩</b> 양식 다운</button><button class="btn sm" id="cmUp"><b class="ic">⇧</b> 양식 업로드</button><span class="sep"></span>' +
         '<button class="btn sm" id="cmVer"><b class="ic">🕘</b> 버전 이력 <span class="ver">v' + (latestVer() ? latestVer().v : 0) + "</span></button>" +
         (anyLock() ? '<span class="cm-lock" title="금액 있는 계정은 다른 분류로 옮기기 · 삭제 · 사용 안 함이 안 됩니다. 이름 · 순서 · 더존 연결은 바꿀 수 있습니다.">🔒 마감된 계획이 있습니다 — 🔒 표시 계정은 옮기기 · 삭제 불가' + (isClosed() ? " · 새 계정은 ‘계획 외’" : "") + "</span>" : "") +
+        '<span class="cm-tip">이름은 눌러서 바로 고치기 · ✕ 삭제 · 우클릭 = 추가 · 옮기기 메뉴</span>' +
         '<input class="search" id="cmSearch" placeholder="분류 · 더존 과목 찾기 (Enter = 다음)"><span class="chip warn" id="cmUnl" title="더존 과목이 하나도 연결되지 않은 계정 — 누르면 차례로 이동"></span></div>' +
         '<div class="cm-wrap4">' + [1, 2, 3].map(function (lv) {
           return '<div class="cm-col" id="cmCol' + lv + '"><div class="cm-h"></div><div class="cm-list" data-lv="' + lv + '"></div>' +
@@ -2926,6 +2929,50 @@
         (links ? " 더존 연결 " + links + "개가 풀립니다." : "") + (amt ? ' <span class="em">' + S.year + "년 계획액 " + u(amt, true) + unitName() + "</span>도 빠집니다." : "") + " (저장 전까지는 [취소]로 되돌릴 수 있음)", "지우기", doDel);
       else { doDel(); render(); }
     }
+    // 항목 우클릭 메뉴: 이름 고치기 · 아래에 추가 · 위로 · 아래로 · 삭제
+    var cmCtx = document.createElement("div");
+    cmCtx.className = "ctx cm-ctx"; cmCtx.hidden = true; $("modal").appendChild(cmCtx); // 팝업 안에 두면 위치가 틀어짐 (팝업이 transform)
+    var lvName = function (lv) { return lv === 1 ? "대분류" : lv === 2 ? "중분류" : "소분류"; };
+    box.addEventListener("contextmenu", function (e) {
+      var p = at(e.target);
+      if (!p) { cmCtx.hidden = true; return; }
+      e.preventDefault();
+      var L = list(p.lv), x = L[p.i];
+      if (!((p.lv === 1 && x === selT) || (p.lv === 2 && x === selM) || (p.lv === 3 && x === selS))) pickItem(p, x);
+      var n = lvName(p.lv), it = function (a, label, dis) { return '<div class="ctx-i' + (dis ? " dis" : "") + '" data-cmc="' + a + '">' + label + "</div>"; };
+      cmCtx.innerHTML = '<div class="ctx-h">' + n + " · " + esc(x.name || "(이름 없음)") + "</div>" +
+        it("ren", "✎ 이름 고치기") + it("addBelow", "＋ 아래에 " + n + " 추가") + it("addEnd", "＋ 맨 아래에 " + n + " 추가") +
+        '<div class="ctx-sep"></div>' + it("up", "↑ 위로", p.i === 0) + it("down", "↓ 아래로", p.i === L.length - 1) +
+        (p.lv === 2 && isLeafMid(x) ? '<div class="ctx-sep"></div>' + it("split", "소분류로 나누기") : "") +
+        '<div class="ctx-sep"></div>' + it("del", "🗑 삭제");
+      cmCtx._p = { lv: p.lv, i: p.i };
+      cmCtx.hidden = false;
+      cmCtx.style.left = "0px"; cmCtx.style.top = "0px";
+      var w = cmCtx.offsetWidth, hh = cmCtx.offsetHeight;
+      cmCtx.style.left = Math.max(4, Math.min(e.clientX, innerWidth - w - 8)) + "px";
+      cmCtx.style.top = Math.max(4, Math.min(e.clientY, innerHeight - hh - 8)) + "px";
+    });
+    document.addEventListener("mousedown", function hideCm(e) { if (!box.isConnected) { document.removeEventListener("mousedown", hideCm, true); cmCtx.remove(); return; } if (!e.target.closest(".cm-ctx")) cmCtx.hidden = true; }, true);
+    cmCtx.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-cmc]");
+      if (!b || b.classList.contains("dis")) return;
+      cmCtx.hidden = true;
+      var a = b.getAttribute("data-cmc"), lv = cmCtx._p.lv, i = cmCtx._p.i, L = list(lv), x = L && L[i];
+      if (!x) return;
+      var focusName = function (idx) { var el = $("cmCol" + lv).querySelector('.ci[data-i="' + idx + '"] .ci-name'); if (el) { el.focus(); el.select(); el.scrollIntoView({ block: "nearest" }); } };
+      if (a === "ren") focusName(i);
+      else if (a === "addBelow" || a === "addEnd") {
+        var nx = lv === 1 ? { id: newId("G"), name: "", kids: [] } : lv === 2 ? { id: newId("M"), name: "", use: true, dz: [], kids: [] } : { id: newId("A"), name: "", use: true, dz: [] };
+        var at2 = a === "addEnd" ? L.length : i + 1;
+        L.splice(at2, 0, nx);
+        if (lv === 1) { selT = nx; selM = null; selS = null; } else if (lv === 2) { selM = nx; selS = null; } else selS = nx;
+        render(); focusName(at2);
+        say("새 " + lvName(lv) + "를 만들었습니다. 이름을 넣으세요 (Enter = 하나 더 추가)");
+      }
+      else if (a === "up" || a === "down") { move(L, i, i + (a === "up" ? -1 : 1)); render(); }
+      else if (a === "split") split(x);
+      else if (a === "del") del({ lv: lv, i: i }, L, x);
+    });
     box.addEventListener("focusin", function (e) {
       var p = at(e.target);
       if (!p) return;
