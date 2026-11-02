@@ -1976,7 +1976,8 @@
     if (id && !m) it("selone:" + id, "이 계정 선택 (Ctrl+클릭으로 여러 개)");
     it("bulk", "⚙ 일괄 적용…" + (m ? " (" + m + "개 선택)" : " (보이는 계정)"));
     if (m) it("unsel", "선택 해제");
-    $("ctx").innerHTML = items.join("");
+    var szm = sizeMenu("plan", cell);
+    $("ctx").innerHTML = items.join("") + szm.html; $("ctx")._sz = szm.ctx;
     $("ctx").setAttribute("data-k", k);
     $("fpop").hidden = true;
     place($("ctx"), e.clientX, e.clientY);
@@ -4715,9 +4716,12 @@
     return null;
   }
   // 합계 줄을 머리글 바로 밑에 고정
-  /* ---------- 칸 크기: 열 너비 (머리글 오른쪽 끝) · 줄 높이 (계정 칸 아래 끝) 끌기, 더블클릭 = 처음대로 ----------
-     열 너비를 정하면 그 너비를 넘는 글은 비고는 줄바꿈, 숫자는 … 으로. 이 PC에 기억 (모든 연도 · 칸 공통) */
-  var SZ = { plan: { w: {}, h: {} }, exec: { w: {}, h: {} } }, NOTE_W = 260, rszJust = 0;
+  /* ---------- 칸 크기 (엑셀처럼) ----------
+     열 머리글 경계에 마우스를 대고 끌기 = 열 너비 (양쪽 어디서나 잡힘, 끄는 동안 너비 표시), 더블클릭 = 내용에 맞춤
+     계정 칸 줄 경계 끌기 = 줄 높이, 더블클릭 = 처음 높이. 여러 열(머리글 Ctrl/Shift+클릭 · 칸 끌어 고르기) · 여러 줄(Ctrl+클릭)을
+     골라 두고 끌면 모두 같은 크기. 우클릭 메뉴: 너비 · 높이 지정, 같은 크기로, 내용에 맞춤, 처음대로. 표는 화면에 맞춰 늘이지 않음
+     (다른 열이 따라 변하지 않게). 이 PC에 기억 (계획 · 집행 따로) */
+  var SZ = { plan: { w: {}, h: {} }, exec: { w: {}, h: {} } }, NOTE_W = 260, rszJust = 0, rszHover = null, CSEL = { plan: [], exec: [] };
   (function () {
     try { var o = JSON.parse(localStorage.getItem("budget.sizes") || "null"); if (o) ["plan", "exec"].forEach(function (k) { if (o[k]) SZ[k] = { w: o[k].w || {}, h: o[k].h || {} }; }); } catch (e) { /* 저장소 막힘 */ }
   })();
@@ -4731,53 +4735,182 @@
     });
   }
   function applySizes(el, scr) {
-    el.querySelectorAll("thead th[data-k]").forEach(function (th) { if (!th.querySelector(".colrs")) th.insertAdjacentHTML("beforeend", '<span class="colrs" title="끌어서 열 너비 조절 · 더블클릭 = 처음대로"></span>'); });
-    el.querySelectorAll("tbody td.c-acc").forEach(function (td) { if (rowKeyOf(td.parentNode) && !td.querySelector(".rowrs")) td.insertAdjacentHTML("beforeend", '<span class="rowrs" title="끌어서 줄 높이 조절 · 더블클릭 = 처음대로"></span>'); });
-    var ks = {}; el.querySelectorAll("thead th[data-k]").forEach(function (th) { ks[th.getAttribute("data-k")] = 1; });
+    var ks = {}; el.querySelectorAll("thead th[data-k]").forEach(function (th) { var k = th.getAttribute("data-k"); ks[k] = 1; th.classList.toggle("csel", CSEL[scr].indexOf(k) >= 0); });
     Object.keys(ks).forEach(function (k) { var w = colW(scr, k); if (w) setColW(el, k, w); });
     var H = SZ[scr].h;
     if (Object.keys(H).length) el.querySelectorAll("tbody tr").forEach(function (tr) { var rk = rowKeyOf(tr); if (rk && H[rk]) { tr.style.height = H[rk] + "px"; tr.classList.add("rh"); } });
   }
   function rerenderAllPanes() { renderAll(); PANES.forEach(function (p) { if (p !== ACT) withPane(p, function () { if (p.year && (YD[p.year] || p.data)) renderPane(); }); }); }
+  function wrapScr(w) { return w.id === "tbl" ? "plan" : "exec"; }
+  // 함께 바꿀 열: 고른 열(머리글) → 끌어 고른 칸의 열 → 그 열 하나
+  function sizeCols(scr, k) {
+    if (CSEL[scr].length > 1 && CSEL[scr].indexOf(k) >= 0) return CSEL[scr].slice();
+    var sg = FS && FS.scr === scr ? selGrid(scr) : null;
+    if (sg && sg.cols.length > 1 && sg.cols.indexOf(k) >= 0) return sg.cols.slice();
+    return [k];
+  }
+  function sizeRows(scr, rk) {
+    if (scr === "plan" && UI.multi[rk] && Object.keys(UI.multi).length > 1) return Object.keys(UI.multi);
+    var sg = FS && FS.scr === scr ? selGrid(scr) : null;
+    if (sg && sg.rows.length > 1 && sg.rows.indexOf(rk) >= 0) return sg.rows.filter(function (x) { return x; });
+    return [rk];
+  }
+  // 내용에 맞춤: 비고는 가장 긴 줄(최대 640px), 나머지는 자연 너비(= 저장값 없음)
+  function fitCol(wrap, scr, k) {
+    if (!(scr === "plan" && k === "note")) { delete SZ[scr].w[k]; return; }
+    var cells = wrap.querySelectorAll('[data-k="note"]'), mx = 80;
+    cells.forEach(function (c) { c.style.width = c.style.minWidth = c.style.maxWidth = ""; c.style.whiteSpace = "pre"; });
+    cells.forEach(function (c) { mx = Math.max(mx, Math.ceil(c.getBoundingClientRect().width)); });
+    cells.forEach(function (c) { c.style.whiteSpace = ""; });
+    SZ[scr].w[k] = Math.min(640, mx + 2);
+  }
+  // 마우스 위치 → 잡을 경계 {wrap, scr, col:k | row:tr}
+  function edgeAt(e) {
+    var t = e.target, wrap = t.closest && t.closest("#tbl,#tblX");
+    if (!wrap || t.closest(".mdl,#ctx")) return null;
+    var x = e.clientX, y = e.clientY, scr = wrapScr(wrap);
+    if (t.closest("thead")) {
+      var best = null;
+      wrap.querySelectorAll("thead th[data-k]").forEach(function (th) { var r = th.getBoundingClientRect(); if (r.width && Math.abs(x - r.right) <= 5 && y >= r.top - 2 && (!best || Math.abs(x - r.right) < best.d)) best = { d: Math.abs(x - r.right), k: th.getAttribute("data-k") }; });
+      if (!best) { var hd = wrap.querySelector("thead").getBoundingClientRect(); wrap.querySelectorAll("thead th[data-k]").forEach(function (th) { var r = th.getBoundingClientRect(); if (r.width && Math.abs(x - r.right) <= 5 && y >= hd.top && y <= hd.bottom) best = { d: 0, k: th.getAttribute("data-k") }; }); }
+      return best ? { wrap: wrap, scr: scr, col: best.k } : null;
+    }
+    var td = t.closest("td.c-acc");
+    if (!td) return null;
+    var tr = td.parentNode, r = tr.getBoundingClientRect(), row = null;
+    if (r.bottom - y <= 4) row = tr;
+    else if (y - r.top <= 3) { row = tr.previousElementSibling; while (row && !rowKeyOf(row)) row = row.previousElementSibling; }
+    return row && rowKeyOf(row) ? { wrap: wrap, scr: scr, row: row } : null;
+  }
+  var rszTip = null;
+  function showRszTip(x, y, txt, vertical) {
+    if (!rszTip) { rszTip = document.createElement("div"); rszTip.className = "rsz-tip"; document.body.appendChild(rszTip); }
+    rszTip.textContent = txt; rszTip.hidden = false;
+    rszTip.style.left = Math.min(x + 12, innerWidth - 200) + "px"; rszTip.style.top = Math.max(4, y - 30) + "px";
+  }
+  function rszLine(x, y, wrap, vertical) {
+    var ln = document.getElementById("rszLine");
+    if (!ln) { ln = document.createElement("div"); ln.id = "rszLine"; document.body.appendChild(ln); }
+    var r = wrap.getBoundingClientRect();
+    ln.hidden = false; ln.className = vertical ? "v" : "h";
+    if (vertical) { ln.style.left = x + "px"; ln.style.top = r.top + "px"; ln.style.height = r.height + "px"; ln.style.width = ""; }
+    else { ln.style.top = y + "px"; ln.style.left = r.left + "px"; ln.style.width = r.width + "px"; ln.style.height = ""; }
+  }
+  document.addEventListener("mousemove", function (e) {
+    if (e.buttons || document.body.classList.contains("rsz-c") || document.body.classList.contains("rsz-r")) return;
+    var h = edgeAt(e);
+    rszHover = h;
+    document.body.classList.toggle("rsz-hc", !!(h && h.col)); document.body.classList.toggle("rsz-hr", !!(h && h.row));
+  }, true);
   document.addEventListener("mousedown", function (e) {
-    var hd = e.target.closest && e.target.closest(".colrs,.rowrs");
-    if (!hd || e.button !== 0) return;
+    var h = e.button === 0 ? edgeAt(e) : null;
+    if (!h) return;
     e.preventDefault(); e.stopPropagation();
-    var wrap = hd.closest("#tbl,#tblX");
-    if (!wrap) return;
-    var scr = wrap.id === "tbl" ? "plan" : "exec", isCol = hd.classList.contains("colrs"), x0 = e.clientX, y0 = e.clientY, fin = null;
+    var wrap = h.wrap, scr = h.scr, x0 = e.clientX, y0 = e.clientY, fin = null, isCol = !!h.col;
     document.body.classList.add(isCol ? "rsz-c" : "rsz-r");
     if (isCol) {
-      var th = hd.closest("th"), k = th.getAttribute("data-k"), w0 = th.getBoundingClientRect().width;
-      var mv = function (ev) { fin = Math.max(32, Math.round(w0 + ev.clientX - x0)); setColW(wrap, k, fin); };
+      var k = h.col, th = wrap.querySelector('thead th[data-k="' + k + '"]'), w0 = th.getBoundingClientRect().width, cols = sizeCols(scr, k);
+      var mv = function (ev) {
+        fin = Math.max(24, Math.round(w0 + ev.clientX - x0));
+        cols.forEach(function (c) { setColW(wrap, c, fin); });
+        rszLine(th.getBoundingClientRect().right, 0, wrap, true);
+        showRszTip(ev.clientX, ev.clientY, "너비: " + fin + "px" + (cols.length > 1 ? " · " + cols.length + "개 열" : ""));
+      };
     } else {
-      var tr = hd.closest("tr"), rk = rowKeyOf(tr), h0 = tr.getBoundingClientRect().height;
-      var mv = function (ev) { fin = Math.max(18, Math.round(h0 + ev.clientY - y0)); tr.style.height = fin + "px"; tr.classList.add("rh"); }; // eslint-disable-line no-redeclare
+      var tr = h.row, rk = rowKeyOf(tr), h0 = tr.getBoundingClientRect().height, rows = sizeRows(scr, rk);
+      var trs = []; wrap.querySelectorAll("tbody tr").forEach(function (x) { if (rows.indexOf(rowKeyOf(x)) >= 0) trs.push(x); });
+      var mv = function (ev) { // eslint-disable-line no-redeclare
+        fin = Math.max(18, Math.round(h0 + ev.clientY - y0));
+        trs.forEach(function (x) { x.style.height = fin + "px"; x.classList.add("rh"); });
+        rszLine(0, tr.getBoundingClientRect().bottom, wrap, false);
+        showRszTip(ev.clientX, ev.clientY, "높이: " + fin + "px" + (rows.length > 1 ? " · " + rows.length + "줄" : ""));
+      };
     }
     var up = function () {
       document.removeEventListener("mousemove", mv); document.removeEventListener("mouseup", up);
       document.body.classList.remove("rsz-c", "rsz-r");
+      if (rszTip) rszTip.hidden = true;
+      var ln = document.getElementById("rszLine"); if (ln) ln.hidden = true;
       rszJust = Date.now();
       if (fin === null) return;
-      if (isCol) SZ[scr].w[k] = fin;
-      else {
-        var keys = [rk];
-        if (scr === "plan" && UI.multi[rk]) keys = Object.keys(UI.multi); // 여러 줄을 골라 두었으면 모두 같은 높이
-        keys.forEach(function (x) { SZ[scr].h[x] = fin; });
-      }
+      if (isCol) cols.forEach(function (c) { SZ[scr].w[c] = fin; });
+      else rows.forEach(function (x) { SZ[scr].h[x] = fin; });
       saveSizes(); rerenderAllPanes();
     };
     document.addEventListener("mousemove", mv); document.addEventListener("mouseup", up);
   }, true);
-  document.addEventListener("click", function (e) { if (rszJust && Date.now() - rszJust < 400 && e.target.closest && e.target.closest(".colrs,.rowrs,th,td.c-acc")) { e.stopPropagation(); e.preventDefault(); } }, true);
+  document.addEventListener("click", function (e) { if (rszJust && Date.now() - rszJust < 400 && e.target.closest && e.target.closest("#tbl,#tblX")) { e.stopPropagation(); e.preventDefault(); } }, true);
   document.addEventListener("dblclick", function (e) {
-    var hd = e.target.closest && e.target.closest(".colrs,.rowrs");
-    if (!hd) return;
+    var h = edgeAt(e);
+    if (!h) return;
     e.preventDefault(); e.stopPropagation();
-    var wrap = hd.closest("#tbl,#tblX"), scr = wrap && wrap.id === "tbl" ? "plan" : "exec";
-    if (hd.classList.contains("colrs")) delete SZ[scr].w[hd.closest("th").getAttribute("data-k")];
-    else delete SZ[scr].h[rowKeyOf(hd.closest("tr"))];
+    if (h.col) sizeCols(h.scr, h.col).forEach(function (k) { fitCol(h.wrap, h.scr, k); });
+    else sizeRows(h.scr, rowKeyOf(h.row)).forEach(function (rk) { delete SZ[h.scr].h[rk]; });
     saveSizes(); rerenderAllPanes();
+  }, true);
+  // 열 고르기: 머리글 Ctrl+클릭 = 하나씩 더하기/빼기, Shift+클릭 = 범위 (분석 창은 열지 않음)
+  document.addEventListener("click", function (e) {
+    var th = e.target.closest && e.target.closest("#tbl thead th[data-k],#tblX thead th[data-k]");
+    if (!th) return;
+    var scr = wrapScr(th.closest("#tbl,#tblX")), k = th.getAttribute("data-k"), L = CSEL[scr];
+    if (!(e.ctrlKey || e.metaKey || e.shiftKey)) { if (L.length) { CSEL[scr] = []; th.closest("thead").querySelectorAll("th.csel").forEach(function (x) { x.classList.remove("csel"); }); } return; }
+    e.preventDefault(); e.stopPropagation();
+    if (e.shiftKey && L.length) {
+      var ths = Array.prototype.map.call(th.closest("thead").querySelectorAll("th[data-k]"), function (x) { return x.getAttribute("data-k"); });
+      var order = th.closest("table").querySelector("tbody tr.grp, tbody tr.acc"), cols = order ? Array.prototype.map.call(order.querySelectorAll("td[data-k]"), function (x) { return x.getAttribute("data-k"); }) : ths;
+      var a = cols.indexOf(L[L.length - 1]), b = cols.indexOf(k);
+      if (a >= 0 && b >= 0) { CSEL[scr] = cols.slice(Math.min(a, b), Math.max(a, b) + 1); }
+    } else { var i = L.indexOf(k); if (i >= 0) L.splice(i, 1); else L.push(k); }
+    th.closest("thead").querySelectorAll("th[data-k]").forEach(function (x) { x.classList.toggle("csel", CSEL[scr].indexOf(x.getAttribute("data-k")) >= 0); });
+    if (CSEL[scr].length > 1) $("stSel").textContent = CSEL[scr].length + "개 열 선택 — 경계를 끌면 모두 같은 너비 · 우클릭 = 너비 메뉴";
+  }, true);
+  // 우클릭 메뉴에 붙는 크기 항목
+  function sizeMenu(scr, cell) {
+    var k = cell.getAttribute("data-k"), tr = cell.closest("tr"), inBody = !!cell.closest("tbody"), rk = inBody ? rowKeyOf(tr) : null, h = [];
+    var it = function (a, label) { h.push('<div class="ctx-i" data-sz="' + a + '">' + label + "</div>"); };
+    if (k) {
+      var cols = sizeCols(scr, k);
+      h.push('<div class="ctx-sep"></div><div class="ctx-h">열 너비' + (cols.length > 1 ? " · " + cols.length + "개 열" : "") + "</div>");
+      it("cw", "↔ 열 너비 지정…");
+      if (cols.length > 1) { it("cwmax", "같은 너비로 — 가장 넓은 열에 맞춤"); it("cwavg", "같은 너비로 — 평균"); }
+      it("cfit", "내용에 맞춤 (경계 더블클릭)"); it("cdef", "처음 너비로"); it("call", "↺ 모든 열 처음 너비로");
+    }
+    if (rk) {
+      var rows = sizeRows(scr, rk);
+      h.push('<div class="ctx-sep"></div><div class="ctx-h">줄 높이' + (rows.length > 1 ? " · " + rows.length + "줄" : "") + "</div>");
+      it("rh", "↕ 줄 높이 지정…");
+      if (rows.length > 1) it("rhmax", "같은 높이로 — 가장 높은 줄에 맞춤");
+      it("rdef", "처음 높이로"); it("rall", "↺ 모든 줄 처음 높이로");
+    }
+    return { html: h.join(""), ctx: { scr: scr, k: k, rk: rk } };
+  }
+  function sizeAct(a, c) {
+    var scr = c.scr, wrap = $(scr === "plan" ? "tbl" : "tblX"), cols = c.k ? sizeCols(scr, c.k) : [], rows = c.rk ? sizeRows(scr, c.rk) : [];
+    var curW = function (k) { var th = wrap.querySelector('thead th[data-k="' + k + '"]'); return th ? Math.round(th.getBoundingClientRect().width) : 80; };
+    var curH = function (rk) { var t = null; wrap.querySelectorAll("tbody tr").forEach(function (x) { if (!t && rowKeyOf(x) === rk) t = x; }); return t ? Math.round(t.getBoundingClientRect().height) : 24; };
+    var done = function () { saveSizes(); rerenderAllPanes(); };
+    var ask = function (title, v, min, fn) {
+      openDialog({ title: title, width: 380, body: '<div class="mdl-pad"><div class="f-row"><label>크기 (px)</label><input class="inp num" id="szV" value="' + v + '"></div><div class="pv-note">' + (title.indexOf("너비") >= 0 ? "열 너비 — 숫자 칸은 보통 70~110, 비고 260" : "줄 높이 — 기본 24") + "</div></div>",
+        onOk: function () { var n = Math.round(Calc.num($("szV").value)); if (!(n >= min)) { toast(min + " 이상 숫자를 넣으세요", true); return false; } fn(Math.min(n, 2000)); done(); } });
+    };
+    if (a === "cw") ask("열 너비 지정" + (cols.length > 1 ? " · " + cols.length + "개 열" : ""), curW(cols[0]), 24, function (n) { cols.forEach(function (k) { SZ[scr].w[k] = n; }); });
+    else if (a === "cwmax") { var mx = 0; cols.forEach(function (k) { mx = Math.max(mx, curW(k)); }); cols.forEach(function (k) { SZ[scr].w[k] = mx; }); done(); }
+    else if (a === "cwavg") { var sm = 0; cols.forEach(function (k) { sm += curW(k); }); var av = Math.round(sm / cols.length); cols.forEach(function (k) { SZ[scr].w[k] = av; }); done(); }
+    else if (a === "cfit") { cols.forEach(function (k) { fitCol(wrap, scr, k); }); done(); }
+    else if (a === "cdef") { cols.forEach(function (k) { delete SZ[scr].w[k]; }); done(); }
+    else if (a === "call") { SZ[scr].w = {}; CSEL[scr] = []; done(); }
+    else if (a === "rh") ask("줄 높이 지정" + (rows.length > 1 ? " · " + rows.length + "줄" : ""), curH(rows[0]), 18, function (n) { rows.forEach(function (rk) { SZ[scr].h[rk] = n; }); });
+    else if (a === "rhmax") { var mh = 0; rows.forEach(function (rk) { mh = Math.max(mh, curH(rk)); }); rows.forEach(function (rk) { SZ[scr].h[rk] = mh; }); done(); }
+    else if (a === "rdef") { rows.forEach(function (rk) { delete SZ[scr].h[rk]; }); done(); }
+    else if (a === "rall") { SZ[scr].h = {}; done(); }
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("#ctx [data-sz]");
+    if (!b) return;
+    e.stopPropagation();
+    var c = $("ctx")._sz;
+    closeCtx();
+    if (c) sizeAct(b.getAttribute("data-sz"), c);
   }, true);
   function stickTotal(el) {
     var tr = el.querySelector("tr.total.ttop"), th = el.querySelector("thead");
@@ -6226,8 +6359,8 @@
         it("memo", "✎ 메모 " + (X.memos[mk] ? "고치기" : "쓰기")); if (X.memos[mk]) it("unmemo", "메모 지우기");
         it("detail", "내역 보기");
       } else if (sc) { items.push('<div class="ctx-sep"></div>'); it("detail", "내역 보기"); }
-      var c = $("ctx");
-      c.innerHTML = items.join("");
+      var c = $("ctx"), szm = sizeMenu("exec", cell);
+      c.innerHTML = items.join("") + szm.html; c._sz = szm.ctx;
       c._x = { k: k, sc: sc, id: id, x: e.clientX, y: e.clientY };
       place(c, e.clientX, e.clientY);
     });
