@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -24,13 +24,13 @@
   --maxw:1280px;--pad:clamp(24px,4vw,72px);
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){--bg:#100F20;--bg-2:#171630;--surface:#1C1B36;--ink:#EDEBF7;--ink-soft:#B6B2CE;--ink-faint:#7C789A;
-    --line:#2C2A4C;--line-strong:#3A3861;--code-bg:#08081A;--code-ink:#EDEBF7;--coral:#FF6E62;--indigo-soft:#8681FF;--teal:#2FD4C1;
-    --shadow:0 30px 70px -30px rgba(0,0,0,.7), 0 10px 30px -18px rgba(0,0,0,.6);}
+  :root:not([data-theme="light"]){--bg:#030606;--bg-2:#0b1312;--surface:rgba(8,13,14,.95);--ink:#F1F5F4;--ink-soft:#B4C2C0;--ink-faint:#7A8C8A;
+    --line:#1c2b2a;--line-strong:#2b3f3d;--code-bg:#050909;--code-ink:#E8F0EE;--coral:#FF7A6B;--indigo:#38bdf8;--indigo-soft:#7dd3fc;--teal:#5eead4;--amber:#F5B94A;
+    --shadow:0 30px 70px -30px rgba(0,0,0,.8), 0 10px 30px -18px rgba(0,0,0,.7);}
 }
-:root[data-theme="dark"]{--bg:#100F20;--bg-2:#171630;--surface:#1C1B36;--ink:#EDEBF7;--ink-soft:#B6B2CE;--ink-faint:#7C789A;
-  --line:#2C2A4C;--line-strong:#3A3861;--code-bg:#08081A;--code-ink:#EDEBF7;--coral:#FF6E62;--indigo-soft:#8681FF;--teal:#2FD4C1;
-  --shadow:0 30px 70px -30px rgba(0,0,0,.7), 0 10px 30px -18px rgba(0,0,0,.6);}
+:root[data-theme="dark"]{--bg:#030606;--bg-2:#0b1312;--surface:rgba(8,13,14,.95);--ink:#F1F5F4;--ink-soft:#B4C2C0;--ink-faint:#7A8C8A;
+    --line:#1c2b2a;--line-strong:#2b3f3d;--code-bg:#050909;--code-ink:#E8F0EE;--coral:#FF7A6B;--indigo:#38bdf8;--indigo-soft:#7dd3fc;--teal:#5eead4;--amber:#F5B94A;
+    --shadow:0 30px 70px -30px rgba(0,0,0,.8), 0 10px 30px -18px rgba(0,0,0,.7);}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;font-family:var(--font-sans);background:var(--bg);color:var(--ink);
@@ -1682,6 +1682,33 @@ body[data-tool="spot"] .spot{display:block}
 }
 @media print{*{animation:none!important}}
 .slide.m-off *{animation:none!important}
+
+/* ===== 회로 기판 스킨: 어두운 화면이 기본, D 키로 원래 밝은 화면 ===== */
+#bg3d{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:none;pointer-events:none;transition:opacity .8s ease}
+#bgScrim{position:fixed;inset:0;z-index:0;pointer-events:none;display:none;transition:background .8s ease;
+  background:linear-gradient(90deg,rgba(2,4,4,.84) 0%,rgba(2,4,4,.55) 40%,rgba(2,4,4,.12) 72%,rgba(2,4,4,0) 100%),linear-gradient(0deg,rgba(2,4,4,.6),rgba(2,4,4,0) 35%)}
+.deck{z-index:1}
+:root[data-theme="dark"] #bg3d,:root[data-theme="dark"] #bgScrim{display:block}
+:root[data-theme="dark"] body{background:#020404}
+:root[data-theme="dark"] body[data-bg="calm"] #bgScrim{background:linear-gradient(90deg,rgba(2,4,4,.84) 0%,rgba(2,4,4,.7) 55%,rgba(2,4,4,.5) 100%)}
+:root[data-theme="dark"] .slide.center.divider:not(.game) .lead,:root[data-theme="dark"] .slide.center.title-slide:not(.game) .tagline{margin-left:0;margin-right:auto;text-align:left}
+:root[data-theme="dark"] body[data-bg="off"] #bg3d{opacity:0}
+:root[data-theme="dark"] .slide:not(.game):not(.video-slide){background:transparent}
+:root[data-theme="dark"] .slide::before{display:none}
+:root[data-theme="dark"] .eyebrow{font-family:var(--font-mono);letter-spacing:.14em;color:var(--teal)}
+:root[data-theme="dark"] .eyebrow .dot{background:var(--teal);border-radius:1px;box-shadow:0 0 10px var(--teal)}
+:root[data-theme="dark"] .slide.game .eyebrow{font-family:inherit;color:#a8895a}
+:root[data-theme="dark"] .slide.game .eyebrow .dot{box-shadow:none}
+/* 표지 · 구분 장: 칩이 보이게 글자는 왼쪽 아래로 */
+:root[data-theme="dark"] .slide.center.title-slide:not(.game),:root[data-theme="dark"] .slide.center.divider:not(.game){align-items:flex-start;text-align:left;justify-content:flex-end;padding-bottom:max(var(--pad),10vh)}
+:root[data-theme="dark"] .slide.center.title-slide:not(.game) .slide-inner,:root[data-theme="dark"] .slide.center.divider:not(.game) .slide-inner{align-items:flex-start;margin:0;max-width:min(1400px,100%)}
+:root[data-theme="dark"] .divider:not(.game) .headline{font-size:clamp(44px,7.4vw,112px);letter-spacing:-.04em;line-height:1.02}
+:root[data-theme="dark"] .divider:not(.game) .idx{color:transparent;-webkit-text-stroke:2px var(--teal);opacity:.9}
+:root[data-theme="dark"] .divider:not(.game) .part-tag,:root[data-theme="dark"] .divider:not(.game) .act{font-family:var(--font-mono);background:transparent;color:var(--teal);border:1px solid var(--teal);border-radius:4px;letter-spacing:.12em}
+:root[data-theme="dark"] .title-slide .kicker{font-family:var(--font-mono);letter-spacing:.14em;color:var(--teal);background:transparent}
+:root[data-theme="dark"] .title-slide .headline.why{font-size:clamp(84px,14vw,200px)}
+:root[data-theme="dark"] .title-slide .headline.why span{color:var(--teal)!important}
+:root[data-theme="dark"] .accent{color:var(--teal)}
 </style>
 </head>
 <body>
@@ -1755,6 +1782,7 @@ body[data-tool="spot"] .spot{display:block}
     </symbol>
   </defs>
 </svg>
+<canvas id="bg3d" aria-hidden="true"></canvas><div id="bgScrim" aria-hidden="true"></div>
 <div class="deck" id="deck">
 
 <!-- ===== 1. 오프닝 영상 ===== -->
@@ -6445,6 +6473,95 @@ document.querySelectorAll('[data-reveal]').forEach(function(el){
   sl.addEventListener('click',function(e){ if(e.target.closest('a,button')) return; el.classList.add('shown'); });
   new MutationObserver(function(){ if(!sl.classList.contains('active')) el.classList.remove('shown'); }).observe(sl,{attributes:true,attributeFilter:['class']});
 });
+</script>
+
+<!-- 회로 기판 배경 (three.js r147, vendor/three) -->
+<script src="vendor/three/three.min.js"></script>
+<script src="vendor/three/RoomEnvironment.js"></script>
+<script src="vendor/three/CopyShader.js"></script>
+<script src="vendor/three/LuminosityHighPassShader.js"></script>
+<script src="vendor/three/EffectComposer.js"></script>
+<script src="vendor/three/RenderPass.js"></script>
+<script src="vendor/three/ShaderPass.js"></script>
+<script src="vendor/three/UnrealBloomPass.js"></script>
+<script>
+(function(){
+  var cv=document.getElementById('bg3d'); if(!cv||!window.THREE||!THREE.UnrealBloomPass) return;
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var renderer; try{ renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'}); }catch(e){ return; }
+  var pr=Math.min(window.devicePixelRatio||1,1.5); renderer.setPixelRatio(pr);
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=0.55; renderer.outputEncoding=THREE.sRGBEncoding; renderer.setClearColor(0x020404,1);
+  var scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(35,innerWidth/innerHeight,0.1,3000), clock=new THREE.Clock();
+  scene.environment=new THREE.PMREMGenerator(renderer).fromScene(new THREE.RoomEnvironment(),0.04).texture;
+  var composer=new THREE.EffectComposer(renderer); composer.addPass(new THREE.RenderPass(scene,camera));
+  var bloom=new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),1.2,0.5,0.7); composer.addPass(bloom);
+  function rnd(){return Math.random()} function lerp(a,b,k){return a+(b-a)*k}
+
+  /* 기판 · 회로선 · 신호 · 칩 */
+  var board=new THREE.Mesh(new THREE.PlaneGeometry(1400,1000),new THREE.MeshStandardMaterial({color:0x020505,metalness:0.1,roughness:0.95}));
+  board.rotation.x=-Math.PI/2; scene.add(board);
+  var C={x:34,z:-6},H=9,traces=[],segs=[];
+  for(var i=0;i<150;i++){var side=i%4,t=(Math.floor(i/4)%10)/9,px,pz;
+    if(side===0){px=C.x-H;pz=C.z-H+t*2*H}else if(side===1){px=C.x+H;pz=C.z-H+t*2*H}else if(side===2){px=C.x-H+t*2*H;pz=C.z-H}else{px=C.x-H+t*2*H;pz=C.z+H}
+    var sx=px+(side===0?-1:side===1?1:0)*(30+rnd()*170)+(side>1?(rnd()-.5)*90:0),sz=pz+(side===2?-1:side===3?1:0)*(30+rnd()*110)+(side<2?(rnd()-.5)*100:0);
+    sx=Math.round(sx/2)*2;sz=Math.round(sz/2)*2;var pts=[[sx,sz]],dx=px-sx,dz=pz-sz,d=Math.min(Math.abs(dx),Math.abs(dz));
+    if(side<2){pts.push([px-Math.sign(dx)*d-Math.sign(dx)*6,sz]);pts.push([px-Math.sign(dx)*6,pz])}else{pts.push([sx,pz-Math.sign(dz)*d-Math.sign(dz)*6]);pts.push([px,pz-Math.sign(dz)*6])}
+    pts.push([px,pz]);var L=0,ls=[0];for(var j=1;j<pts.length;j++){L+=Math.hypot(pts[j][0]-pts[j-1][0],pts[j][1]-pts[j-1][1]);ls.push(L);segs.push(pts[j-1][0],0.05,pts[j-1][1],pts[j][0],0.05,pts[j][1])}
+    traces.push({p:pts,l:ls,L:L,o:rnd(),v:0.18+rnd()*0.25})}
+  var lg=new THREE.BufferGeometry(); lg.setAttribute('position',new THREE.Float32BufferAttribute(segs,3));
+  var lines=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x123d38,transparent:true,opacity:0.95})); scene.add(lines);
+  var pads=new THREE.BufferGeometry(),pp=[]; traces.forEach(function(tr){pp.push(tr.p[0][0],0.06,tr.p[0][1])});
+  pads.setAttribute('position',new THREE.Float32BufferAttribute(pp,3)); scene.add(new THREE.Points(pads,new THREE.PointsMaterial({color:0x1d5c54,size:2.2})));
+  var NP=traces.length*2,pg=new THREE.BufferGeometry(),parr=new Float32Array(NP*3); pg.setAttribute('position',new THREE.BufferAttribute(parr,3));
+  var dot=(function(){var c=document.createElement('canvas');c.width=c.height=64;var x=c.getContext('2d'),g=x.createRadialGradient(32,32,0,32,32,32);
+    g.addColorStop(0,'#fff');g.addColorStop(.3,'rgba(160,255,240,.9)');g.addColorStop(1,'rgba(94,234,212,0)');x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)})();
+  scene.add(new THREE.Points(pg,new THREE.PointsMaterial({size:5,map:dot,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,color:new THREE.Color(1.6,2.2,2.1),toneMapped:false})));
+  var chip=new THREE.Group(), body=new THREE.Mesh(new THREE.BoxGeometry(2*H-2,2.4,2*H-2),new THREE.MeshStandardMaterial({color:0x111318,metalness:0.85,roughness:0.3}));
+  body.position.y=1.2; chip.add(body);
+  var lab=(function(){var c=document.createElement('canvas');c.width=c.height=256;var x=c.getContext('2d');x.fillStyle='#0b0c0f';x.fillRect(0,0,256,256);
+    x.strokeStyle='#2a2c33';x.lineWidth=4;x.strokeRect(14,14,228,228);x.fillStyle='#5eead4';x.font='800 120px "PretendardLocal",sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('AI',128,134);return new THREE.CanvasTexture(c)})();
+  var topMat=new THREE.MeshStandardMaterial({map:lab,emissiveMap:lab,emissive:new THREE.Color(0x5eead4),emissiveIntensity:0.25,metalness:0.4,roughness:0.5});
+  var top=new THREE.Mesh(new THREE.PlaneGeometry(2*H-5,2*H-5),topMat); top.rotation.x=-Math.PI/2; top.position.y=2.42; chip.add(top);
+  var pinM=new THREE.MeshStandardMaterial({color:0xc9ced8,metalness:1,roughness:0.25});
+  for(var s=0;s<4;s++)for(var k=0;k<10;k++){var pin=new THREE.Mesh(new THREE.BoxGeometry(s<2?2.4:0.7,0.35,s<2?0.7:2.4),pinM),tt=-H+1.6+k*((2*H-3.2)/9);
+    if(s===0)pin.position.set(-H-0.2,0.2,tt);else if(s===1)pin.position.set(H+0.2,0.2,tt);else if(s===2)pin.position.set(tt,0.2,-H-0.2);else pin.position.set(tt,0.2,H+0.2);chip.add(pin)}
+  chip.position.set(C.x,0,C.z); scene.add(chip);
+  var key=new THREE.DirectionalLight(0xffffff,1.0); key.position.set(-40,80,60); scene.add(key);
+
+  /* 장 종류별 카메라 · 신호 속도 · 칩 열기 */
+  var ST={hero:{cx:-8,cy:62,cz:78,lx:-12,ly:8,speed:1,heat:0.3,lines:0.95},
+          heat:{cx:4,cy:50,cz:58,lx:-6,ly:6,speed:2.6,heat:1.6,lines:1},
+          calm:{cx:-14,cy:96,cz:118,lx:-22,ly:4,speed:0.7,heat:0.2,lines:0.5},
+          off:{cx:-14,cy:96,cz:118,lx:-22,ly:4,speed:0.4,heat:0.1,lines:0.3}};
+  var HEAT=/사람을 넘다|더 똑똑하고|Why Now의 답|긴 프롬프트|세상은 이미|모델 출시 연표/;
+  function stateOf(sl){ if(!sl) return 'calm'; var c=sl.classList;
+    if(c.contains('game')||c.contains('video-slide')) return 'off';
+    if(c.contains('title-slide')||c.contains('divider')) return 'hero';
+    if(HEAT.test(sl.getAttribute('data-title')||'')) return 'heat'; return 'calm'; }
+  var want=ST.hero, speed=1, heat=0.3, prog=0, mx=0, my=0, slow=0, last=0, cur='';
+  camera.position.set(want.cx,want.cy,want.cz); var look=new THREE.Vector3(want.lx,want.ly,-14);
+  addEventListener('mousemove',function(e){mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});
+  function resize(){renderer.setSize(innerWidth,innerHeight,false);composer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}
+  addEventListener('resize',resize); resize();
+  function frame(){
+    requestAnimationFrame(frame);
+    if(document.documentElement.getAttribute('data-theme')==='light'||document.hidden) return;
+    var t=clock.getElapsedTime(), dt=Math.min(0.1,t-last); last=t;
+    var st=stateOf(document.querySelector('.slide.active')); if(st!==cur){cur=st;want=ST[st];document.body.setAttribute('data-bg',st)}
+    if(st==='off'&&t>2) return;
+    if(dt>0.045){slow+=dt; if(slow>2.5&&pr>1){pr=1;renderer.setPixelRatio(1);resize();slow=0}} else slow=Math.max(0,slow-dt);
+    var k=Math.min(1,dt*1.6); speed=lerp(speed,want.speed,k); heat=lerp(heat,want.heat,k);
+    lines.material.opacity=lerp(lines.material.opacity,want.lines,k); topMat.emissiveIntensity=heat;
+    if(!reduce) prog+=dt*speed;
+    for(var i=0;i<traces.length;i++){var T=traces[i];for(var q=0;q<2;q++){var u=((prog*T.v+T.o+q*0.5)%1)*T.L,j=1;while(j<T.l.length-1&&T.l[j]<u)j++;
+      var f=(u-T.l[j-1])/Math.max(0.001,T.l[j]-T.l[j-1]),a=T.p[j-1],b=T.p[j],n=(i*2+q)*3;parr[n]=a[0]+(b[0]-a[0])*f;parr[n+1]=0.4;parr[n+2]=a[1]+(b[1]-a[1])*f}}
+    pg.attributes.position.needsUpdate=true;
+    camera.position.x=lerp(camera.position.x,want.cx+mx*10,k);camera.position.y=lerp(camera.position.y,want.cy-my*6,k);camera.position.z=lerp(camera.position.z,want.cz,k);
+    look.x=lerp(look.x,want.lx,k);look.y=lerp(look.y,want.ly,k);camera.lookAt(look);
+    composer.render();
+  }
+  requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>
