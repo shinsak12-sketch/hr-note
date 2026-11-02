@@ -4054,7 +4054,7 @@
   /* ---------- 2026년 테스트(더미) 데이터 ----------
      2026년 계획(전년 = 2025 실적, 원안 마감 + 1차 변경 마감) + 더존 손익 원데이터 양식 더미(2026년 1~12월)
      → 2027년 새 연도를 만들고 [전년 실적 가져오기]로 그 파일을 넣어 보며 테스트 */
-  var APP_VER = "1.4.0"; // 프로그램 버전 (배포할 때마다 올림 · 설명서 · 첫 화면에 표시)
+  var APP_VER = "1.4.1"; // 프로그램 버전 (배포할 때마다 올림 · 설명서 · 첫 화면에 표시)
   var TEST_PL = "2026_손익_1-12월_테스트.xls";
   var HAS_TEST = typeof TestData !== "undefined"; // 배포판에는 testdata.js 가 없음 → 테스트 기능 숨김
   function testDataDialog() {
@@ -4673,7 +4673,7 @@
       if (c.warn) { cls += " r1"; txt += " ⚠"; }
       if (k === "rate" && !isNaN(c.v) && M) {
         var hot = c.v > M / 12 + 0.05;
-        return '<td class="' + cls + ' ratec" data-k="rate" title="연간 계획 대비 집행 ' + txt + " · 시간 " + Math.round(M / 12 * 100) + '% 지남"><div class="rbar"><i class="' + (hot ? "hot" : "") + '" style="width:' + Math.max(0, Math.min(100, c.v * 100)).toFixed(1) + '%"></i><s style="left:' + (M / 12 * 100).toFixed(1) + '%"></s></div><span>' + txt + "</span></td>";
+        return '<td class="' + cls + ' ratec" data-k="rate" title="연간 계획 대비 집행 ' + txt + " · 시간 " + Math.round(M / 12 * 100) + '% 지남"><div class="rbar"><i class="' + (hot ? "hot" : "") + '" style="width:' + Math.max(0, Math.min(100, c.v * 100)).toFixed(1) + '%"></i></div><span>' + txt + "</span></td>";
       }
       return '<td class="' + cls + '" data-k="' + k + '">' + txt + "</td>";
     };

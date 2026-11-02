@@ -854,7 +854,6 @@ select.itsel.pinned{border-color:var(--pri);color:var(--pri);font-weight:700}
 .plan td.ratec .rbar{position:absolute;left:5px;right:5px;top:50%;height:12px;margin-top:-6px;background:#EEF1F0;border-radius:2px;overflow:hidden}
 .plan td.ratec .rbar i{display:block;height:100%;background:#9CD0B3}
 .plan td.ratec .rbar i.hot{background:#F2A49C}
-.plan td.ratec .rbar s{position:absolute;top:-2px;bottom:-2px;width:0;border-left:2px solid #3C4043;text-decoration:none}
 .plan td.ratec span{position:relative;z-index:1;font-weight:600}
 .fsplit{display:inline-flex}
 .fsplit .fb:first-child{border-radius:3px 0 0 3px}
