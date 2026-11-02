@@ -12,6 +12,27 @@
   };
   var clone = function (o) { return JSON.parse(JSON.stringify(o)); };
 
+  /* 여러 줄 메모: Alt+Enter = 줄바꿈 (엑셀처럼), 입력칸 높이는 줄 수에 맞춰 늘어남 */
+  var memoClean = function (v) { return String(v === undefined || v === null ? "" : v).replace(/\r\n?/g, "\n").replace(/[ \t]+$/gm, "").replace(/^\n+|\s+$/g, ""); };
+  var taGrow = function (ta) { if (!ta || ta.tagName !== "TEXTAREA") return; var min = ta.classList.contains("nl") ? 70 : 0; ta.style.height = "0px"; ta.style.height = Math.max(min, ta.scrollHeight + 2) + "px"; };
+  var taNewline = function (ta) { ta.setRangeText("\n", ta.selectionStart, ta.selectionEnd, "end"); ta.dispatchEvent(new Event("input", { bubbles: true })); taGrow(ta); };
+  var isAltEnter = function (e) { return e.altKey && (e.key === "Enter" || e.code === "Enter" || e.code === "NumpadEnter"); };
+  // 한글 조합 중에 Alt+Enter → 조합이 끝난 뒤 줄바꿈 (안 그러면 마지막 글자만 확정되고 줄바꿈이 안 됨)
+  var altEnterNl = function (ta, e, after) {
+    e.preventDefault(); e.stopPropagation();
+    var go = function () { if (done) return; done = true; ta.removeEventListener("compositionend", ce); taNewline(ta); if (after) after(); }, done = false;
+    var ce = function () { setTimeout(go, 0); };
+    if (e.isComposing || e.keyCode === 229) { ta.addEventListener("compositionend", ce); setTimeout(go, 120); } else go();
+  };
+  document.addEventListener("keydown", function (e) {
+    var t = e.target;
+    if (isAltEnter(e) && t && t.tagName === "TEXTAREA" && t.classList.contains("ml")) altEnterNl(t, e);
+  }, true);
+  document.addEventListener("input", function (e) { if (e.target && e.target.tagName === "TEXTAREA" && e.target.classList.contains("ml")) taGrow(e.target); }, true);
+  new MutationObserver(function (ms) {
+    ms.forEach(function (m) { m.addedNodes.forEach(function (n) { if (n.nodeType === 1) [].forEach.call(n.matches && n.matches("textarea.ml") ? [n] : n.querySelectorAll ? n.querySelectorAll("textarea.ml") : [], function (ta) { requestAnimationFrame(function () { taGrow(ta); }); }); }); });
+  }).observe(document.documentElement, { childList: true, subtree: true });
+
   /* ---------- 상태 ----------
      S.cat  : 분류 트리 (기준정보.xlsx, 모든 연도 공통). 배열 순서 = 순번
               대분류 › 중분류 › 소분류(선택). 소분류가 없는 중분류는 그 자체가 계정, 있으면 소분류가 계정
@@ -1118,7 +1139,7 @@
           return '<label><span>' + (i + 1) + '월</span><input class="inp num" data-sv="' + i + '" data-kind="' + (pct ? "pct" : "won") + '" value="' + esc(fmtInput(v, pct ? "pct" : "won")) + '"' + (pct ? ' placeholder="%"' : "") + "></label>";
         }).join("") + "</div>";
       }
-      h += '<div class="f-row"><label>메모</label><input class="inp plain" id="pMemo" value="' + esc(d.memo) + '" placeholder="산출근거 뒤에 붙는 메모 (예: 신규 1명 포함)"></div>';
+      h += '<div class="f-row"><label>메모</label><textarea class="inp plain ml" id="pMemo" rows="1" placeholder="산출근거 뒤에 붙는 메모 (예: 신규 1명 포함) · Alt+Enter 줄바꿈">' + esc(d.memo) + '</textarea></div>';
       return h;
     }
 
@@ -1132,7 +1153,7 @@
       if (au === "a") d.a = 0; else if (au === "b") d.b = 0; else if (au === "c") d.c = 0;
       if (au && au !== "t") { var x = Calc.solve(d); d[au] = Math.round(x[au] * 10000) / 10000; }
       root.querySelectorAll("[data-sv]").forEach(function (el) { d.sv[+el.getAttribute("data-sv")] = readInput(el); });
-      d.memo = $("pMemo").value;
+      d.memo = memoClean($("pMemo").value);
       readItems();
     }
     /* 확정 항목: 총액에서 굵직하게 확정된 것만 떼어 둠 (더존 과목 = 이 계정에 연결된 코드만) → 집행 때 그 과목(+조건) 전표로 비교 */
@@ -1590,6 +1611,7 @@
     var w = Math.max(r.width, UI.cell.k === "note" ? 300 : 110);
     ed.style.left = Math.min(r.left, innerWidth - w - 4) + "px"; ed.style.top = r.top + "px";
     ed.style.width = w + "px"; ed.style.height = r.height + "px";
+    if (editing && editing.k === "note") { ed.style.height = "0px"; ed.style.height = Math.max(r.height, ed.scrollHeight + 2) + "px"; }
     ed.classList.toggle("num", UI.cell.k !== "note");
     if (document.activeElement !== ed && !document.activeElement.closest(".mdl,#calc,#ctx,#fpop") && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) ed.focus({ preventScroll: true });
   }
@@ -1624,12 +1646,12 @@
     if (!keep) { ed.value = isM ? (r._c.missing ? "" : Calc.fmtWon(r._c.months[+k.slice(1)])) : r.memo; }
     editing = { id: r.id, k: k };
     ed.classList.add("on");
-    ed.placeholder = isM ? "" : "메모 — 산출근거 뒤에 붙습니다";
+    ed.placeholder = isM ? "" : "메모 — 산출근거 뒤에 붙습니다 · Alt+Enter 줄바꿈";
     placeEd();
     ed.focus({ preventScroll: true });
     if (!keep) ed.select(); else ed.setSelectionRange(ed.value.length, ed.value.length);
   }
-  function stopEdit() { editing = null; var ed = $("cellEd"); ed.classList.remove("on"); ed.value = ""; ed.placeholder = ""; }
+  function stopEdit() { editing = null; var ed = $("cellEd"); ed.classList.remove("on"); ed.value = ""; ed.placeholder = ""; ed.scrollTop = 0; }
   function commitEdit(val, dx, dy) {
     var ed = editing;
     if (!ed) return;
@@ -1637,7 +1659,7 @@
     var r = rowBy(ed.id);
     if (!r) { renderAll(); return; }
     if (ed.k === "note") {
-      val = String(val).trim();
+      val = memoClean(val);
       if (val !== r.memo) change(function () { var p = clone(planFor(r.id)); p.memo = val; setPlan(r.id, p); }, rowLabel(r) + " 메모: " + (val || "(지움)"));
     } else {
       var mi = +ed.k.slice(1), n = String(val).trim() === "" ? 0 : Calc.num(val);
@@ -1669,14 +1691,17 @@
     var ed = $("cellEd");
     ed.addEventListener("compositionstart", function () { if (!editing) startEdit(true); });
     ed.addEventListener("input", function () {
+      if (editing && editing.k === "note") placeEd();
       if (editing || !UI.cell) return;
       if (UI.cell.k !== "note" && !/^[0-9\-.,]*$/.test(ed.value)) { ed.value = ""; return; }
       startEdit(true);
     });
     ed.addEventListener("keydown", function (e) {
+      if (editing && editing.k === "note" && isAltEnter(e)) { altEnterNl(ed, e, placeEd); return; }
       if (e.isComposing || e.keyCode === 229) return; // 한글 조합 중
       var k = e.key, ctl = e.ctrlKey || e.metaKey;
       if (editing) {
+        if (k === "Enter" && e.altKey) { e.preventDefault(); return; }
         if (k === "Enter") { e.preventDefault(); commitEdit(ed.value, 0, e.shiftKey ? -1 : 1); }
         else if (k === "Tab") { e.preventDefault(); commitEdit(ed.value, e.shiftKey ? -1 : 1, 0); }
         else if (k === "Escape") { e.preventDefault(); stopEdit(); placeEd(); }
@@ -1837,11 +1862,11 @@
         opt("bkM", "절대증감", '절대증감 <input class="inp num" id="bkAbs" value="" placeholder="원" style="width:140px;display:inline-block"> 원', false) + "</div>" +
         '<div class="bk-sec"><b>월 분할</b>' + opt("bkS", "", "그대로", true) + opt("bkS", "균등", "균등", false) + opt("bkS", "작년처럼", "작년처럼 (전년 월별 실적 비율 — 없는 계정은 그대로)", false) + "</div>" +
         '<div class="bk-sec"><b>메모</b>' + opt("bkN", "", "그대로", true) + opt("bkN", "add", "뒤에 붙이기", false) + opt("bkN", "set", "바꾸기", false) +
-        '<input class="inp plain" id="bkMemo" placeholder="메모 내용"></div>' +
+        '<textarea class="inp plain ml" id="bkMemo" rows="1" placeholder="메모 내용 · Alt+Enter 줄바꿈"></textarea></div>' +
         '<div class="bk-prev" id="bkPrev"></div></div>',
       okText: "적용",
       onOk: function () {
-        var list = targets(), M = val("bkM"), Sp = val("bkS"), N = val("bkN"), memo = $("bkMemo").value.trim();
+        var list = targets(), M = val("bkM"), Sp = val("bkS"), N = val("bkN"), memo = memoClean($("bkMemo").value);
         if (!list.length) { toast("적용할 계정이 없습니다", true); return false; }
         if (!M && !Sp && !N) { toast("바꿀 항목을 고르세요", true); return false; }
         var res = calcBulk(list, M, Sp, N, memo);
@@ -1858,7 +1883,7 @@
         else if (M === "절대증감") { p.meth = "절대증감"; p.a = Calc.num($("bkAbs").value); }
         if (Sp === "균등") p.split = "균등";
         else if (Sp === "작년처럼") { var rt = Calc.ratiosFrom(p.pm); if (rt) { p.split = "비율"; p.sv = rt; } }
-        if (N === "add" && memo) p.memo = p.memo ? p.memo + " " + memo : memo;
+        if (N === "add" && memo) p.memo = p.memo ? p.memo + (/\n/.test(p.memo + memo) ? "\n" : " ") + memo : memo;
         else if (N === "set") p.memo = memo;
         return { id: r.id, p: p, before: r._c.missing ? 0 : r._c.plan, after: p.meth ? Calc.compute(Object.assign({}, r, p), S.settings).plan : 0 };
       });
@@ -3778,7 +3803,7 @@
   /* ---------- 2026년 테스트(더미) 데이터 ----------
      2026년 계획(전년 = 2025 실적, 원안 마감 + 1차 변경 마감) + 더존 손익 원데이터 양식 더미(2026년 1~12월)
      → 2027년 새 연도를 만들고 [전년 실적 가져오기]로 그 파일을 넣어 보며 테스트 */
-  var APP_VER = "1.1.0"; // 프로그램 버전 (배포할 때마다 올림 · 설명서 · 첫 화면에 표시)
+  var APP_VER = "1.1.1"; // 프로그램 버전 (배포할 때마다 올림 · 설명서 · 첫 화면에 표시)
   var TEST_PL = "2026_손익_1-12월_테스트.xls";
   var HAS_TEST = typeof TestData !== "undefined"; // 배포판에는 testdata.js 가 없음 → 테스트 기능 숨김
   function testDataDialog() {
@@ -5506,16 +5531,16 @@
   /* ---------- 메모 (집행 칸 · 전표 줄) — 마우스를 올리면 보임 ---------- */
   function memoEdit(key, label, x, y, after) {
     var ed = $("memoEd"), cur = X.memos[key];
-    ed.innerHTML = '<div class="me-h">✎ ' + esc(label) + '</div><textarea id="meText" rows="4" placeholder="이슈 · 특이점 메모">' + esc(cur ? cur.text : "") + '</textarea><div class="me-b">' +
+    ed.innerHTML = '<div class="me-h">✎ ' + esc(label) + '</div><textarea id="meText" class="ml nl" rows="4" placeholder="이슈 · 특이점 메모 (Enter · Alt+Enter 줄바꿈, Ctrl+Enter 저장)">' + esc(cur ? cur.text : "") + '</textarea><div class="me-b">' +
       (cur ? '<span class="me-at">' + esc(cur.at) + '</span><button class="btn sm danger" id="meDel">지우기</button>' : "") + '<button class="btn sm" id="meNo">취소</button><button class="btn sm primary" id="meOk">저장</button></div>';
     ed.hidden = false;
     ed.style.left = Math.max(8, Math.min(x, innerWidth - 340)) + "px";
     ed.style.top = Math.max(8, Math.min(y, innerHeight - 200)) + "px";
     var close = function () { ed.hidden = true; };
-    $("meText").focus();
+    $("meText").focus(); taGrow($("meText"));
     $("meNo").addEventListener("click", close);
     $("meOk").addEventListener("click", function () {
-      var t = $("meText").value.trim();
+      var t = memoClean($("meText").value);
       close();
       if ((cur ? cur.text : "") === t) return;
       xChange(function () { if (t) X.memos[key] = { text: t, at: Store.stamp().slice(0, 16), label: label }; else delete X.memos[key]; }, "메모 " + (t ? "저장" : "지움") + ": " + label);
@@ -5543,7 +5568,7 @@
     openDialog({
       title: "메모 모아보기 · " + rows.length + "개", crumb: "집행 › 칸 메모와 전표 줄 메모", width: 900, okText: null, cancelText: "닫기",
       body: '<div class="mdl-pad"><table class="maptbl mon"><tr><th>위치</th><th>메모</th><th>일시</th></tr>' + rows.map(function (r) {
-        return '<tr data-mk="' + esc(r.k) + '" class="clk"><td>' + esc(r.label) + "</td><td>" + esc(r.text) + "</td><td>" + esc(r.at) + "</td></tr>";
+        return '<tr data-mk="' + esc(r.k) + '" class="clk"><td>' + esc(r.label) + '</td><td class="ml-txt">' + esc(r.text) + "</td><td>" + esc(r.at) + "</td></tr>";
       }).join("") + "</table><div class=\"pv-note\">줄을 누르면 그 내역으로 갑니다.</div></div>",
       extra: '<button class="btn" id="mlXls">엑셀로</button>'
     });
@@ -6209,7 +6234,7 @@
       if (e.target.id === "cellEd") return;
       if (dlg) {
         if (e.key === "Escape") { e.preventDefault(); closeDialog(); }
-        else if (e.key === "Enter" && dlg.enterOk && !e.shiftKey && e.target.tagName !== "BUTTON" && e.target.tagName !== "TEXTAREA" && e.target.tagName !== "SELECT") {
+        else if (e.key === "Enter" && dlg.enterOk && !e.shiftKey && e.target.tagName !== "BUTTON" && (e.target.tagName !== "TEXTAREA" || (e.target.classList.contains("ml") && !e.target.classList.contains("nl"))) && e.target.tagName !== "SELECT") {
           var ok = $("modal").querySelector("[data-ok]");
           if (ok) { e.preventDefault(); ok.click(); }
         }

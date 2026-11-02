@@ -919,3 +919,12 @@ select.itsel.pinned{border-color:var(--pri);color:var(--pri);font-weight:700}
 .rm-mascot .m-leg,.rm-mascot .m-leg2{animation:m-walk .35s infinite steps(2)}
 .rm-bub{position:absolute;top:-4px;left:50%;transform:translateX(-50%);background:#fff;border:1.5px solid #1B3A2A;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700;color:#1B3A2A;white-space:nowrap}
 @keyframes rm-hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+/* 여러 줄 메모 — Alt+Enter 줄바꿈, 줄 수만큼 칸이 늘어남 */
+textarea.ml{display:block;width:100%;resize:none;overflow:hidden;font:inherit;line-height:1.5;min-height:26px;white-space:pre-wrap}
+textarea.ml.nl{min-height:70px;max-height:60vh;overflow-y:auto}
+
+.cell-ed{resize:none;overflow:hidden;line-height:18px;white-space:pre}
+.cell-ed.on:not(.num){white-space:pre-wrap;word-break:break-all}
+.plan td.c-note{white-space:pre;line-height:18px;vertical-align:middle}
+.ml-txt{white-space:pre-wrap}
+.pv-basis{white-space:pre-wrap}
