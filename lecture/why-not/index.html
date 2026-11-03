@@ -1869,7 +1869,7 @@ body{background:var(--bg)}
 :root[data-theme="ink"]{
   --bg:#F4F5F8;--bg-2:#ECEEF3;--surface:#FFFFFF;--ink:#16181F;--ink-soft:#4A4F5E;--ink-faint:#7C8293;
   --line:#D7DAE3;--line-strong:#B9BECB;--wb-line:#16181F;
-  --indigo:#5B3FF0;--indigo-soft:#5B3FF0;--teal:#5B3FF0;--coral:#E0402F;--coral-deep:#C2321F;--amber:#D48E12;
+  --indigo:#5B3FF0;--indigo-soft:#5B3FF0;--teal:#5B3FF0;--coral:#5B3FF0;--coral-deep:#4A30D6;--amber:#5B3FF0;--accent:#5B3FF0;--bad:#E0402F;
   --mint:#E9E4FF;--mint-ink:#5B3FF0;--chip:#16181F;--ok:#14966A;
   --font-sans:"IBM Plex Sans KR","PretendardLocal","Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
   --font-mono:"IBM Plex Mono","JetBrains Mono",ui-monospace,Consolas,monospace}
@@ -1885,6 +1885,9 @@ body{background:var(--bg)}
 :root[data-theme="ink"] .slide:not(.game) .part-tag,:root[data-theme="ink"] .title-slide:not(.game) .kicker{border-radius:999px;background:var(--ink)}
 :root[data-theme="ink"] .slide:not(.game) .mark{background:linear-gradient(transparent 52%,var(--mint) 0)}
 :root[data-theme="ink"] .slide.bp{background-image:none}
+:root[data-theme="ink"] .mtl{--s1:#16181F;--s2:#5B3FF0;--s3:#8A78F5;--s4:#B9ADFF;--s5:#7C8293}
+:root[data-theme="ink"] .slide:not(.game) .callout.warn{background:var(--mint)}
+:root[data-theme="ink"] .slide:not(.game) .callout.warn .bang{background:var(--indigo);color:#fff}
 </style>
 </head>
 <body>
