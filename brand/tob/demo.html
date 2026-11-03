@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>톱 캐릭터 가이드</title>
+<style>
+:root{--bg:#F3F4F2;--paper:#fff;--ink:#1A1F1C;--ink2:#5A635E;--ink3:#9AA19C;--line:#E3E6E3;--g:#1D7A4C;--o:#EBA21E;--sh:rgba(26,31,28,.07)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 "Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;padding:32px max(16px,env(safe-area-inset-left)) 64px}
+.wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.tag{font:600 11px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase}
+h1{margin:4px 0 0;font-size:30px;letter-spacing:-.02em;display:flex;align-items:center;gap:12px}
+h2{margin:0 0 12px;font-size:17px}
+p{margin:0;color:var(--ink2)}
+.card{background:var(--paper);border-radius:18px;padding:20px;box-shadow:0 1px 2px var(--sh),0 8px 24px var(--sh)}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.st{flex:1 1 150px;background:var(--bg);border-radius:14px;padding:16px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.st b{font-size:13px}.st span{font-size:11.5px;color:var(--ink2);text-align:center}
+.sz{display:flex;flex-direction:column;align-items:center;gap:6px;font:600 10px ui-monospace,monospace;color:var(--ink3)}
+.dark{background:#1A1F1C;border-radius:12px;padding:14px}
+.on-g{background:var(--g);border-radius:12px;padding:14px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td,th{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+th{color:var(--ink3);font-weight:600;font-size:12px}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.btn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:10px;background:var(--g);color:#fff;border-radius:12px;padding:10px 16px;font-weight:700;box-shadow:0 2px 0 #145a37}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.about{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.big{width:120px;height:120px;border-radius:26px;background:linear-gradient(160deg,#1D7A4C,#16603B);display:grid;place-items:center}
+code{font:12.5px ui-monospace,Menlo,Consolas,monospace;background:var(--bg);padding:1px 6px;border-radius:5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <div class="tag">SHIN signature character · TOB</div>
+    <h1><span data-tob="base" data-tob-size="40" data-tob-egg title="눌러 보기"></span>톱 캐릭터 가이드</h1>
+    <p>내가 만드는 모든 프로그램에 붙는 서명 캐릭터. 제목 옆 톱을 눌러 보면 이스터에그가 나옴.</p>
+  </div>
+
+  <section class="card">
+    <h2>상태 4가지</h2>
+    <div class="row">
+      <div class="st"><span data-tob="base" data-tob-size="72"></span><b>base · 기본</b><span>평소 · 빈 화면</span></div>
+      <div class="st"><span data-tob="work" data-tob-size="72"></span><b>work · 계산 중</b><span>걷기 · 톱니 빠르게</span></div>
+      <div class="st"><span data-tob="done" data-tob-size="72"></span><b>done · 완료</b><span>^ ^ · 팔 듦</span></div>
+      <div class="st"><span data-tob="oops" data-tob-size="72"></span><b>oops · 오류</b><span>— — · 팔 처짐</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>크기 · 바탕</h2>
+    <div class="row" id="sizes"></div>
+  </section>
+
+  <section class="card">
+    <h2>색</h2>
+    <table><tr><th>이름</th><th>값</th><th>쓰는 곳</th></tr>
+      <tr><td><i class="sw" style="background:#EBA21E"></i>호박</td><td><code>#EBA21E</code></td><td>몸 · 팔 · 다리 · 톱니 (어느 프로그램이든 그대로)</td></tr>
+      <tr><td><i class="sw" style="background:#1A1F1C"></i>먹</td><td><code>#1A1F1C</code></td><td>눈</td></tr>
+      <tr><td><i class="sw" style="background:#1D7A4C"></i>초록</td><td><code>#1D7A4C</code></td><td>크게 놓을 때 받침 · 이스터에그 조각</td></tr>
+      <tr><td><i class="sw" style="background:#F6D58E"></i>연호박</td><td><code>#F6D58E</code></td><td>이스터에그 먼지</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>붙일 자리</h2>
+    <table><tr><th>#</th><th>자리</th><th>크기</th><th>상태</th></tr>
+      <tr><td>1</td><td>브라우저 탭 아이콘</td><td>16</td><td>base · 읽는 중 work</td></tr>
+      <tr><td>2</td><td>앱 이름 왼쪽 (누르면 이스터에그)</td><td>28</td><td>base</td></tr>
+      <tr><td>3</td><td>저장 표시</td><td>18</td><td>저장 중 work · 됨 done · 실패 oops</td></tr>
+      <tr><td>4</td><td>상태줄 왼쪽 끝</td><td>16</td><td>오래 걸리는 계산 중 work</td></tr>
+      <tr><td>5</td><td>모든 알림</td><td>20</td><td>done · 오류 oops</td></tr>
+      <tr><td>6–7</td><td>시작 · 불러오는 중 / 오류 화면</td><td>62</td><td>work / oops</td></tr>
+      <tr><td>8–12</td><td>결과 없음 · 빈 목록 · 알림 없음 · 빈 시트 · 명령 없음</td><td>40–72</td><td>base · done · oops</td></tr>
+      <tr><td>13</td><td>도움말 · 인쇄 머리</td><td>26 · 14</td><td>base</td></tr>
+      <tr><td>14</td><td>프로그램 정보</td><td>96</td><td>done + Made by SHIN</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>프로그램 정보 견본</h2>
+    <div class="about"><div class="big"><span data-tob="done" data-tob-size="84"></span></div><div><b style="font-size:18px">인력관리 프로그램</b> <span style="color:var(--ink3)">v1.5</span><p>가동률 · 생산성 · 추출보드 · 앞으로 붙는 인력 관리 기능</p><div id="sig" style="margin-top:10px"></div></div></div>
+  </section>
+
+  <section class="card">
+    <h2>이스터에그</h2>
+    <p style="margin-bottom:12px">머리줄 톱을 누르면 화면 여기저기 6~8번 뛰다가 한 바퀴 돌며 펑 · 제자리로 돌아옴. 뛰는 동안 화면 조작은 막지 않음.</p>
+    <button class="btn" id="egg"><span data-tob="base" data-tob-size="24"></span>뛰어 보기</button>
+  </section>
+</div>
+<script src="tob.js"></script>
+<script>
+(function(){
+  var h="";[12,16,24,32,48,72].forEach(function(n){h+='<div class="sz">'+Tob.svg("base",{size:n})+n+'px</div>';});
+  h+='<div class="dark row">'+[16,24,48].map(function(n){return '<div class="sz">'+Tob.svg("base",{size:n})+n+'</div>';}).join("")+'</div>';
+  h+='<div class="on-g row">'+[16,24,48].map(function(n){return '<div class="sz" style="color:#cfe">'+Tob.svg("base",{size:n})+n+'</div>';}).join("")+'</div>';
+  document.getElementById("sizes").innerHTML=h;
+  Tob.favicon("base"); Tob.signature("#sig");
+  var b=document.getElementById("egg"); b.addEventListener("click",function(){Tob.romp(b.querySelector("svg"));});
+})();
+</script>
+</body>
+</html>
