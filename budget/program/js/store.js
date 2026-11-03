@@ -755,7 +755,20 @@
     return writeFile(folder, name, new Uint8Array(XLSX.write(wb, { type: "array", bookType: type || "xlsx" })));
   }
 
+  // 내보내는 엑셀에 서명: '정보' 시트가 있으면 줄을 더하고, 없으면 '정보' 시트를 맨 뒤에 붙임
+  var SIGN = "";
+  function setSign(t) { SIGN = t || ""; }
+  function signBook(wb, name) {
+    if (!SIGN) return;
+    try {
+      wb.Props = Object.assign({}, wb.Props || {}, { Title: String(name || "").replace(/\.xlsx?$/i, ""), Author: "SHIN", Comments: SIGN });
+      var rows = [["만든 프로그램", SIGN], ["내보낸 시각", stamp()]];
+      if (wb.Sheets["정보"]) XLSX.utils.sheet_add_aoa(wb.Sheets["정보"], [[""]].concat(rows), { origin: -1 });
+      else { var ws = XLSX.utils.aoa_to_sheet([["항목", "값"]].concat(rows)); ws["!cols"] = [{ wch: 14 }, { wch: 48 }]; XLSX.utils.book_append_sheet(wb, ws, "정보"); }
+    } catch (e) { /* 서명은 못 붙여도 내보내기는 계속 */ }
+  }
   function download(wb, name) {
+    signBook(wb, name);
     var blob = new Blob([toBytes(wb)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -787,9 +800,9 @@
   root.Store = {
     supported: supported, restore: restore, grant: grant, pick: pick, useHandle: useHandle, folderName: folderName, isProgramFolder: isProgramFolder, connected: connected,
     listYears: listYears, load: load, save: save, loadMaster: loadMaster, saveMaster: saveMaster,
-    fileName: fileName, MASTER: MASTER, exportReport: exportReport, readAnyFile: readAnyFile, stamp: stamp,
+    fileName: fileName, MASTER: MASTER, FORMAT_VER: FORMAT_VER, exportReport: exportReport, readAnyFile: readAnyFile, stamp: stamp,
     downloadTemplate: downloadTemplate, parseTemplate: parseTemplate, roundLabel: roundLabel, writeBook: writeBook,
-    listFiles: listFiles, readPath: readPath, readDouzone: readDouzone, loadExec: loadExec, saveExec: saveExec, execClosedAt: execClosedAt, execName: execName, download: download, removeFile: removeFile,
+    listFiles: listFiles, setSign: setSign, readPath: readPath, readDouzone: readDouzone, loadExec: loadExec, saveExec: saveExec, execClosedAt: execClosedAt, execName: execName, download: download, removeFile: removeFile,
     acceptExternal: acceptExternal, setReadOnly: setReadOnly, idle: idle, readOnly: readOnly, readRaw: readRaw, writeRaw: writeRaw, execLinesName: execLinesName
   };
 })(this);

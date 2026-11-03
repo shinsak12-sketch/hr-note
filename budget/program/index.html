@@ -9,8 +9,8 @@
 <body>
 <div class="app" id="app">
   <div class="title">
-    <svg class="mascot" id="mascot" viewBox="0 0 13 10" shape-rendering="crispEdges" aria-hidden="true"><g class="m-body"><rect x="3" y="0" width="2" height="1"/><rect x="8" y="0" width="2" height="1"/><rect x="2" y="1" width="9" height="5"/><rect x="0" y="3" width="2" height="2"/><rect x="11" y="3" width="2" height="2"/><rect x="3" y="6" width="1" height="2" class="m-leg"/><rect x="5" y="6" width="1" height="2" class="m-leg2"/><rect x="7" y="6" width="1" height="2" class="m-leg"/><rect x="9" y="6" width="1" height="2" class="m-leg2"/></g><g class="m-eye"><rect x="4" y="2" width="1" height="2"/><rect x="8" y="2" width="1" height="2"/></g><rect class="m-coin" x="6" y="4" width="1" height="1"/></svg><b>사업비 관리 프로그램</b><span class="file" id="fileName"></span><span class="lockpill" id="lockPill" hidden></span><span class="lockpill closed exec-only" id="execPill"></span>
-    <span class="saved" id="saveState"><span class="dot"></span><span id="saveText">폴더 연결 전</span></span>
+    <span class="tob-head" id="mascot" data-tob="base" data-tob-size="28" data-tob-egg title="Made by SHIN"></span><b>사업비 관리 프로그램</b><span class="file" id="fileName"></span><span class="lockpill" id="lockPill" hidden></span><span class="lockpill closed exec-only" id="execPill"></span>
+    <span class="saved" id="saveState"><span class="sv-tob" id="saveTob"></span><span id="saveText">폴더 연결 전</span></span>
     <button class="savebtn" data-act="saveAll" title="지금 바로 저장 (Ctrl+S) — 열려 있는 모든 연도 · 분류">💾 저장</button>
   </div>
 
@@ -120,6 +120,7 @@
 
   <div class="ribbon help" id="rb-help" hidden>
     <button class="rb strong" data-act="manual" style="flex:none"><span class="ic">📖</span>사용<br>설명서</button>
+    <button class="rb" data-act="about" style="flex:none"><span class="ic">ⓘ</span>프로그램<br>정보</button>
     <div class="helptext">
       <b>📖 사용 설명서</b>(왼쪽 버튼)에 모든 기능이 있습니다 · 설명서 안에서 찾기도 됩니다.<br>
       <b>분류 이름 클릭</b> = 분류 분석 · <b>머리글(월 · 분기 · 누계) 클릭</b> = 기간 분석 · <b>▾</b> = 접기 · 펴기 · <b>집행 칸 클릭</b> = 분개장 내역 · <b>계획 칸 클릭</b> = 산출 입력<br>
@@ -170,7 +171,7 @@
   </div>
   </div></div>
   <div class="status">
-    <span id="stState">준비</span><span id="stCount"></span>
+    <span class="st-tob" data-tob-busy data-tob-size="16"></span><span id="stState">준비</span><span id="stCount"></span>
     <div class="r"><span id="stSel"></span><span id="stSum"></span></div>
   </div>
 </div>
@@ -178,7 +179,7 @@
 <!-- 처음 화면: 데이터 폴더 연결 -->
 <div class="cover" id="cover" hidden>
   <div class="cover-box">
-    <div class="cover-mascot"><svg class="mascot" viewBox="0 0 13 10" shape-rendering="crispEdges" aria-hidden="true"><g class="m-body"><rect x="3" y="0" width="2" height="1"/><rect x="8" y="0" width="2" height="1"/><rect x="2" y="1" width="9" height="5"/><rect x="0" y="3" width="2" height="2"/><rect x="11" y="3" width="2" height="2"/><rect x="3" y="6" width="1" height="2" class="m-leg"/><rect x="5" y="6" width="1" height="2" class="m-leg2"/><rect x="7" y="6" width="1" height="2" class="m-leg"/><rect x="9" y="6" width="1" height="2" class="m-leg2"/></g><g class="m-eye"><rect x="4" y="2" width="1" height="2"/><rect x="8" y="2" width="1" height="2"/></g><rect class="m-coin" x="6" y="4" width="1" height="1"/></svg></div>
+    <div class="cover-mascot"><div class="tob-plate" id="coverTob"></div></div>
     <div class="cover-brand">사업비 관리 프로그램 <small id="coverVer"></small></div>
     <div class="cover-title" id="coverTitle">데이터 폴더를 연결하세요</div>
     <div class="cover-text" id="coverText"></div>
@@ -206,8 +207,6 @@
     <button data-ck="%" class="fn">%</button><button data-ck="." class="fn">.</button><button id="ckClr" class="fn" title="계산 기록 지우기">기록 ✕</button><button id="ckCopy" class="fn" title="결과 복사 (Ctrl+C)">복사</button>
   </div>
 </div>
-<!-- 이스터에그: 제목 줄 캐릭터를 누르면 -->
-<div class="egg" id="egg" hidden><div class="egg-coins" id="eggCoins"></div><div class="egg-body" id="eggBody" title="또 눌러 보세요"><div class="egg-say" id="eggSay"></div><svg class="mascot egg-svg" viewBox="0 0 13 10" shape-rendering="crispEdges" aria-hidden="true"><g class="m-body"><rect x="3" y="0" width="2" height="1"/><rect x="8" y="0" width="2" height="1"/><rect x="2" y="1" width="9" height="5"/><rect x="0" y="3" width="2" height="2"/><rect x="11" y="3" width="2" height="2"/><rect x="3" y="6" width="1" height="2" class="m-leg"/><rect x="5" y="6" width="1" height="2" class="m-leg2"/><rect x="7" y="6" width="1" height="2" class="m-leg"/><rect x="9" y="6" width="1" height="2" class="m-leg2"/></g><g class="m-eye"><rect x="4" y="2" width="1" height="2"/><rect x="8" y="2" width="1" height="2"/></g><rect class="m-coin" x="6" y="4" width="1" height="1"/></svg></div></div>
 <div id="modal"></div>
 <div class="toast" id="toast"></div>
 
@@ -217,6 +216,7 @@
 <script src="js/testdata.js"></script>
 <script src="js/help.js"></script>
 <script src="js/store.js"></script>
+<script src="brand/tob/tob.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
