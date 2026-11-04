@@ -114,6 +114,19 @@ body{background:#E6E8EE;color:var(--ink);font-family:var(--sans);overflow:hidden
 .s01 .ghost{opacity:0;transform:scale(.85) rotate(var(--r));}
 .s01.k1 .ghost{opacity:1;transform:scale(1) rotate(var(--r))}
 .s01 .ghost .wb{gap:14px}
+.s01 .ghost .msg{font-size:22px;padding:10px 16px}
+.s01.k2 .ghost{opacity:0;transform:scale(.9) rotate(var(--r))}
+.s01.k2 .main{left:110px!important;top:200px!important}
+.s01.k3 .main{opacity:0}
+.s01 .vs{position:absolute;left:1000px;width:810px;border:3px solid var(--ink);border-radius:26px;background:var(--card);padding:28px 32px;box-sizing:border-box;display:flex;flex-direction:column;gap:14px}
+.s01 .vs .q{font:600 30px/1.4 var(--sans)}
+.s01 .vs .q b{font-weight:700}
+.s01 .vs .r{font:600 28px var(--sans);color:var(--mute)}
+.s01 .vs .r em{font-style:normal;color:var(--ink);font-weight:700}
+.s01 .why{position:absolute;left:1000px;top:690px;width:810px;text-align:center;font:700 58px var(--sans);color:var(--accent)}
+.s01 .gate{position:absolute;left:0;right:0;top:330px;text-align:center}
+.s01 .gate .h-big{font-size:70px;line-height:1.3}
+.s01 .gate .h-big em{font-style:normal;color:var(--accent)}
 /* S03 */
 .s03.k1 .win{left:180px!important;opacity:.38}
 .s03 .wire{height:0;border-top:4px dashed var(--accent);width:0;transition:width .8s var(--ease) .4s}
@@ -298,16 +311,21 @@ const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
 const S=[];
 const A0='0막 오프닝',A1='1막 LLM이란',A2='2막 답이 써지는 원리',A3='3막 어떻게 배웠나',A4='4막 대화가 이어지는 원리',A5='5막 그래서 이렇게 쓴다';
 
-// S01
-S.push({act:A0,title:'매일 쓰는데',caps:['매일 쓰는 AI','근데 *안에서* 무슨 일이?'],
- html:win(560,190,800,0,'AI 채팅',`<div class="msg me">이번 주 회의록 세 줄로 요약해 줘</div><div class="msg ai"><span class="st"></span><span class="cur"></span></div>`,'main')
- +[['챗GPT',110,170,-4],['클로드',1440,190,3],['제미나이',150,560,2],['코파일럿',1400,580,-3]].map(([t,x,y,r],i)=>
-   `<div class="win ghost" style="left:${x}px;top:${y}px;width:380px;--r:${r}deg;transition-delay:${i*.09}s"><div class="tb"><i></i><i></i><i></i><span>${t}</span></div><div class="wb"><div class="bar" style="width:70%;margin-left:auto;background:var(--ink)"></div><div class="bar" style="width:90%"></div><div class="bar" style="width:60%"></div></div></div>`).join(''),
+// S01 (앞 장 '실망한 답 · 만족한 답'에서 이어짐)
+const Q01='주말에 와이프랑 1박 2일, 자차로 놀러 갈 만한 서울 근교 여행지 추천해 줘';
+S.push({act:A0,title:'원하는 답이 안 나오는 이유',caps:['아까 그 질문','어느 AI에 물어도 *누구나 아는 답*','어떤 답은 실망, 어떤 답은 *만족*. 차이는?','답을 바꾸려면, 먼저 *AI를 이해*해야'],
+ html:win(560,170,800,0,'AI 채팅',`<div class="msg me">${Q01}</div><div class="msg ai"><span class="st"></span><span class="cur"></span></div>`,'main')
+ +[['챗GPT',90,150,-4],['클로드',1450,170,3],['제미나이',110,640,2],['코파일럿',1430,640,-3]].map(([t,x,y,r],i)=>
+   `<div class="win ghost" style="left:${x}px;top:${y}px;width:380px;--r:${r}deg;transition-delay:${i*.09}s"><div class="tb"><i></i><i></i><i></i><span>${t}</span></div><div class="wb"><div class="bar" style="width:70%;margin-left:auto;background:var(--ink)"></div><div class="msg ai">${['가평 · 춘천 · 양평…','양평 · 가평 · 포천…','춘천 · 가평 · 남이섬…','가평 · 양평 · 원주…'][i]}</div></div></div>`).join('')
+ +`<div class="vs" data-in="2" data-out="3" style="top:170px"><span class="tag bad" style="align-self:flex-start">실망</span><div class="q">여행지 추천 · 선물 추천 · 회식 장소</div><div class="r">→ <em>누구나 아는 답</em></div></div>`
+ +`<div class="vs" data-in="2" data-out="3" style="top:420px;--d:.25s"><span class="tag ok" style="align-self:flex-start">만족</span><div class="q">법 조항 · 약 성분 · 엑셀 함수</div><div class="r">→ <em>딱 맞는 답</em></div></div>`
+ +`<div class="why" data-in="2" data-out="3" style="--d:.6s">차이는?</div>`
+ +`<div class="gate" data-in="3" style="--d:.2s"><div class="h-big">답을 바꾸려면, 먼저<br><em>AI가 답을 만드는 방식</em>을 알아야 합니다</div></div>`,
  on(r,k,anim,ctx){
    if(k!==0)return;
-   const full='1. 신규 채용 일정 확정\n2. 교육 예산 10% 증액\n3. 다음 회의 11월 18일',el=r.querySelector('.st');
+   const full='1. 원주 · 뮤지엄 산, 소금산\n2. 양평 · 두물머리\n3. 가평 · 남이섬, 쁘띠프랑스\n4. 포천 · 산정호수',el=r.querySelector('.st');
    if(!anim){el.textContent=full;return}
-   let i=0;ctx.later(()=>ctx.every(()=>{i+=1;el.textContent=full.slice(0,i);return i<full.length},45),500);
+   let i=0;ctx.later(()=>ctx.every(()=>{i+=1;el.textContent=full.slice(0,i);return i<full.length},40),500);
  }});
 
 // S02
@@ -510,22 +528,13 @@ S.push({act:A4,title:'컨텍스트 윈도우',caps:['한 번에 읽을 수 있�
    if(k===2&&anim)tp.firstElementChild.classList.add('acc');
  }});
 
-// S17 환각
-S.push({act:A5,title:'그럴듯함 ≠ 사실',caps:['다음에 올 말은?','후보가 *전부 그럴듯함*','그럴듯함 ≠ 사실 = *환각*'],
- html:`<div class="A h-big" style="left:0;right:0;top:170px;text-align:center">우리 회사 연차 규정은<span class="blank"></span></div>`
- +barsHTML([['입사일 기준',31],['회계연도 기준',27],['1월 일괄 부여',19],['근속 따라 가산',14]],31)
- +`<div class="A" data-in="1" data-out="2" style="left:1580px;top:610px;--d:.8s"><span class="tag">전부 그럴듯함</span></div>`
- +`<div data-in="2" style="--d:.1s">${win(300,300,1320,0,'AI 채팅',`<div class="msg me">우리 회사 연차 규정 알려 줘</div><div class="msg ai">우리 회사 연차는 매년 1월에 일괄 부여됩니다. 입사 첫해는 월 1일씩 발생합니다.</div>`)}</div>`
- +`<div class="A stamp bad" data-in="2" style="left:1150px;top:580px;--d:.7s">우리 회사 규정 읽은 적 없음</div>`,
- on(r,k){const R=r.querySelector('.rows');R.classList.toggle('showbars',k>=1);R.style.opacity=k>=2?'0':'1';R.style.transition='opacity .6s'}});
-
 // S18 쓰는 요령
 const ic1='<span class="mini"></span><span class="mini"></span><span class="mini" style="background:var(--accent);border-color:var(--accent)"></span>';
 const ic2='<span style="width:180px;height:70px;border:4px dashed var(--accent);border-radius:14px;display:block"></span>';
 const ic3=`<span style="width:96px;height:96px;border-radius:50%;border:3px solid var(--ink);background:conic-gradient(var(--accent) 0 110deg,var(--ink) 110deg 190deg,#D7DAE3 190deg 360deg);display:block"></span>`;
-S.push({act:A5,title:'쓰는 요령 3가지',caps:['원리를 알면 쓰는 법이 보임','① 재료를 줄수록 *정확함*','② 주제가 바뀌면 *새 대화*','③ 숫자·규정·법은 *원문 확인*'],
+S.push({act:A5,title:'쓰는 요령 3가지',caps:['원리를 알면 쓰는 법이 보임','① 재료를 줄수록 *정확함*','② 주제가 바뀌면 *새 대화*','③ 답이 별로면 *다시 뽑기*'],
  html:`<div class="A h-big" style="left:0;right:0;top:140px;text-align:center;font-size:52px" data-out="1">원리를 알면, 쓰는 법이 보임</div>`
- +[[ic1,'재료를 줄수록 정확함','규정·자료는 직접 붙여넣기','대화 테이프'],[ic2,'주제가 바뀌면 새 대화','중요한 조건은 다시 말해 주기','컨텍스트 윈도우'],[ic3,'숫자·규정·법은 원문 확인','그럴듯함 ≠ 사실','돌림판']]
+ +[[ic1,'재료를 줄수록 정확함','규정·자료는 직접 붙여넣기','대화 테이프'],[ic2,'주제가 바뀌면 새 대화','중요한 조건은 다시 말해 주기','컨텍스트 윈도우'],[ic3,'답이 별로면 다시 뽑기','같은 질문도 매번 다른 답 · 여러 번 받아 보고 고르기','돌림판']]
    .map(([ic,h,p,e],i)=>`<div class="tip" data-in="${i+1}" style="left:${150+i*560}px"><div class="ic">${ic}</div><em>${['①','②','③'][i]} · ${e}</em><h3>${h}</h3><p>${p}</p></div>`).join('')});
 
 // S19 원테이크 복습
