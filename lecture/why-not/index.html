@@ -1640,15 +1640,15 @@ body[data-tool="spot"] .spot{display:block}
   .slide.active .mg-stamp{transform-box:fill-box;transform-origin:50% 50%;animation:mgStamp .45s cubic-bezier(.3,1.3,.5,1) 3.8s both}
 
   /* 30: 긴 문서를 빠르게 끝까지 훑어 내려감 → 줄 수 770 */
-  .slide.active .lp-rush{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1em;position:absolute;inset:0;z-index:1;
+  .slide.active:has(.lpgo.shown) .lp-rush{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1em;position:absolute;inset:0;z-index:1;
     background-color:var(--code-bg);
     background-image:repeating-linear-gradient(180deg,transparent 0 8px,rgba(255,255,255,.13) 8px 12px,transparent 12px 20px,rgba(185,182,211,.09) 20px 24px,transparent 24px 31px,rgba(255,180,172,.10) 31px 35px,transparent 35px 44px);
     background-size:100% 220px;
     animation:mgRush 2.6s linear .4s both,mgOut .45s ease 3.1s forwards}
-  .slide.active .lp-rush::after{content:"";position:absolute;right:8px;width:6px;height:14%;border-radius:4px;background:#B9B6D3;animation:mgThumb 2.6s linear .4s both}
-  .slide.active .lp-rush em{font-style:normal;font-family:var(--font-sans);font-weight:800;font-size:clamp(13px,1.4vw,18px);color:#B9B6D3;background:var(--code-bg);padding:.1em .6em;border-radius:6px}
-  .slide.active .lp-rush b{font-family:var(--font-mono);font-size:clamp(46px,6vw,92px);font-weight:900;color:#FFB4AC;line-height:1;background:var(--code-bg);padding:0 .2em;border-radius:10px}
-  .slide.active .lp-rush span{font-family:var(--font-sans);font-weight:800;color:#FFB4AC;font-size:clamp(14px,1.5vw,20px);background:var(--code-bg);padding:0 .5em;border-radius:6px}
+  .slide.active:has(.lpgo.shown) .lp-rush::after{content:"";position:absolute;right:8px;width:6px;height:14%;border-radius:4px;background:#B9B6D3;animation:mgThumb 2.6s linear .4s both}
+  .slide.active:has(.lpgo.shown) .lp-rush em{font-style:normal;font-family:var(--font-sans);font-weight:800;font-size:clamp(13px,1.4vw,18px);color:#B9B6D3;background:var(--code-bg);padding:.1em .6em;border-radius:6px}
+  .slide.active:has(.lpgo.shown) .lp-rush b{font-family:var(--font-mono);font-size:clamp(46px,6vw,92px);font-weight:900;color:var(--lp-hi);line-height:1;background:var(--code-bg);padding:0 .2em;border-radius:10px}
+  .slide.active:has(.lpgo.shown) .lp-rush span{font-family:var(--font-sans);font-weight:800;color:var(--lp-hi);font-size:clamp(14px,1.5vw,20px);background:var(--code-bg);padding:0 .5em;border-radius:6px}
 
   /* 48: 마법진이 돌고 빛나면 스킬북이 펼쳐지고, 고른 스킬이 반짝 */
   .slide.active.mg-summon .sbook{overflow:hidden}
@@ -1865,6 +1865,48 @@ body{background:var(--bg)}
   .slide.active .cbud .bdy{animation:bBob 2.4s ease-in-out 2.2s infinite}
   .slide.active .cbud .arm-r{transform-box:fill-box;transform-origin:left center;animation:bWave .5s ease-in-out 2.2s 4}
 }
+
+/* ===== 클릭하면 하나씩 (.rv + data-reveal) ===== */
+.rmark{display:none}
+.rv{opacity:0;transform:translateY(18px) scale(.985);transition:opacity .5s ease,transform .65s cubic-bezier(.2,.8,.2,1);animation:none!important}
+.rv.shown{opacity:1;transform:none}
+.rv :is(.bt i,.gb i,.hbar i),.rv:is(.vb) i{animation:none!important}
+/* 막대: 칸은 보이고, 막대 · 숫자만 클릭에 */
+.rv.brow,.rv.g,.rv.vb{opacity:1;transform:none}
+.rv.brow .bt i{transform:scaleX(0);transform-origin:0 50%;transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.rv.brow>b,.rv.g>b,.rv.vb>b{opacity:0;transition:opacity .4s ease .25s}
+.rv.g .gb i,.rv.vb>i{transform:scaleY(0);transform-origin:50% 100%;transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.rv.shown.brow .bt i,.rv.shown.g .gb i,.rv.shown.vb>i{transform:none}
+.rv.shown.brow>b,.rv.shown.g>b,.rv.shown.vb>b{opacity:1}
+/* 흐름 카드 안: 돌 · 칸 · 문제가 차례로 */
+.ev.rv :is(.stones i,.tiles i,.probs i){opacity:0;transform:scale(.4);transition:opacity .25s ease,transform .4s cubic-bezier(.2,1.5,.4,1);transition-delay:calc(.35s + var(--n,0) * .07s)}
+.ev.rv.shown :is(.stones i,.tiles i,.probs i){opacity:1;transform:none}
+.ev.rv .hbar i{transform:scaleX(0);transform-origin:0 50%;transition:transform 1s cubic-bezier(.2,.8,.2,1) .3s}
+.ev.rv.shown .hbar i{transform:none}
+/* 완성 체크: ✓ 도장 */
+.s3done>.rv i{transform:scale(0) rotate(-30deg);transition:transform .45s cubic-bezier(.2,1.6,.4,1) .2s}
+.s3done>.rv.shown i{transform:none}
+@media (prefers-reduced-motion:reduce){.rv{transition:none}}
+@media print{.rv,.rv *{opacity:1!important;transform:none!important}}
+/* 25장: 원리와 잇는 상자 */
+.ctxnote{display:flex;align-items:center;gap:clamp(12px,1.6vw,22px);margin-top:clamp(12px,2vh,20px);padding:clamp(10px,1.3vw,16px) clamp(14px,1.8vw,22px);border:1.5px dashed var(--line-strong);border-radius:14px;background:var(--surface)}
+.ctxnote p{margin:0;font-size:clamp(14px,1.6vw,20px);line-height:1.45;color:var(--ink-soft);font-weight:600}
+.ctxnote p b{color:var(--ink)}
+.cwm{flex:none;display:flex;gap:4px;align-items:center;padding:6px;border:2px dashed var(--indigo);border-radius:8px}
+.cwm i{width:clamp(12px,1.4vw,20px);height:clamp(20px,2.4vw,30px);border-radius:4px;border:1.5px solid var(--ink);background:var(--surface)}
+.cwm i.f{background:var(--indigo);border-color:var(--indigo)}
+.cwm i.m{opacity:.22;border-style:dashed}
+/* 10장 연표: 클릭하면 날짜 순서대로 점 */
+.mtl .pt{transform-box:fill-box;transform-origin:50% 50%;transition:opacity .25s ease,transform .4s cubic-bezier(.2,1.7,.4,1)}
+.mtl .pt.hide{opacity:0;transform:scale(.2)}
+.mtl .mark,.mtl .mk{transition:opacity .4s ease}
+.mtl .mark.hide,.mtl .mk.hide{opacity:0}
+.mtl .pt.planon .dot{animation:tlBlink .7s ease-in-out 4}
+@keyframes tlBlink{50%{opacity:.15}}
+/* 29장 색 */
+.lp{--lp-hi:#FFB4AC}
+:root[data-theme="ink"] .lp{--lp-hi:#B9ADFF}
+
 /* ===== LLM 원리 디자인 (D 키로 화이트보드와 전환) =====
    종이 회색 바탕 · 굵은 잉크 테두리 · 둥근 카드 · 알약 태그 · 보라 강조 1색 · 그림자 없음 */
 :root[data-theme="ink"]{
@@ -2131,7 +2173,7 @@ body{background:var(--bg)}
 
 <!-- ===== 6. AI 발전 속도 ===== -->
 <section class="slide wide" data-accent="indigo" data-title="AI 모델 출시 연표"
-  data-notes="[0:33 · 3분 · 연표] 보여 줄 것: AI 모델이 빠르게 진화하면서 계속 늘어나고 있다. 점 하나 = 회사의 대표 모델 하나(공식 발표 기준, 대표 모델만 골라 표시). 아래 막대는 이 표에 찍힌 연도별 수(2026년은 10월까지).
+  data-notes="[0:33 · 3분 · 연표 · 클릭하면 2018년부터 점이 날짜 순서대로 찍힘(약 7초), 아래 연도별 막대도 같이 차오름, 마지막에 예정 모델이 깜빡임] 보여 줄 것: AI 모델이 빠르게 진화하면서 계속 늘어나고 있다. 점 하나 = 회사의 대표 모델 하나(공식 발표 기준, 대표 모델만 골라 표시). 아래 막대는 이 표에 찍힌 연도별 수(2026년은 10월까지).
 멘트: 'ChatGPT 전 5년 동안 점이 5개였습니다. 이후 4년 사이 54개. 이름 뒤 숫자도 GPT-1에서 GPT-6까지 계속 올라갑니다. 오늘 배우는 메뉴도 내년이면 또 바뀝니다. 그래서 버튼보다 시키는 법을 익히는 게 오래갑니다.'
 날짜(공식 발표 기준): OpenAI GPT-1 2018.6.11 · GPT-2 2019.2.14 · GPT-3 2020.5.28 · ChatGPT 2022.11.30 · GPT-4 2023.3.14 · GPT-4o 2024.5.13 · o1 2024.9.12 · GPT-4.5 2025.2.27 · GPT-5 2025.8.7 · GPT-5.2 2025.12.11 · GPT-5.5 2026.4 · GPT-5.6 2026.7.9 · GPT-6 Astra 2026.9.3
 Google BERT 2018.10 · PaLM 2022.4 · Bard 2023.3.21 · Gemini 1.0 2023.12.6 · Gemini 1.5 2024.2.15 · Gemini 2.0 2024.12.11 · Gemini 2.5 Pro 2025.3.25 · Gemini 3 Pro 2025.11.18 · Gemini 3.1 Pro 2026.2.19 · Gemini 3.5 Flash 2026.5.19 · Gemini 3.6 Flash 2026.7 · Gemini 3.7 Flash 2026.8
@@ -2145,6 +2187,7 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
     <h2 class="subhead">새 모델이 몇 개월마다 나옵니다. <span class="accent">그리고 이건 시작입니다</span></h2>
     <p class="desc">점 하나가 회사의 대표 모델 하나입니다. ChatGPT 전 약 5년 동안 <b>5개</b>였던 점이, 이후 4년 사이 <b>54개</b>로 늘었습니다. 회사마다 <b>몇 개월에 한 번씩</b> 새 모델을 내고, 그 간격은 점점 짧아지고 있습니다. 그런데 이건 <b>시작일 뿐</b>입니다.</p>
     <div class="mtl" id="tl" role="img" aria-label="2018년부터 2026년까지 회사별 대표 AI 모델 출시 시점 점도표"></div>
+    <i class="rmark tlgo" data-reveal aria-hidden="true"></i>
     <p class="src">각 회사 발표 · 보도 기준 · 대표 모델만 골라 표시(연도별 수도 이 표 기준) · 2026년 11월 초 기준 · 속이 빈 점은 예정(날짜 미정, 연도별 수에서 뺌) · 점에 마우스를 올리면 이름과 출시 월</p>
   </div>
 </section>
@@ -2159,9 +2202,9 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
     <h2 class="subhead qtitle">"나는 바둑계에 <span class="accent">미래가 먼저 왔다</span>고 생각한다."</h2>
     <p class="qby">장강명, 『먼저 온 미래』(2025) · 알파고 이후 바둑계 10년을 취재한 책</p>
     <div class="evo">
-      <div class="ev"><span class="y">2016.3</span><h3>알파고 vs 이세돌</h3><div class="stones"><i class="w">승</i><i class="w">승</i><i class="w">승</i><i class="l">패</i><i class="w">승</i></div><b class="big">4 : 1</b><p>세계 최정상 기사가 AI에게 졌습니다</p></div>
-      <div class="ev"><span class="y">2017</span><h3>알파고 제로 vs 알파고</h3><div class="hbar"><i style="width:100%"></i></div><b class="big">100 : 0</b><p>사람 기보 없이 혼자 배운 AI가 이전 AI를 완파</p></div>
-      <div class="ev now"><span class="y">지금은</span><h3>기사들이 묻습니다<br>"<span class="accent">AI라면 어디에 뒀을까?</span>"</h3><p>프로 기사들이 대국 중에도 AI의 수를 떠올리며 둡니다. AI가 바둑의 <b>기준</b>이 됐습니다.</p></div>
+      <div data-reveal class="rv ev"><span class="y">2016.3</span><h3>알파고 vs 이세돌</h3><div class="stones"><i class="w">승</i><i class="w">승</i><i class="w">승</i><i class="l">패</i><i class="w">승</i></div><b class="big">4 : 1</b><p>세계 최정상 기사가 AI에게 졌습니다</p></div>
+      <div data-reveal class="rv ev"><span class="y">2017</span><h3>알파고 제로 vs 알파고</h3><div class="hbar"><i style="width:100%"></i></div><b class="big">100 : 0</b><p>사람 기보 없이 혼자 배운 AI가 이전 AI를 완파</p></div>
+      <div data-reveal class="rv ev now"><span class="y">지금은</span><h3>기사들이 묻습니다<br>"<span class="accent">AI라면 어디에 뒀을까?</span>"</h3><p>프로 기사들이 대국 중에도 AI의 수를 떠올리며 둡니다. AI가 바둑의 <b>기준</b>이 됐습니다.</p></div>
     </div>
     <p class="src">구글 딥마인드 · Silver 외, Nature(2017) · 장강명, 동아시아(2025) · '지금은'은 강사 참고 영상(유튜브 쇼츠)</p>
   </div>
@@ -2179,10 +2222,10 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
     <h2 class="subhead qtitle">"손으로 코드를 안 쓴 지 <span class="accent">두 달이 넘었습니다</span>."</h2>
     <p class="qby">보리스 체르니, Claude Code 책임자(2026) · 세계 최고 개발자들의 1년</p>
     <div class="evo" style="--n:4">
-      <div class="ev"><span class="y">2025.7 · 세계 코딩 대회</span><h3>사람 1위, AI 2위</h3><div class="pod"><div class="p1"><b>1위</b><span>사람</span></div><div class="p2"><b>2위</b><span>AI</span></div></div><p>근소한 차이로 사람이 이겼습니다</p></div>
-      <div class="ev"><span class="y">2025.9 · 대학생 세계 대회</span><h3>12문제 전부 해결</h3><div class="tiles t12"><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i></div><p>사람 139개 팀 중 만점은 없었습니다</p></div>
-      <div class="ev"><span class="y">2026.7 · 세계 코딩 대회</span><h3>5문제 전부, 사람 전원을 앞섬</h3><div class="probs"><i style="flex:900">A</i><i style="flex:900">B</i><i style="flex:1500">C</i><i style="flex:2500">D</i><i style="flex:2500">E</i></div><p>1년 만에 근소한 패배가 완승으로</p></div>
-      <div class="ev now"><span class="y">지금은</span><b class="big">80%+</b><h3>AI 회사 코드는<br>AI가 씁니다</h3><p>Anthropic 실제 서비스 코드의 80% 이상을 Claude가 작성. OpenAI도 "20% → 80%"</p></div>
+      <div data-reveal class="rv ev"><span class="y">2025.7 · 세계 코딩 대회</span><h3>사람 1위, AI 2위</h3><div class="pod"><div class="p1"><b>1위</b><span>사람</span></div><div class="p2"><b>2위</b><span>AI</span></div></div><p>근소한 차이로 사람이 이겼습니다</p></div>
+      <div data-reveal class="rv ev"><span class="y">2025.9 · 대학생 세계 대회</span><h3>12문제 전부 해결</h3><div class="tiles t12"><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i></div><p>사람 139개 팀 중 만점은 없었습니다</p></div>
+      <div data-reveal class="rv ev"><span class="y">2026.7 · 세계 코딩 대회</span><h3>5문제 전부, 사람 전원을 앞섬</h3><div class="probs"><i style="flex:900">A</i><i style="flex:900">B</i><i style="flex:1500">C</i><i style="flex:2500">D</i><i style="flex:2500">E</i></div><p>1년 만에 근소한 패배가 완승으로</p></div>
+      <div data-reveal class="rv ev now"><span class="y">지금은</span><b class="big">80%+</b><h3>AI 회사 코드는<br>AI가 씁니다</h3><p>Anthropic 실제 서비스 코드의 80% 이상을 Claude가 작성. OpenAI도 "20% → 80%"</p></div>
     </div>
     <p class="src">AtCoder World Tour Finals 2025 · 2026 · ICPC World Finals 2025(The Decoder · TechRepublic) · Anthropic(2026.5) · 그레그 브록먼 발언 · 회사 발표 기준</p>
   </div>
@@ -2200,9 +2243,9 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
     <h2 class="subhead"><span class="accent">80년 묵은</span> 수학 난제도 풀었습니다</h2>
     <p class="qby">사람이 낸 시험이 아니라, 답을 아무도 모르던 문제입니다</p>
     <div class="evo">
-      <div class="ev"><span class="y">2026.5</span><b class="big">80년</b><h3>에르되시의 추측(1946)을<br>AI가 뒤집었습니다</h3><p>반례를 찾아 틀렸다고 증명. 바깥 수학자들이 검증했습니다</p></div>
-      <div class="ev"><span class="y">2026.8</span><div class="tiles t10"><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i></div><h3>10년 넘게 멈춘 문제 10개에서 새 결과</h3><p>증명을 컴퓨터(Lean)로 검증해 공개</p></div>
-      <div class="ev now"><span class="y">지금은</span><b class="big">722편</b><h3>수학 원고를 한꺼번에 공개</h3><p>이제는 사람이 AI의 증명을 <b>검증하느라</b> 바쁩니다 <small>(회사 주장 · 검증 진행 중)</small></p></div>
+      <div data-reveal class="rv ev"><span class="y">2026.5</span><b class="big">80년</b><h3>에르되시의 추측(1946)을<br>AI가 뒤집었습니다</h3><p>반례를 찾아 틀렸다고 증명. 바깥 수학자들이 검증했습니다</p></div>
+      <div data-reveal class="rv ev"><span class="y">2026.8</span><div class="tiles t10"><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i><i>✓</i></div><h3>10년 넘게 멈춘 문제 10개에서 새 결과</h3><p>증명을 컴퓨터(Lean)로 검증해 공개</p></div>
+      <div data-reveal class="rv ev now"><span class="y">지금은</span><b class="big">722편</b><h3>수학 원고를 한꺼번에 공개</h3><p>이제는 사람이 AI의 증명을 <b>검증하느라</b> 바쁩니다 <small>(회사 주장 · 검증 진행 중)</small></p></div>
     </div>
     <p class="src">OpenAI(2026.5 · 2026.8.1) · TechCrunch(2026.5.20) · OpenAI 수학 원고 공개(2026.10.6) · A Human Audit of OpenAI's AI-Generated Mathematical Proofs(arXiv 2026.8)</p>
   </div>
@@ -2216,10 +2259,10 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
     <h2 class="subhead">사람만 풀 수 있게 만든 시험도, <span class="accent">반년 만에</span></h2>
     <p class="desc">설명 없는 게임을 직접 해 보며 규칙을 알아내는 시험입니다. <b>사람에게는 쉽고 AI에게는 어렵게</b> 일부러 만들었습니다.</p>
     <div class="bars big">
-      <div class="brow human"><span class="bk">사람</span><div class="bt"><i style="width:100%"></i></div><b>100%</b></div>
-      <div class="brow"><span class="bk">AI · 2026.3 공개 때</span><div class="bt"><i style="width:0.6%"></i></div><b>0.37%</b></div>
-      <div class="brow"><span class="bk">AI · 2026.7</span><div class="bt"><i style="width:30.2%"></i></div><b>30.2%</b></div>
-      <div class="brow hot"><span class="bk">AI · 2026.9</span><div class="bt"><i style="width:62.7%"></i></div><b>62.7%</b></div>
+      <div data-reveal class="rv brow human"><span class="bk">사람</span><div class="bt"><i style="width:100%"></i></div><b>100%</b></div>
+      <div data-reveal class="rv brow"><span class="bk">AI · 2026.3 공개 때</span><div class="bt"><i style="width:0.6%"></i></div><b>0.37%</b></div>
+      <div data-reveal class="rv brow"><span class="bk">AI · 2026.7</span><div class="bt"><i style="width:30.2%"></i></div><b>30.2%</b></div>
+      <div data-reveal class="rv brow hot"><span class="bk">AI · 2026.9</span><div class="bt"><i style="width:62.7%"></i></div><b>62.7%</b></div>
     </div>
     <p class="src">ARC Prize · ARC-AGI-3(2026.3 공개) · 2026.9는 ARC 표준 평가 기준(GPT-6 Astra) · 보도 기준 · 집계처마다 숫자 차이 있음</p>
   </div>
@@ -2283,15 +2326,16 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> Why Now의 답</span>
     <h2 class="subhead">AI를 쓰는 사람과 안 쓰는 사람, <span class="accent">6시간에서 1주로</span> 벌어지는 중입니다</h2>
-    <div class="gap6"><div class="nowline"><em>지금 · 2026.10</em></div><div class="proof"><span class="pb">!</span><div><b>실화입니다</b><p>강의안 86장, 보통 <s>최소 1주일</s> → 이번엔 <em>2일</em></p></div></div>
-      <div class="g"><div class="gb"><i style="height:16%"></i></div><b>30초</b><span>2023년 초</span></div>
-      <div class="g"><div class="gb"><i style="height:38%"></i></div><b>45분</b><span>2025년</span></div>
-      <div class="g"><div class="gb"><i style="height:48%"></i></div><b>6시간</b><span>2026년 초</span></div>
-      <div class="g fut"><div class="gb"><i style="height:64%"></i></div><b>1주</b><span>2026년 말 · 예측</span></div>
-      <div class="g fut"><div class="gb"><i style="height:86%"></i></div><b>2년</b><span>2028년 말 · 예측</span></div>
-      <div class="g fut"><div class="gb"><i style="height:100%"></i></div><b>커리어 전체</b><span>2030년 말 · 예측</span></div>
+    <div class="gap6"><div class="rv nowline"><em>지금 · 2026.10</em></div><div class="rv proof"><span class="pb">!</span><div><b>실화입니다</b><p>강의안 86장, 보통 <s>최소 1주일</s> → 이번엔 <em>2일</em></p></div></div>
+      <div data-reveal class="rv g"><div class="gb"><i style="height:16%"></i></div><b>30초</b><span>2023년 초</span></div>
+      <div data-reveal class="rv g"><div class="gb"><i style="height:38%"></i></div><b>45분</b><span>2025년</span></div>
+      <div data-reveal data-also=".gap6 .proof,.gap6 .nowline" class="rv g"><div class="gb"><i style="height:48%"></i></div><b>6시간</b><span>2026년 초</span></div>
+      <div class="rv g fut"><div class="gb"><i style="height:64%"></i></div><b>1주</b><span>2026년 말 · 예측</span></div>
+      <div class="rv g fut"><div class="gb"><i style="height:86%"></i></div><b>2년</b><span>2028년 말 · 예측</span></div>
+      <div class="rv g fut"><div class="gb"><i style="height:100%"></i></div><b>커리어 전체</b><span>2030년 말 · 예측</span></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>아직은 <b>6시간 남짓</b>, 따라잡을 수 있는 차이입니다. 1주, 2년으로 벌어지기 전에, <b>지금 우리도 AI를 쓰기 시작해야 합니다.</b> <b class="start-now">START NOW</b></p></div>
+    <div class="rv callout tip"><span class="bang">!</span><p>아직은 <b>6시간 남짓</b>, 따라잡을 수 있는 차이입니다. 1주, 2년으로 벌어지기 전에, <b>지금 우리도 AI를 쓰기 시작해야 합니다.</b> <b class="start-now">START NOW</b></p></div>
+    <i class="rmark futgo" data-reveal data-also=".gap6 .g.fut,.callout.rv" aria-hidden="true"></i>
     <p class="src">AI 사용 여부에 따른 격차: 강연 자료 인용(METR 'AI가 혼자 해내는 일의 길이' 측정 기반) · 2026년 말 이후는 예측 · 막대는 로그 눈금</p>
   </div>
 </section>
@@ -2326,11 +2370,11 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
     <span class="eyebrow"><span class="dot"></span> 트렌드의 변화</span>
     <h2 class="subhead">질문을 잘 쓰는 시대에서, <span class="accent">일할 환경을 만드는</span> 시대로</h2>
     <div class="b-trend">
-      <div class="tr"><span class="y">2023</span><b>프롬프트<br>엔지니어링</b><p>질문 문장을 <b>잘 쓰는 요령</b></p><small>'프롬프트 엔지니어' 연봉 최대 33.5만 달러 채용 공고가 화제</small></div>
-      <i class="ar">→</i>
-      <div class="tr"><span class="y">2025.6</span><b>컨텍스트<br>엔지니어링</b><p>질문 한 줄보다 AI가 보는 <b>자료 전체</b>를 잘 채우기</p><small>쇼피파이 CEO 뤼트케 제안 · 카파시 동의</small></div>
-      <i class="ar">→</i>
-      <div class="tr hot"><span class="y">2026.2</span><b>하네스<br>엔지니어링</b><p>AI가 일할 <b>환경 전체</b>를 깔아 두기</p><small>OpenAI "사람은 방향을 잡고, 에이전트가 실행한다"</small></div>
+      <div data-reveal class="rv tr"><span class="y">2023</span><b>프롬프트<br>엔지니어링</b><p>질문 문장을 <b>잘 쓰는 요령</b></p><small>'프롬프트 엔지니어' 연봉 최대 33.5만 달러 채용 공고가 화제</small></div>
+      <i class="rv ar">→</i>
+      <div data-also=".b-trend>i.ar:nth-of-type(1)" data-reveal class="rv tr"><span class="y">2025.6</span><b>컨텍스트<br>엔지니어링</b><p>질문 한 줄보다 AI가 보는 <b>자료 전체</b>를 잘 채우기</p><small>쇼피파이 CEO 뤼트케 제안 · 카파시 동의</small></div>
+      <i class="rv ar">→</i>
+      <div data-also=".b-trend>i.ar:nth-of-type(2)" data-reveal class="rv tr hot"><span class="y">2026.2</span><b>하네스<br>엔지니어링</b><p>AI가 일할 <b>환경 전체</b>를 깔아 두기</p><small>OpenAI "사람은 방향을 잡고, 에이전트가 실행한다"</small></div>
     </div>
     <p class="src">Fortune · Bloomberg(2023.3) · The Decoder(2025.6) · Anthropic(2025.9) · Mitchell Hashimoto(2026.2.5) · OpenAI 'Harness engineering'(2026.2.11)</p>
   </div>
@@ -2360,13 +2404,13 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
     <span class="eyebrow"><span class="dot"></span> 1부 지도</span>
     <h2 class="subhead">마구도 결국 <span class="accent">프롬프트</span>로 만듭니다</h2>
     <div class="b-map">
-      <div class="mp"><span class="n">CHAPTER 1</span><b>프롬프트</b><p><em>입력</em> · 어떻게 시킬까</p></div>
-      <i class="ar">→</i>
-      <div class="mp"><span class="n">CHAPTER 2</span><b>메모라이징 · 스킬</b><p><em>산출</em> · 결과물을 어떻게 좋게</p></div>
-      <i class="ar">→</i>
-      <div class="mp"><span class="n">CHAPTER 3</span><b>자동화 환경</b><p><em>묶기</em> · 버튼 하나로 돌아가게</p></div>
+      <div data-reveal class="rv mp"><span class="n">CHAPTER 1</span><b>프롬프트</b><p><em>입력</em> · 어떻게 시킬까</p></div>
+      <i class="rv ar">→</i>
+      <div data-also=".b-map>i.ar:nth-of-type(1)" data-reveal class="rv mp"><span class="n">CHAPTER 2</span><b>메모라이징 · 스킬</b><p><em>산출</em> · 결과물을 어떻게 좋게</p></div>
+      <i class="rv ar">→</i>
+      <div data-also=".b-map>i.ar:nth-of-type(2),.callout.rv" data-reveal class="rv mp"><span class="n">CHAPTER 3</span><b>자동화 환경</b><p><em>묶기</em> · 버튼 하나로 돌아가게</p></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>그래서 오늘은 <b>프롬프트부터</b> 시작합니다.</p></div>
+    <div class="rv callout tip"><span class="bang">!</span><p>그래서 오늘은 <b>프롬프트부터</b> 시작합니다.</p></div>
   </div>
 </section>
 
@@ -2387,11 +2431,11 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
     <h2 class="subhead">프롬프트는 AI에게 주는 <span class="accent">말과 자료 전부</span>입니다</h2>
     <p class="desc">AI는 많이 나온 답을 뽑는다고 했죠. 조건 없이 물으면 <b>모든 사람의 평균 답</b>에서 뽑고, 내 조건을 넣을수록 뽑는 범위가 <b>내 상황</b>으로 좁혀집니다.</p>
     <div class="b-funnel">
-      <div class="fl" style="--w:100%"><b>조건 없음</b><span>세상 모든 사람의 평균 답</span></div>
-      <div class="fl" style="--w:82%"><b>+ 목적</b><span>무엇을, 누구에게</span></div>
-      <div class="fl" style="--w:64%"><b>+ 상황 · 자료</b><span>지금 무슨 일이 있는지, 붙여 넣은 자료</span></div>
-      <div class="fl" style="--w:46%"><b>+ 기준 · 형식</b><span>지켜야 할 규칙, 원하는 모양</span></div>
-      <div class="fl hot" style="--w:30%"><b>내 답</b></div>
+      <div data-reveal class="rv fl" style="--w:100%"><b>조건 없음</b><span>세상 모든 사람의 평균 답</span></div>
+      <div data-reveal class="rv fl" style="--w:82%"><b>+ 목적</b><span>무엇을, 누구에게</span></div>
+      <div data-reveal class="rv fl" style="--w:64%"><b>+ 상황 · 자료</b><span>지금 무슨 일이 있는지, 붙여 넣은 자료</span></div>
+      <div data-reveal class="rv fl" style="--w:46%"><b>+ 기준 · 형식</b><span>지켜야 할 규칙, 원하는 모양</span></div>
+      <div data-reveal class="rv fl hot" style="--w:30%"><b>내 답</b></div>
     </div>
   </div>
 </section>
@@ -2411,6 +2455,7 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
 
 <section class="slide wide" data-accent="teal" data-title="대화법 ① 컨텍스트 · 인수인계서"
   data-notes="[대화법 ① · 3분] 컨텍스트 = 인수인계서. 신입에게 '이거 해 와'가 아니라 인수인계서를 주듯, AI가 볼 자료 전체를 설계한다. 6칸. 예전 5요소(역할 · 상황 · 할 일 · 형식 · 예시)와 다른 점은 재료와 기준. 이 두 칸이 컨텍스트 엔지니어링의 핵심.
+아래 점선 상자: 7장 원리(4막 컨텍스트 윈도우)와 연결. '대화가 길어지면 중간부터 흐려지거나 잘릴 수 있다고 했죠. 그래서 첫 메시지, 인수인계서에 필요한 걸 다 담는 게 제일 중요합니다.'
 보안: 재료를 넣을 때 이름 · 차량번호 · 연락처 · 계좌는 가리고 넣는다. 회사 보안 정책이 먼저.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 대화법 ① · 컨텍스트</span>
@@ -2424,6 +2469,7 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
       <div class="c"><span class="n">5 · 형식</span><b>원하는 모양</b><p>문자 500자 이내, 존댓말, 기호 없이</p></div>
       <div class="c"><span class="n">6 · 예시</span><b>이런 느낌으로</b><p>지난번 잘 나간 회신 문자 붙이기</p></div>
     </div>
+    <div class="ctxnote"><span class="cwm" aria-hidden="true"><i class="f"></i><i></i><i class="m"></i><i class="m"></i><i class="m"></i><i></i><i></i></span><p><b>AI 원리</b>에서 봤듯, 대화가 길어지면 <b>중간 내용부터 흐려지거나 잘릴</b> 수 있습니다. 그래서 <b>첫 메시지(인수인계서)</b>가 가장 중요합니다.</p></div>
     <div class="callout tip"><span class="bang">!</span><p>핵심은 <b>재료와 기준</b>입니다. 질문을 잘 쓰는 것보다, 무엇을 같이 넣느냐가 결과를 바꿉니다.</p></div>
   </div>
 </section>
@@ -2438,7 +2484,7 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
         <div class="prompt">민원 답변 써줘</div>
         <div class="out"><span class="lab">결과</span>고객님, 불편을 드려 대단히 죄송합니다. 고객님의 소중한 의견을 바탕으로 더 나은 서비스를 제공하기 위해 노력하겠습니다. 빠른 시일 내에 처리될 수 있도록 최선을 다하겠습니다…</div>
       </div>
-      <div class="side good">
+      <div data-reveal class="rv side good">
         <span class="k">6칸으로 시키면</span>
         <div class="prompt"><span class="tag5">목적</span>수리비 지연 민원 고객에게 보낼 회신 문자. <span class="tag5">상황</span>10.9 견적 접수, 부품 단가 확인 필요해 10.14 공업사에 요청. <span class="tag5">재료</span>(민원 원문 붙임) <span class="tag5">기준</span>책임 인정 표현 금지, 지급일은 확정하지 말고 '예정'. <span class="tag5">형식</span>문자 500자 이내, 존댓말, 기호 없이.</div>
         <div class="out"><span class="lab">결과</span>김○○ 고객님, 수리비 안내가 늦어져 답답하셨을 것 같습니다.<br>10월 9일 받은 견적 중 부품 단가 확인이 필요한 항목이 있어, 10월 14일 공업사에 확인을 요청해 둔 상태입니다.<br>회신이 오는 대로 바로 지급 절차를 진행할 예정이며, 10월 21일(수)까지 진행 상황을 다시 연락드리겠습니다.</div>
@@ -2455,9 +2501,9 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
     <div class="b-free">
       <div class="chat">
         <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>다음 주 팀 회의 때 낼 업무 개선 아이디어, 같이 생각해 보자.</div></div>
-        <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>몇 가지 방향을 제안해 볼게요. ① 서류 체크리스트 통일 ② 자주 쓰는 안내 문자 모음 ③ 주간 보고 양식 간소화 …</div></div>
-        <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>2번 좋네. 근데 우리는 현장 출동이 많아서 <b>폰에서 바로 꺼내 쓰는 게</b> 중요해.</div></div>
-        <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>그럼 상황별로 짧게 나눠, 폰 메모에 붙여 넣기 좋게 다시 정리할게요 …</div></div>
+        <div data-reveal class="rv turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>몇 가지 방향을 제안해 볼게요. ① 서류 체크리스트 통일 ② 자주 쓰는 안내 문자 모음 ③ 주간 보고 양식 간소화 …</div></div>
+        <div data-reveal class="rv turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>2번 좋네. 근데 우리는 현장 출동이 많아서 <b>폰에서 바로 꺼내 쓰는 게</b> 중요해.</div></div>
+        <div data-reveal class="rv turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>그럼 상황별로 짧게 나눠, 폰 메모에 붙여 넣기 좋게 다시 정리할게요 …</div></div>
       </div>
       <ul class="ftips">
         <li><b>처음엔 대충</b><span>완벽한 질문을 고민하지 말고 일단 던지기</span></li>
@@ -2514,29 +2560,30 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
 [면책 판단] 자차손해에서 주정차 중 타이어·튜브에만 생긴 손해는 원칙 면책(다른 차와 충돌,
 화재·산사태, 가해자 확정 사고 등은 보상 대상 예외)
 [업무처리] 기본옵션과 다른 타이어·휠 장착 시 부속품 담보 기재여부 확인. 제원(단면폭/</pre></div>
-      <div class="lpstat">
+      <div class="rv lpstat">
         <div><b data-dur="2300">27,870<small>자</small></b><span>프롬프트 하나의 길이</span></div>
         <div><b data-dur="2300">770<small>줄</small></b><span>공통 블록 6 · 개별 3 · 참고자료 14</span></div>
         <div><b>v3</b><span>고치고 또 고친 세 번째 판</span></div>
         <p class="lpno">사람이 처음부터<br>한 번에 쓰기는 <b>불가능</b></p>
       </div>
     </div>
+    <i class="rmark lpgo" data-reveal data-also=".lpstat" aria-hidden="true"></i>
     <div class="callout tip"><span class="bang">!</span><p>사람 머리로 단순하게 짠 프롬프트로는 결과물도 거기서 멈춥니다. <b>자유대화로 키우고, 컨텍스트로 굳힌다.</b> 그래서 둘 다 써야 합니다.</p></div>
     <p class="src">실제 업무 도구 프롬프트(자동차 손해사정 AI 도구 · 개정안 v3) 앞·뒷부분 발췌</p>
   </div>
 </section>
 
 <!-- ===== 챕터 1 · 응용 ===== -->
-<section class="slide wide" data-accent="teal" data-title="응용 · 자유대화의 두 벽"
-  data-notes="[응용 시작 · 1분] 자유대화가 결국 좋은 프롬프트를 만든다. 그런데 두 가지 벽. 전문가는 뭘 물어야 할지 알아서 자유대화가 편하지만, 처음 쓰는 분은 뭘 말해야 할지부터 막힌다. 그리고 깨지고 고치는 만큼 시간이 든다. 그래서 초보자도 자유대화의 효과를 빠르게 얻는 세 가지.">
+<section class="slide wide" data-accent="teal" data-title="응용 · 프롬프트의 두 벽"
+  data-notes="[응용 시작 · 1분 · 클릭마다 벽 ① → 벽 ② → 해법] '프롬프트를 잘 쓰라는 건 알겠는데…' 막상 잘 쓰려면 두 가지 벽. 전문가는 뭘 물어야 할지 알아서 자유대화가 편하지만, 처음 쓰는 분은 뭘 말해야 할지부터 막힌다. 그리고 깨지고 고치는 만큼 시간이 든다. 그래서 초보자도 자유대화의 효과를 빠르게 얻는 세 가지.">
   <div class="slide-inner">
     <span class="eyebrow"><span class="dot"></span> 프롬프트 응용</span>
-    <h2 class="subhead">자유대화가 답인 건 알겠는데…</h2>
+    <h2 class="subhead">프롬프트를 잘 쓰라는 건 알겠는데…</h2>
     <div class="b-walls">
-      <div class="w"><span class="n">벽 ①</span><b>어렵다</b><p>뭘 말해야 할지 모르겠다<br><small>특히 처음 쓰는 분</small></p></div>
-      <div class="w"><span class="n">벽 ②</span><b>오래 걸린다</b><p>깨지고 고치는 만큼 시간이 든다<br><small>전문가도 마찬가지</small></p></div>
+      <div data-reveal class="rv w"><span class="n">벽 ①</span><b>어렵다</b><p>뭘 말해야 할지 모르겠다<br><small>특히 처음 쓰는 분</small></p></div>
+      <div data-reveal class="rv w"><span class="n">벽 ②</span><b>오래 걸린다</b><p>깨지고 고치는 만큼 시간이 든다<br><small>전문가도 마찬가지</small></p></div>
     </div>
-    <div class="b-fix"><span>그래서, 초보자도 빠르게</span><b>① 역질문</b><b>② 벤치마킹</b><b>③ 굳히기</b></div>
+    <div data-reveal class="rv b-fix"><span>그래서, 초보자도 빠르게</span><b>① 역질문</b><b>② 벤치마킹</b><b>③ 굳히기</b></div>
   </div>
 </section>
 
@@ -2550,11 +2597,11 @@ Meta LLaMA 2023.2.24 · Llama 2 2023.7.18 · Llama 3 2024.4.18 · Llama 3.1 2024
     <h2 class="subhead">대화의 핸들을 <span class="accent">AI에게</span> 넘기세요: 역질문</h2>
     <div class="chat">
       <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>수리비 지연 민원 회신 문자를 쓰려고 해. <b>바로 쓰지 말고, 필요한 걸 한 번에 하나씩 물어봐. 충분하면 질문을 멈추고 써 줘.</b></div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>첫 번째 질문입니다. 지급이 늦어진 원인은 무엇인가요? (서류 · 공업사 · 내부 확인 중)</div></div>
-      <div class="turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>공업사 견적에 단가 확인이 필요한 부품이 있어.</div></div>
-      <div class="turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>두 번째 질문입니다. 고객에게 다음 연락 시점을 약속할 수 있나요? … <b>(질문 4개 뒤)</b> 이제 충분합니다. 회신 문안을 쓰겠습니다.</div></div>
+      <div data-reveal class="rv turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>첫 번째 질문입니다. 지급이 늦어진 원인은 무엇인가요? (서류 · 공업사 · 내부 확인 중)</div></div>
+      <div data-reveal class="rv turn me"><div class="avatar">나</div><div class="bubble"><span class="who">나</span>공업사 견적에 단가 확인이 필요한 부품이 있어.</div></div>
+      <div data-also=".callout.rv" data-reveal class="rv turn ai"><div class="avatar">AI</div><div class="bubble"><span class="who">AI</span>두 번째 질문입니다. 고객에게 다음 연락 시점을 약속할 수 있나요? … <b>(질문 4개 뒤)</b> 이제 충분합니다. 회신 문안을 쓰겠습니다.</div></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>나는 <b>답만</b> 하면 됩니다. 말할 건 세 가지: <b>목표 · 한 번에 하나씩 · 언제 멈출지</b>.</p></div>
+    <div class="rv callout tip"><span class="bang">!</span><p>나는 <b>답만</b> 하면 됩니다. 말할 건 세 가지: <b>목표 · 한 번에 하나씩 · 언제 멈출지</b>.</p></div>
     <p class="src">White 외, "A Prompt Pattern Catalog to Enhance Prompt Engineering with ChatGPT"(2023) · Flipped Interaction 패턴</p>
   </div>
 </section>
@@ -2583,11 +2630,11 @@ AI에게 다듬게 하기: Gemini에서 젬(Gem)을 만들 때 지침 칸 아래
     <span class="eyebrow"><span class="dot"></span> 응용 ③ · 매번 다시 하지 않게</span>
     <h2 class="subhead">잘 된 대화는 <span class="accent">굳혀</span> 두세요</h2>
     <div class="flow" style="--n:3">
-      <div class="step"><span class="n">01</span><h3>대화로 한 번</h3><p>역질문 · 벤치마킹으로 마음에 드는 결과가 나올 때까지</p></div>
-      <div class="step hot"><span class="n">02</span><h3>요청문으로 정리</h3><p>"다음엔 한 번에 이 결과가 나오게, 지금까지 대화를 <b>요청문 하나로</b> 정리해 줘"</p></div>
-      <div class="step"><span class="n">03</span><h3>AI가 다듬기</h3><p>Gemini 젬 만들기의 <b>'Gemini로 지침 다시 쓰기'</b> 버튼 · 무료 요금제도 가능</p></div>
+      <div data-reveal class="rv step"><span class="n">01</span><h3>대화로 한 번</h3><p>역질문 · 벤치마킹으로 마음에 드는 결과가 나올 때까지</p></div>
+      <div data-reveal class="rv step hot"><span class="n">02</span><h3>요청문으로 정리</h3><p>"다음엔 한 번에 이 결과가 나오게, 지금까지 대화를 <b>요청문 하나로</b> 정리해 줘"</p></div>
+      <div data-also=".callout.rv" data-reveal class="rv step"><span class="n">03</span><h3>AI가 다듬기</h3><p>Gemini 젬 만들기의 <b>'Gemini로 지침 다시 쓰기'</b> 버튼 · 무료 요금제도 가능</p></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>이렇게 굳힌 요청문을 파일로 저장해 두면, 그게 바로 <b>스킬</b>입니다. (챕터 2)</p></div>
+    <div class="rv callout tip"><span class="bang">!</span><p>이렇게 굳힌 요청문을 파일로 저장해 두면, 그게 바로 <b>스킬</b>입니다. (챕터 2)</p></div>
     <p class="src">Google 도움말 'Gems 시작하기' · OpenAI 'GPT-5 prompting guide'(메타프롬프팅)</p>
   </div>
 </section>
@@ -2921,10 +2968,10 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
     <span class="eyebrow"><span class="dot"></span> 오늘 만들 것</span>
     <h2 class="subhead">4단계면 <span class="accent">내 작업장</span>이 완성됩니다</h2>
     <div class="s3map">
-      <div class="s3"><span class="n">STEP 1</span><b>프로젝트 만들기</b><p>이름: 분쟁심의답변서생성기</p></div>
-      <div class="s3"><span class="n">STEP 2</span><b>자기소개 · 지침</b><p>환경설정만 가볍게</p></div>
-      <div class="s3"><span class="n">STEP 3</span><b>자료 저장</b><p>기준 · 양식 · 잘 쓴 예시</p></div>
-      <div class="s3 hot"><span class="n">STEP 4</span><b>스킬 만들기</b><p>업무 규칙은 여기에 · "분심 답변서 만들어줘"</p></div>
+      <div data-reveal class="rv s3"><span class="n">STEP 1</span><b>프로젝트 만들기</b><p>이름: 분쟁심의답변서생성기</p></div>
+      <div data-reveal class="rv s3"><span class="n">STEP 2</span><b>자기소개 · 지침</b><p>환경설정만 가볍게</p></div>
+      <div data-reveal class="rv s3"><span class="n">STEP 3</span><b>자료 저장</b><p>기준 · 양식 · 잘 쓴 예시</p></div>
+      <div data-reveal class="rv s3 hot"><span class="n">STEP 4</span><b>스킬 만들기</b><p>업무 규칙은 여기에 · "분심 답변서 만들어줘"</p></div>
     </div>
     <div class="s3need"><b>준비물</b><span>로그인한 AI 계정</span><span>자료 파일 1~2개 (개인정보 없는 것)</span><span>옆 사람</span></div>
   </div>
@@ -3055,12 +3102,12 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
     <span class="eyebrow"><span class="dot"></span> 완성 체크</span>
     <h2 class="subhead">네 칸 다 채웠으면, <span class="accent">작업장 완성</span>입니다</h2>
     <div class="s3done">
-      <div><i>✓</i><b>프로젝트</b><span>분쟁심의답변서생성기</span></div>
-      <div><i>✓</i><b>지침</b><span>환경설정 · 가볍게</span></div>
-      <div><i>✓</i><b>자료</b><span>기준 · 예시 · 조문</span></div>
-      <div><i>✓</i><b>스킬</b><span>업무 규칙까지 · "분심 답변서 만들어줘"</span></div>
+      <div data-reveal class="rv"><i>✓</i><b>프로젝트</b><span>분쟁심의답변서생성기</span></div>
+      <div data-reveal class="rv"><i>✓</i><b>지침</b><span>환경설정 · 가볍게</span></div>
+      <div data-reveal class="rv"><i>✓</i><b>자료</b><span>기준 · 예시 · 조문</span></div>
+      <div data-also=".callout.rv" data-reveal class="rv"><i>✓</i><b>스킬</b><span>업무 규칙까지 · "분심 답변서 만들어줘"</span></div>
     </div>
-    <div class="callout tip"><span class="bang">!</span><p>오늘부터는 <b>쓰면서 레벨업</b>. 틀린 곳이 나오면 스킬에 한 줄씩 반영하면 됩니다.</p></div>
+    <div class="rv callout tip"><span class="bang">!</span><p>오늘부터는 <b>쓰면서 레벨업</b>. 틀린 곳이 나오면 스킬에 한 줄씩 반영하면 됩니다.</p></div>
   </div>
 </section>
 
@@ -3097,9 +3144,9 @@ Claude 스킬: 모든 요금제, 설정에서 '코드 실행 및 파일 생성' 
     <h2 class="subhead">세상은 이미 <span class="accent">말로</span> 만들고 있습니다</h2>
     <div class="vstat">
       <div class="vs-chart"><span class="k">구글 새 코드 중 AI가 만든 비율</span>
-        <div class="vb"><i style="height:25%"></i><b>25%</b><span>2024.10</span></div>
-        <div class="vb"><i style="height:50%"></i><b>50%</b><span>2025 가을</span></div>
-        <div class="vb hot"><i style="height:75%"></i><b>75%</b><span>2026.4</span></div>
+        <div data-reveal class="rv vb"><i style="height:25%"></i><b>25%</b><span>2024.10</span></div>
+        <div data-reveal class="rv vb"><i style="height:50%"></i><b>50%</b><span>2025 가을</span></div>
+        <div data-reveal class="rv vb hot"><i style="height:75%"></i><b>75%</b><span>2026.4</span></div>
       </div>
       <div class="vs-cards">
         <div><b>4곳 중 1곳</b><span>실리콘밸리 스타트업이 코드의 <em>95%</em>를 AI로 작성 (와이콤비네이터, 2025.3)</span></div>
@@ -3483,12 +3530,12 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
     <h2 class="subhead">이것만은 <span class="accent">꼭</span> 지킵니다</h2>
     <p class="desc">AI에 입력한 내용은 서비스 회사의 서버로 갑니다. 개인 요금제는 설정에 따라 AI 학습에 쓰일 수도 있습니다. 편리함보다 먼저 챙겨야 할 네 가지입니다.</p>
     <ul class="list num-list">
-      <li><span class="mk"></span><span>설정에서 <b>"모델 학습에 내 대화 사용" 끄기</b></span></li>
-      <li><span class="mk"></span><span>민감한 건 <b>임시 채팅</b>으로 (기록 · 메모리에 안 남음)</span></li>
-      <li><span class="mk"></span><span>고객 이름 · 주민번호 · 연락처 · 차량번호는 <b>넣지 않거나 가리기</b></span></li>
-      <li><span class="mk"></span><span>AI 결과를 <b>그대로 고객에게 보내지 않기</b></span></li>
+      <li data-reveal class="rv"><span class="mk"></span><span>설정에서 <b>"모델 학습에 내 대화 사용" 끄기</b></span></li>
+      <li data-reveal class="rv"><span class="mk"></span><span>민감한 건 <b>임시 채팅</b>으로 (기록 · 메모리에 안 남음)</span></li>
+      <li data-reveal class="rv"><span class="mk"></span><span>고객 이름 · 주민번호 · 연락처 · 차량번호는 <b>넣지 않거나 가리기</b></span></li>
+      <li data-also=".callout.rv" data-reveal class="rv"><span class="mk"></span><span>AI 결과를 <b>그대로 고객에게 보내지 않기</b></span></li>
     </ul>
-    <div class="callout warn"><span class="bang">!</span><p><b>회사 보안 정책</b>이 언제나 먼저입니다.</p></div>
+    <div class="rv callout warn"><span class="bang">!</span><p><b>회사 보안 정책</b>이 언제나 먼저입니다.</p></div>
   </div>
 </section>
 
@@ -3591,7 +3638,10 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
     var h=inner.scrollHeight; sl.classList.remove('m-off'); if(h>avail+2) inner.style.zoom=Math.max(.68,(avail/h)).toFixed(3); }
   window.addEventListener('resize',function(){ fitSlide(slides[i]); });
   function go(n){ i=Math.max(0,Math.min(total-1,n)); render(); }
-  function next(){ if(window.__deckHook&&window.__deckHook(slides[i],1)) return; var r=slides[i].querySelector('[data-reveal]:not(.shown)'); if(r){ r.classList.add('shown'); return; } go(i+1); } function prev(){ if(window.__deckHook&&window.__deckHook(slides[i],-1)) return; go(i-1); }
+  function next(){ if(window.__deckHook&&window.__deckHook(slides[i],1)) return; window.__deckDir=1; var r=slides[i].querySelector('[data-reveal]:not(.shown)'); if(r){ r.classList.add('shown'); return; } go(i+1); }
+  function prev(){ if(window.__deckHook&&window.__deckHook(slides[i],-1)) return;
+    var sh=slides[i].querySelectorAll('[data-reveal].shown'); if(sh.length){ sh[sh.length-1].classList.remove('shown'); return; }
+    if(i===0) return; window.__deckDir=-1; go(i-1); slides[i].querySelectorAll('[data-reveal]').forEach(function(r){ r.classList.add('shown'); }); }
   document.getElementById('btnNext').onclick=next;
   document.getElementById('btnPrev').onclick=prev;
   document.getElementById('btnOverview').onclick=toggleOverview;
@@ -3632,6 +3682,10 @@ QR 주소는 오늘 날짜 방(같은 날 들어온 사람끼리 공유). 실제
   });
   var x0=null;
   document.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; },{passive:true});
+  // 화면 클릭 = 다음 (버튼 · 입력칸 · 영상 · 펜 도구일 때는 제외)
+  document.getElementById('deck').addEventListener('click',function(e){ if(tool||e.button) return;
+    if(e.target.closest('a,button,input,select,textarea,label,video,iframe,summary,[contenteditable],.mtl .pt,.noclick')) return;
+    try{ if(String(window.getSelection())) return; }catch(x){} next(); });
   document.addEventListener('touchend',function(e){ if(x0===null||tool) return;
     var dx=e.changedTouches[0].clientX-x0; if(Math.abs(dx)>70){ dx<0?next():prev(); } x0=null; },{passive:true});
   function fromHash(){ var n=parseInt((location.hash||'').replace('#',''),10); if(!isNaN(n)&&n>=1&&n<=total) i=n-1; }
@@ -6522,8 +6576,8 @@ var qrcode = function() {
   for(var yr=2018;yr<=2027;yr++){ var gx=X(yr+'-01-01');
     h+='<line class="grid" x1="'+gx+'" y1="'+T+'" x2="'+gx+'" y2="'+BASE+'"/>';
     if(yr<2027){ var mid=gx+(X((yr+1)+'-01-01')-gx)/2, n=cnt[yr]||0, bh=n/cmax*BMAX;
-      if(n) h+='<rect class="bar" x="'+(mid-22)+'" y="'+(BASE-bh)+'" width="44" height="'+bh+'" rx="4"/>';
-      h+='<text class="bn" x="'+mid+'" y="'+(BASE-bh-7)+'" text-anchor="middle">'+n+(yr===2026?'<tspan class="bs">개 (1~10월)</tspan>':'')+'</text>';
+      h+='<rect class="bar" data-yr="'+yr+'" x="'+(mid-22)+'" y="'+(BASE-bh)+'" width="44" height="'+bh+'" rx="4"/>';
+      h+='<text class="bn" data-yr="'+yr+'" x="'+mid+'" y="'+(BASE-bh-7)+'" text-anchor="middle">'+n+(yr===2026?'<tspan class="bs">개 (1~10월)</tspan>':'')+'</text>';
       h+='<text class="yr" x="'+mid+'" y="'+(BASE+26)+'" text-anchor="middle">'+yr+'</text>'; } }
   h+='<line class="base" x1="'+L+'" y1="'+BASE+'" x2="'+R+'" y2="'+BASE+'"/><text class="ln sm" x="'+(L-16)+'" y="'+(BASE-14)+'" text-anchor="end">연도별 수</text>';
   LANES.forEach(function(l,k){ h+='<line class="lane" x1="'+L+'" y1="'+Y(k)+'" x2="'+R+'" y2="'+Y(k)+'"/>'+
@@ -6536,6 +6590,12 @@ var qrcode = function() {
     h+='</g>'; });
   h+='</svg><div class="tip" hidden></div>';
   box.innerHTML=h;
+  // 클릭하면 점이 날짜 순서대로 찍히게 (아래 '하나씩 열기 엔진'이 씀)
+  (function(){ var pts=[].slice.call(box.querySelectorAll('.pt')), order=[], plans=[];
+    D.forEach(function(d,n){ (d[5]?plans:order).push(n); }); order.sort(function(a,b){ return D[a][2]<D[b][2]?-1:D[a][2]>D[b][2]?1:0; });
+    function setYear(y,c){ var bh=c/cmax*BMAX, r=box.querySelector('.bar[data-yr="'+y+'"]'), t=box.querySelector('.bn[data-yr="'+y+'"]');
+      if(r){ r.setAttribute('y',BASE-bh); r.setAttribute('height',bh); } if(t){ t.setAttribute('y',BASE-bh-7); t.innerHTML=(c||(y==='2026'?'':''))+(y==='2026'&&c?'<tspan class="bs">개 (1~10월)</tspan>':''); if(!c) t.textContent=''; } }
+    box.__tl={D:D,pts:pts,order:order,plans:plans,cnt:cnt,years:Object.keys(cnt).concat(['2021']).filter(function(v,k,a){ return a.indexOf(v)===k; }),setYear:setYear,mark:[].slice.call(box.querySelectorAll('.mark,.mk'))}; })();
   var tip=box.querySelector('.tip');
   box.addEventListener('mouseover',function(e){ var g=e.target.closest('.pt'); if(!g){ tip.hidden=true; return; }
     var d=D[+g.getAttribute('data-n')], p=d[2].split('-');
@@ -6574,15 +6634,53 @@ var qrcode = function() {
 })();
 </script>
 <script>
-/* ===== 클릭하면 정답: [data-reveal] (→ 키도 먼저 정답부터 연다) ===== */
+/* ===== [data-reveal]: 클릭 · → 로 하나씩 열림, 장을 떠나면 처음 상태로 ===== */
 document.querySelectorAll('[data-reveal]').forEach(function(el){
   var sl=el.closest('.slide');
-  sl.addEventListener('click',function(e){ if(e.target.closest('a,button')) return; el.classList.add('shown'); });
   new MutationObserver(function(){ if(!sl.classList.contains('active')) el.classList.remove('shown'); }).observe(sl,{attributes:true,attributeFilter:['class']});
 });
 </script>
 
 
+<script>
+/* ===== 하나씩 열기 엔진: data-also 같이 열기 · 숫자 0부터 · 10장 연표 점 ===== */
+(function(){
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NUM='.big,.brow>b,.g>b,.vb>b,.lpstat b,.lp-rush b';
+  function origs(b){ if(b._nodes) return b._nodes; var w=document.createTreeWalker(b,NodeFilter.SHOW_TEXT), n, out=[], first=true;
+    while((n=w.nextNode())){ if(/\d/.test(n.nodeValue)){ out.push([n,(first&&b.dataset.cu)?b.dataset.cu.replace(/^([\d,.]+).*$/,'$1')+n.nodeValue.replace(/^[\d,.]+/,''):n.nodeValue]); first=false; } }
+    return (b._nodes=out); }
+  document.querySelectorAll('[data-reveal] :is('+NUM+'), [data-reveal]:is('+NUM+'), .rv :is('+NUM+')').forEach(origs);
+  function fmt(o,p){ return o.replace(/\d[\d,]*(?:\.\d+)?/g,function(m){ var dec=(m.split('.')[1]||'').length, v=parseFloat(m.replace(/,/g,''))*p; return m.indexOf(',')>=0?Math.round(v).toLocaleString('en-US'):v.toFixed(dec); }); }
+  function count(b){ var nodes=origs(b); if(!nodes.length) return; b._cu=(b._cu||0)+1; var run=(b._cr=(b._cr||0)+1), t0=null;
+    if(reduce){ nodes.forEach(function(x){ x[0].nodeValue=x[1]; }); return; }
+    function step(ts){ if(b._cr!==run) return; if(t0===null) t0=ts; var p=Math.min(1,(ts-t0)/900), e=1-Math.pow(1-p,3);
+      nodes.forEach(function(x){ x[0].nodeValue=p<1?fmt(x[1],e):x[1]; }); if(p<1) requestAnimationFrame(step); }
+    requestAnimationFrame(step); }
+  function countIn(el){ if(el.matches(NUM)) count(el); el.querySelectorAll(NUM).forEach(count); }
+  // 흐름 카드 안 작은 칸 순서
+  document.querySelectorAll('.ev.rv :is(.stones,.tiles,.probs)').forEach(function(g){ [].forEach.call(g.children,function(c,k){ c.style.setProperty('--n',k); }); });
+  document.querySelectorAll('[data-reveal]').forEach(function(el){ var sl=el.closest('.slide');
+    new MutationObserver(function(){ var on=el.classList.contains('shown'); if(on===!!el._on) return; el._on=on;
+      var also=el.getAttribute('data-also'), more=also?[].slice.call(sl.querySelectorAll(also)):[];
+      more.forEach(function(x){ x.classList.toggle('shown',on); });
+      if(on){ countIn(el); more.forEach(countIn); }
+      el.dispatchEvent(new CustomEvent(on?'reveal':'unreveal')); }).observe(el,{attributes:true,attributeFilter:['class']}); });
+  // 10장 연표
+  var box=document.getElementById('tl'), mk=document.querySelector('.rmark.tlgo');
+  if(box&&mk&&box.__tl){ var T=box.__tl, timers=[];
+    function clear(){ timers.forEach(clearTimeout); timers=[]; }
+    function reset(){ clear(); T.pts.forEach(function(p){ p.classList.add('hide'); p.classList.remove('planon'); }); T.years.forEach(function(y){ T.setYear(y,0); }); T.mark.forEach(function(m){ m.classList.add('hide'); }); }
+    function full(){ clear(); T.pts.forEach(function(p){ p.classList.remove('hide'); }); T.years.forEach(function(y){ T.setYear(y,T.cnt[y]||0); }); T.mark.forEach(function(m){ m.classList.remove('hide'); }); }
+    function play(){ reset(); var N=T.order.length, c={}, TOT=reduce?0:6600;
+      T.order.forEach(function(n,k){ timers.push(setTimeout(function(){ var p=T.pts[n], y=T.D[n][2].slice(0,4); p.classList.remove('hide'); c[y]=(c[y]||0)+1; T.setYear(y,c[y]);
+        if(T.D[n][1]==='ChatGPT') T.mark.forEach(function(m){ m.classList.remove('hide'); }); }, TOT*Math.sqrt(k/N))); });
+      timers.push(setTimeout(function(){ T.plans.forEach(function(n){ T.pts[n].classList.remove('hide'); T.pts[n].classList.add('planon'); }); }, TOT+500)); }
+    mk.addEventListener('reveal',function(){ if(window.__deckDir<0) full(); else play(); });
+    mk.addEventListener('unreveal',reset);
+    reset(); }
+})();
+</script>
 <script>
 /* ===== 장이 열리고 닫힐 때 (7장 원리 영상 · 9장 단계 초기화 · 팡 장) ===== */
 (function(){
@@ -6602,7 +6700,7 @@ document.querySelectorAll('[data-reveal]').forEach(function(el){
   }
   // 9장: 다시 들어오면 처음 단계부터
   var ord=document.querySelector('.mg-order');
-  if(ord) watch(ord,function(){ ord.querySelectorAll('.ostep').forEach(function(x){ x.classList.remove('shown'); }); });
+  if(ord) watch(ord,function(){ if(window.__deckDir<0) return; ord.querySelectorAll('.ostep').forEach(function(x){ x.classList.remove('shown'); }); });
   // 팡 장: 벌어지는 두 선
   var pc=document.getElementById('popcv');
   if(pc){ var ps=pc.closest('.slide'), ctx=pc.getContext('2d'), raf=0, t0=0;
