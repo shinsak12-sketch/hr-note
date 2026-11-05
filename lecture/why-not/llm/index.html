@@ -614,8 +614,11 @@ function prev(){const d=S[si];if(si===0&&k===0){tell({edge:-1});return}
 
 stage.addEventListener('click',next);
 addEventListener('keydown',e=>{
-  if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();next()}
-  else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();prev()}
+  let key=e.key;
+  if(!key||key==='Unidentified') key={34:'PageDown',33:'PageUp',39:'ArrowRight',37:'ArrowLeft',40:'ArrowDown',38:'ArrowUp',116:'F5',190:'.'}[e.keyCode]||key;
+  if(['ArrowRight','PageDown','ArrowDown',' ','Enter'].includes(key)){e.preventDefault();next()}
+  else if(['ArrowLeft','PageUp','ArrowUp','Backspace'].includes(key)){e.preventDefault();prev()}
+  else if(EMB&&!e.metaKey&&!e.ctrlKey&&!e.altKey){if(key==='F5')e.preventDefault();tell({key:key,shift:e.shiftKey})}
   else if(e.key==='f'||e.key==='F'){const el=document.documentElement;(document.fullscreenElement?document.exitFullscreen():el.requestFullscreen?.())?.catch?.(()=>{})}
   else if(e.key==='Home'){build(0,0,'enter')}
 });
